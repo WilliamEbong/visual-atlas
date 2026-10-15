@@ -310,6 +310,10 @@ class Worker:
             return self._plan()
         if self._added() >= target:
             return self._done(self._summary())
+        spent = (self._analysed() >= self._budget('max_analyses')
+                 or self._count('download') >= self._budget('max_downloads'))
+        if spent and not self._items("kind='candidate' AND state='downloaded'"):
+            return self._done(self._summary(exhausted=True))  # nothing more this job finds could still be analysed
         now_ = clock()
         for state, step in (('downloaded', self._analyze), ('eligible', self._download), ('found', self._permission)):
             item = self.store.one("SELECT * FROM job_items WHERE job_id=? AND kind='candidate' AND state=? AND "
@@ -324,10 +328,18 @@ class Worker:
         if query and self._count('search') < self._budget('max_searches') and candidates < self._budget('max_candidates'):
             self._search(query)
             return True
-        waiting = self.store.one("SELECT COUNT(*) AS n FROM job_items WHERE job_id=? AND state IN "
-                                 "('pending','found','eligible','downloaded') AND next_attempt_at>?",
-                                 (self.job['id'], now_))['n']
-        if waiting:
+        can_search = self._count('search') < self._budget('max_searches') and candidates < self._budget('max_candidates')
+        waiting = self.store.one(
+            "SELECT provider, MIN(next_attempt_at) AS until FROM job_items WHERE job_id=? AND next_attempt_at>? AND "
+            "(state IN ('found','eligible','downloaded') OR (kind='query' AND state='pending' AND ?)) "
+            "GROUP BY provider ORDER BY until LIMIT 1", (self.job['id'], now_, can_search))
+        if waiting:  # only steps a source asked us to delay remain: say so instead of a stale stage message
+            minutes = max(1, round((waiting['until'] - now_) / 60))
+            name = providers.NAMES.get(waiting['provider'], waiting['provider'])
+            message = (f'Waiting for {name}, which asked us to slow down: trying again in about {minutes} minute'
+                       f'{"s" if minutes != 1 else ""}. You can pause or cancel; images already added are kept.')
+            if self.job['message'] != message:
+                self._set(message=message)
             return None
         return self._done(self._summary(exhausted=True))
 
@@ -385,14 +397,14 @@ class Worker:
         if skipped:
             parts.append('Skipped ' + ', '.join(skipped) + '.')
         if exhausted and self._added() < target:
-            parts.append(self._stop_reason(rows))
+            parts.append(self._stop_reason())
         return ' '.join(parts)
 
-    def _stop_reason(self, rows: list[dict]) -> str:
+    def _stop_reason(self) -> str:
         """A budget running out is not the same as the collections having nothing more to offer."""
-        reasons = {row['reason'] for row in rows if row['state'] == 'skipped'}
-        for key, budget in (('analysis', 'max_analyses'), ('download', 'max_downloads')):
-            if f'{key} budget reached' in reasons:
+        for key, used, budget in (('analysis', self._analysed(), 'max_analyses'),
+                                  ('download', self._count('download'), 'max_downloads')):
+            if used >= self._budget(budget):
                 return f"Stopped at this job's {key} limit ({self._budget(budget)}); start another job to find more."
         pending = self._items("kind='query' AND state='pending'")
         if pending and self._count('search') >= self._budget('max_searches'):

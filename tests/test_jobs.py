@@ -157,7 +157,8 @@ def test_budgets_stop_the_job(home):
         assert store.one("SELECT COUNT(*) AS n FROM attempts WHERE kind='ai' AND job_id=? AND item_id IS NOT NULL",
                          (job_id,))['n'] <= 2  # the planning call is not an image analysis
         assert store.one("SELECT COUNT(*) AS n FROM images WHERE status='pending'")['n'] == 0  # nothing left unanalysed
-        assert store.one("SELECT COUNT(*) AS n FROM job_items WHERE reason='analysis budget reached'")['n'] >= 1
+        message = store.one('SELECT message FROM jobs WHERE id=?', (job_id,))['message']
+        assert "Stopped at this job's analysis limit (2)" in message  # not 'the searches ran out'
 
 
 def test_removed_images_are_never_collected_again(home):
@@ -378,3 +379,29 @@ def test_a_budget_stop_is_reported_as_a_budget_not_as_running_out(home):
     with jobs.open_store(home) as store:
         message = store.one('SELECT message FROM jobs WHERE id=?', (job_id,))['message']
     assert "Stopped at this job's analysis limit (1)" in message and 'ran out' not in message
+
+
+def test_a_spent_budget_ends_the_job_instead_of_waiting_for_a_slow_source(home, monkeypatch):
+    held = held_worker(home, monkeypatch)
+    job_id = held.job['id']
+    held.job = held.store.one('SELECT * FROM jobs WHERE id=?', (job_id,))
+    held.spec = {'target_new_images': 3, 'budgets': {'max_analyses': 1}}
+    item = held.store.one("SELECT id FROM job_items WHERE key='aic:1'")['id']
+    held.store.record_attempt({'job_id': job_id, 'item_id': item, 'kind': 'ai', 'backend': held.job['backend'],
+                               'status': 'ok'})
+    held.store.delay_provider(job_id, 'A', 'aic', 1_000_000 + 3000)  # a source asked for a long wait
+    held._discovery_step()
+    job = held.store.one('SELECT state, message FROM jobs WHERE id=?', (job_id,))
+    assert job['state'] == 'done' and "Stopped at this job's analysis limit (1)" in job['message']
+
+
+def test_waiting_only_for_a_slow_source_says_so(home, monkeypatch):
+    held = held_worker(home, monkeypatch)
+    job_id = held.job['id']
+    held.job = held.store.one('SELECT * FROM jobs WHERE id=?', (job_id,))
+    with held.store.transaction():
+        held.store.connection.execute("UPDATE job_items SET state='skipped' WHERE kind='candidate'")
+        held.store.connection.execute("UPDATE job_items SET next_attempt_at=? WHERE kind='query'", (1_000_000 + 600,))
+    assert held._discovery_step() is None
+    message = held.store.one('SELECT message FROM jobs WHERE id=?', (job_id,))['message']
+    assert message.startswith('Waiting for Art Institute of Chicago') and 'about 10 minutes' in message
