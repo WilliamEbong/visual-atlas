@@ -1,0 +1,453 @@
+{
+ "summary": {
+  "library_size": 85,
+  "records_within_prompt_budget": 40,
+  "briefs": 16,
+  "recall@10": {
+   "relevance": {
+    "k": 40,
+    "n": 80,
+    "rate": 0.5,
+    "ci95": [
+     0.39,
+     0.61
+    ]
+   },
+   "recency_baseline": {
+    "k": 9,
+    "n": 80,
+    "rate": 0.11,
+    "ci95": [
+     0.06,
+     0.2
+    ]
+   }
+  },
+  "recall@20": {
+   "relevance": {
+    "k": 54,
+    "n": 80,
+    "rate": 0.68,
+    "ci95": [
+     0.57,
+     0.77
+    ]
+   },
+   "recency_baseline": {
+    "k": 24,
+    "n": 80,
+    "rate": 0.3,
+    "ci95": [
+     0.21,
+     0.41
+    ]
+   }
+  },
+  "recall@40": {
+   "relevance": {
+    "k": 72,
+    "n": 80,
+    "rate": 0.9,
+    "ci95": [
+     0.81,
+     0.95
+    ]
+   },
+   "recency_baseline": {
+    "k": 43,
+    "n": 80,
+    "rate": 0.54,
+    "ci95": [
+     0.43,
+     0.64
+    ]
+   }
+  },
+  "coder_techniques": {
+   "precision": {
+    "k": 3,
+    "n": 4,
+    "rate": 0.75,
+    "ci95": [
+     0.3,
+     0.95
+    ]
+   },
+   "recall": {
+    "k": 3,
+    "n": 18,
+    "rate": 0.17,
+    "ci95": [
+     0.06,
+     0.39
+    ]
+   }
+  },
+  "coder_goals": {
+   "precision": {
+    "k": 3,
+    "n": 7,
+    "rate": 0.43,
+    "ci95": [
+     0.16,
+     0.75
+    ]
+   },
+   "recall": {
+    "k": 3,
+    "n": 10,
+    "rate": 0.3,
+    "ci95": [
+     0.11,
+     0.6
+    ]
+   }
+  }
+ },
+ "briefs": [
+  {
+   "id": 1,
+   "relevant": 5,
+   "coded_techniques": [],
+   "coded_goals": [
+    "create-calm"
+   ],
+   "subject_terms": [
+    "stargazing",
+    "night",
+    "lake",
+    "wondrous",
+    "inviting"
+   ],
+   "relevance@10": 1,
+   "recency@10": 0,
+   "relevance@20": 3,
+   "recency@20": 1,
+   "relevance@40": 3,
+   "recency@40": 3
+  },
+  {
+   "id": 2,
+   "relevant": 5,
+   "coded_techniques": [
+    "negative-space"
+   ],
+   "coded_goals": [],
+   "subject_terms": [
+    "book",
+    "loneliness",
+    "figure",
+    "huge"
+   ],
+   "relevance@10": 2,
+   "recency@10": 0,
+   "relevance@20": 2,
+   "recency@20": 2,
+   "relevance@40": 4,
+   "recency@40": 4
+  },
+  {
+   "id": 3,
+   "relevant": 6,
+   "coded_techniques": [
+    "silhouette"
+   ],
+   "coded_goals": [],
+   "subject_terms": [
+    "against",
+    "bright",
+    "evening",
+    "sky",
+    "summer",
+    "festival",
+    "flyer"
+   ],
+   "relevance@10": 6,
+   "recency@10": 0,
+   "relevance@20": 6,
+   "recency@20": 4,
+   "relevance@40": 6,
+   "recency@40": 6
+  },
+  {
+   "id": 4,
+   "relevant": 6,
+   "coded_techniques": [
+    "repetition-with-interruption"
+   ],
+   "coded_goals": [],
+   "subject_terms": [
+    "campaign",
+    "product",
+    "stand",
+    "row",
+    "identical",
+    "ones",
+    "spot"
+   ],
+   "relevance@10": 5,
+   "recency@10": 2,
+   "relevance@20": 5,
+   "recency@20": 6,
+   "relevance@40": 6,
+   "recency@40": 6
+  },
+  {
+   "id": 5,
+   "relevant": 7,
+   "coded_techniques": [],
+   "coded_goals": [
+    "build-depth",
+    "draw-attention"
+   ],
+   "subject_terms": [
+    "dramatic",
+    "theatre",
+    "shadow",
+    "source",
+    "light"
+   ],
+   "relevance@10": 2,
+   "recency@10": 1,
+   "relevance@20": 2,
+   "recency@20": 1,
+   "relevance@40": 7,
+   "recency@40": 1
+  },
+  {
+   "id": 6,
+   "relevant": 4,
+   "coded_techniques": [],
+   "coded_goals": [
+    "create-calm"
+   ],
+   "subject_terms": [
+    "annual",
+    "report",
+    "orderly",
+    "symmetrical",
+    "architecture"
+   ],
+   "relevance@10": 3,
+   "recency@10": 0,
+   "relevance@20": 3,
+   "recency@20": 0,
+   "relevance@40": 3,
+   "recency@40": 2
+  },
+  {
+   "id": 7,
+   "relevant": 7,
+   "coded_techniques": [],
+   "coded_goals": [],
+   "subject_terms": [
+    "children",
+    "book",
+    "spread",
+    "full",
+    "fantastic",
+    "creature",
+    "dreamlike",
+    "strangeness"
+   ],
+   "relevance@10": 3,
+   "recency@10": 0,
+   "relevance@20": 5,
+   "recency@20": 0,
+   "relevance@40": 6,
+   "recency@40": 0
+  },
+  {
+   "id": 8,
+   "relevant": 6,
+   "coded_techniques": [],
+   "coded_goals": [],
+   "subject_terms": [
+    "botanical",
+    "stationery",
+    "delicate",
+    "plant",
+    "blank",
+    "paper"
+   ],
+   "relevance@10": 2,
+   "recency@10": 0,
+   "relevance@20": 4,
+   "recency@20": 0,
+   "relevance@40": 6,
+   "recency@40": 6
+  },
+  {
+   "id": 9,
+   "relevant": 7,
+   "coded_techniques": [],
+   "coded_goals": [],
+   "subject_terms": [
+    "hero",
+    "strong",
+    "sense",
+    "depth",
+    "foreground",
+    "middle",
+    "ground",
+    "far"
+   ],
+   "relevance@10": 0,
+   "recency@10": 0,
+   "relevance@20": 4,
+   "recency@20": 1,
+   "relevance@40": 5,
+   "recency@40": 1
+  },
+  {
+   "id": 10,
+   "relevant": 5,
+   "coded_techniques": [
+    "rhythm-pattern"
+   ],
+   "coded_goals": [],
+   "subject_terms": [
+    "sitter",
+    "frame",
+    "mostly",
+    "profile"
+   ],
+   "relevance@10": 2,
+   "recency@10": 0,
+   "relevance@20": 3,
+   "recency@20": 0,
+   "relevance@40": 5,
+   "recency@40": 4
+  },
+  {
+   "id": 11,
+   "relevant": 4,
+   "coded_techniques": [],
+   "coded_goals": [
+    "make-an-idea-visible"
+   ],
+   "subject_terms": [
+    "bold",
+    "graphic",
+    "bright",
+    "clashing",
+    "colour",
+    "shape"
+   ],
+   "relevance@10": 1,
+   "recency@10": 3,
+   "relevance@20": 3,
+   "recency@20": 4,
+   "relevance@40": 4,
+   "recency@40": 4
+  },
+  {
+   "id": 12,
+   "relevant": 3,
+   "coded_techniques": [],
+   "coded_goals": [],
+   "subject_terms": [
+    "museum",
+    "exhibition",
+    "animal",
+    "display",
+    "gallery"
+   ],
+   "relevance@10": 2,
+   "recency@10": 0,
+   "relevance@20": 3,
+   "recency@20": 0,
+   "relevance@40": 3,
+   "recency@40": 1
+  },
+  {
+   "id": 13,
+   "relevant": 4,
+   "coded_techniques": [],
+   "coded_goals": [
+    "create-tension"
+   ],
+   "subject_terms": [
+    "satirical",
+    "newsletter",
+    "illustration",
+    "cartoon",
+    "scene",
+    "many",
+    "figure"
+   ],
+   "relevance@10": 2,
+   "recency@10": 3,
+   "relevance@20": 2,
+   "recency@20": 3,
+   "relevance@40": 4,
+   "recency@40": 3
+  },
+  {
+   "id": 14,
+   "relevant": 2,
+   "coded_techniques": [],
+   "coded_goals": [],
+   "subject_terms": [
+    "tech",
+    "conference",
+    "flyer",
+    "glowing",
+    "keyboard",
+    "modern",
+    "device",
+    "seen"
+   ],
+   "relevance@10": 2,
+   "recency@10": 0,
+   "relevance@20": 2,
+   "recency@20": 2,
+   "relevance@40": 2,
+   "recency@40": 2
+  },
+  {
+   "id": 15,
+   "relevant": 5,
+   "coded_techniques": [],
+   "coded_goals": [],
+   "subject_terms": [
+    "gothic",
+    "horror",
+    "novel",
+    "dark",
+    "unsettling",
+    "skull",
+    "devil"
+   ],
+   "relevance@10": 5,
+   "recency@10": 0,
+   "relevance@20": 5,
+   "recency@20": 0,
+   "relevance@40": 5,
+   "recency@40": 0
+  },
+  {
+   "id": 16,
+   "relevant": 4,
+   "coded_techniques": [],
+   "coded_goals": [
+    "create-calm"
+   ],
+   "subject_terms": [
+    "misty",
+    "morning",
+    "soft",
+    "pastel",
+    "colour",
+    "wellness",
+    "app"
+   ],
+   "relevance@10": 2,
+   "recency@10": 0,
+   "relevance@20": 2,
+   "recency@20": 0,
+   "relevance@40": 3,
+   "recency@40": 0
+  }
+ ]
+}
