@@ -4,8 +4,9 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-Fill technique gaps in the real library (8 techniques had 0 examples), export the starter pack, build the demo,
-take README screenshots + GIF from the real library, second Codex review round, then publish.
+Finish README screenshots + GIF from the real library (library, image, technique done), reset the real library's
+`welcomed` setting to 0, export the starter pack, build the demo, fresh-install test from the release zip, final
+gates, publish (repo, v0.1.0 tag, Pages), WELCOME-BACK.md.
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —
@@ -15,7 +16,7 @@ take README screenshots + GIF from the real library, second Codex review round, 
 - Help material: illustrated guide, quick-start, in-app welcome, README screenshots, GIF tour (no videos).
 
 ## Assumptions and decisions (Claude)
-- Reuse Qualia's stack and patterns (same owner, MIT): Python 3.14/uv/FastAPI/Typer/SQLite + React/Vite/TS/Tailwind.
+- Reuse Qualia's stack and patterns (same owner, MIT): Python 3.14/uv/FastAPI/Typer/SQLite + React/Vite/TS with plain CSS tokens (no Tailwind).
 - Project folder `C:\Users\Owner\OneDrive\Documents\VisualAtlas`; data home `%USERPROFILE%\VisualAtlas` (outside OneDrive).
 - Enabled providers: Met, AIC, Cleveland, Smithsonian (DEMO_KEY or owner key), Wikimedia Commons (CC0/PD/CC BY only).
   Disabled with evidence: Unsplash (hotlink + ML-dataset clause), Pexels, Pixabay (AI/ML clauses), others = later candidates.
@@ -64,9 +65,19 @@ take README screenshots + GIF from the real library, second Codex review round, 
      #19 (malformed Claude envelopes are recorded failures), #20 (dead code removed).
    - Gap noted by the review (adapter argv/env/event handling untested) closed by tests/test_adapters.py.
 4. task-mv9c6ruu-ej6r51 (2026-10-15) — transfer findings #1/#4/#6/#16 with tests: 57 passed in its files; full suite 283.
+5. Adversarial review round 2 (base 01e5953): 9 findings, all fixed in aee4c4b (fenced and guarded automatic removal,
+   leases valid only while unexpired, restore of a library with missing media, full schema comparison, pause->cancel
+   stops the worker, resumable and atomic verification, no model-authored intent, late web answers ignored).
+6. Adversarial review round 3 (final, base 01e5953): confirmed round-2 fixes; 2 new findings, both fixed with
+   regression tests: [high] slow searches/downloads let the lease expire (the heartbeat now covers every step, not only
+   AI calls); [medium] a cancel or pause arriving during a quick resume could be overwritten (queued->running is now
+   conditional, then the state is read again). Review rounds stop here (bound of 3).
 
 ## Verification evidence
-- Offline: `uv run pytest` 245 passed; `npm --prefix web test` 6 passed; ruff clean; tsc clean (2026-10-15).
+- Offline: `uv run pytest` 290 passed (7 live deselected); `npm --prefix web test` 6 passed; ruff clean; tsc clean.
+- Real library (`%USERPROFILE%\VisualAtlas`): 85 ready references after curation (removed an order form and a burst
+  frame), all 26 techniques with >=1 example, 24 with >=2; annotations 169 model_reviewed, 46 proposed.
+- Held-out challenge: docs/evaluation/HELDOUT.md (two rounds; builder judgment, not expert ground truth).
 - Live (2026-10-15): Codex analyse + Claude verify via CLI (AIC); Claude analyse + Codex verify via UI (Commons);
   Codex directions for a brief (4 grounded directions); Codex plan step; Claude haiku/sonnet aliases resolve to
   claude-haiku-4-5 / claude-sonnet-5-5 (recorded per analysis).

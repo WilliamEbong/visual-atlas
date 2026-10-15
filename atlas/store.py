@@ -449,14 +449,19 @@ class Store:
             self._update('jobs', 'id', job_id, {'lease_until': clock + lease_seconds, 'heartbeat_at': clock})
             return self.one('SELECT * FROM jobs WHERE id=?', (job_id,))
 
-    def update_job(self, job_id: str, owner: str | None, **changes):
+    def update_job(self, job_id: str, owner: str | None, only_from: str | None = None, **changes) -> bool:
+        """only_from applies the change only while the job is still in that state (so a pause or cancel that
+        arrives in between is never overwritten). Returns whether the change was made."""
         allowed = {'state', 'stage', 'message', 'error_code', 'finished_at', 'lease_owner', 'lease_until'}
         if not changes or set(changes) - allowed:
             raise ValueError('invalid job change')
         with self.transaction():
             if owner is not None:
                 self._fence(job_id, owner)
+            if only_from and self.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] != only_from:
+                return False
             self._update('jobs', 'id', job_id, changes)
+            return True
 
     def request_job_state(self, job_id: str, action: str) -> dict:
         """User control from the UI or CLI: pause, resume or cancel."""

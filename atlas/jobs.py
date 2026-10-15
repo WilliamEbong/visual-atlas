@@ -11,6 +11,7 @@ import socket
 import threading
 import time
 import uuid
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from atlas.store import LeaseLost, Store, canonical, now
 BACKENDS = {'codex': codex_cli, 'claude': claude_cli, 'fake': fake}
 BACKEND_NAMES = {'codex': 'Codex', 'claude': 'Claude Code', 'fake': 'Practice mode'}
 LEASE_SECONDS = 60
+HEARTBEAT_SECONDS = 5
 DEFAULT_BUDGETS = {'max_searches': 10, 'max_candidates': 80, 'max_downloads': 30, 'max_analyses': 12}
 DAILY_AI_CAP = 120
 clock = time.time  # retry back-off clock (tests replace it; leases use the real clock in store.py)
@@ -175,27 +177,10 @@ class Worker:
             row = self.store.one("SELECT value FROM settings WHERE key='daily_ai_cap'")
             if self._ai_today() >= (int(row['value']) if row else DAILY_AI_CAP):
                 raise BackendError('daily_cap')
-        cancel = threading.Event()
-        done = threading.Event()
-
-        def watch():  # keep the lease alive during a long call and stop the CLI if the user cancels or pauses
-            with Store(db_path(self.home)) as side:
-                while not done.wait(5):
-                    try:
-                        job = side.heartbeat(self.job['id'], self.owner, LEASE_SECONDS)
-                    except LeaseLost:
-                        cancel.set()
-                        return
-                    if job['state'] not in ('running', 'queued'):
-                        cancel.set()
-                        return
-
-        watcher = threading.Thread(target=watch, daemon=True)
-        watcher.start()
         started = time.monotonic()
         try:
             answer = self.backends[backend].run(prompt, schema, image_paths, model=model, record=item_id,
-                                                cancel=cancel)
+                                                cancel=self._cancel)
         except BackendError as error:
             self.store.record_attempt({'job_id': self.job['id'], 'item_id': item_id, 'kind': 'ai', 'backend': backend,
                                        'model': model, 'status': 'error', 'error_code': error.code,
@@ -203,9 +188,6 @@ class Worker:
                                        'latency_ms': int((time.monotonic() - started) * 1000),
                                        'cli_version': error.cli_version})
             raise
-        finally:
-            done.set()
-            watcher.join(timeout=10)
         self.store.record_attempt({'job_id': self.job['id'], 'item_id': item_id, 'kind': 'ai', 'backend': backend,
                                    'model': model, 'status': 'ok', 'input_tokens': answer['input_tokens'],
                                    'output_tokens': answer['output_tokens'],
@@ -223,6 +205,33 @@ class Worker:
             'output_tokens': answer['output_tokens']})
 
     # ---- the job loop -------------------------------------------------------------------------
+    @contextmanager
+    def _lease_kept(self):
+        """Keep the lease alive for a whole step (slow searches and downloads as well as AI calls), and stop a
+        running AI call when the user pauses or cancels or the lease is lost. Writes stay fenced either way."""
+        self._cancel = cancel = threading.Event()
+        done = threading.Event()
+
+        def watch():
+            with Store(db_path(self.home)) as side:
+                while not done.wait(HEARTBEAT_SECONDS):
+                    try:
+                        job = side.heartbeat(self.job['id'], self.owner, LEASE_SECONDS)
+                    except LeaseLost:
+                        cancel.set()
+                        return
+                    if job['state'] not in ('running', 'queued'):
+                        cancel.set()
+                        return
+
+        watcher = threading.Thread(target=watch, daemon=True)
+        watcher.start()
+        try:
+            yield
+        finally:
+            done.set()
+            watcher.join(timeout=10)
+
     def _work(self):
         kind = self.job['kind']
         self._set(message='Starting…')
@@ -230,15 +239,16 @@ class Worker:
             job = self._job()
             if job['state'] == 'cancelling':
                 return self._finish('cancelled', 'Cancelled. Images already added were kept.')
-            if job['state'] != 'running':
-                if job['state'] == 'queued':  # resumed before this worker noticed the pause
-                    self._set(state='running')
-                else:  # paused, or already finished elsewhere: let go and stop
-                    return self._set(lease_owner=None, lease_until=None)
+            if job['state'] == 'queued':  # resumed before this worker noticed the pause
+                self.store.update_job(self.job['id'], self.owner, only_from='queued', state='running')
+                continue  # read the state again: a pause or cancel may have arrived in between
+            if job['state'] != 'running':  # paused, or already finished elsewhere: let go and stop
+                return self._set(lease_owner=None, lease_until=None)
             try:
-                progressed = {'find': self._discovery_step, 'grow': self._discovery_step,
-                              'verify': self._verify_step, 'analyze': self._reanalyze_step,
-                              'compare': self._compare_step, 'directions': self._directions_step}[kind]()
+                with self._lease_kept():
+                    progressed = {'find': self._discovery_step, 'grow': self._discovery_step,
+                                  'verify': self._verify_step, 'analyze': self._reanalyze_step,
+                                  'compare': self._compare_step, 'directions': self._directions_step}[kind]()
             except BackendError as error:
                 if error.code == 'cancelled':
                     continue  # paused or cancelled mid-call; the loop top carries out the request

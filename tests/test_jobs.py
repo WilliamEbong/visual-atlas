@@ -276,3 +276,50 @@ def test_automatic_removal_never_takes_an_image_a_person_is_using(home):
         store.claim_job('W', job_id=job_id)
         with pytest.raises(ValueError, match='in use'):
             store.remove_image(image['id'], 'automatic', fence=(job_id, 'W'))
+
+
+def test_slow_searches_and_downloads_keep_the_lease(home, monkeypatch):
+    monkeypatch.setattr(jobs, 'LEASE_SECONDS', 0.6)
+    monkeypatch.setattr(jobs, 'HEARTBEAT_SECONDS', 0.1)
+    with jobs.open_store(home) as store:
+        job_id = find(store)
+    slow = worker(home, 'A')
+    fetcher = slow.fetcher
+    get_json, get_image = fetcher.get_json, fetcher.get_image
+
+    def later(call):
+        def wrapped(*args, **kwargs):
+            time.sleep(0.8)  # each request outlasts the whole lease
+            return call(*args, **kwargs)
+        return wrapped
+
+    fetcher.get_json, fetcher.get_image = later(get_json), later(get_image)
+    slow.run_once()
+    with jobs.open_store(home) as store:
+        job = store.one('SELECT * FROM jobs WHERE id=?', (job_id,))
+        assert job['state'] == 'done' and 'Added 2 images' in job['message']
+
+
+def test_a_cancel_that_arrives_while_resuming_is_kept(home):
+    with jobs.open_store(home) as store:
+        job_id = find(store)
+    racing = worker(home, 'A')
+    read_state = racing._job
+    raced = []
+
+    def resumed_then_cancelled():
+        if not raced:
+            raced.append(True)
+            with jobs.open_store(home) as other:
+                other.request_job_state(job_id, 'pause')
+                other.request_job_state(job_id, 'resume')
+                job = read_state()  # the worker sees 'queued'...
+                other.request_job_state(job_id, 'cancel')  # ...and a cancel lands before it acts on that
+                return job
+        return read_state()
+
+    racing._job = resumed_then_cancelled
+    racing.run_once(job_id)
+    with jobs.open_store(home) as store:
+        assert store.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] == 'cancelled'
+        assert store.rows('SELECT * FROM images') == []
