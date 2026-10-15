@@ -26,6 +26,7 @@ BACKEND_NAMES = {'codex': 'Codex', 'claude': 'Claude Code', 'fake': 'Practice mo
 LEASE_SECONDS = 60
 DEFAULT_BUDGETS = {'max_searches': 10, 'max_candidates': 80, 'max_downloads': 30, 'max_analyses': 12}
 DAILY_AI_CAP = 120
+clock = time.time  # retry back-off clock (tests replace it; leases use the real clock in store.py)
 RETRYABLE = {'timeout', 'network', 'rate_limited', 'http_500', 'http_502', 'http_503', 'http_504', 'http_521',
              'http_522', 'provider_error', 'invalid_response'}
 PAUSING = {'quota', 'subscription_auth_required', 'unavailable', 'unsupported_version', 'unsupported_flag',
@@ -160,7 +161,7 @@ class Worker:
     def _retry_or_fail(self, item: dict, code: str, message: str):
         attempts = item['attempts'] + 1
         if code in RETRYABLE and attempts < 3:
-            self._item(item['id'], attempts=attempts, next_attempt_at=time.time() + min(5 * 2 ** attempts, 300),
+            self._item(item['id'], attempts=attempts, next_attempt_at=clock() + min(5 * 2 ** attempts, 300),
                        reason=f'retrying: {message}')
         else:
             self._item(item['id'], attempts=attempts, state='failed', reason=message[:300])
@@ -185,7 +186,7 @@ class Worker:
                     except LeaseLost:
                         cancel.set()
                         return
-                    if job['state'] in ('cancelling', 'paused'):
+                    if job['state'] not in ('running', 'queued'):
                         cancel.set()
                         return
 
@@ -229,8 +230,11 @@ class Worker:
             job = self._job()
             if job['state'] == 'cancelling':
                 return self._finish('cancelled', 'Cancelled. Images already added were kept.')
-            if job['state'] == 'paused':
-                return self._set(lease_owner=None, lease_until=None)
+            if job['state'] != 'running':
+                if job['state'] == 'queued':  # resumed before this worker noticed the pause
+                    self._set(state='running')
+                else:  # paused, or already finished elsewhere: let go and stop
+                    return self._set(lease_owner=None, lease_until=None)
             try:
                 progressed = {'find': self._discovery_step, 'grow': self._discovery_step,
                               'verify': self._verify_step, 'analyze': self._reanalyze_step,
@@ -257,23 +261,23 @@ class Worker:
             return self._plan()
         if self._added() >= target:
             return self._done(f'Ready. Added {self._added()} images.')
-        clock = time.time()
+        now_ = clock()
         for state, step in (('downloaded', self._analyze), ('eligible', self._download), ('found', self._permission)):
             item = self.store.one("SELECT * FROM job_items WHERE job_id=? AND kind='candidate' AND state=? AND "
                                   "next_attempt_at<=? ORDER BY json_extract(payload_json,'$.rank'), id LIMIT 1",
-                                  (self.job['id'], state, clock))
+                                  (self.job['id'], state, now_))
             if item:
                 step(item)
                 return True
         query = self.store.one("SELECT * FROM job_items WHERE job_id=? AND kind='query' AND state='pending' AND "
-                               "next_attempt_at<=? ORDER BY id LIMIT 1", (self.job['id'], clock))
+                               "next_attempt_at<=? ORDER BY id LIMIT 1", (self.job['id'], now_))
         candidates = len(self._items("kind='candidate'"))
         if query and self._count('search') < self._budget('max_searches') and candidates < self._budget('max_candidates'):
             self._search(query)
             return True
         waiting = self.store.one("SELECT COUNT(*) AS n FROM job_items WHERE job_id=? AND state IN "
                                  "('pending','found','eligible','downloaded') AND next_attempt_at>?",
-                                 (self.job['id'], clock))['n']
+                                 (self.job['id'], now_))['n']
         if waiting:
             return None
         return self._done(self._summary(exhausted=True))
@@ -524,7 +528,10 @@ class Worker:
             self.verify_image(image_id, verifier, item_id=item_id)
 
     def _remove_unhelpful(self, image: dict, reason: str):
-        removed = self.store.remove_image(image['id'], f'not added: {reason}')
+        try:
+            removed = self.store.remove_image(image['id'], f'not added: {reason}', fence=(self.job['id'], self.owner))
+        except ValueError:
+            return  # someone is already using this image; keep it
         images.delete_files(self.media, removed)
 
     def analyze_image(self, image: dict, *, item_id=None) -> str:
@@ -588,17 +595,19 @@ class Worker:
         except tasks.InvalidResult:
             return  # leave annotations as 'proposed'; the verification simply did not count
         except BackendError as error:
-            if error.code == 'daily_cap':
-                raise
+            if error.code in ('daily_cap', 'cancelled'):
+                raise  # a pause or cancel leaves the check to be resumed
             return  # verifier unavailable, over its limit or erroring: keep the proposal unverified and go on
-        analysis_id = self._save_analysis('verify', answer, result, image_id=image_id, input_sha=image['analysis_sha256'])
-        self.store.apply_verdicts(image_id, analysis_id, result['verdicts'],
-                                  f"model:{answer['backend']}/{answer['model']}", fence=(self.job['id'], self.owner))
+        with self.store.transaction():  # the saved answer and its effect commit together
+            analysis_id = self._save_analysis('verify', answer, result, image_id=image_id,
+                                              input_sha=image['analysis_sha256'])
+            self.store.apply_verdicts(image_id, analysis_id, result['verdicts'],
+                                      f"model:{answer['backend']}/{answer['model']}", fence=(self.job['id'], self.owner))
 
     # ---- follow-up jobs -------------------------------------------------------------------------
     def _image_items(self, state: str):
         return self.store.one("SELECT * FROM job_items WHERE job_id=? AND state=? AND next_attempt_at<=? "
-                              "ORDER BY id LIMIT 1", (self.job['id'], state, time.time()))
+                              "ORDER BY id LIMIT 1", (self.job['id'], state, clock()))
 
     def _waiting(self, state: str) -> bool:
         return self.store.one('SELECT 1 FROM job_items WHERE job_id=? AND state=? LIMIT 1',

@@ -63,7 +63,7 @@ export default function ImagePage({ id }: { id: number }) {
             {analysis.ambiguities.length > 0 && <p className="muted"><strong>Left open:</strong> {analysis.ambiguities.join(' ')}</p>}
             <p className="mono">Described by {backendName(analysis.backend)} ({analysis.model}) on {date(analysis.created_at)}.
               Observations are a model's description of the pixels, not a catalogue record.{analysis.subjects.length ? ` Subjects: ${analysis.subjects.join(', ')}.` : ''}</p>
-            {analysis.creator_intent && <p><strong>Documented intent</strong> (from the source's {analysis.creator_intent.metadata_field} field): {analysis.creator_intent.statement}</p>}
+            {image.description && <p><strong>From the source record</strong> (the institution's own words, not an analysis): {image.description}</p>}
           </>
         ) : <p className="muted">Not analysed yet.{!readOnly && <> <button type="button" onClick={() => startJob('analyze')}>Analyse this image</button></>}</p>}
 

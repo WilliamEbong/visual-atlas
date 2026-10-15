@@ -143,13 +143,32 @@ def list_backups(home) -> list[dict]:
     return sorted(entries, key=lambda entry: (entry['created'], entry['name']), reverse=True)
 
 
-def _validate_database(path, members):
+def _schema(db) -> set[tuple]:
+    return {(kind, name, ' '.join((sql or '').split())) for kind, name, sql in db.execute(
+        "SELECT type, name, sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%'")}
+
+
+_REFERENCE: dict = {}
+
+
+def _reference_schema() -> tuple[int, set[tuple]]:
+    """The exact schema this version creates (built once from the migrations in a scratch database)."""
+    if not _REFERENCE:
+        with tempfile.TemporaryDirectory() as directory:
+            with Store(Path(directory) / 'reference.db') as store:
+                _REFERENCE['version'] = store.connection.execute('PRAGMA user_version').fetchone()[0]
+                _REFERENCE['schema'] = _schema(store.connection)
+    return _REFERENCE['version'], _REFERENCE['schema']
+
+
+def _validate_database(path, members, missing=frozenset()):
     # immutable keeps validation read-only, including for a database saved in WAL mode.
     with closing(sqlite3.connect(path.resolve().as_uri() + '?mode=ro&immutable=1', uri=True)) as db:
-        newest = max(int(match[1]) for file in Path(__file__).with_name('migrations').glob('*.sql')
-                     if (match := re.match(r'([0-9]{3})_', file.name)))
-        if not 1 <= db.execute('PRAGMA user_version').fetchone()[0] <= newest:
+        version, schema = _reference_schema()
+        if db.execute('PRAGMA user_version').fetchone()[0] != version:
             raise ValueError('unsupported backup database version')
+        if _schema(db) != schema:
+            raise ValueError('backup database does not have the expected tables, columns and triggers')
         if db.execute('PRAGMA integrity_check').fetchall() != [('ok',)]:
             raise ValueError('backup database failed integrity check')
         if db.execute('PRAGMA foreign_key_check').fetchone() is not None:
@@ -167,13 +186,16 @@ def _validate_database(path, members):
             for relative in row:
                 if relative is not None and (not isinstance(relative, str)
                                              or not MEDIA_PATH.fullmatch(relative)
-                                             or f'media/{relative}' not in members):
+                                             or (f'media/{relative}' not in members and relative not in missing)):
                     raise ValueError('backup database references invalid or missing media')
         return db.execute('SELECT COUNT(*) FROM images WHERE removed_at IS NULL').fetchone()[0]
 
 
-def backup(home) -> dict:
+def backup(home, allow_missing: bool = False) -> dict:
+    """Back up the library. allow_missing (used only for the safety copy before a restore) records files that are
+    already missing instead of refusing, so a damaged library can still be replaced by a good backup."""
     home = Path(home)
+    missing = []
     path = _archive_path(home / 'backups', 'visual-atlas-backup')
     created = datetime.now(UTC).isoformat()
     with tempfile.TemporaryDirectory(dir=path.parent) as temporary:
@@ -192,6 +214,9 @@ def backup(home) -> dict:
                     file = media / relative
                     if not MEDIA_PATH.fullmatch(relative) or not file.resolve().is_relative_to(media):
                         raise ValueError('media file outside library')
+                    if allow_missing and not file.is_file():
+                        missing.append(relative)
+                        continue
                     files[f'media/{relative}'] = file
         hashes = {}
         archive_path = temporary / 'backup.zip'
@@ -208,9 +233,9 @@ def backup(home) -> dict:
                 hashes[name] = digest.hexdigest()
             archive.writestr('manifest.json', json.dumps({
                 'format': 'visual-atlas-backup', 'version': 1, 'created': created,
-                'app_version': __version__, 'files': hashes}, indent=2))
+                'app_version': __version__, 'files': hashes, 'missing': sorted(set(missing))}, indent=2))
         os.replace(archive_path, path)
-    return {**_file_info(path), 'created': created, 'images': count}
+    return {**_file_info(path), 'created': created, 'images': count, 'missing': len(set(missing))}
 
 
 def _validate_archive(archive):
@@ -239,10 +264,14 @@ def _validate_archive(archive):
     files = manifest['files']
     if set(files) != set(archive.namelist()) - {'manifest.json'} or 'atlas.db' not in files:
         raise ValueError('backup members do not match manifest')
+    missing = manifest.get('missing', [])
+    if not isinstance(missing, list) or not all(isinstance(m, str) and MEDIA_PATH.fullmatch(m) for m in missing):
+        raise ValueError('invalid backup manifest')
     for name, expected in files.items():
         with archive.open(name) as source:
             if hashlib.file_digest(source, 'sha256').hexdigest() != expected:
                 raise ValueError('backup checksum mismatch')
+    return frozenset(missing)
 
 
 def restore(home, name) -> dict:
@@ -257,11 +286,11 @@ def restore(home, name) -> dict:
         stage = Path(temporary)
         try:
             with zipfile.ZipFile(path) as archive:
-                _validate_archive(archive)
+                missing = _validate_archive(archive)
                 with archive.open('atlas.db') as source, (stage / 'atlas.db').open('wb') as target:
                     shutil.copyfileobj(source, target)
-                count = _validate_database(stage / 'atlas.db', set(archive.namelist()))
-                safety = backup(home)
+                count = _validate_database(stage / 'atlas.db', set(archive.namelist()), missing)
+                safety = backup(home, allow_missing=True)
                 (stage / 'media').mkdir()
                 for item in archive.infolist():
                     if not item.filename.startswith('media/'):

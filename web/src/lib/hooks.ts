@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { request } from './client'
 import type { Taxonomy } from './types'
 
@@ -6,6 +6,8 @@ import type { Taxonomy } from './types'
  *  can never act on a record it is no longer showing. Errors become plain messages for the page. */
 export function useData<T>(path: string | null, deps: unknown[] = []) {
   const [state, setState] = useState<{ path: string | null; data: T | null }>({ path: null, data: null })
+  const latest = useRef(path)
+  latest.current = path
   const [error, setError] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
   useEffect(() => {
@@ -17,7 +19,9 @@ export function useData<T>(path: string | null, deps: unknown[] = []) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, tick, ...deps])
   const reload = useCallback(() => setTick((value) => value + 1), [])
-  const setData = useCallback((value: T | null) => setState({ path, data: value }), [path])
+  const setData = useCallback((value: T | null) => {
+    if (latest.current === path) setState({ path, data: value })  // ignore answers for a page already left
+  }, [path])
   return { data: state.path === path ? state.data : null, error, reload, setData }
 }
 

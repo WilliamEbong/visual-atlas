@@ -240,12 +240,20 @@ class Store:
         self.connection.execute('INSERT INTO images_fts(rowid,title,creator,body) VALUES(?,?,?,?)',
                                 (image_id, image['title'], image['creator'], ' '.join(filter(None, parts))))
 
-    def remove_image(self, image_id: int, reason: str) -> dict:
-        """Forget an image: files are deleted by the caller; a tombstone stops it being re-added."""
+    def remove_image(self, image_id: int, reason: str, fence: tuple | None = None) -> dict:
+        """Forget an image: files are deleted by the caller after this commits; a tombstone stops it being re-added.
+
+        An automatic removal (fence given, from a job) never removes an image a person has already worked on."""
         with self.transaction():
+            if fence:
+                self._fence(*fence)
             image = self.one('SELECT * FROM images WHERE id=? AND removed_at IS NULL', (image_id,))
             if image is None:
                 raise ValueError('image not found')
+            if fence and (image['status'] == 'ready' or self.one(
+                    'SELECT 1 FROM annotations WHERE image_id=? AND human_locked=1 UNION ALL '
+                    'SELECT 1 FROM collection_items WHERE image_id=? LIMIT 1', (image_id, image_id))):
+                raise ValueError('image is in use and was not removed automatically')
             self._insert('tombstones', {'provider': image['provider'], 'provider_item_id': image['provider_item_id'],
                                         'file_sha256': image['file_sha256'], 'dhash': image['dhash'],
                                         'reason': reason[:200], 'created_at': now()})
@@ -421,8 +429,8 @@ class Store:
             return self.one('SELECT * FROM jobs WHERE id=?', (job['id'],))
 
     def _fence(self, job_id: str, owner: str):
-        job = self.one('SELECT lease_owner FROM jobs WHERE id=?', (job_id,))
-        if job is None or job['lease_owner'] != owner:
+        job = self.one('SELECT lease_owner, lease_until FROM jobs WHERE id=?', (job_id,))
+        if job is None or job['lease_owner'] != owner or (job['lease_until'] or 0) <= time.time():
             raise LeaseLost(job_id)
 
     def heartbeat(self, job_id: str, owner: str, lease_seconds: float = 60) -> dict:
@@ -448,7 +456,10 @@ class Store:
             if job is None:
                 raise ValueError('job not found')
             state = job['state']
-            if action == 'cancel' and state in ('queued', 'paused'):
+            live = (job['lease_until'] or 0) > time.time() and job['lease_owner']
+            if action == 'cancel' and state in ('queued', 'paused') and live:
+                self._update('jobs', 'id', job_id, {'state': 'cancelling', 'message': 'Stopping…'})
+            elif action == 'cancel' and state in ('queued', 'paused'):
                 self._update('jobs', 'id', job_id, {'state': 'cancelled', 'stage': 'cancelled',
                                                     'message': 'Cancelled before it finished.', 'finished_at': now()})
                 self.connection.execute("UPDATE job_items SET state='skipped', reason='cancelled', updated_at=? "

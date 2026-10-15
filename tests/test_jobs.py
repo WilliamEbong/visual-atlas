@@ -137,7 +137,7 @@ def test_failed_downloads_retry_then_give_up(home, monkeypatch):
         clock.now += 50
         return clock.now
 
-    monkeypatch.setattr(jobs.time, 'time', fake_time)
+    monkeypatch.setattr(jobs, 'clock', fake_time)
     with jobs.open_store(home) as store:
         job_id = find(store)
     failing = {'0558d3c0-dd86-7d26-2e55-126c1470ca41'}
@@ -213,7 +213,7 @@ def test_a_verifier_error_keeps_the_proposal_and_the_job_going(home):
 
 def test_an_analysis_error_retries_that_picture_only(home, monkeypatch):
     clock = types.SimpleNamespace(now=1e9)
-    monkeypatch.setattr(jobs.time, 'time', lambda: setattr(clock, 'now', clock.now + 50) or clock.now)
+    monkeypatch.setattr(jobs, 'clock', lambda: setattr(clock, 'now', clock.now + 50) or clock.now)
     with jobs.open_store(home) as store:
         job_id = find(store)
     hiccup = Flaky(fail_on={2}, error=BackendError('provider_error'))  # first image's analysis fails once
@@ -240,3 +240,39 @@ def test_explicit_budgets_are_kept(home):
         job_id = find(store, target_new_images=1, budgets={'max_analyses': 1})
         spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (job_id,))['spec_json'])
         assert spec['budgets']['max_analyses'] == 1
+
+
+def test_an_expired_lease_cannot_be_renewed_or_written_with(home):
+    with jobs.open_store(home) as store:
+        first, second = find(store), find(store)
+        store.claim_job('A', job_id=first)
+        store.update_job(first, None, lease_until=time.time() - 1)  # A stalled past its lease
+        assert store.claim_job('B', job_id=second)['id'] == second
+        with pytest.raises(LeaseLost):
+            store.heartbeat(first, 'A')
+
+
+def test_cancelling_a_paused_job_with_an_active_worker_lets_the_worker_stop(home):
+    with jobs.open_store(home) as store:
+        job_id = find(store)
+        store.claim_job('A')
+        store.request_job_state(job_id, 'pause')
+        assert store.request_job_state(job_id, 'cancel')['state'] == 'cancelling'  # A still holds the lease
+    worker(home, 'A').run_once(job_id)
+    with jobs.open_store(home) as store:
+        assert store.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] == 'cancelled'
+        assert store.rows('SELECT * FROM images') == []
+
+
+def test_automatic_removal_never_takes_an_image_a_person_is_using(home):
+    with jobs.open_store(home) as store:
+        find(store, target_new_images=1)
+    worker(home, 'A').run_once()
+    with jobs.open_store(home) as store:
+        image = store.one('SELECT * FROM images')
+        board = store.create_collection('Mine')
+        store.collect(board, image['id'])
+        job_id = find(store)
+        store.claim_job('W', job_id=job_id)
+        with pytest.raises(ValueError, match='in use'):
+            store.remove_image(image['id'], 'automatic', fence=(job_id, 'W'))

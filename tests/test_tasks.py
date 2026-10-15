@@ -46,8 +46,8 @@ def test_valid_answer_is_normalised():
     (bad(summary='See https://example.com for more'), 'link'),
     (bad(summary='<script>alert(1)</script>'), 'markup'),
     (bad(image_usable=False, unusable_reason='blank'), 'unusable image cannot have techniques'),
-    (bad(creator_intent={'statement': 'The painter wanted loneliness.', 'metadata_field': 'description'}), 'source description'),
-    (bad(creator_intent={'statement': 'The work glorifies war and empire.', 'metadata_field': 'title'}), 'source description'),
+    (bad(creator_intent={'statement': 'The painter wanted loneliness.', 'metadata_field': 'description'}), 'must be null'),
+    (bad(creator_intent={'statement': 'The work glorifies war and empire.', 'metadata_field': 'title'}), 'must be null'),
     (bad(techniques=[{**GOOD['techniques'][0], 'confidence': 1.4}]), 'confidence'),
     (bad(observations=[GOOD['observations'][0], GOOD['observations'][0]]), 'duplicate observation'),
     (bad(techniques=[GOOD['techniques'][0], {**GOOD['techniques'][1], 'role': 'primary'}]), 'one primary'),
@@ -58,10 +58,11 @@ def test_contract_violations_are_rejected(answer, message):
         tasks.validate_analysis(answer, IDS, METADATA)
 
 
-def test_documented_intent_needs_a_real_metadata_field():
+def test_models_never_document_intent_even_when_the_description_supports_it():
     metadata = {**METADATA, 'description': 'The artist wrote that the empty bay stands for exile.'}
     answer = bad(creator_intent={'statement': 'The artist linked the empty bay to exile.', 'metadata_field': 'description'})
-    assert tasks.validate_analysis(answer, IDS, metadata)['creator_intent']['metadata_field'] == 'description'
+    with pytest.raises(tasks.InvalidResult, match='must be null'):
+        tasks.validate_analysis(answer, IDS, metadata)
 
 
 def test_prompts_mark_metadata_as_untrusted_data():
@@ -124,10 +125,3 @@ def test_fake_backend_answers_satisfy_every_contract(tmp_path):
     tasks.validate_directions(directions, IDS, {1, 2, 3})
     comparison = fake.run('', tasks.compare_schema([1, 2], ids), [image, image])['result']
     tasks.validate_compare(comparison, {1, 2}, IDS)
-
-
-def test_intent_must_be_restated_from_the_description_not_invented():
-    metadata = {**METADATA, 'description': 'A quiet harbour scene painted on a summer evening.'}
-    answer = bad(creator_intent={'statement': 'The artist meant to protest industrial pollution.', 'metadata_field': 'description'})
-    with pytest.raises(tasks.InvalidResult, match='source description'):
-        tasks.validate_analysis(answer, IDS, metadata)

@@ -436,3 +436,48 @@ def test_list_backups_ordering(library):
         assert set(entry) == {'name', 'size_bytes', 'created'}
         assert entry['size_bytes'] == (home / 'backups' / entry['name']).stat().st_size
         datetime.fromisoformat(entry['created'])
+
+
+def test_restore_replaces_a_damaged_library_even_when_current_files_are_missing(home):
+    from helpers import aic_fetcher
+
+    from atlas import jobs as job_module
+    from atlas.ai import fake
+    with job_module.open_store(home) as store:
+        job_module.create_job(store, 'find', {'goal': 'harbour', 'providers': ['aic'], 'backend': 'fake',
+                                             'target_new_images': 1})
+    job_module.Worker(home, owner='T', fetcher=aic_fetcher(), backends={'fake': fake}).run_once()
+    good = transfer.backup(home)
+    for path in (home / 'media' / 'thumbs').rglob('*.jpg'):
+        path.unlink()  # the current library loses a file
+    result = transfer.restore(home, good['name'])
+    assert result['images'] == 1
+    assert any((home / 'media' / 'thumbs').rglob('*.jpg'))
+
+
+def test_restore_rejects_a_database_missing_a_table(home):
+    import sqlite3
+    import zipfile as zf
+
+    from atlas import jobs as job_module
+    with job_module.open_store(home):
+        pass
+    made = transfer.backup(home)
+    path = home / 'backups' / made['name']
+    with zf.ZipFile(path) as archive:
+        payload = {name: archive.read(name) for name in archive.namelist()}
+    db_file = home / 'tamper.db'
+    db_file.write_bytes(payload['atlas.db'])
+    connection = sqlite3.connect(db_file)
+    connection.execute('DROP TABLE settings')
+    connection.commit()
+    connection.close()
+    payload['atlas.db'] = db_file.read_bytes()
+    manifest = json.loads(payload['manifest.json'])
+    manifest['files']['atlas.db'] = hashlib.sha256(payload['atlas.db']).hexdigest()
+    payload['manifest.json'] = json.dumps(manifest).encode()
+    with zf.ZipFile(path, 'w') as archive:
+        for name, data in payload.items():
+            archive.writestr(name, data)
+    with pytest.raises(ValueError, match='expected tables'):
+        transfer.restore(home, made['name'])

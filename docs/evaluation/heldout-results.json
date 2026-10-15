@@ -22,30 +22,26 @@
       "usable": true,
       "techniques": {
         "color-contrast": 0.9,
-        "value-contrast": 0.85,
-        "texture-contrast": 0.77
+        "texture-contrast": 0.83
       },
-      "ambiguities": [
-        "The deep shadows make the exact support beneath the nest difficult to distinguish."
-      ],
+      "ambiguities": [],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
         "color-contrast": 0.7,
-        "value-contrast": 0.5,
-        "tight-cropping": 0.45
+        "color-harmony": 0.5,
+        "value-contrast": 0.45
       },
       "ambiguities": [
-        "The dark, earthy palette could be read as limited-palette harmony, with the blue eggs as the only exception.",
-        "Foliage around the nest might be read as framing, but it does not form a continuous border."
+        "The foliage around the nest could be read as a frame, but it fills the whole picture rather than forming a distinct border.",
+        "Blue-versus-brown could be read as complementary color contrast or as value contrast, since the eggs are also lighter."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "color-contrast": true,
-      "value-contrast": true,
       "texture-contrast": false
     }
   },
@@ -72,13 +68,13 @@
     "codex": {
       "usable": true,
       "techniques": {
-        "color-harmony": 0.96,
-        "atmospheric-perspective": 0.83,
-        "color-contrast": 0.9
+        "color-harmony": 0.92,
+        "color-contrast": 0.88,
+        "atmospheric-perspective": 0.78
       },
       "ambiguities": [
-        "The orange disk could depict the sun or moon; the image alone does not establish which.",
-        "The distant forms are too indistinct to separate buildings, ships, and individual masts reliably."
+        "The rounded gold shape could be a celestial disc or an illuminated distant feature; its identity is not visually certain.",
+        "The distant upright forms are too indistinct to separate confidently into masts, buildings, or other structures."
       ],
       "model": "gpt-6-astra"
     },
@@ -86,19 +82,19 @@
       "usable": true,
       "techniques": {
         "color-harmony": 0.8,
-        "color-contrast": 0.7,
-        "negative-space": 0.55
+        "color-contrast": 0.65,
+        "negative-space": 0.5
       },
       "ambiguities": [
-        "The orange disc could be a setting sun or a moon; this does not change the reading of the colour accent.",
-        "Atmospheric perspective is plausible given the hazy, soft forms, but the whole picture is uniformly soft rather than graded by distance."
+        "Atmospheric perspective could be read in the dissolving distance, but the whole picture is uniformly hazy rather than graded by planes.",
+        "The dark mass at right may be a ship, pier or headland; it is not clearly identifiable."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "color-harmony": true,
-      "atmospheric-perspective": false,
-      "color-contrast": true
+      "color-contrast": true,
+      "atmospheric-perspective": false
     }
   },
   {
@@ -123,13 +119,13 @@
     "codex": {
       "usable": true,
       "techniques": {
-        "layered-depth": 0.96,
-        "value-contrast": 0.89,
-        "asymmetric-balance": 0.83
+        "layered-depth": 0.95,
+        "asymmetric-balance": 0.86,
+        "value-contrast": 0.83
       },
       "ambiguities": [
-        "The lowered eyes and supported head could indicate sleep or quiet rest; the visible pose alone does not establish which.",
-        "Details of the shadowed wall objects and distant furniture are difficult to resolve."
+        "The woman's lowered or closed eyes and supported head suggest rest, but her precise state cannot be established visually.",
+        "Details of the dark wall pictures and distant furnishings are difficult to distinguish."
       ],
       "model": "gpt-6-astra"
     },
@@ -137,19 +133,19 @@
       "usable": true,
       "techniques": {
         "layered-depth": 0.7,
-        "texture-contrast": 0.55,
-        "color-harmony": 0.5
+        "color-harmony": 0.5,
+        "texture-contrast": 0.5
       },
       "ambiguities": [
-        "The open doorway could be read as a frame within a frame, but it sits beside the figure and does not surround her.",
-        "The dark foreground chair may be read as a repoussoir element within layered depth or as a separate framing device."
+        "The open doorway could be read as a frame within a frame, but it does not enclose the main figure.",
+        "The dark foreground chair could be read as a repoussoir for depth or simply as tight cropping."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "layered-depth": true,
-      "value-contrast": false,
-      "asymmetric-balance": true
+      "asymmetric-balance": true,
+      "value-contrast": true
     }
   },
   {
@@ -174,31 +170,30 @@
     "codex": {
       "usable": true,
       "techniques": {
-        "value-contrast": 0.99,
-        "asymmetric-balance": 0.87,
-        "color-harmony": 0.79
+        "value-contrast": 0.98,
+        "asymmetric-balance": 0.88
       },
       "ambiguities": [
-        "The precise function of the cylindrical apparatus and the identities of the small tabletop pieces are not clear from their visible forms."
+        "The exact function of the cylindrical apparatus and the small desk objects cannot be determined from their visible forms alone."
       ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "value-contrast": 0.88,
-        "color-harmony": 0.55,
+        "value-contrast": 0.9,
+        "color-harmony": 0.5,
         "gaze-direction": 0.4
       },
       "ambiguities": [
-        "The green jacket against the warm tones could be read as colour contrast, but it is muted and sits in shadow, so it may not be a defining feature."
+        "The warm-dominated palette could be read as colour harmony, but it follows from the single candle light source.",
+        "The man looks outward while his hand works on the slide, so attention is split between viewer and task."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "value-contrast": true,
-      "asymmetric-balance": true,
-      "color-harmony": true
+      "asymmetric-balance": true
     }
   },
   {
@@ -224,29 +219,31 @@
       "usable": true,
       "techniques": {
         "asymmetric-balance": 0.96,
-        "color-contrast": 0.92,
-        "value-contrast": 0.88
+        "color-contrast": 0.93,
+        "value-contrast": 0.86
       },
-      "ambiguities": [],
+      "ambiguities": [
+        "The pale rectangles show subtle tonal differences, but the photograph does not establish how much comes from paint, lighting, or surface aging."
+      ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "asymmetric-balance": 0.8,
+        "asymmetric-balance": 0.75,
         "color-contrast": 0.65,
-        "negative-space": 0.4
+        "negative-space": 0.45
       },
       "ambiguities": [
-        "The large central field could be read as negative space or simply as one more unit of the grid.",
-        "Asymmetric balance is a strong fit, but the whole grid structure could also be read as rhythm or pattern."
+        "The large central rectangle could be read as negative space or as the main subject of the composition.",
+        "Asymmetric balance and color contrast both plausibly lead; the ranking is debatable."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "asymmetric-balance": true,
       "color-contrast": true,
-      "value-contrast": true
+      "value-contrast": false
     }
   },
   {
@@ -273,31 +270,30 @@
       "techniques": {
         "layered-depth": 0.96,
         "rhythm-pattern": 0.88,
-        "asymmetric-balance": 0.81
+        "value-contrast": 0.82
       },
       "ambiguities": [
-        "The large right-hand pair is visually prominent, but the distributed crowd makes a single main subject uncertain."
+        "Small background figures and animals have simplified details, leaving some individual actions and identities unclear."
       ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "layered-depth": 0.7,
-        "value-contrast": 0.55,
-        "color-contrast": 0.5,
-        "scale-contrast": 0.45
+        "layered-depth": 0.6,
+        "value-contrast": 0.5,
+        "scale-contrast": 0.4
       },
       "ambiguities": [
-        "Static, frozen poses could be read as rhythm-pattern across the many upright figures, but spacing is irregular.",
-        "The painted dotted border is a surface feature; it is not treated as a frame within a frame."
+        "The stiff, repeated upright figures could be read as rhythm-pattern, but they vary in size and placement.",
+        "The dotted colour technique is a medium quality and is not listed as a compositional technique."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "layered-depth": true,
       "rhythm-pattern": true,
-      "asymmetric-balance": true
+      "value-contrast": false
     }
   },
   {
@@ -323,12 +319,12 @@
     "codex": {
       "usable": true,
       "techniques": {
-        "implied-motion": 0.98,
-        "scale-contrast": 0.96,
-        "rhythm-pattern": 0.89
+        "scale-contrast": 0.97,
+        "implied-motion": 0.96,
+        "rhythm-pattern": 0.88
       },
       "ambiguities": [
-        "The branching foam can resemble claws or fingers, but whether that resemblance constitutes a visual metaphor is uncertain."
+        "The foam tips can resemble claws, but whether this constitutes a visual metaphor is uncertain from the image alone."
       ],
       "model": "gpt-6-astra"
     },
@@ -336,19 +332,18 @@
       "usable": true,
       "techniques": {
         "scale-contrast": 0.8,
-        "framing": 0.5,
-        "implied-motion": 0.6,
-        "color-harmony": 0.5
+        "framing": 0.6,
+        "implied-motion": 0.6
       },
       "ambiguities": [
-        "The mountain may be read as a framed focal point, or as just a small element set against the wave in a scale comparison.",
-        "The strong curved diagonal could be read as diagonal energy, but it is mainly part of the wave's shape and motion."
+        "The mountain framing is formed by open space between waves rather than a solid border, so it may read as layered depth or framing.",
+        "The limited blue-cream palette could also be read as colour harmony, but it may come from the print medium."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
-      "implied-motion": true,
       "scale-contrast": true,
+      "implied-motion": true,
       "rhythm-pattern": true
     }
   },
@@ -374,31 +369,29 @@
     "codex": {
       "usable": true,
       "techniques": {
-        "atmospheric-perspective": 0.91,
-        "color-harmony": 0.96
+        "atmospheric-perspective": 0.93
       },
       "ambiguities": [
-        "The visible atmospheric veil could include fog, falling snow, or both.",
-        "The image alone does not establish whether the blue cast comes from lighting, processing, or a combination."
+        "The upper-edge forms are difficult to separate into individual trees or branches.",
+        "The central tree has a silhouette-like outline, but visible snow and tonal detail prevent it from reading as a purely featureless shape."
       ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "color-harmony": 0.7,
+        "color-harmony": 0.6,
         "atmospheric-perspective": 0.6,
-        "negative-space": 0.55
+        "symmetry": 0.45
       },
       "ambiguities": [
-        "The tree is centered but the surroundings are not mirrored, so symmetry is only loosely applicable.",
-        "Fog depth and the limited palette overlap, so which is primary is debatable."
+        "The blue-grey tone may come from the monochrome or toned medium rather than a compositional choice.",
+        "The fog-filled space could also be read as negative space isolating the tree."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
-      "atmospheric-perspective": true,
-      "color-harmony": true
+      "atmospheric-perspective": true
     }
   },
   {
@@ -434,13 +427,14 @@
     "claude": {
       "usable": true,
       "techniques": {
-        "leading-lines": 0.8,
-        "rhythm-pattern": 0.75,
-        "color-harmony": 0.55
+        "rhythm-pattern": 0.8,
+        "leading-lines": 0.6,
+        "color-contrast": 0.5,
+        "symmetry": 0.4
       },
       "ambiguities": [
-        "The nested arches could also be read as framing, since each arch frames the next and the far doorway.",
-        "The near-symmetric layout is broken by the doors on the left and columns on the right, so symmetry is debatable."
+        "Symmetry is only approximate: the left has doors and the right has columns and a balustrade.",
+        "Leading lines and rhythm overlap, since the same repeated elements create both the beat and the convergence."
       ],
       "model": "claude-sonnet-5-5"
     },
@@ -468,31 +462,23 @@
     },
     "codex": {
       "usable": true,
-      "techniques": {
-        "diagonal-energy": 0.83,
-        "texture-contrast": 0.8
-      },
+      "techniques": {},
       "ambiguities": [
-        "The furnishing's exact function and opening mechanism cannot be established from this view."
+        "The object's specific function and the operation of its metal fittings cannot be established from the image alone."
       ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "visual-metaphor": 0.6,
-        "texture-contrast": 0.55,
-        "color-harmony": 0.4
+        "texture-contrast": 0.5,
+        "color-harmony": 0.45
       },
       "ambiguities": [
-        "The book resemblance may be functional form rather than a deliberate metaphor.",
-        "The tilted panel could also be read as diagonal energy, but it is a product of the object's design."
+        "This is a plain catalogue-style photo of an object on a studio ground, so the techniques listed are only moderately defining.",
+        "The book-shaped form could be read as a visual metaphor, but it is simply the object's design."
       ],
       "model": "claude-sonnet-5-5"
-    },
-    "claude_verify": {
-      "diagonal-energy": true,
-      "texture-contrast": true
     }
   },
   {
@@ -516,31 +502,29 @@
     "codex": {
       "usable": true,
       "techniques": {
-        "value-contrast": 0.95,
-        "framing": 0.93
+        "framing": 0.93,
+        "value-contrast": 0.88
       },
       "ambiguities": [
-        "The dark support beneath the extended hand is too indistinct to identify confidently.",
-        "The visible oval enclosure could be a physical mount or part of the reproduced image."
+        "The dark support beneath the extended hand is too indistinct to identify confidently."
       ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "value-contrast": 0.55,
-        "color-harmony": 0.45,
+        "framing": 0.5,
         "gaze-direction": 0.45
       },
       "ambiguities": [
-        "The oval mount could be read as a frame within a frame, but it is a print border rather than a scene element, so I left framing out.",
-        "The value contrast is moderate rather than dramatic, because the backdrop is mid-dark and the dress is mid-tone."
+        "The oval mount is a conventional presentation format for portraits of this kind, so reading it as framing is debatable.",
+        "The sepia tonality comes from the medium, so no colour technique is listed."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
-      "value-contrast": true,
-      "framing": false
+      "framing": false,
+      "value-contrast": true
     }
   },
   {
@@ -565,32 +549,30 @@
       "usable": true,
       "techniques": {
         "layered-depth": 0.91,
-        "atmospheric-perspective": 0.74,
-        "color-harmony": 0.86
+        "selective-focus": 0.76
       },
       "ambiguities": [
-        "The faint architecture could reflect abbreviated drawing rather than an explicit depiction of atmospheric haze.",
-        "The contents of the containers and the precise activities of individual figures are not clearly resolved."
+        "The small, abbreviated marks do not clearly establish individual activities or the contents of the containers.",
+        "The pale architectural rendering could suggest distance as well as selective emphasis; a continuous atmospheric recession is not clearly established."
       ],
       "model": "gpt-6-astra"
     },
     "claude": {
       "usable": true,
       "techniques": {
-        "selective-focus": 0.55,
-        "proximity-grouping": 0.5,
-        "color-harmony": 0.45
+        "selective-focus": 0.5,
+        "proximity-grouping": 0.45,
+        "diagonal-energy": 0.4
       },
       "ambiguities": [
-        "The sketchiness may reflect an unfinished study rather than deliberate selective emphasis.",
-        "Monochrome ink is a medium choice, so color-harmony is debatable."
+        "The loose sketchiness of the buildings may come from the unfinished drawing medium rather than deliberate selective emphasis.",
+        "The slanting rooflines may simply be linear perspective, not diagonal composition."
       ],
       "model": "claude-sonnet-5-5"
     },
     "claude_verify": {
       "layered-depth": true,
-      "atmospheric-perspective": false,
-      "color-harmony": false
+      "selective-focus": false
     }
   }
 ]
