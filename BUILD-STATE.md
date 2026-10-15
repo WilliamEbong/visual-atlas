@@ -4,9 +4,10 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-v0.3 (package 0.3.0) is built, verified and committed locally on main (not pushed or tagged). Pending: fold in the
-independent Codex review (at most 2 rounds), rerun the gates, rebuild release/VisualAtlas-v0.3.0.zip from the final
-commit. Publishing v0.3.0 waits for the owner's go-ahead.
+v0.3 (package 0.3.0) is complete and committed locally on main; it is not pushed or tagged. Both review rounds are
+folded in and the gates pass. release/VisualAtlas-v0.3.0.zip is built from the commit that carries this file. Next,
+only on the owner's go-ahead: push main and tag v0.3.0 (the release workflow runs Checks on Linux and Windows, then
+packages), then check that Pages rebuilt the demo.
 
 ## v0.3 status (2026-10-15)
 - Owner choices (2026-10-15): polish and finish, plus the deferred features (new sources, better request coding,
@@ -53,7 +54,7 @@ commit. Publishing v0.3.0 waits for the owner's go-ahead.
 - **Release zip.** design-review/** is export-ignore, so the zip drops from 31 MB to 21.1 MB.
 
 ### v0.3 evidence (2026-10-15)
-- **Tests:** 355 passed, 9 deselected (live). New tests cover sources, the coder's cue phrases, the reading
+- **Tests:** 359 passed, 9 deselected (live) after both review rounds. New tests cover sources, the coder's cue phrases, the reading
   endpoint, image sizes, cache headers, the no-alert rule, nextByPosition, activeFilters and regions. Ruff, tsc,
   vitest (14), build, taxonomy check, data guard and npm audit are clean.
 - **Live:** Rijksmuseum and National Gallery smoke tests pass; each found eligible images and downloaded one.
@@ -70,6 +71,22 @@ commit. Publishing v0.3.0 waits for the owner's go-ahead.
   - Coding, final holdout: F1 0.29 to 0.62.
   - Metadata filter: rules 11/18 negatives and 5/29 positives skipped; Jev 10/18 and 5/29. Neither integrated.
   - Jev spend about $0.002, using the Qualia key in the evaluation process only.
+- **Independent review (Codex adversarial, base v0.2.0, at most 2 rounds):**
+  - **Round 1:** 5 findings, all reproduced and fixed with tests that fail on the old code (bf9566c).
+    - [high] The National Gallery index manufactured maxpixels='' even when the column was missing. The index now
+      keeps the record's own values, and the rule needs maxpixels present and empty.
+    - [medium] A refresh that failed to parse lost the old index. It now keeps it, or fails as bad_data, and always
+      cleans up its downloads.
+    - [medium] A failed Undo vanished. It now stays with the reason and a Try again button.
+    - [medium] Image-page Undo lost the collection order.
+    - [medium] A stale Find reading could overwrite a newer one.
+    - The three web fixes were also checked in Playwright with intercepted requests.
+  - **Round 2 (final):** confirmed the fixes for the index evidence, failed Undo and stale readings, and found 2 gaps,
+    both fixed with tests that fail on the old code.
+    - [medium] A short CSV row put None into the index and broke later searches; values are now always strings.
+    - [medium] Undo order was lost beyond the first 200 items. A removal now returns the image's position, and adding
+      it back with that position restores it in one transaction (store.collect). Playwright confirmed both screens.
+  - Review rounds stop here (bound of 2).
 - **Install and upgrade:**
   - v0.3.0 zip (21.1 MB) installed over the library made by the published v0.2.0, after adding a collection, a
     favourite and a rejected reading. Version 0.3.0; all three kept; seven sources; the coder reads "backlit" as

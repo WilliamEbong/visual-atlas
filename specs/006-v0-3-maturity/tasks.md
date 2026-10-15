@@ -35,4 +35,4 @@
 - [x] T620 axe scans (light, dark) and layout-shift measurement; fix findings (web/package.json devDependency axe-core)
 - [x] T621 Docs and screenshots (README.md, QUICK-START.md, docs/USER-GUIDE.md, design-review/v0.3/)
 - [x] T622 Full checks; Playwright journeys desktop and 375 px; fresh install and upgrade from published v0.2.0; local release zip
-- [ ] T623 Independent review (≤ 2 rounds), fixes, converge, BUILD-STATE handoff
+- [x] T623 Independent review (≤ 2 rounds), fixes, converge, BUILD-STATE handoff
