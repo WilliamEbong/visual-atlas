@@ -52,7 +52,15 @@ Claude-owned tests (store, jobs, tasks, catalog, server), then fold in Codex tas
 2. task-mv9al476-5imman (2026-10-15, running) — offline tests + bug fixes for fetch/images/rights/providers.
 
 ## Verification evidence
-(none yet)
+- Offline: `uv run pytest` 245 passed; `npm --prefix web test` 6 passed; ruff clean; tsc clean (2026-10-15).
+- Live (2026-10-15): Codex analyse + Claude verify via CLI (AIC); Claude analyse + Codex verify via UI (Commons);
+  Codex directions for a brief (4 grounded directions); Codex plan step; Claude haiku/sonnet aliases resolve to
+  claude-haiku-4-5 / claude-sonnet-5-5 (recorded per analysis).
+- Playwright (screenshots in design-review/slice and design-review/journeys): welcome dialog, library grid,
+  image detail (proposer/checker shown), reject + edit correction persisted, technique page → related technique,
+  search, restart persistence, Find via UI with progress stages, collections create/save, compare 2 images,
+  connections map, project directions, settings AI status, backup, remove → restore (image, media, annotations back),
+  375 px: no horizontal overflow on 11 screens, keyboard grid arrows with visible focus, no console errors after fixes.
 
 ## Blockers
 (none)

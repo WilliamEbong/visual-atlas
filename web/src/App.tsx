@@ -39,7 +39,8 @@ export default function App() {
   useEffect(checkJobs, [checkJobs, section])
   usePoll(checkJobs, true, running ? 3000 : 30000)  // the 30 s ping also tells the launcher the window is open
   useEffect(() => {
-    if (section !== 'image') document.title = `${NAV.find(([key]) => key === section)?.[1] ?? 'Visual Atlas'} · Visual Atlas`
+    const extra: Record<string, string> = { compare: 'Compare', connections: 'See connections', technique: 'Technique' }
+    if (section !== 'image') document.title = `${NAV.find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Library'} · Visual Atlas`
   }, [section])
 
   let page

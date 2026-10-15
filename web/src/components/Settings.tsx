@@ -49,7 +49,7 @@ export default function SettingsPage() {
           {(['codex', 'claude'] as const).map((name) => (
             <div key={name} className="notice stack">
               <h3>{name === 'codex' ? 'Codex (ChatGPT plan)' : 'Claude Code (Claude plan)'}</h3>
-              {status ? <p><strong>{status[name].ready ? '● Ready' : '○ Not ready'}</strong> — {status[name].message}{status[name].version && status[name].version !== 'unknown' ? ` (version ${status[name].version})` : ''}</p>
+              {status ? <p><strong>{status[name].ready ? '● Ready' : '○ Not ready'}</strong>{status[name].ready ? '' : ` — ${status[name].message}`}{status[name].version && status[name].version !== 'unknown' ? ` (version ${status[name].version})` : ''}</p>
                 : <p className="mono">Checking…</p>}
               {status && !status[name].ready && <p>{SIGN_IN[name]}</p>}
             </div>))}

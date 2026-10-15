@@ -26,7 +26,7 @@ export default function Connections({ focus }: { focus: string }) {
       const edges = data.edges.map((edge, index) => ({ data: { id: `e${index}`, source: edge.source, target: edge.target } }))
       cy.current = cytoscape({
         container: box.current, elements: [...nodes, ...edges], layout: { name: 'preset', fit: true, padding: 40 },
-        minZoom: 0.25, maxZoom: 3, wheelSensitivity: 0.3, autoungrabify: true,
+        minZoom: 0.25, maxZoom: 3, autoungrabify: true,
         style: [
           { selector: 'node', style: { label: 'data(label)', 'font-family': 'Libre Franklin Variable, sans-serif', 'font-size': 12, color: ink,
             'text-wrap': 'wrap', 'text-max-width': '120px', 'text-valign': 'bottom', 'text-margin-y': 6 } },

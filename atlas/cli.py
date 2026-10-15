@@ -86,11 +86,20 @@ def verify(image_ids: list[int], backend: str = typer.Option('claude'), run: boo
 
 
 @app.command()
-def analyze(image_ids: list[int], backend: str = typer.Option(None), run: bool = typer.Option(True)):
+def analyze(image_ids: list[int] = typer.Argument(None, help='Image ids; default: every image waiting for analysis.'),
+            backend: str = typer.Option(None), verify_with: str = typer.Option(None), run: bool = typer.Option(True)):
     """Analyse (or re-analyse) images. A person's corrections are never overwritten."""
+    if not image_ids:
+        with jobs.open_store() as store:
+            image_ids = [r['id'] for r in store.rows("SELECT id FROM images WHERE removed_at IS NULL AND status='pending'")]
+        if not image_ids:
+            typer.echo('No images are waiting for analysis.')
+            return
     spec = {'image_ids': image_ids}
     if backend:
         spec['backend'] = backend
+    if verify_with:
+        spec['verify_with'] = verify_with
     _queue('analyze', spec, run)
 
 

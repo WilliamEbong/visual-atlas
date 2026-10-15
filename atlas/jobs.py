@@ -689,6 +689,9 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
         if not ids or (kind == 'compare' and not 2 <= len(ids) <= 4):
             raise ValueError('pick images' if kind != 'compare' else 'compare needs two to four images')
         clean['image_ids'] = ids[:200]
+        verifier = spec.get('verify_with')
+        if kind == 'analyze' and verifier in ('codex', 'claude') and verifier != backend:
+            clean['verify_with'] = verifier
     elif kind == 'directions':
         clean['brief_id'] = int(spec.get('brief_id') or 0)
         if not store.one('SELECT id FROM briefs WHERE id=?', (clean['brief_id'],)):
