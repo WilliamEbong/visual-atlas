@@ -1,0 +1,876 @@
+{
+  "version": "2026-10-15.1",
+  "note": "Visual Atlas's own taxonomy. Definitions are working definitions written for this project (working_definition: true); 'sources' lists background reading on the underlying idea, not the origin of our wording. Edit freely, then run `atlas taxonomy check`.",
+  "goals": [
+    {"id": "draw-attention", "name": "Make one thing stand out", "description": "Direct the viewer to a single subject before anything else."},
+    {"id": "guide-the-eye", "name": "Guide the eye", "description": "Control the order and path in which the viewer looks around the image."},
+    {"id": "show-scale", "name": "Show size or scale", "description": "Make something read as vast, tiny, or out of proportion."},
+    {"id": "create-tension", "name": "Create tension or unease", "description": "Make the image feel unstable, crowded, confrontational or unresolved."},
+    {"id": "create-calm", "name": "Create calm and order", "description": "Make the image feel quiet, balanced, stable or contemplative."},
+    {"id": "group-and-relate", "name": "Show what belongs together", "description": "Make parts read as a set, a pair, or as separate from one another."},
+    {"id": "surprise", "name": "Surprise or provoke a second look", "description": "Break an expectation so the viewer stops and looks again."},
+    {"id": "tell-a-story", "name": "Suggest a story or relationship", "description": "Imply events, intentions or relationships beyond what is literally shown."},
+    {"id": "build-depth", "name": "Build depth and space", "description": "Make a flat picture read as deep, layered space."},
+    {"id": "suggest-motion", "name": "Suggest movement or energy", "description": "Make a still image feel active, fast or about to change."},
+    {"id": "make-an-idea-visible", "name": "Make an idea visible", "description": "Express an abstract concept through concrete visual form."}
+  ],
+  "operations": [
+    {"id": "contrast", "name": "Contrast", "description": "Set one value of a visual variable against a very different value."},
+    {"id": "isolate", "name": "Isolate", "description": "Remove competition around a subject so it stands alone."},
+    {"id": "repeat", "name": "Repeat", "description": "Use the same element or interval several times."},
+    {"id": "direct", "name": "Direct", "description": "Use lines, gazes or gestures that point the eye somewhere."},
+    {"id": "enclose", "name": "Enclose", "description": "Surround a subject with a boundary inside the picture."},
+    {"id": "group", "name": "Group", "description": "Place elements so they read as belonging together or apart."},
+    {"id": "juxtapose", "name": "Juxtapose", "description": "Place unlike things side by side so each changes how the other reads."},
+    {"id": "layer", "name": "Layer", "description": "Stack elements in front of and behind one another."},
+    {"id": "reduce", "name": "Reduce", "description": "Simplify to fewer shapes, colours or details."},
+    {"id": "substitute", "name": "Substitute", "description": "Let one thing stand for another."},
+    {"id": "break-expectation", "name": "Break expectation", "description": "Introduce something that does not fit the established pattern or context."}
+  ],
+  "domains": [
+    {"id": "color", "name": "Colour", "description": "Hue, saturation and colour temperature.", "variables": ["hue", "saturation", "temperature"]},
+    {"id": "value", "name": "Light and value", "description": "How light or dark areas are, and where light comes from.", "variables": ["luminance", "light direction", "shadow"]},
+    {"id": "scale", "name": "Scale", "description": "The apparent size of things relative to each other and to the frame.", "variables": ["relative size", "distance", "frame fill"]},
+    {"id": "position", "name": "Position and frame", "description": "Where things sit in the rectangle and where the frame cuts them.", "variables": ["placement", "alignment", "crop edge", "balance"]},
+    {"id": "line-shape", "name": "Line and shape", "description": "Contours, edges and the direction of lines.", "variables": ["line direction", "contour", "outline", "geometry"]},
+    {"id": "texture", "name": "Texture and detail", "description": "Surface quality and how much detail is rendered.", "variables": ["surface", "sharpness", "detail density"]},
+    {"id": "space", "name": "Space and depth", "description": "Cues that make the picture read as near and far.", "variables": ["overlap", "focus", "atmosphere", "vantage"]},
+    {"id": "body-gaze", "name": "Body and gaze", "description": "Where people and animals look, point and lean.", "variables": ["gaze", "gesture", "pose"]},
+    {"id": "meaning", "name": "Meaning and context", "description": "What things are, what they usually mean and where they usually belong.", "variables": ["symbol", "setting", "expectation"]},
+    {"id": "time-motion", "name": "Time and motion", "description": "Cues for movement, speed and moments in time.", "variables": ["blur", "pose", "direction of travel"]}
+  ],
+  "techniques": [
+    {
+      "id": "negative-space",
+      "name": "Negative space isolation",
+      "aliases": ["empty space", "breathing room", "white space", "isolation by emptiness"],
+      "definition": "A subject is surrounded by a large, quiet, mostly empty area, so the emptiness itself frames it.",
+      "explanation": "When most of the picture offers nothing to look at, the eye settles on the one place that does. The empty area also sets a mood: it can feel calm, lonely, spacious or exposed depending on its tone and how small the subject is.",
+      "when_it_helps": ["You need one subject to read instantly", "You want calm, solitude or scale", "Text must sit on the image without fighting it"],
+      "observable_cues": ["A large area of even sky, water, wall, snow or plain ground", "One small or isolated subject", "Few competing details anywhere else"],
+      "confusions": [
+        {"technique": "scale-contrast", "how_to_tell": "Scale contrast compares the sizes of two things; negative space is about the emptiness around one thing, whatever its size."},
+        {"technique": "silhouette", "how_to_tell": "A silhouette is a dark shape against light; negative space can be any tone as long as the surround is quiet."}
+      ],
+      "limitations": "Emptiness only isolates when it is genuinely quiet; busy texture or pattern in the 'empty' area competes with the subject.",
+      "counterexample": "A lone figure on a beach covered in footprints, seaweed and umbrellas is small, but the surroundings are not empty, so the figure does not pop.",
+      "related": [
+        {"technique": "scale-contrast", "relation": "often_combined"},
+        {"technique": "silhouette", "relation": "often_combined"},
+        {"technique": "tight-cropping", "relation": "opposite_strategy"}
+      ],
+      "goals": ["draw-attention", "create-calm", "show-scale"],
+      "operations": ["isolate", "reduce"],
+      "domains": ["position", "space"],
+      "search_hints": {
+        "met": ["lone figure landscape", "snow landscape", "seascape calm", "single boat"],
+        "aic": ["solitary figure", "snow", "empty beach", "fog"],
+        "cma": ["seascape", "winter landscape", "solitary"],
+        "smithsonian": ["lone tree photograph", "desert landscape"],
+        "commons": ["minimalism photography", "lone tree field", "single boat lake"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Negative space\"", "url": "https://en.wikipedia.org/wiki/Negative_space"}],
+      "working_definition": true
+    },
+    {
+      "id": "scale-contrast",
+      "name": "Scale contrast",
+      "aliases": ["size contrast", "dwarfing", "small against large"],
+      "definition": "Two things of very different apparent size appear together, so each makes the size of the other legible.",
+      "explanation": "We judge size by comparison. A familiar small thing — a person, a boat, a house — placed beside something enormous turns 'large' into a felt quantity. Reversing the expected sizes makes the familiar seem strange.",
+      "when_it_helps": ["Showing how vast a landscape, building or object is", "Making people feel small, fragile or heroic", "Making a small object feel monumental"],
+      "observable_cues": ["A recognisable small element (figure, animal, vehicle) next to a much larger form", "The small element is clearly readable, not lost", "Size difference of roughly ten times or more"],
+      "confusions": [
+        {"technique": "negative-space", "how_to_tell": "Negative space needs emptiness; scale contrast needs a second, much larger thing to compare with."},
+        {"technique": "vantage-point", "how_to_tell": "A low or high viewpoint distorts size through perspective; scale contrast is about the relative size of two things."}
+      ],
+      "limitations": "Works only if the viewer recognises the size of the reference object; an unfamiliar object gives no scale.",
+      "counterexample": "A rock beside a mountain shows two sizes, but with no familiar reference the viewer cannot tell how big either is.",
+      "related": [
+        {"technique": "negative-space", "relation": "often_combined"},
+        {"technique": "layered-depth", "relation": "often_combined"},
+        {"technique": "contextual-incongruity", "relation": "can_create"}
+      ],
+      "goals": ["show-scale", "draw-attention", "tell-a-story"],
+      "operations": ["contrast"],
+      "domains": ["scale"],
+      "search_hints": {
+        "met": ["mountains travelers", "waterfall figures", "cathedral interior"],
+        "aic": ["figures cliffs", "ships harbor", "giant"],
+        "cma": ["mountain landscape figures", "ruins"],
+        "smithsonian": ["canyon photograph", "redwood tree"],
+        "commons": ["person giant tree", "small boat big ship", "climber mountain"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Scale (art)\"", "url": "https://en.wikipedia.org/wiki/Scale_(art)"}],
+      "working_definition": true
+    },
+    {
+      "id": "color-contrast",
+      "name": "Colour contrast",
+      "aliases": ["complementary contrast", "colour pop", "warm against cool", "hue contrast"],
+      "definition": "An area of one hue sits against a field of a strongly different hue — often complementary or warm against cool.",
+      "explanation": "Hue difference is detected early and without effort. A small warm accent in a cool field (or the reverse) is found almost at once, and complementary pairs make each other look more intense.",
+      "when_it_helps": ["Marking the one element that matters", "Adding energy to an otherwise quiet image", "Separating subject from background when tones are similar"],
+      "observable_cues": ["A distinct patch of saturated colour different from the surrounding hue", "Warm reds/oranges against blues/greens, or other complementary pairs", "The accent is small relative to the field"],
+      "confusions": [
+        {"technique": "value-contrast", "how_to_tell": "Convert it to greyscale in your head: if the subject still pops, the contrast is mainly value; if it disappears, it is colour."},
+        {"technique": "color-harmony", "how_to_tell": "Harmony uses neighbouring hues to unify; colour contrast uses distant hues to separate."}
+      ],
+      "limitations": "Overused accents compete with each other; many saturated colours at once cancel the effect.",
+      "counterexample": "A street with signs in red, yellow, blue and green has strong hues everywhere, so no single colour stands out.",
+      "related": [
+        {"technique": "value-contrast", "relation": "often_combined"},
+        {"technique": "color-harmony", "relation": "opposite_strategy"},
+        {"technique": "repetition-with-interruption", "relation": "can_create"}
+      ],
+      "goals": ["draw-attention", "suggest-motion"],
+      "operations": ["contrast"],
+      "domains": ["color"],
+      "search_hints": {
+        "met": ["red umbrella", "orange sunset sea", "red coat"],
+        "aic": ["red dress", "orange", "sunset"],
+        "cma": ["red", "sunset harbor"],
+        "smithsonian": ["poster red blue", "parrot"],
+        "commons": ["red umbrella blue", "orange flower blue background", "complementary colors photography"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Contrast (vision)\"", "url": "https://en.wikipedia.org/wiki/Contrast_(vision)"}, {"citation": "Wikipedia, \"Complementary colors\"", "url": "https://en.wikipedia.org/wiki/Complementary_colors"}],
+      "working_definition": true
+    },
+    {
+      "id": "value-contrast",
+      "name": "Light–dark contrast (chiaroscuro)",
+      "aliases": ["chiaroscuro", "tonal contrast", "spotlighting", "high contrast lighting"],
+      "definition": "The subject is much lighter or darker than its surroundings, often lit by a single strong source.",
+      "explanation": "The eye goes first to the brightest area and to the sharpest light–dark edges. A pool of light in darkness both points at the subject and models it, giving volume and drama.",
+      "when_it_helps": ["Drama, intimacy or secrecy", "Pulling a face or object out of a busy scene", "Giving volume to forms"],
+      "observable_cues": ["One area markedly brighter (or darker) than everything else", "Hard shadows from a single directional light", "Large areas of deep shadow"],
+      "confusions": [
+        {"technique": "silhouette", "how_to_tell": "In a silhouette the subject is the dark, featureless shape; in chiaroscuro the subject is usually lit and modelled."},
+        {"technique": "color-contrast", "how_to_tell": "If the effect survives in black and white, it is value contrast."}
+      ],
+      "limitations": "Strong tonal contrast can hide detail in the shadows and may feel theatrical or harsh for gentle subjects.",
+      "counterexample": "An evenly lit overcast landscape has no dominant light area, so no subject is singled out by light.",
+      "related": [
+        {"technique": "silhouette", "relation": "often_combined"},
+        {"technique": "color-contrast", "relation": "often_combined"},
+        {"technique": "selective-focus", "relation": "similar_purpose"}
+      ],
+      "goals": ["draw-attention", "create-tension", "build-depth"],
+      "operations": ["contrast", "isolate"],
+      "domains": ["value"],
+      "search_hints": {
+        "met": ["candlelight", "night scene", "chiaroscuro", "lamp"],
+        "aic": ["candle", "night", "interior lamp"],
+        "cma": ["candlelight", "night"],
+        "smithsonian": ["night photograph", "spotlight"],
+        "commons": ["chiaroscuro photography", "window light portrait", "single light dark room"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Chiaroscuro\"", "url": "https://en.wikipedia.org/wiki/Chiaroscuro"}],
+      "working_definition": true
+    },
+    {
+      "id": "repetition-with-interruption",
+      "name": "Repetition with interruption",
+      "aliases": ["odd one out", "pattern break", "anomaly in a pattern", "break the grid"],
+      "definition": "A regular series of similar elements is broken by one element that differs in colour, direction, shape or position.",
+      "explanation": "Repetition sets up an expectation the eye learns quickly; the single exception violates it and becomes the focal point. The pattern also says 'many', which makes the exception feel singular.",
+      "when_it_helps": ["Showing individuality, difference or choice", "Making one item in a set unmistakable", "Adding wit to orderly subjects"],
+      "observable_cues": ["Many near-identical units in rows, grids or series", "One unit that differs in colour, orientation, size or state", "The difference is visible at a glance"],
+      "confusions": [
+        {"technique": "rhythm-pattern", "how_to_tell": "Rhythm is the repetition itself; the interruption is the break that becomes the subject."},
+        {"technique": "color-contrast", "how_to_tell": "If the odd one differs only in hue it uses colour contrast as its means, but the mechanism is the broken pattern."}
+      ],
+      "limitations": "Needs enough repetitions to set the expectation (usually five or more), and only one or two exceptions.",
+      "counterexample": "A shelf of mixed objects has no established pattern, so nothing reads as the exception.",
+      "related": [
+        {"technique": "rhythm-pattern", "relation": "builds_on"},
+        {"technique": "color-contrast", "relation": "often_combined"},
+        {"technique": "contextual-incongruity", "relation": "similar_purpose"}
+      ],
+      "goals": ["draw-attention", "surprise"],
+      "operations": ["repeat", "break-expectation"],
+      "domains": ["position", "color", "line-shape"],
+      "search_hints": {
+        "met": ["row of figures", "procession", "pattern textile"],
+        "aic": ["row", "repeated", "pattern"],
+        "cma": ["procession", "pattern"],
+        "smithsonian": ["rows photograph", "uniform"],
+        "commons": ["odd one out", "row of chairs one different", "one red among white"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Pop-out effect\"", "url": "https://en.wikipedia.org/wiki/Pop-out_effect"}],
+      "working_definition": true
+    },
+    {
+      "id": "framing",
+      "name": "Frame within a frame",
+      "aliases": ["internal frame", "natural frame", "doorway framing", "window framing"],
+      "definition": "A shape inside the picture — a doorway, window, arch, branches, a gap — surrounds the subject like a second frame.",
+      "explanation": "The inner frame encloses the subject, cutting it off from the rest and pointing to it from all sides. It also adds a layer of depth and can suggest looking in, watching or being separated.",
+      "when_it_helps": ["Isolating a subject in a busy setting", "Adding depth with a dark foreground border", "Suggesting voyeurism, confinement or a threshold"],
+      "observable_cues": ["A continuous or near-continuous border around the subject (doorway, window, arch, foliage)", "The border is usually darker or nearer than the subject", "The subject sits inside the opening"],
+      "confusions": [
+        {"technique": "layered-depth", "how_to_tell": "Layering stacks planes; framing specifically encloses the subject on several sides."},
+        {"technique": "leading-lines", "how_to_tell": "Leading lines point toward the subject; a frame surrounds it."}
+      ],
+      "limitations": "A frame that is too detailed or bright competes with what it frames.",
+      "counterexample": "A window seen straight on with nothing visible through it is a shape, not a frame — there is no subject inside.",
+      "related": [
+        {"technique": "layered-depth", "relation": "often_combined"},
+        {"technique": "value-contrast", "relation": "often_combined"},
+        {"technique": "leading-lines", "relation": "similar_purpose"}
+      ],
+      "goals": ["draw-attention", "build-depth", "tell-a-story"],
+      "operations": ["enclose", "layer"],
+      "domains": ["position", "space"],
+      "search_hints": {
+        "met": ["doorway interior", "view through window", "arch"],
+        "aic": ["doorway", "window view", "arch"],
+        "cma": ["interior doorway", "window"],
+        "smithsonian": ["doorway photograph", "archway"],
+        "commons": ["view through window", "doorway silhouette", "arch frame"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Framing (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Framing_(visual_arts)"}],
+      "working_definition": true
+    },
+    {
+      "id": "leading-lines",
+      "name": "Leading lines",
+      "aliases": ["directional lines", "converging lines", "paths into the picture"],
+      "definition": "Lines in the scene — roads, rivers, walls, rails, edges of light — run toward the subject or deep into the picture.",
+      "explanation": "The eye tends to travel along strong edges. When those edges converge on a subject or vanishing point, they carry the viewer there and create a sense of depth and journey.",
+      "when_it_helps": ["Guiding the viewer to a subject that is small or far away", "Creating depth and a sense of travel", "Organising a complex scene"],
+      "observable_cues": ["Long continuous lines (paths, rails, shorelines, walls, rows)", "Lines converge toward a point or subject", "The subject sits at or near where the lines lead"],
+      "confusions": [
+        {"technique": "diagonal-energy", "how_to_tell": "Diagonals create movement in themselves; leading lines are judged by where they take the eye."},
+        {"technique": "gaze-direction", "how_to_tell": "Gaze uses a look or gesture rather than physical lines."}
+      ],
+      "limitations": "Lines that lead out of the frame or to nothing pull attention away; strong lines can dominate the subject.",
+      "counterexample": "A road that runs off the corner of the picture leads the eye out of the image instead of to a subject.",
+      "related": [
+        {"technique": "diagonal-energy", "relation": "often_combined"},
+        {"technique": "layered-depth", "relation": "often_combined"},
+        {"technique": "gaze-direction", "relation": "similar_purpose"}
+      ],
+      "goals": ["guide-the-eye", "build-depth"],
+      "operations": ["direct"],
+      "domains": ["line-shape", "space"],
+      "search_hints": {
+        "met": ["road landscape", "avenue trees", "canal", "railway"],
+        "aic": ["road", "avenue", "railroad", "river"],
+        "cma": ["road", "canal", "street"],
+        "smithsonian": ["railroad tracks photograph", "highway"],
+        "commons": ["leading lines road", "railway perspective", "pier perspective"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Composition (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Composition_(visual_arts)"}],
+      "working_definition": true
+    },
+    {
+      "id": "proximity-grouping",
+      "name": "Proximity grouping",
+      "aliases": ["clustering", "gestalt proximity", "grouping by distance"],
+      "definition": "Elements placed close together read as one group, and gaps between groups read as separation.",
+      "explanation": "Perception groups nearby items automatically. Spacing alone can make three people read as a family and a fourth as an outsider, or turn scattered objects into a set.",
+      "when_it_helps": ["Showing relationships, belonging or exclusion", "Organising many elements into a few readable units", "Isolating one element by distance"],
+      "observable_cues": ["Elements clustered into distinct groups", "Clear gaps between groups", "One element set apart from a cluster"],
+      "confusions": [
+        {"technique": "repetition-with-interruption", "how_to_tell": "Interruption changes an element's appearance; proximity changes only its distance."},
+        {"technique": "negative-space", "how_to_tell": "Negative space isolates with emptiness around one subject; proximity is about relative gaps between several elements."}
+      ],
+      "limitations": "Strong similarity (colour, shape) can override spacing and regroup elements differently.",
+      "counterexample": "Evenly spaced trees in an orchard read as a field, not as groups, because the gaps are all equal.",
+      "related": [
+        {"technique": "juxtaposition", "relation": "often_combined"},
+        {"technique": "rhythm-pattern", "relation": "related"},
+        {"technique": "negative-space", "relation": "related"}
+      ],
+      "goals": ["group-and-relate", "tell-a-story"],
+      "operations": ["group"],
+      "domains": ["position"],
+      "search_hints": {
+        "met": ["group of figures", "family", "conversation"],
+        "aic": ["group", "family", "figures conversing"],
+        "cma": ["group", "family"],
+        "smithsonian": ["group portrait photograph", "family photograph"],
+        "commons": ["group of people apart", "birds on wire", "cluster"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Principles of grouping\"", "url": "https://en.wikipedia.org/wiki/Principles_of_grouping"}],
+      "working_definition": true
+    },
+    {
+      "id": "gaze-direction",
+      "name": "Gaze direction",
+      "aliases": ["eyeline", "looking room", "pointing gesture", "directed attention"],
+      "definition": "Where a figure looks or points directs the viewer's attention the same way.",
+      "explanation": "We instinctively follow other people's gaze and gestures. A figure looking at something makes that thing important; a figure looking out at us creates direct address; a figure looking out of frame creates curiosity.",
+      "when_it_helps": ["Linking two subjects", "Creating intimacy (eye contact) or mystery (looking away)", "Guiding the eye without lines"],
+      "observable_cues": ["Faces or eyes turned clearly in one direction", "Pointing hands or leaning bodies", "Something of interest along the line of the gaze, or deliberate space for it"],
+      "confusions": [
+        {"technique": "leading-lines", "how_to_tell": "Leading lines are physical lines; gaze is an implied line from eyes or hands."},
+        {"technique": "juxtaposition", "how_to_tell": "Juxtaposition sets two things side by side for comparison; gaze links them through a look or gesture."}
+      ],
+      "limitations": "Needs readable faces or gestures; tiny or blurred figures carry no clear gaze.",
+      "counterexample": "A crowd looking in many directions does not direct attention anywhere in particular.",
+      "related": [
+        {"technique": "leading-lines", "relation": "similar_purpose"},
+        {"technique": "proximity-grouping", "relation": "often_combined"},
+        {"technique": "juxtaposition", "relation": "often_combined"}
+      ],
+      "goals": ["guide-the-eye", "tell-a-story"],
+      "operations": ["direct"],
+      "domains": ["body-gaze"],
+      "search_hints": {
+        "met": ["woman looking", "portrait gaze", "pointing"],
+        "aic": ["looking", "gaze", "pointing figure"],
+        "cma": ["portrait looking", "woman reading"],
+        "smithsonian": ["portrait looking away", "pointing photograph"],
+        "commons": ["person looking at", "looking through window", "pointing finger"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Gaze\"", "url": "https://en.wikipedia.org/wiki/Gaze"}],
+      "working_definition": true
+    },
+    {
+      "id": "tight-cropping",
+      "name": "Tight cropping",
+      "aliases": ["close crop", "edge cutting", "fill the frame", "partial view"],
+      "definition": "The frame cuts close to or through the subject, showing only part of it or filling the whole picture with it.",
+      "explanation": "Cropping removes context, forcing attention onto detail, texture and expression. Cutting a form at the edge implies it continues beyond the frame and can feel intimate, abrupt or dynamic.",
+      "when_it_helps": ["Intimacy and detail", "Energy and immediacy", "Making a familiar object unfamiliar"],
+      "observable_cues": ["The subject touches or is cut by two or more edges", "Little or no background visible", "A part stands for the whole (hands, eye, fragment)"],
+      "confusions": [
+        {"technique": "negative-space", "how_to_tell": "Negative space adds room around the subject; tight cropping removes it."},
+        {"technique": "scale-contrast", "how_to_tell": "Filling the frame makes something look large without a comparison object."}
+      ],
+      "limitations": "Too little context can make the subject unrecognisable or the image feel claustrophobic.",
+      "counterexample": "A full-length portrait with space all around shows the whole figure, so nothing is cropped.",
+      "related": [
+        {"technique": "negative-space", "relation": "opposite_strategy"},
+        {"technique": "texture-contrast", "relation": "often_combined"},
+        {"technique": "visual-metaphor", "relation": "can_create"}
+      ],
+      "goals": ["draw-attention", "create-tension", "surprise"],
+      "operations": ["reduce", "isolate"],
+      "domains": ["position", "scale"],
+      "search_hints": {
+        "met": ["detail hands", "close-up", "fragment"],
+        "aic": ["close-up", "hands", "face detail"],
+        "cma": ["head", "hands", "fragment"],
+        "smithsonian": ["close-up photograph", "macro"],
+        "commons": ["extreme close-up", "macro photography", "cropped portrait"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Cropping (image)\"", "url": "https://en.wikipedia.org/wiki/Cropping_(image)"}],
+      "working_definition": true
+    },
+    {
+      "id": "juxtaposition",
+      "name": "Juxtaposition",
+      "aliases": ["side-by-side contrast", "pairing", "visual comparison"],
+      "definition": "Two unlike things are placed together so the viewer compares them and reads a relationship between them.",
+      "explanation": "Placing unlike things together invites the viewer to supply the connection — old and new, rich and poor, natural and built. The meaning comes from the pairing rather than from either element alone.",
+      "when_it_helps": ["Making an argument or comparison without words", "Irony and humour", "Showing change, contrast or coexistence"],
+      "observable_cues": ["Two distinct subjects of comparable visual weight", "A clear difference in kind, age, scale or mood", "Both readable at once"],
+      "confusions": [
+        {"technique": "contextual-incongruity", "how_to_tell": "Incongruity is one thing out of place; juxtaposition is two things set in deliberate comparison."},
+        {"technique": "scale-contrast", "how_to_tell": "If the point is only the size difference, it is scale contrast."}
+      ],
+      "limitations": "Meaning depends on the viewer recognising both elements and their usual associations; it can be read in more than one way.",
+      "counterexample": "Two similar trees side by side are near each other but invite no comparison of meaning.",
+      "related": [
+        {"technique": "contextual-incongruity", "relation": "similar_purpose"},
+        {"technique": "visual-metaphor", "relation": "related"},
+        {"technique": "scale-contrast", "relation": "related"}
+      ],
+      "goals": ["tell-a-story", "surprise", "make-an-idea-visible"],
+      "operations": ["juxtapose"],
+      "domains": ["meaning"],
+      "search_hints": {
+        "met": ["old and young", "ruins modern", "contrast"],
+        "aic": ["old and new", "city and nature"],
+        "cma": ["ruins", "old and young"],
+        "smithsonian": ["old and new photograph", "industry nature"],
+        "commons": ["old and new architecture", "juxtaposition photography", "nature versus city"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Juxtaposition\"", "url": "https://en.wikipedia.org/wiki/Juxtaposition"}],
+      "working_definition": true
+    },
+    {
+      "id": "figure-ground-ambiguity",
+      "name": "Figure–ground ambiguity",
+      "aliases": ["figure-ground reversal", "positive-negative ambiguity", "shared contours"],
+      "definition": "Shapes and the spaces between them are balanced so the viewer can read either as the subject, and the reading flips.",
+      "explanation": "Perception normally splits a picture into figure and background. When a contour is shared and both sides are equally plausible, the picture alternates between readings, which holds attention and rewards a second look.",
+      "when_it_helps": ["Logos and posters that reward a second look", "Showing two ideas in one form", "Playful or puzzling images"],
+      "observable_cues": ["Two tones of similar area meeting along a shared contour", "The space between shapes forms a recognisable shape", "Alternating readings are possible"],
+      "confusions": [
+        {"technique": "silhouette", "how_to_tell": "A silhouette has a clear figure; ambiguity requires that the background also reads as a figure."},
+        {"technique": "visual-metaphor", "how_to_tell": "A metaphor substitutes meaning; figure–ground ambiguity is a perceptual flip that may or may not carry meaning."}
+      ],
+      "limitations": "Hard to find in ordinary photographs; usually designed. When overdone it becomes a puzzle rather than a message.",
+      "counterexample": "A dark tree against a pale sky is a clear figure on a ground — the sky never reads as a shape.",
+      "related": [
+        {"technique": "silhouette", "relation": "builds_on"},
+        {"technique": "visual-metaphor", "relation": "often_combined"},
+        {"technique": "negative-space", "relation": "related"}
+      ],
+      "goals": ["surprise", "make-an-idea-visible"],
+      "operations": ["substitute", "reduce"],
+      "domains": ["line-shape", "value"],
+      "search_hints": {
+        "met": ["silhouette cut paper", "positive negative"],
+        "aic": ["silhouette", "stencil"],
+        "cma": ["silhouette"],
+        "smithsonian": ["poster silhouette", "cooper hewitt poster"],
+        "commons": ["figure ground illusion", "rubin vase", "optical illusion"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Figure–ground (perception)\"", "url": "https://en.wikipedia.org/wiki/Figure%E2%80%93ground_(perception)"}],
+      "working_definition": true
+    },
+    {
+      "id": "visual-metaphor",
+      "name": "Visual metaphor",
+      "aliases": ["visual pun", "symbolic substitution", "conceptual image"],
+      "definition": "One thing is shown as, or in place of, another so that qualities transfer from one to the other.",
+      "explanation": "By merging or substituting forms — a cloud shaped like a sheep, a city as a circuit board — the image asks the viewer to map one idea onto another. It makes an abstract claim concrete and memorable.",
+      "when_it_helps": ["Expressing an abstract idea (time, risk, growth)", "Editorial and campaign imagery", "Making a message memorable"],
+      "observable_cues": ["A form that resembles or replaces something it is not", "Two concepts fused into one image", "The resemblance looks deliberate"],
+      "confusions": [
+        {"technique": "juxtaposition", "how_to_tell": "Juxtaposition keeps two things separate; metaphor fuses or substitutes them."},
+        {"technique": "figure-ground-ambiguity", "how_to_tell": "An ambiguous shape is a perceptual effect; a metaphor transfers meaning."}
+      ],
+      "limitations": "Interpretation is cultural and subjective; without documented intent, any metaphor reading is a possible interpretation, not a fact.",
+      "counterexample": "A rock that happens to look like a face is a resemblance, but unless the image builds on it, it is pareidolia, not a metaphor.",
+      "related": [
+        {"technique": "juxtaposition", "relation": "related"},
+        {"technique": "contextual-incongruity", "relation": "often_combined"},
+        {"technique": "figure-ground-ambiguity", "relation": "often_combined"}
+      ],
+      "goals": ["make-an-idea-visible", "surprise"],
+      "operations": ["substitute"],
+      "domains": ["meaning", "line-shape"],
+      "search_hints": {
+        "met": ["allegory", "vanitas", "emblem"],
+        "aic": ["allegory", "symbol"],
+        "cma": ["allegory", "vanitas"],
+        "smithsonian": ["poster", "propaganda poster"],
+        "commons": ["vanitas", "allegory painting", "emblem book"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Visual metaphor\"", "url": "https://en.wikipedia.org/wiki/Visual_metaphor"}],
+      "working_definition": true
+    },
+    {
+      "id": "contextual-incongruity",
+      "name": "Contextual incongruity",
+      "aliases": ["out of place", "unexpected element", "surreal placement"],
+      "definition": "Something appears in a setting where it does not belong, so the mismatch becomes the point.",
+      "explanation": "Settings create strong expectations of what they contain. An object, animal or person that violates those expectations is noticed immediately and prompts questions — humour, unease or curiosity.",
+      "when_it_helps": ["Stopping power in campaigns and editorial", "Humour and surrealism", "Prompting a question or story"],
+      "observable_cues": ["A recognisable setting with clear expectations", "One element that does not fit that setting", "The mismatch is the most noticeable feature"],
+      "confusions": [
+        {"technique": "repetition-with-interruption", "how_to_tell": "Interruption breaks a visual pattern; incongruity breaks a meaning or context."},
+        {"technique": "juxtaposition", "how_to_tell": "Juxtaposition compares two things; incongruity is one thing in the wrong place."}
+      ],
+      "limitations": "Depends on shared expectations about the setting; what is odd in one culture or period may be normal in another.",
+      "counterexample": "A boat on a lake fits its setting, so nothing is incongruous.",
+      "related": [
+        {"technique": "juxtaposition", "relation": "similar_purpose"},
+        {"technique": "visual-metaphor", "relation": "often_combined"},
+        {"technique": "scale-contrast", "relation": "can_create"}
+      ],
+      "goals": ["surprise", "tell-a-story"],
+      "operations": ["break-expectation", "juxtapose"],
+      "domains": ["meaning"],
+      "search_hints": {
+        "met": ["surreal", "fantastic", "strange"],
+        "aic": ["surrealism", "dream"],
+        "cma": ["surreal", "fantasy"],
+        "smithsonian": ["unusual photograph", "fantasy"],
+        "commons": ["surreal photography", "animal in city", "out of place"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Surrealism\"", "url": "https://en.wikipedia.org/wiki/Surrealism"}],
+      "working_definition": true
+    },
+    {
+      "id": "symmetry",
+      "name": "Symmetry and central balance",
+      "aliases": ["mirror symmetry", "centred composition", "formal balance", "bilateral symmetry"],
+      "definition": "The picture is arranged so that its halves mirror each other around a central axis, with the subject on that axis.",
+      "explanation": "Symmetry reads as order, stability and intention. It feels formal, calm, sacred or monumental, and any small break in it becomes very noticeable.",
+      "when_it_helps": ["Authority, ceremony, stillness", "Architecture and products presented formally", "Setting up a deliberate break"],
+      "observable_cues": ["A strong central vertical (or horizontal) axis", "Left and right halves closely mirror each other", "Subject on the centre line; reflections in water"],
+      "confusions": [
+        {"technique": "rhythm-pattern", "how_to_tell": "Pattern repeats along a direction; symmetry mirrors around an axis."},
+        {"technique": "framing", "how_to_tell": "A centred arch frames; symmetry is about the mirroring of the whole composition."}
+      ],
+      "limitations": "Can feel static or stiff; perfect symmetry with no tension may be dull.",
+      "counterexample": "A landscape with a tree on the left third and an empty field on the right is balanced asymmetrically, not symmetrically.",
+      "related": [
+        {"technique": "repetition-with-interruption", "relation": "can_create"},
+        {"technique": "framing", "relation": "often_combined"},
+        {"technique": "rhythm-pattern", "relation": "related"}
+      ],
+      "goals": ["create-calm", "draw-attention"],
+      "operations": ["repeat"],
+      "domains": ["position"],
+      "search_hints": {
+        "met": ["cathedral facade", "reflection lake", "temple"],
+        "aic": ["facade", "reflection", "temple"],
+        "cma": ["facade", "reflection"],
+        "smithsonian": ["architecture facade", "reflection photograph"],
+        "commons": ["symmetry architecture", "reflection lake mountain", "symmetrical corridor"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Symmetry\"", "url": "https://en.wikipedia.org/wiki/Symmetry"}],
+      "working_definition": true
+    },
+    {
+      "id": "rhythm-pattern",
+      "name": "Rhythm and pattern",
+      "aliases": ["repetition", "visual rhythm", "regular pattern", "series"],
+      "definition": "Similar elements repeat at regular or progressive intervals, creating a beat the eye follows across the picture.",
+      "explanation": "Repetition is easy to read and pleasant to scan. Regular intervals feel orderly and calm; accelerating or diminishing intervals create movement and depth.",
+      "when_it_helps": ["Texture and abundance", "Industrial, architectural or natural order", "A backdrop that makes one exception stand out"],
+      "observable_cues": ["Many similar elements (columns, windows, waves, rows)", "Regular or gradually changing spacing", "The repetition covers a large part of the picture"],
+      "confusions": [
+        {"technique": "repetition-with-interruption", "how_to_tell": "If one element breaks the pattern and becomes the focus, it is interruption."},
+        {"technique": "symmetry", "how_to_tell": "Symmetry mirrors; pattern repeats."}
+      ],
+      "limitations": "Pure pattern has no focal point and can feel monotonous.",
+      "counterexample": "Three scattered stones do not establish a rhythm — there are too few and the intervals vary randomly.",
+      "related": [
+        {"technique": "repetition-with-interruption", "relation": "can_create"},
+        {"technique": "leading-lines", "relation": "often_combined"},
+        {"technique": "symmetry", "relation": "related"}
+      ],
+      "goals": ["create-calm", "guide-the-eye", "suggest-motion"],
+      "operations": ["repeat"],
+      "domains": ["position", "line-shape"],
+      "search_hints": {
+        "met": ["colonnade", "textile pattern", "rows"],
+        "aic": ["pattern", "columns", "rows"],
+        "cma": ["pattern", "textile"],
+        "smithsonian": ["pattern design", "wallpaper"],
+        "commons": ["repetition pattern architecture", "rows of windows", "colonnade"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Rhythm (art)\"", "url": "https://en.wikipedia.org/wiki/Rhythm_(art)"}],
+      "working_definition": true
+    },
+    {
+      "id": "layered-depth",
+      "name": "Layered depth (foreground, middle, background)",
+      "aliases": ["depth layering", "overlap", "foreground interest", "planes"],
+      "definition": "Distinct planes — something near, something in the middle, something far — overlap to build deep space.",
+      "explanation": "Overlap is one of the strongest depth cues: what covers is nearer. Clear separate planes give the eye stepping stones into the picture and make a flat surface feel deep and immersive.",
+      "when_it_helps": ["Immersive landscapes and interiors", "Placing a subject within its world", "Adding interest to a distant view"],
+      "observable_cues": ["A distinct foreground element", "Overlapping forms at different distances", "Three or more separable planes"],
+      "confusions": [
+        {"technique": "atmospheric-perspective", "how_to_tell": "Atmospheric perspective uses haze and fading colour; layering uses overlap of distinct planes."},
+        {"technique": "framing", "how_to_tell": "A frame encloses; a foreground layer need not surround the subject."}
+      ],
+      "limitations": "Too many layers can clutter; a foreground that is too strong steals attention.",
+      "counterexample": "A flat wall photographed straight on has a single plane, so there is no depth layering.",
+      "related": [
+        {"technique": "atmospheric-perspective", "relation": "often_combined"},
+        {"technique": "framing", "relation": "often_combined"},
+        {"technique": "leading-lines", "relation": "often_combined"}
+      ],
+      "goals": ["build-depth", "guide-the-eye"],
+      "operations": ["layer"],
+      "domains": ["space"],
+      "search_hints": {
+        "met": ["landscape valley", "view of town", "river landscape"],
+        "aic": ["landscape", "valley", "view"],
+        "cma": ["landscape", "view"],
+        "smithsonian": ["landscape painting", "valley photograph"],
+        "commons": ["foreground middleground background", "mountain layers", "valley view"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Depth perception\" (occlusion cue)", "url": "https://en.wikipedia.org/wiki/Depth_perception"}],
+      "working_definition": true
+    },
+    {
+      "id": "atmospheric-perspective",
+      "name": "Atmospheric perspective",
+      "aliases": ["aerial perspective", "haze recession", "fading distance"],
+      "definition": "Distant forms become paler, bluer, softer and lower in contrast than near ones, as if seen through air.",
+      "explanation": "Air scatters light, so faraway things lose contrast and shift toward the sky colour. Reproducing that gradient tells the eye 'far away' even without lines or overlap, and often feels quiet and expansive.",
+      "when_it_helps": ["Vast, misty or serene landscapes", "Separating background planes", "Creating mood (mist, dawn, dusk)"],
+      "observable_cues": ["Successively paler, lower-contrast planes toward the horizon", "Distant forms tinted blue or grey", "Soft edges in the distance"],
+      "confusions": [
+        {"technique": "layered-depth", "how_to_tell": "Layering uses overlap; atmospheric perspective uses fading contrast and colour."},
+        {"technique": "selective-focus", "how_to_tell": "Focus blur comes from the lens; atmospheric fading comes from haze and colour shift."}
+      ],
+      "limitations": "Needs distance and air; close-up and interior subjects rarely show it.",
+      "counterexample": "A crisp, cloudless desert photo where far mountains are as sharp and dark as the foreground shows no atmospheric perspective.",
+      "related": [
+        {"technique": "layered-depth", "relation": "often_combined"},
+        {"technique": "color-harmony", "relation": "often_combined"},
+        {"technique": "negative-space", "relation": "related"}
+      ],
+      "goals": ["build-depth", "create-calm"],
+      "operations": ["layer", "reduce"],
+      "domains": ["space", "color", "value"],
+      "search_hints": {
+        "met": ["mist mountains", "hazy landscape", "Chinese landscape"],
+        "aic": ["mist", "mountains", "haze"],
+        "cma": ["mist", "mountains"],
+        "smithsonian": ["mountains mist", "hudson river school"],
+        "commons": ["mountain layers haze", "misty hills", "fog valley"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Aerial perspective\"", "url": "https://en.wikipedia.org/wiki/Aerial_perspective"}],
+      "working_definition": true
+    },
+    {
+      "id": "selective-focus",
+      "name": "Selective focus",
+      "aliases": ["shallow depth of field", "soft background", "bokeh isolation", "lost and found edges"],
+      "definition": "Only the subject is sharp or detailed; the rest is blurred or loosely rendered.",
+      "explanation": "The eye goes to sharp detail and treats blur as background. In photographs this comes from shallow depth of field; in painting from crisp versus loose handling. It separates the subject without changing its colour or light.",
+      "when_it_helps": ["Isolating a subject in clutter", "Portraits and product detail", "Suggesting a point of view or memory"],
+      "observable_cues": ["A sharply rendered area beside clearly blurred or sketchy areas", "Smooth, out-of-focus background", "Detail concentrated on the subject"],
+      "confusions": [
+        {"technique": "atmospheric-perspective", "how_to_tell": "Haze fades colour and contrast with distance; focus blur can affect near and far equally."},
+        {"technique": "value-contrast", "how_to_tell": "If the subject is singled out by sharpness rather than brightness, it is selective focus."}
+      ],
+      "limitations": "Overused blur can feel generic; in prints and paintings the effect depends on the artist's handling.",
+      "counterexample": "A landscape sharp from front to back gives the eye no focus cue.",
+      "related": [
+        {"technique": "value-contrast", "relation": "similar_purpose"},
+        {"technique": "negative-space", "relation": "similar_purpose"},
+        {"technique": "layered-depth", "relation": "often_combined"}
+      ],
+      "goals": ["draw-attention", "build-depth"],
+      "operations": ["isolate", "contrast"],
+      "domains": ["texture", "space"],
+      "search_hints": {
+        "met": ["photograph portrait", "pictorialism"],
+        "aic": ["pictorialist photograph", "soft focus"],
+        "cma": ["photograph portrait"],
+        "smithsonian": ["photograph flower close", "soft focus"],
+        "commons": ["shallow depth of field", "bokeh flower", "macro insect"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Depth of field\"", "url": "https://en.wikipedia.org/wiki/Depth_of_field"}],
+      "working_definition": true
+    },
+    {
+      "id": "diagonal-energy",
+      "name": "Diagonal energy",
+      "aliases": ["dynamic diagonal", "tilted axis", "oblique composition"],
+      "definition": "The main lines or forms run diagonally across the frame instead of horizontally or vertically.",
+      "explanation": "Horizontals and verticals read as stable; diagonals read as falling, rising or moving. A strong diagonal makes a still image feel active, unstable or dramatic.",
+      "when_it_helps": ["Action, struggle, speed", "Adding energy to architecture or landscape", "Unease and instability"],
+      "observable_cues": ["Dominant lines at roughly 30–60 degrees", "Figures or structures leaning or tilted", "Composition organised along a corner-to-corner axis"],
+      "confusions": [
+        {"technique": "leading-lines", "how_to_tell": "Leading lines are judged by where they lead; diagonals by the energy they create."},
+        {"technique": "implied-motion", "how_to_tell": "Implied motion shows something moving; diagonals can energise static subjects."}
+      ],
+      "limitations": "A tilt that looks accidental (a crooked horizon) reads as an error rather than energy.",
+      "counterexample": "A calm horizon with upright trees has no diagonal tension.",
+      "related": [
+        {"technique": "implied-motion", "relation": "often_combined"},
+        {"technique": "leading-lines", "relation": "often_combined"},
+        {"technique": "vantage-point", "relation": "can_create"}
+      ],
+      "goals": ["suggest-motion", "create-tension", "guide-the-eye"],
+      "operations": ["direct"],
+      "domains": ["line-shape"],
+      "search_hints": {
+        "met": ["storm ship", "battle", "wind trees"],
+        "aic": ["storm", "wind", "battle"],
+        "cma": ["storm", "battle"],
+        "smithsonian": ["staircase photograph", "bridge cables"],
+        "commons": ["diagonal composition", "staircase diagonal", "dutch angle"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Composition (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Composition_(visual_arts)"}],
+      "working_definition": true
+    },
+    {
+      "id": "implied-motion",
+      "name": "Implied motion",
+      "aliases": ["frozen action", "motion blur", "decisive moment", "movement cues"],
+      "definition": "A still image shows cues of movement — a pose mid-action, blur, flying material, or a moment just before or after an event.",
+      "explanation": "We complete actions in our heads. An unstable pose, streaks of blur or hair and cloth caught in the wind make the viewer feel the movement and anticipate what happens next.",
+      "when_it_helps": ["Sport, dance, weather, urgency", "Telling a moment in a story", "Bringing energy to still subjects"],
+      "observable_cues": ["Bodies or objects in unstable, mid-action positions", "Directional blur or streaks", "Wind-blown hair, cloth, water spray, birds in flight"],
+      "confusions": [
+        {"technique": "diagonal-energy", "how_to_tell": "Diagonals are structural lines; implied motion requires a moving subject or moment."},
+        {"technique": "selective-focus", "how_to_tell": "Motion blur streaks in one direction of travel; focus blur is soft and even."}
+      ],
+      "limitations": "Ambiguous blur can read as a mistake; stiff poses kill the effect.",
+      "counterexample": "A posed studio portrait with a seated sitter has no motion cues.",
+      "related": [
+        {"technique": "diagonal-energy", "relation": "often_combined"},
+        {"technique": "gaze-direction", "relation": "related"},
+        {"technique": "tight-cropping", "relation": "often_combined"}
+      ],
+      "goals": ["suggest-motion", "tell-a-story"],
+      "operations": ["break-expectation"],
+      "domains": ["time-motion", "body-gaze"],
+      "search_hints": {
+        "met": ["dancer", "horse galloping", "wave"],
+        "aic": ["dancer", "galloping", "wave"],
+        "cma": ["dancer", "horse"],
+        "smithsonian": ["motion photograph", "muybridge"],
+        "commons": ["motion blur", "jumping person", "bird in flight"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Motion blur\"", "url": "https://en.wikipedia.org/wiki/Motion_blur"}],
+      "working_definition": true
+    },
+    {
+      "id": "silhouette",
+      "name": "Silhouette",
+      "aliases": ["backlit shape", "shadow figure", "outline against light"],
+      "definition": "The subject is a dark, mostly featureless shape against a much lighter background, read by its outline alone.",
+      "explanation": "Removing interior detail leaves only contour, which the eye reads very fast. Silhouettes simplify, add mystery or anonymity, and depend on a distinctive, unoverlapped outline.",
+      "when_it_helps": ["Instant recognition of a shape", "Mystery, anonymity, universality", "Strong graphic design and posters"],
+      "observable_cues": ["Dark subject with little interior detail", "Bright sky, window or backdrop behind", "Clear, distinctive outline"],
+      "confusions": [
+        {"technique": "value-contrast", "how_to_tell": "Chiaroscuro models a lit subject; a silhouette hides the subject's detail."},
+        {"technique": "figure-ground-ambiguity", "how_to_tell": "A silhouette's background stays background; ambiguity needs both to read as figures."}
+      ],
+      "limitations": "Overlapping or frontal shapes merge into unreadable blobs; facial expression is lost.",
+      "counterexample": "A front-lit portrait with visible features is not a silhouette, however dark the background.",
+      "related": [
+        {"technique": "value-contrast", "relation": "builds_on"},
+        {"technique": "negative-space", "relation": "often_combined"},
+        {"technique": "figure-ground-ambiguity", "relation": "can_create"}
+      ],
+      "goals": ["draw-attention", "make-an-idea-visible", "create-calm"],
+      "operations": ["contrast", "reduce"],
+      "domains": ["value", "line-shape"],
+      "search_hints": {
+        "met": ["silhouette", "sunset figures", "shadow puppet"],
+        "aic": ["silhouette", "sunset"],
+        "cma": ["silhouette", "sunset"],
+        "smithsonian": ["silhouette portrait", "cut paper silhouette"],
+        "commons": ["silhouette sunset", "backlit person", "silhouette tree"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Silhouette\"", "url": "https://en.wikipedia.org/wiki/Silhouette"}],
+      "working_definition": true
+    },
+    {
+      "id": "texture-contrast",
+      "name": "Texture contrast",
+      "aliases": ["rough against smooth", "surface contrast", "tactile contrast"],
+      "definition": "Areas of very different surface quality — rough and smooth, detailed and plain — are set against each other.",
+      "explanation": "Texture invites an imagined touch. Placing a highly textured area beside a smooth one makes both more vivid and can separate a subject from its surroundings or suggest age, comfort or harshness.",
+      "when_it_helps": ["Material, craft and product imagery", "Separating subject from background without colour", "Age, weathering, softness"],
+      "observable_cues": ["Clearly different surface qualities side by side", "One area dense with detail, another plain", "Light raking across a surface to reveal texture"],
+      "confusions": [
+        {"technique": "selective-focus", "how_to_tell": "Blur removes detail through focus; texture contrast is a difference in the surfaces themselves."},
+        {"technique": "tight-cropping", "how_to_tell": "Close crops often reveal texture, but the crop is the framing decision."}
+      ],
+      "limitations": "Small reproductions lose fine texture, so the effect needs size or a close view.",
+      "counterexample": "A uniformly smooth ceramic on a smooth cloth shows no texture contrast.",
+      "related": [
+        {"technique": "tight-cropping", "relation": "often_combined"},
+        {"technique": "value-contrast", "relation": "often_combined"},
+        {"technique": "juxtaposition", "relation": "related"}
+      ],
+      "goals": ["draw-attention", "make-an-idea-visible"],
+      "operations": ["contrast"],
+      "domains": ["texture"],
+      "search_hints": {
+        "met": ["still life textures", "fur", "lace", "armor"],
+        "aic": ["still life", "fur", "textile"],
+        "cma": ["still life", "lace"],
+        "smithsonian": ["texture photograph", "bark"],
+        "commons": ["rough smooth texture", "tree bark close-up", "weathered wood"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Texture (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Texture_(visual_arts)"}],
+      "working_definition": true
+    },
+    {
+      "id": "vantage-point",
+      "name": "Unusual vantage point",
+      "aliases": ["low angle", "high angle", "bird's-eye view", "worm's-eye view", "overhead view"],
+      "definition": "The scene is seen from markedly above or below normal eye level.",
+      "explanation": "Viewpoint changes power and familiarity. Looking up makes subjects loom and feel heroic or threatening; looking down makes them small, patterned or vulnerable; straight down turns scenes into maps and graphics.",
+      "when_it_helps": ["Power, dominance or vulnerability", "Turning familiar scenes into graphic patterns", "Making architecture monumental"],
+      "observable_cues": ["Strong converging verticals (looking up) or a visible ground plane/pattern from above", "Horizon very high, very low or absent", "Subjects foreshortened"],
+      "confusions": [
+        {"technique": "scale-contrast", "how_to_tell": "Viewpoint changes apparent size through perspective; scale contrast compares two objects."},
+        {"technique": "diagonal-energy", "how_to_tell": "Low angles often create diagonals, but the mechanism is the viewpoint."}
+      ],
+      "limitations": "Extreme angles can distort subjects unflatteringly; viewers may not read the viewpoint in abstract compositions.",
+      "counterexample": "An eye-level street view with a centred horizon uses a normal vantage point.",
+      "related": [
+        {"technique": "diagonal-energy", "relation": "can_create"},
+        {"technique": "scale-contrast", "relation": "related"},
+        {"technique": "rhythm-pattern", "relation": "can_create"}
+      ],
+      "goals": ["create-tension", "show-scale", "surprise"],
+      "operations": ["break-expectation"],
+      "domains": ["space", "scale"],
+      "search_hints": {
+        "met": ["view from above", "bird's eye view", "aerial view city"],
+        "aic": ["view from above", "aerial"],
+        "cma": ["view from above", "bird's eye"],
+        "smithsonian": ["aerial photograph", "skyscraper looking up"],
+        "commons": ["looking up skyscraper", "aerial view pattern", "top-down view"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Camera angle\"", "url": "https://en.wikipedia.org/wiki/Camera_angle"}],
+      "working_definition": true
+    },
+    {
+      "id": "color-harmony",
+      "name": "Limited palette harmony",
+      "aliases": ["analogous colour", "monochrome palette", "colour unity", "restricted palette"],
+      "definition": "The picture uses a narrow range of related hues (or one hue in many tones), so the colours unify rather than compete.",
+      "explanation": "A restricted palette makes an image feel coherent and sets a single mood — warm nostalgia, cool calm, sombre monochrome. It also makes any departure from the palette very visible.",
+      "when_it_helps": ["Setting a consistent mood", "Brand and series consistency", "Calm, nostalgic or atmospheric imagery"],
+      "observable_cues": ["Most colours sit in one family (e.g. browns and golds, blues and greens)", "Low variety of hue", "Sepia, monochrome or tinted look"],
+      "confusions": [
+        {"technique": "color-contrast", "how_to_tell": "Contrast relies on distant hues; harmony relies on close ones."},
+        {"technique": "atmospheric-perspective", "how_to_tell": "Haze unifies distant colour; a limited palette unifies the whole image."}
+      ],
+      "limitations": "Black-and-white originals have a limited palette by medium, not necessarily by choice; note the medium before reading intent into it.",
+      "counterexample": "A bright market scene with every hue present has no limited palette.",
+      "related": [
+        {"technique": "color-contrast", "relation": "opposite_strategy"},
+        {"technique": "atmospheric-perspective", "relation": "often_combined"},
+        {"technique": "negative-space", "relation": "related"}
+      ],
+      "goals": ["create-calm", "make-an-idea-visible"],
+      "operations": ["reduce"],
+      "domains": ["color"],
+      "search_hints": {
+        "met": ["nocturne", "blue period", "sepia"],
+        "aic": ["nocturne", "blue", "twilight"],
+        "cma": ["nocturne", "twilight"],
+        "smithsonian": ["tonalism", "nocturne"],
+        "commons": ["monochromatic photography", "blue hour city", "golden hour field"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Color scheme\"", "url": "https://en.wikipedia.org/wiki/Color_scheme"}],
+      "working_definition": true
+    },
+    {
+      "id": "asymmetric-balance",
+      "name": "Off-centre placement",
+      "aliases": ["rule of thirds", "asymmetric balance", "counterweight", "off-centre subject"],
+      "definition": "The main subject sits away from the centre and is balanced by space or a smaller element on the other side.",
+      "explanation": "Placing the subject off-centre creates a mild tension and gives the eye somewhere to travel between subject and counterweight. It often feels more natural and dynamic than a centred layout.",
+      "when_it_helps": ["Natural, relaxed compositions", "Leaving room for text or for a subject to look or move into", "Balancing a large shape with a small bright one"],
+      "observable_cues": ["Main subject near a third of the frame, not the centre", "Open space or a smaller element balancing the other side", "Horizon on an upper or lower third"],
+      "confusions": [
+        {"technique": "symmetry", "how_to_tell": "Symmetry centres the subject and mirrors; off-centre placement balances unequal sides."},
+        {"technique": "negative-space", "how_to_tell": "The empty side may be negative space, but the mechanism here is the off-centre balance."}
+      ],
+      "limitations": "The 'rule of thirds' is a convention, not a law; many strong images are centred.",
+      "counterexample": "A centred portrait facing the viewer is deliberately symmetrical, not off-centre.",
+      "related": [
+        {"technique": "negative-space", "relation": "often_combined"},
+        {"technique": "gaze-direction", "relation": "often_combined"},
+        {"technique": "symmetry", "relation": "opposite_strategy"}
+      ],
+      "goals": ["guide-the-eye", "create-calm"],
+      "operations": ["isolate"],
+      "domains": ["position"],
+      "search_hints": {
+        "met": ["landscape with figure", "boat on river"],
+        "aic": ["landscape figure", "boat"],
+        "cma": ["landscape", "boat"],
+        "smithsonian": ["landscape photograph"],
+        "commons": ["rule of thirds", "lone boat lake", "lighthouse coast"]
+      },
+      "sources": [{"citation": "Wikipedia, \"Rule of thirds\"", "url": "https://en.wikipedia.org/wiki/Rule_of_thirds"}],
+      "working_definition": true
+    }
+  ]
+}

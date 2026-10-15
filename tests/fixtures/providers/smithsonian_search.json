@@ -1,0 +1,661 @@
+{
+  "status": 200,
+  "responseCode": 1,
+  "response": {
+    "rows": [
+      {
+        "id": "ld1-1643399887910-1643399897946-1",
+        "title": "Design for a Lighthouse",
+        "unitCode": "CHNDM",
+        "type": "edanmdm",
+        "url": "edanmdm:chndm_1921-6-293-4",
+        "content": {
+          "freetext": {
+            "date": [
+              {
+                "label": "Date",
+                "content": "1760–75"
+              }
+            ],
+            "name": [
+              {
+                "label": "Designer",
+                "content": "A. Le Canu, French, active 1746 – 1768"
+              },
+              {
+                "label": "Publisher",
+                "content": "Jean François Daumont, French, active 1740-1775"
+              },
+              {
+                "label": "Print Maker",
+                "content": "A. Le Canu, French, active 1746 – 1768"
+              }
+            ],
+            "notes": [
+              {
+                "label": "Catalogue Status",
+                "content": "Research in Progress"
+              },
+              {
+                "label": "Description",
+                "content": "Design for a Neoclassical lighthouse with a smooth-faced horizontal banded rusticated façade. Doors on the sides, with windows above, and a central door on the balcony level. Figures visible on the balcony and around the base of the lighthouse. The French royal coat of arms on the upper façade of the tower. Topped with a flaming/ smoking urn or vase framed within a round trellised structure. Clouds in the background and steps leading up to the lighthouse. A scale below the design. The plate is titled and numbered."
+              }
+            ],
+            "place": [
+              {
+                "label": "made in",
+                "content": "France"
+              },
+              {
+                "label": "published in",
+                "content": "Paris, France"
+              }
+            ],
+            "setName": [
+              {
+                "label": "See more items in",
+                "content": "Cooper Hewitt, Smithsonian Design Museum Collection"
+              },
+              {
+                "label": "See more items in",
+                "content": "Drawings, Prints, and Graphic Design Department"
+              }
+            ],
+            "creditLine": [
+              {
+                "label": "Credit Line",
+                "content": "Purchased for the Museum by the Advisory Council"
+              }
+            ],
+            "dataSource": [
+              {
+                "label": "Data Source",
+                "content": "Cooper Hewitt, Smithsonian Design Museum"
+              }
+            ],
+            "identifier": [
+              {
+                "label": "Accession Number",
+                "content": "1921-6-293-4"
+              }
+            ],
+            "objectType": [
+              {
+                "label": "Type",
+                "content": "architecture"
+              },
+              {
+                "label": "Object Name",
+                "content": "Print"
+              },
+              {
+                "label": "Type",
+                "content": "Print"
+              }
+            ],
+            "objectRights": [
+              {
+                "label": "Restrictions & Rights",
+                "content": "CC0"
+              }
+            ],
+            "physicalDescription": [
+              {
+                "label": "Medium",
+                "content": "Engraving on white laid paper"
+              },
+              {
+                "label": "Dimensions",
+                "content": "Sheet: 45.1 x 29.8 cm (17 3/4 x 11 3/4 in.)"
+              },
+              {
+                "label": "Dimensions",
+                "content": "Platemark: 27.3 x 18.6 cm (10 3/4 x 7 5/16 in.)"
+              }
+            ]
+          },
+          "indexedStructured": {
+            "date": [
+              "1770s",
+              "1760s"
+            ],
+            "name": [
+              "Daumont, Jean François",
+              "Le Canu, A"
+            ],
+            "place": [
+              "France",
+              "Paris"
+            ],
+            "topic": [
+              "Architecture"
+            ],
+            "geoLocation": [
+              {
+                "L2": {
+                  "type": "Country",
+                  "content": "France"
+                }
+              },
+              {
+                "L2": {
+                  "type": "Country",
+                  "content": "France"
+                },
+                "L5": {
+                  "type": "City",
+                  "content": "Paris"
+                }
+              }
+            ],
+            "object_type": [
+              "Prints"
+            ],
+            "online_media_type": [
+              "Images"
+            ]
+          },
+          "descriptiveNonRepeating": {
+            "guid": "http://n2t.net/ark:/65665/kq4e45af9a3-7cdf-4b46-9a47-c7c739d5504e",
+            "title": {
+              "label": "Title",
+              "content": "Design for a Lighthouse"
+            },
+            "record_ID": "chndm_1921-6-293-4",
+            "unit_code": "CHNDM",
+            "title_sort": "DESIGN FOR A LIGHTHOUSE",
+            "data_source": "Cooper Hewitt, Smithsonian Design Museum",
+            "record_link": "https://collection.cooperhewitt.org/view/objects/asitem/id/30588",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:CHSDM-CH1078",
+                  "guid": "http://n2t.net/ark:/65665/vc951a81e29-92e1-4d1a-9f9c-514663cdfc67",
+                  "type": "Images",
+                  "idsId": "CHSDM-CH1078",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-CH1078",
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-CH1078",
+                  "altTextAccessibility": "DESIGN FOR A LIGHTHOUSE",
+                  "extDescrAccessibility": "Design for a Neoclassical lighthouse with a smooth-faced horizontal banded rusticated façade. Doors on the sides, with windows above, and a central door on the balcony level. Figures visible on the balcony and around the base of the lighthouse. The French royal coat of arms on the upper façade of the tower. Topped with a flaming/ smoking urn or vase framed within a round trellised structure. Clouds in the background and steps leading up to the lighthouse. A scale below the design. The plate is titled and numbered.",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-CH1078.jpg",
+                      "width": 1019,
+                      "height": 1500,
+                      "dimensions": "1019x1500"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-CH1078_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-CH1078_thumb"
+                    }
+                  ]
+                },
+                {
+                  "id": "media:CHSDM-3C37CEEE2FFF2-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc9188022cd-d6c3-4c57-a873-369173abb181",
+                  "type": "Images",
+                  "idsId": "CHSDM-3C37CEEE2FFF2-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-3C37CEEE2FFF2-000001",
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-3C37CEEE2FFF2-000001",
+                  "altTextAccessibility": "DESIGN FOR A LIGHTHOUSE",
+                  "extDescrAccessibility": "Design for a Neoclassical lighthouse with a smooth-faced horizontal banded rusticated façade. Doors on the sides, with windows above, and a central door on the balcony level. Figures visible on the balcony and around the base of the lighthouse. The French royal coat of arms on the upper façade of the tower. Topped with a flaming/ smoking urn or vase framed within a round trellised structure. Clouds in the background and steps leading up to the lighthouse. A scale below the design. The plate is titled and numbered.",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-3C37CEEE2FFF2-000001.jpg",
+                      "width": 4506,
+                      "height": 6670,
+                      "dimensions": "4506x6670"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-3C37CEEE2FFF2-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-3C37CEEE2FFF2-000001_thumb"
+                    }
+                  ]
+                }
+              ],
+              "mediaCount": 2
+            },
+            "metadata_usage": {
+              "access": "CC0"
+            }
+          }
+        },
+        "hash": "9317c596670294103407c216eb1b57c567d725c0",
+        "docSignature": "d0fe328da8cef29a4d1f0ed15676b726",
+        "timestamp": "1663784056",
+        "lastTimeUpdated": "1769540882",
+        "version": "1769538334"
+      },
+      {
+        "id": "ld1-1643381040022-1643381047102-0",
+        "title": "Sea View of Cape Poge Lighthouse",
+        "unitCode": "SAAM",
+        "type": "edanmdm",
+        "url": "edanmdm:saam_1976.116",
+        "content": {
+          "freetext": {
+            "date": [
+              {
+                "label": "Date",
+                "content": "ca. 1840-1849"
+              }
+            ],
+            "name": [
+              {
+                "label": "Artist",
+                "content": "Charles Hubbard, born 1801-died 1876"
+              }
+            ],
+            "topic": [
+              {
+                "label": "Topic",
+                "content": "Figure group"
+              },
+              {
+                "label": "Topic",
+                "content": "Waterscape\\boat"
+              },
+              {
+                "label": "Topic",
+                "content": "Landscape\\coast"
+              },
+              {
+                "label": "Topic",
+                "content": "Landscape\\Massachusetts\\Cape Poge"
+              },
+              {
+                "label": "Topic",
+                "content": "Architecture\\lighthouse\\Cape Poge Lighthouse"
+              }
+            ],
+            "setName": [
+              {
+                "label": "See more items in",
+                "content": "Smithsonian American Art Museum Collection"
+              },
+              {
+                "label": "Department",
+                "content": "Painting and Sculpture"
+              }
+            ],
+            "creditLine": [
+              {
+                "label": "Credit Line",
+                "content": "Smithsonian American Art Museum, Museum purchase"
+              }
+            ],
+            "dataSource": [
+              {
+                "label": "Data Source",
+                "content": "Smithsonian American Art Museum"
+              }
+            ],
+            "identifier": [
+              {
+                "label": "Object number",
+                "content": "1976.116"
+              }
+            ],
+            "objectType": [
+              {
+                "label": "Type",
+                "content": "Painting"
+              }
+            ],
+            "objectRights": [
+              {
+                "label": "Restrictions & Rights",
+                "content": "CC0"
+              }
+            ],
+            "physicalDescription": [
+              {
+                "label": "Medium",
+                "content": "oil on wood"
+              },
+              {
+                "label": "Dimensions",
+                "content": "15 5/8 x 21 5/8 in. (39.7 x 54.8 cm)"
+              }
+            ]
+          },
+          "indexedStructured": {
+            "date": [
+              "1840s"
+            ],
+            "name": [
+              "Hubbard, Charles"
+            ],
+            "place": [
+              "Massachusetts"
+            ],
+            "topic": [
+              "Boats and boating",
+              "Landscapes",
+              "Coasts",
+              "Architecture",
+              "Figure group",
+              "Lighthouses",
+              "Cape Poge",
+              "Cape Poge Lighthouse",
+              "Waterscapes"
+            ],
+            "usage_flag": [
+              "permcoll"
+            ],
+            "geoLocation": [
+              {
+                "L1": {
+                  "type": "Continent",
+                  "content": "North America"
+                },
+                "L2": {
+                  "type": "Country",
+                  "content": "United States"
+                },
+                "L3": {
+                  "type": "State",
+                  "content": "Massachusetts"
+                }
+              }
+            ],
+            "object_type": [
+              "Paintings"
+            ],
+            "online_media_type": [
+              "Images"
+            ]
+          },
+          "descriptiveNonRepeating": {
+            "guid": "http://n2t.net/ark:/65665/vk798404e59-8587-461e-924d-718b2fa222a2",
+            "title": {
+              "label": "Title",
+              "content": "Sea View of Cape Poge Lighthouse"
+            },
+            "record_ID": "saam_1976.116",
+            "unit_code": "SAAM",
+            "title_sort": "SEA VIEW OF CAPE POGE LIGHTHOUSE",
+            "data_source": "Smithsonian American Art Museum",
+            "record_link": "https://americanart.si.edu/collections/search/artwork/?id=10861",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:SAAM-1976.116_1",
+                  "guid": "http://n2t.net/ark:/65665/bj99a99f0d4-95a8-4c92-a378-285c41a3f951",
+                  "type": "Images",
+                  "idsId": "SAAM-1976.116_1",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "content": "https://ids.si.edu/ids/deliveryService?id=SAAM-1976.116_1",
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=SAAM-1976.116_1",
+                  "altTextAccessibility": "",
+                  "extDescrAccessibility": "",
+                  "resources": [
+                    {
+                      "label": "High-resolution TIFF",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1976.116_1.tif",
+                      "width": 3000,
+                      "height": 2156,
+                      "dimensions": "3000x2156"
+                    },
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1976.116_1.jpg",
+                      "width": 3000,
+                      "height": 2156,
+                      "dimensions": "3000x2156"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1976.116_1_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1976.116_1_thumb"
+                    }
+                  ]
+                }
+              ],
+              "mediaCount": 1
+            },
+            "metadata_usage": {
+              "access": "CC0"
+            }
+          }
+        },
+        "hash": "7f90903e33b4a29cdf7984c5437770ed9a590c01",
+        "docSignature": "9992c3a3f268955fe557a7c255298a39",
+        "timestamp": "1663786514",
+        "lastTimeUpdated": "1757413722",
+        "version": "1757407933"
+      },
+      {
+        "id": "ld1-1643381040022-1643381061142-0",
+        "title": "Ruins of the Charleston Lighthouse, Morris Island, South Carolina",
+        "unitCode": "SAAM",
+        "type": "edanmdm",
+        "url": "edanmdm:saam_1994.91.52",
+        "content": {
+          "freetext": {
+            "date": [
+              {
+                "label": "Date",
+                "content": "ca. 1863"
+              }
+            ],
+            "name": [
+              {
+                "label": "Artist",
+                "content": "J. R. Foster, active 1860s-1870s"
+              }
+            ],
+            "topic": [
+              {
+                "label": "Topic",
+                "content": "History\\United States\\Civil War"
+              },
+              {
+                "label": "Topic",
+                "content": "Landscape\\South Carolina\\Charleston"
+              },
+              {
+                "label": "Topic",
+                "content": "Landscape\\South Carolina\\Morris Island"
+              },
+              {
+                "label": "Topic",
+                "content": "Architecture Exterior\\ruins"
+              },
+              {
+                "label": "Topic",
+                "content": "Architecture Exterior\\lighthouse"
+              },
+              {
+                "label": "Topic",
+                "content": "Architecture Exterior\\lighthouse\\Charleston Lighthouse"
+              }
+            ],
+            "setName": [
+              {
+                "label": "See more items in",
+                "content": "Smithsonian American Art Museum Collection"
+              },
+              {
+                "label": "Department",
+                "content": "Graphic Arts"
+              }
+            ],
+            "creditLine": [
+              {
+                "label": "Credit Line",
+                "content": "Smithsonian American Art Museum, Museum purchase from the Charles Isaacs Collection made possible in part by the Luisita L. and Franz H. Denghausen Endowment"
+              }
+            ],
+            "dataSource": [
+              {
+                "label": "Data Source",
+                "content": "Smithsonian American Art Museum"
+              }
+            ],
+            "identifier": [
+              {
+                "label": "Object number",
+                "content": "1994.91.52"
+              }
+            ],
+            "objectType": [
+              {
+                "label": "Type",
+                "content": "Photography-Photoprint"
+              }
+            ],
+            "objectRights": [
+              {
+                "label": "Restrictions & Rights",
+                "content": "CC0"
+              }
+            ],
+            "physicalDescription": [
+              {
+                "label": "Medium",
+                "content": "albumen silver print"
+              },
+              {
+                "label": "Dimensions",
+                "content": "sheet and image: 5 1/4 x 8 1/8 in. (13.3 x 20.7 cm.)"
+              }
+            ]
+          },
+          "indexedStructured": {
+            "date": [
+              "1861-1885",
+              "1860s"
+            ],
+            "name": [
+              "Foster, J. R."
+            ],
+            "place": [
+              "Charleston (S.C.)",
+              "United States",
+              "South Carolina"
+            ],
+            "topic": [
+              "Ruins",
+              "Landscapes",
+              "Civil War, 1861-1865",
+              "Architecture",
+              "Charleston Lighthouse",
+              "American Civil War (1861-1865)",
+              "History",
+              "Lighthouses",
+              "Morris Island"
+            ],
+            "usage_flag": [
+              "permcoll"
+            ],
+            "geoLocation": [
+              {
+                "L1": {
+                  "type": "Continent",
+                  "content": "North America"
+                },
+                "L2": {
+                  "type": "Country",
+                  "content": "United States of America"
+                }
+              }
+            ],
+            "object_type": [
+              "Photographs"
+            ],
+            "online_media_type": [
+              "Images"
+            ]
+          },
+          "descriptiveNonRepeating": {
+            "guid": "http://n2t.net/ark:/65665/vk7996f6ad5-efc6-4fd2-acc7-3de0782662af",
+            "title": {
+              "label": "Title",
+              "content": "Ruins of the Charleston Lighthouse, Morris Island, South Carolina"
+            },
+            "record_ID": "saam_1994.91.52",
+            "unit_code": "SAAM",
+            "title_sort": "RUINS OF THE CHARLESTON LIGHTHOUSE, MORRIS ISLAND, SOUTH CAROLINA",
+            "data_source": "Smithsonian American Art Museum",
+            "record_link": "https://americanart.si.edu/collections/search/artwork/?id=34214",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:SAAM-1994.91.52_1",
+                  "guid": "http://n2t.net/ark:/65665/bj9fd52cc39-4710-4925-a925-bfc11b8a167a",
+                  "type": "Images",
+                  "idsId": "SAAM-1994.91.52_1",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "content": "https://ids.si.edu/ids/deliveryService?id=SAAM-1994.91.52_1",
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=SAAM-1994.91.52_1",
+                  "altTextAccessibility": "",
+                  "extDescrAccessibility": "",
+                  "resources": [
+                    {
+                      "label": "High-resolution TIFF",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1994.91.52_1.tif",
+                      "width": 3000,
+                      "height": 2090,
+                      "dimensions": "3000x2090"
+                    },
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1994.91.52_1.jpg",
+                      "width": 3000,
+                      "height": 2090,
+                      "dimensions": "3000x2090"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1994.91.52_1_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=SAAM-1994.91.52_1_thumb"
+                    }
+                  ]
+                }
+              ],
+              "mediaCount": 1
+            },
+            "metadata_usage": {
+              "access": "CC0"
+            }
+          }
+        },
+        "hash": "dcb374b1e494f8d3876daf92fad178b2a08b436a",
+        "docSignature": "38c3d9832870691b7243733c345f5dbf",
+        "timestamp": "1663786514",
+        "lastTimeUpdated": "1769619007",
+        "version": "1769601223"
+      }
+    ],
+    "facets": {},
+    "rowCount": 2949,
+    "message": "content found"
+  }
+}

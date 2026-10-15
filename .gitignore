@@ -1,0 +1,33 @@
+# secrets and local-only files
+.env
+.env.*
+!.env.example
+*.local
+OWNER-NEEDED.md
+logs/
+.claude/settings.local.json
+
+# user libraries never enter this repo (they live in VISUAL_ATLAS_HOME)
+*.db
+*.db-*
+*.db.*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+home/
+scratch/
+
+# build output and tooling
+node_modules/
+dist/
+web/dist-demo/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.uv-cache/
+*.egg-info/
+web/test-results/
+.playwright-mcp/
+release/

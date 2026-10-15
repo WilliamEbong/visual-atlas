@@ -1,0 +1,39 @@
+[project]
+name = "visual-atlas"
+version = "0.1.0"
+description = "Find free-to-use images, learn the visual techniques that make them work, and apply them to your projects"
+requires-python = ">=3.14"
+license = "MIT"
+dependencies = [
+  "fastapi>=0.142,<0.143", "uvicorn>=0.54,<0.55", "typer>=0.27,<0.28",
+  "pydantic>=2.13,<2.14", "httpx>=0.28,<1", "pillow>=11",
+]
+
+[project.scripts]
+atlas = "atlas.cli:app"
+
+[project.gui-scripts]
+visual-atlas = "atlas.launcher:main"
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "atlas"
+module-root = ""
+
+[dependency-groups]
+dev = ["pytest>=9,<10", "ruff>=0.15", "pip-audit>=2.9"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: opt-in subscription CLI or external provider calls"]
+addopts = "-m 'not live'"
+
+[tool.ruff]
+target-version = "py314"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

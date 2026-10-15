@@ -1,0 +1,224 @@
+{
+  "version": "2026-10-15.1",
+  "note": "Which providers Visual Atlas may collect from, and why. atlas/rights.py applies each enabled provider's rule to every item; anything that does not meet the rule is ineligible. 'checked_on' is when a person last read the evidence pages. Re-check before changing a status.",
+  "user_agent": "VisualAtlas/0.1 (+https://github.com/WilliamEbong/visual-atlas; local personal research app)",
+  "providers": [
+    {
+      "id": "aic",
+      "name": "Art Institute of Chicago",
+      "status": "enabled",
+      "hosts": [
+        "api.artic.edu",
+        "www.artic.edu"
+      ],
+      "requires_key": false,
+      "min_interval_seconds": 1.1,
+      "accepted_licenses": [
+        "CC0-1.0"
+      ],
+      "rule": "Artwork record has is_public_domain == true and an image_id. Image fetched from the IIIF service at 843 px wide (AIC's recommended cached size).",
+      "label": "CC0 — source checked",
+      "attribution": "Not legally required; AIC asks for a caption: Artist, Title, Date. The Art Institute of Chicago.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "Public-domain status covers the artwork image only; AIC's text 'description' field is CC BY 4.0 and is attributed if shown.",
+      "evidence_urls": [
+        "https://www.artic.edu/open-access/open-access-images",
+        "https://www.artic.edu/image-licensing",
+        "https://api.artic.edu/docs/",
+        "https://www.artic.edu/terms"
+      ],
+      "notes": "IIIF image requests must send the AIC-User-Agent header (their documented courtesy header); without it the CDN challenges automated clients, which Visual Atlas never tries to bypass. Keep to about 1 request per second.",
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "met",
+      "name": "The Metropolitan Museum of Art",
+      "status": "enabled",
+      "hosts": [
+        "collectionapi.metmuseum.org",
+        "images.metmuseum.org"
+      ],
+      "requires_key": false,
+      "min_interval_seconds": 0.1,
+      "accepted_licenses": [
+        "CC0-1.0"
+      ],
+      "rule": "Object record has isPublicDomain == true and a primaryImage URL on images.metmuseum.org.",
+      "label": "CC0 — source checked",
+      "attribution": "Not legally required; credit included: Artist, Title, Date. The Metropolitan Museum of Art, Credit line.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "Only objects The Met marks public domain; other objects are skipped.",
+      "evidence_urls": [
+        "https://www.metmuseum.org/hubs/open-access",
+        "https://metmuseum.github.io/",
+        "https://www.metmuseum.org/policies/terms-and-conditions"
+      ],
+      "notes": "The /v1/search endpoint was retired on 2026-10-01; Visual Atlas uses /v1.1/search (paginated) and checks isPublicDomain on each object. Stay well under 80 requests per second.",
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "cma",
+      "name": "Cleveland Museum of Art",
+      "status": "enabled",
+      "hosts": [
+        "openaccess-api.clevelandart.org",
+        "openaccess-cdn.clevelandart.org"
+      ],
+      "requires_key": false,
+      "min_interval_seconds": 0.5,
+      "accepted_licenses": [
+        "CC0-1.0"
+      ],
+      "rule": "Artwork record has share_license_status == 'CC0' and images.web.url on openaccess-cdn.clevelandart.org.",
+      "label": "CC0 — source checked",
+      "attribution": "Not legally required; credit included: Artist, Title, Date. The Cleveland Museum of Art.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "Copyrighted and 'Other' records are skipped.",
+      "evidence_urls": [
+        "https://www.clevelandart.org/open-access",
+        "https://openaccess-api.clevelandart.org/"
+      ],
+      "notes": "The image CDN returned HTTP 521 during the 2026-10-15 check (temporary outage); jobs record such failures and move on.",
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "smithsonian",
+      "name": "Smithsonian Open Access",
+      "status": "enabled",
+      "hosts": [
+        "api.si.edu",
+        "ids.si.edu"
+      ],
+      "requires_key": true,
+      "key_setting": "SMITHSONIAN_API_KEY",
+      "key_fallback": "DEMO_KEY",
+      "min_interval_seconds": 2,
+      "accepted_licenses": [
+        "CC0-1.0"
+      ],
+      "rule": "The image media item itself has usage.access == 'CC0' (online_media.media[].usage.access). CC0 metadata alone is not enough.",
+      "label": "CC0 — source checked",
+      "attribution": "Not legally required; credit included: Title, Creator, Smithsonian unit, CC0.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).",
+      "evidence_urls": [
+        "https://www.si.edu/openaccess/faq",
+        "https://edan.si.edu/openaccess/apidocs/",
+        "https://api.data.gov/docs/developer-manual/"
+      ],
+      "notes": "Without your own free api.data.gov key Visual Atlas uses the shared DEMO_KEY, which is limited to a few requests per hour; add SMITHSONIAN_API_KEY to the .env file in your Visual Atlas folder for more.",
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "commons",
+      "name": "Wikimedia Commons",
+      "status": "enabled",
+      "hosts": [
+        "commons.wikimedia.org",
+        "upload.wikimedia.org",
+        "thumb.wikimedia.org"
+      ],
+      "requires_key": false,
+      "min_interval_seconds": 1,
+      "accepted_licenses": [
+        "CC0-1.0",
+        "PDM-1.0",
+        "PD",
+        "CC-BY-4.0",
+        "CC-BY-3.0",
+        "CC-BY-2.5",
+        "CC-BY-2.0",
+        "CC-BY-1.0"
+      ],
+      "rule": "Per-file extmetadata LicenseShortName is CC0, Public domain, or CC BY (any version, no SA/NC/ND), with a licence URL for CC BY, an author for CC BY, and no multi-licence ambiguity. Files with a Restrictions value are flagged.",
+      "label": "Depends on the file: 'Public domain — source checked', 'CC0 — source checked' or 'Free with attribution — credit included'",
+      "attribution": "CC BY files: author, title, licence name with link, source link — carried into every export.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.",
+      "evidence_urls": [
+        "https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia",
+        "https://www.mediawiki.org/wiki/Extension:CommonsMetadata",
+        "https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy",
+        "https://www.mediawiki.org/wiki/API:Etiquette"
+      ],
+      "notes": "Requests send a descriptive User-Agent and run one at a time. Searches are narrowed with structured-data licence statements (P275/P6216) and every file is still checked individually.",
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "unsplash",
+      "name": "Unsplash",
+      "status": "disabled",
+      "reason": "API terms require hotlinking images rather than storing copies, and Unsplash's terms bar use in connection with machine-learning or AI datasets. Permission for our store-and-analyse use is unclear.",
+      "evidence_urls": [
+        "https://unsplash.com/api-terms",
+        "https://unsplash.com/terms",
+        "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "pexels",
+      "name": "Pexels",
+      "status": "disabled",
+      "reason": "Licence allows ordinary reuse, but Pexels prohibits collecting images at scale to train, fine-tune or evaluate AI without permission; whether automated per-image analysis counts is unclear.",
+      "evidence_urls": [
+        "https://www.pexels.com/license/",
+        "https://www.pexels.com/terms-of-service/",
+        "https://help.pexels.com/hc/en-us/articles/900005880463"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "pixabay",
+      "name": "Pixabay",
+      "status": "disabled",
+      "reason": "Terms prohibit data mining and scraping for machine learning; automated collection plus AI analysis is not clearly permitted.",
+      "evidence_urls": [
+        "https://pixabay.com/service/terms/",
+        "https://pixabay.com/api/docs/"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "openverse",
+      "name": "Openverse",
+      "status": "candidate",
+      "reason": "Aggregator that does not verify licences itself; each result would need checking at its original source. Not built yet.",
+      "evidence_urls": [
+        "https://docs.openverse.org/terms_of_service.html"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "rijksmuseum",
+      "name": "Rijksmuseum",
+      "status": "candidate",
+      "reason": "New Linked Art search API is in beta and a per-image rights field was not verified. Not built yet.",
+      "evidence_urls": [
+        "https://data.rijksmuseum.nl/"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "nga",
+      "name": "National Gallery of Art",
+      "status": "candidate",
+      "reason": "CC0 open data is published as CSV files rather than a search API; would need a different connector. Not built yet.",
+      "evidence_urls": [
+        "https://github.com/NationalGalleryOfArt/opendata",
+        "https://www.nga.gov/open-access-images.html"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "nasa",
+      "name": "NASA Image and Video Library",
+      "status": "candidate",
+      "reason": "Generally not copyrighted, but some items are third-party and the usage guidelines need per-item checks. Not built yet.",
+      "evidence_urls": [
+        "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+      ],
+      "checked_on": "2026-10-15"
+    }
+  ]
+}
