@@ -17,11 +17,12 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from atlas import __version__
-from atlas.store import Store
+from atlas.store import APPEND_ONLY, Store
 
 MAX_ARCHIVE_BYTES = 20 * 1024**3
 MAX_ARCHIVE_MEMBERS = 200_000
 MEDIA_KINDS = ('originals', 'analysis', 'thumbs')
+MEDIA_PATH = re.compile(r'(originals|analysis|thumbs)/[0-9a-f]{2}/[0-9a-f]{64}\.(jpg|png|webp)')
 RIGHTS_FIELDS = ('license_code', 'license_version', 'license_url', 'label',
                  'required_attribution', 'evidence_url', 'restrictions')
 
@@ -109,8 +110,9 @@ def export_collection(store: Store, home: Path, collection_id: int) -> Path:
             annotations = []
             for row in _images(store, collection_id=collection_id):
                 original = (media / (row['original_path'] or '')).resolve()
-                if not original.is_relative_to(media / 'originals') or not original.is_file():
-                    raise ValueError(f"original file missing or outside originals: {row['id']}")
+                reduced = original.is_relative_to(media / 'analysis')
+                if not (original.is_relative_to(media / 'originals') or reduced) or not original.is_file():
+                    raise ValueError(f"original file missing or outside originals/analysis: {row['id']}")
                 archive.write(original, f"images/{row['id']}-{_slug(row['title'])}{original.suffix}")
                 analysis = store.one('SELECT result_json FROM analyses WHERE id=?', (row['analysis_id'],))
                 result = json.loads(analysis['result_json']) if analysis else {}
@@ -122,6 +124,8 @@ def export_collection(store: Store, home: Path, collection_id: int) -> Path:
                                     'rights': {field: row[field] for field in RIGHTS_FIELDS},
                                     'observations': result.get('observations', []),
                                     'summary': result.get('summary', ''), 'annotations': items})
+                if reduced:
+                    annotations[-1]['file'] = 'reduced copy (starter library)'
             archive.writestr('CREDITS.md', credits(store, collection_id=collection_id))
             archive.writestr('annotations.json', json.dumps(annotations, ensure_ascii=False, indent=2))
         os.replace(archive_path, path)
@@ -139,11 +143,32 @@ def list_backups(home) -> list[dict]:
     return sorted(entries, key=lambda entry: (entry['created'], entry['name']), reverse=True)
 
 
-def _database_images(path):
+def _validate_database(path, members):
     # immutable keeps validation read-only, including for a database saved in WAL mode.
     with closing(sqlite3.connect(path.resolve().as_uri() + '?mode=ro&immutable=1', uri=True)) as db:
-        if db.execute('PRAGMA user_version').fetchone()[0] < 1:
+        newest = max(int(match[1]) for file in Path(__file__).with_name('migrations').glob('*.sql')
+                     if (match := re.match(r'([0-9]{3})_', file.name)))
+        if not 1 <= db.execute('PRAGMA user_version').fetchone()[0] <= newest:
             raise ValueError('unsupported backup database version')
+        if db.execute('PRAGMA integrity_check').fetchall() != [('ok',)]:
+            raise ValueError('backup database failed integrity check')
+        if db.execute('PRAGMA foreign_key_check').fetchone() is not None:
+            raise ValueError('backup database failed foreign key check')
+        tables = {row[0] for row in db.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
+        if not {'images', 'rights_records', 'annotations', 'analyses', 'jobs', 'job_items',
+                'collections', 'techniques'} <= tables:
+            raise ValueError('backup database is missing core tables')
+        triggers = set(db.execute("SELECT name, tbl_name FROM sqlite_schema WHERE type='trigger'"))
+        if not {(f'{table}_{action}', table) for table in APPEND_ONLY
+                for action in ('update', 'delete')} <= triggers:
+            raise ValueError('backup database is missing append-only triggers')
+        for row in db.execute('SELECT original_path, analysis_path, thumb_path FROM images '
+                              'WHERE removed_at IS NULL'):
+            for relative in row:
+                if relative is not None and (not isinstance(relative, str)
+                                             or not MEDIA_PATH.fullmatch(relative)
+                                             or f'media/{relative}' not in members):
+                    raise ValueError('backup database references invalid or missing media')
         return db.execute('SELECT COUNT(*) FROM images WHERE removed_at IS NULL').fetchone()[0]
 
 
@@ -156,23 +181,30 @@ def backup(home) -> dict:
         snapshot = temporary / 'atlas.db'
         with Store(home / 'atlas.db') as store:
             store.backup_to(snapshot)
-        count = _database_images(snapshot)
         files = {'atlas.db': snapshot}
-        for kind in MEDIA_KINDS:
-            for file in sorted((home / 'media' / kind).rglob('*')):
-                if file.is_file():
-                    if not file.resolve().is_relative_to((home / 'media').resolve()):
+        media = (home / 'media').resolve()
+        with closing(sqlite3.connect(snapshot.resolve().as_uri() + '?mode=ro&immutable=1', uri=True)) as db:
+            count = db.execute('SELECT COUNT(*) FROM images WHERE removed_at IS NULL').fetchone()[0]
+            for row in db.execute('SELECT original_path, analysis_path, thumb_path FROM images'):
+                for relative in row:
+                    if relative is None:
+                        continue
+                    file = media / relative
+                    if not MEDIA_PATH.fullmatch(relative) or not file.resolve().is_relative_to(media):
                         raise ValueError('media file outside library')
-                    files[file.relative_to(home).as_posix()] = file
+                    files[f'media/{relative}'] = file
         hashes = {}
         archive_path = temporary / 'backup.zip'
         with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as archive:
             for name, file in files.items():
                 digest = hashlib.sha256()
-                with file.open('rb') as source, archive.open(name, 'w', force_zip64=True) as target:
-                    while chunk := source.read(1024 * 1024):
-                        digest.update(chunk)
-                        target.write(chunk)
+                try:
+                    with file.open('rb') as source, archive.open(name, 'w', force_zip64=True) as target:
+                        while chunk := source.read(1024 * 1024):
+                            digest.update(chunk)
+                            target.write(chunk)
+                except FileNotFoundError as error:
+                    raise ValueError('The library changed during the backup; try again.') from error
                 hashes[name] = digest.hexdigest()
             archive.writestr('manifest.json', json.dumps({
                 'format': 'visual-atlas-backup', 'version': 1, 'created': created,
@@ -228,7 +260,7 @@ def restore(home, name) -> dict:
                 _validate_archive(archive)
                 with archive.open('atlas.db') as source, (stage / 'atlas.db').open('wb') as target:
                     shutil.copyfileobj(source, target)
-                count = _database_images(stage / 'atlas.db')
+                count = _validate_database(stage / 'atlas.db', set(archive.namelist()))
                 safety = backup(home)
                 (stage / 'media').mkdir()
                 for item in archive.infolist():
@@ -304,6 +336,7 @@ def export_starter(store: Store, home: Path, out: Path) -> int:
 def import_starter(store: Store, home: Path, source: Path) -> int:
     """Add the bundled starter references to a library (skips ones already present or removed)."""
     home, source = Path(home), Path(source)
+    source_media, target_media = (source / 'media').resolve(), (home / 'media').resolve()
     data = json.loads((source / 'library.json').read_text(encoding='utf-8'))
     if data.get('format') != 'visual-atlas-starter' or data.get('version') != 1:
         raise ValueError('not a Visual Atlas starter pack')
@@ -312,8 +345,12 @@ def import_starter(store: Store, home: Path, source: Path) -> int:
         image = dict(reference['image'])
         paths = {key: image.pop(key) for key in ('analysis_path', 'thumb_path')}
         for key, relative in paths.items():
+            if not isinstance(relative, str) or not re.fullmatch(r'(analysis|thumbs)/[0-9a-f]{2}/[0-9a-f]{64}\.jpg', relative):
+                raise ValueError('unexpected path in starter pack')
             parts = relative.split('/')
-            if len(parts) != 3 or parts[0] not in ('analysis', 'thumbs') or not re.fullmatch(r'[0-9a-f]{64}\.jpg', parts[2]):
+            if (parts[1] != parts[2][:2]
+                    or not (source_media / relative).resolve().is_relative_to(source_media)
+                    or not (target_media / relative).resolve().is_relative_to(target_media)):
                 raise ValueError('unexpected path in starter pack')
             if key == 'analysis_path' and hashlib.sha256((source / 'media' / relative).read_bytes()).hexdigest() != \
                     image['analysis_sha256']:

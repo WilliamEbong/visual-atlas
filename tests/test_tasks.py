@@ -46,7 +46,8 @@ def test_valid_answer_is_normalised():
     (bad(summary='See https://example.com for more'), 'link'),
     (bad(summary='<script>alert(1)</script>'), 'markup'),
     (bad(image_usable=False, unusable_reason='blank'), 'unusable image cannot have techniques'),
-    (bad(creator_intent={'statement': 'The painter wanted loneliness.', 'metadata_field': 'description'}), 'metadata field'),
+    (bad(creator_intent={'statement': 'The painter wanted loneliness.', 'metadata_field': 'description'}), 'source description'),
+    (bad(creator_intent={'statement': 'The work glorifies war and empire.', 'metadata_field': 'title'}), 'source description'),
     (bad(techniques=[{**GOOD['techniques'][0], 'confidence': 1.4}]), 'confidence'),
     (bad(observations=[GOOD['observations'][0], GOOD['observations'][0]]), 'duplicate observation'),
     (bad(techniques=[GOOD['techniques'][0], {**GOOD['techniques'][1], 'role': 'primary'}]), 'one primary'),
@@ -123,3 +124,10 @@ def test_fake_backend_answers_satisfy_every_contract(tmp_path):
     tasks.validate_directions(directions, IDS, {1, 2, 3})
     comparison = fake.run('', tasks.compare_schema([1, 2], ids), [image, image])['result']
     tasks.validate_compare(comparison, {1, 2}, IDS)
+
+
+def test_intent_must_be_restated_from_the_description_not_invented():
+    metadata = {**METADATA, 'description': 'A quiet harbour scene painted on a summer evening.'}
+    answer = bad(creator_intent={'statement': 'The artist meant to protest industrial pollution.', 'metadata_field': 'description'})
+    with pytest.raises(tasks.InvalidResult, match='source description'):
+        tasks.validate_analysis(answer, IDS, metadata)

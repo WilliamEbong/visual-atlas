@@ -213,7 +213,7 @@ class Worker:
         return {**answer, 'backend': backend, 'model': model}
 
     def _save_analysis(self, task: str, answer: dict, result: dict, *, image_id=None, input_sha='', cache_key=''):
-        return self.store.add_analysis({
+        return self.store.add_analysis(fence=(self.job['id'], self.owner), record={
             'image_id': image_id, 'job_id': self.job['id'], 'task': task, 'backend': answer['backend'],
             'model': answer['model'], 'model_version': answer.get('model_version'),
             'cli_version': answer.get('cli_version'), 'prompt_sha': tasks.prompt_sha(task),
@@ -236,6 +236,8 @@ class Worker:
                               'verify': self._verify_step, 'analyze': self._reanalyze_step,
                               'compare': self._compare_step, 'directions': self._directions_step}[kind]()
             except BackendError as error:
+                if error.code == 'cancelled':
+                    continue  # paused or cancelled mid-call; the loop top carries out the request
                 message = backend_message(error.code, self.job['backend'])
                 if error.code in PAUSING:
                     return self._pause(message, error.code)
@@ -309,18 +311,17 @@ class Worker:
                         queries.append({'provider': provider, 'query': hint, 'technique_id': technique_id})
         else:
             goal = self._goal_text()
-            planned = None
-            if True:  # AI planning first; curated taxonomy hints if it is unavailable or invalid
-                try:
-                    schema = tasks.plan_schema(sorted(self.techniques), enabled)
-                    answer = self._call('plan', tasks.plan_prompt(goal, list(self.techniques.values()), enabled),
-                                        schema, [])
-                    planned = tasks.validate_plan(answer['result'], set(self.techniques), set(enabled))
-                    self._save_analysis('plan', answer, planned, input_sha=hashlib.sha256(goal.encode()).hexdigest())
-                except (BackendError, tasks.InvalidResult) as error:
-                    if isinstance(error, BackendError) and error.code in ('quota', 'daily_cap'):
-                        raise
-                    planned = None
+            planned = None  # AI planning first; curated taxonomy hints if it is unavailable or invalid
+            try:
+                schema = tasks.plan_schema(sorted(self.techniques), enabled)
+                answer = self._call('plan', tasks.plan_prompt(goal, list(self.techniques.values()), enabled),
+                                    schema, [])
+                planned = tasks.validate_plan(answer['result'], set(self.techniques), set(enabled))
+                self._save_analysis('plan', answer, planned, input_sha=hashlib.sha256(goal.encode()).hexdigest())
+            except (BackendError, tasks.InvalidResult) as error:
+                if isinstance(error, BackendError) and error.code in ('quota', 'daily_cap', 'cancelled'):
+                    raise
+                planned = None
             queries = planned['queries'] if planned else self._fallback_queries(goal, enabled)
         items = [{'kind': 'query', 'key': f"{q['provider']}:{q['query'].lower()}", 'provider': q['provider'],
                   'payload': {'query': q['query'], 'technique_id': q.get('technique_id')}} for q in queries]
@@ -386,7 +387,7 @@ class Worker:
                 "SELECT 1 FROM images WHERE provider=? AND provider_item_id=? UNION ALL "
                 "SELECT 1 FROM tombstones WHERE provider=? AND provider_item_id=? UNION ALL "
                 "SELECT 1 FROM job_items WHERE provider=? AND provider_item_id=? AND state IN "
-                "('ineligible','duplicate','low_quality','no_technique','filtered') LIMIT 1",
+                "('ineligible','duplicate','low_quality','no_technique') LIMIT 1",
                 (candidate['provider'], candidate['provider_item_id']) * 3)
             if known:
                 continue
@@ -394,7 +395,8 @@ class Worker:
                           'provider': candidate['provider'], 'provider_item_id': candidate['provider_item_id'],
                           'payload': {**candidate, 'rank': rank, 'technique_hint': payload.get('technique_id')},
                           'state': 'found'})
-        added = self.store.add_items(self.job['id'], self.owner, fresh)
+        room = self._budget('max_candidates') - len(self._items("kind='candidate'"))
+        added = self.store.add_items(self.job['id'], self.owner, fresh[:max(0, room)])
         self._item(query['id'], state='searched', reason=f'{len(found)} results, {added} new')
 
     def _permission(self, item: dict):
@@ -424,6 +426,11 @@ class Worker:
             return self._item(item['id'], state='low_quality', reason=str(error))
         self._attempt('download', item, 'ok', None, started)
         sha = hashlib.sha256(data).hexdigest()
+        mine = self.store.one('SELECT id FROM images WHERE file_sha256=? AND job_id=? AND provider=? '
+                              'AND provider_item_id=? AND removed_at IS NULL',
+                              (sha, self.job['id'], item['provider'], item['provider_item_id']))
+        if mine:  # saved just before a crash; carry on from where it stopped
+            return self._item(item['id'], state='downloaded', image_id=mine['id'])
         stats = images.metrics(picture)
         problem = images.quality_problem(picture, stats)
         if problem:
@@ -463,7 +470,8 @@ class Worker:
                                            'search_rank': candidate['rank'], 'credit_line': candidate.get('credit_line', ''),
                                            'retrieved_by': 'Visual Atlas 0.1'})},
             {**{k: stats[k] for k in ('aspect', 'orientation', 'mean_luma', 'contrast', 'colorfulness', 'saturation',
-                                      'color_family')}, 'palette_json': canonical(stats['palette'])})
+                                      'color_family')}, 'palette_json': canonical(stats['palette'])},
+            fence=(self.job['id'], self.owner))
         self._item(item['id'], state='downloaded', image_id=image_id)
 
     def _attempt(self, kind, item, status, code, started):
@@ -475,9 +483,11 @@ class Worker:
         image = self.store.one('SELECT * FROM images WHERE id=?', (item['image_id'],))
         if image is None or image['removed_at']:
             return self._item(item['id'], state='skipped', reason='image was removed')
-        if image['status'] != 'pending':  # analysed already (e.g. before a crash after saving)
-            return self._item(item['id'], state='added' if image['status'] == 'ready' else 'no_technique')
-        if self._analysed() >= self._budget('max_analyses'):
+        if image['status'] != 'pending':  # analysed already (e.g. a crash after saving)
+            if image['status'] == 'ready':
+                self._finish_verification(image['id'], item['id'])
+            return self._item(item['id'], state='added' if image['status'] == 'ready' else 'no_technique', reason='')
+        if self._analysed() >= self._budget('max_analyses') and not self._cached(image):
             return self._item(item['id'], state='skipped', reason='analysis budget reached')
         self._set(stage='analyzing', message=f"Analyzing “{image['title'][:60]}”…")
         try:
@@ -496,6 +506,23 @@ class Worker:
         self._remove_unhelpful(image, outcome)
         self._item(item['id'], state='no_technique', reason=outcome)
 
+    def _cache_key(self, image: dict) -> str:
+        backend = self.job['backend']
+        model = (self.spec.get('models') or {}).get('analyze') or tasks.DEFAULT_MODELS[backend]['analyze']
+        return hashlib.sha256('|'.join([image['analysis_sha256'], self.taxonomy_sha, tasks.prompt_sha('analyze'),
+                                        backend, model]).encode()).hexdigest()
+
+    def _cached(self, image: dict) -> bool:
+        return self.store.one("SELECT 1 FROM analyses WHERE cache_key=? AND task='analyze'",
+                              (self._cache_key(image),)) is not None
+
+    def _finish_verification(self, image_id: int, item_id: int):
+        """After a crash between analysis and the second-model check, run the check that was missed."""
+        verifier = self.spec.get('verify_with')
+        if verifier and not self.store.one("SELECT 1 FROM analyses WHERE image_id=? AND task='verify' AND job_id=?",
+                                           (image_id, self.job['id'])):
+            self.verify_image(image_id, verifier, item_id=item_id)
+
     def _remove_unhelpful(self, image: dict, reason: str):
         removed = self.store.remove_image(image['id'], f'not added: {reason}')
         images.delete_files(self.media, removed)
@@ -507,8 +534,7 @@ class Worker:
         metadata = {'title': image['title'], 'creator': image['creator'], 'date': image['date_text'],
                     'medium': image['medium'], 'description': image['description'],
                     'source': image['provider']}
-        cache_key = hashlib.sha256('|'.join([image['analysis_sha256'], self.taxonomy_sha, tasks.prompt_sha('analyze'),
-                                             backend, model]).encode()).hexdigest()
+        cache_key = self._cache_key(image)
         cached = self.store.one("SELECT * FROM analyses WHERE cache_key=? AND task='analyze' ORDER BY id DESC LIMIT 1",
                                 (cache_key,))
         if cached:
@@ -529,7 +555,8 @@ class Worker:
         texts = tasks.evidence_texts(result)
         proposals = [{'technique_id': t['technique_id'], 'evidence': texts[t['technique_id']], 'effect': t['effect'],
                       'confidence': t['confidence'], 'role': t['role']} for t in result['techniques']]
-        merged = self.store.apply_analysis(image['id'], analysis_id, proposals, f'model:{backend}/{model}')
+        merged = self.store.apply_analysis(image['id'], analysis_id, proposals, f'model:{backend}/{model}',
+                                           fence=(self.job['id'], self.owner))
         if not merged['applied'] and not merged['kept_human']:
             return 'no technique was clear enough'
         verifier = self.spec.get('verify_with')
@@ -538,8 +565,9 @@ class Worker:
         return 'added'
 
     def verify_image(self, image_id: int, verifier: str, *, item_id=None):
-        rows = self.store.rows("SELECT technique_id, evidence_json, effect FROM annotations WHERE image_id=? AND "
-                               "state='proposed' AND human_locked=0", (image_id,))
+        rows = self.store.rows("SELECT a.technique_id, a.evidence_json, a.effect FROM annotations a LEFT JOIN "
+                               "analyses p ON p.id=a.analysis_id WHERE a.image_id=? AND a.state='proposed' AND "
+                               "a.human_locked=0 AND COALESCE(p.backend,'')!=?", (image_id, verifier))
         if not rows:
             return
         image = self.store.one('SELECT analysis_path, analysis_sha256 FROM images WHERE id=?', (image_id,))
@@ -564,12 +592,17 @@ class Worker:
                 raise
             return  # verifier unavailable, over its limit or erroring: keep the proposal unverified and go on
         analysis_id = self._save_analysis('verify', answer, result, image_id=image_id, input_sha=image['analysis_sha256'])
-        self.store.apply_verdicts(image_id, analysis_id, result['verdicts'], f"model:{answer['backend']}/{answer['model']}")
+        self.store.apply_verdicts(image_id, analysis_id, result['verdicts'],
+                                  f"model:{answer['backend']}/{answer['model']}", fence=(self.job['id'], self.owner))
 
     # ---- follow-up jobs -------------------------------------------------------------------------
     def _image_items(self, state: str):
         return self.store.one("SELECT * FROM job_items WHERE job_id=? AND state=? AND next_attempt_at<=? "
                               "ORDER BY id LIMIT 1", (self.job['id'], state, time.time()))
+
+    def _waiting(self, state: str) -> bool:
+        return self.store.one('SELECT 1 FROM job_items WHERE job_id=? AND state=? LIMIT 1',
+                              (self.job['id'], state)) is not None
 
     def _seed_images(self, state: str):
         if not self._items():
@@ -582,7 +615,7 @@ class Worker:
         self._seed_images('pending')
         item = self._image_items('pending')
         if item is None:
-            return self._done('Ready. Second-model check finished.')
+            return None if self._waiting('pending') else self._done('Ready. Second-model check finished.')
         image_id = int(item['provider_item_id'])
         self._item(item['id'], image_id=image_id)
         self.verify_image(image_id, self.job['backend'], item_id=item['id'])
@@ -593,7 +626,7 @@ class Worker:
         self._seed_images('pending')
         item = self._image_items('pending')
         if item is None:
-            return self._done('Ready. Analysis finished.')
+            return None if self._waiting('pending') else self._done('Ready. Analysis finished.')
         image = self.store.one('SELECT * FROM images WHERE id=? AND removed_at IS NULL', (int(item['provider_item_id']),))
         if image is None:
             self._item(item['id'], state='skipped', reason='image was removed')
@@ -692,9 +725,10 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
         goal = str(spec.get('goal') or '').strip()
         if kind == 'find' and not (goal or spec.get('subject') or technique_ids):
             raise ValueError('describe what you are looking for, or pick a technique')
-        budgets = {k: max(1, min(int((spec.get('budgets') or {}).get(k, DEFAULT_BUDGETS[k])), 200))
-                   for k in DEFAULT_BUDGETS}
-        budgets['max_analyses'] = max(budgets['max_analyses'], min(target + 4, 200))
+        asked = spec.get('budgets') or {}
+        budgets = {k: max(1, min(int(asked.get(k, DEFAULT_BUDGETS[k])), 200)) for k in DEFAULT_BUDGETS}
+        if 'max_analyses' not in asked:  # by default leave room for a few pictures that turn out unclear
+            budgets['max_analyses'] = max(budgets['max_analyses'], min(target + 4, 200))
         clean.update(goal=goal[:1000], subject=str(spec.get('subject') or '')[:120],
                      intended_use=str(spec.get('intended_use') or '')[:200], technique_ids=technique_ids,
                      orientation=spec.get('orientation') if spec.get('orientation') in ('landscape', 'portrait', 'square') else None,

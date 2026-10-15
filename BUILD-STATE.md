@@ -4,8 +4,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-Playwright-verify the slice UI against a running server (scratch home with 3 live images), write
-Claude-owned tests (store, jobs, tasks, catalog, server), then fold in Codex task 2 results.
+Fill technique gaps in the real library (8 techniques had 0 examples), export the starter pack, build the demo,
+take README screenshots + GIF from the real library, second Codex review round, then publish.
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —
@@ -40,16 +40,30 @@ Claude-owned tests (store, jobs, tasks, catalog, server), then fold in Codex tas
 5 connections + briefs · 6 packaging + docs · 7 ingestion (~60 refs) + held-out · 8 converge, reviews, release.
 
 ## File ownership
-- Codex task 2 (running): atlas/fetch.py, atlas/images.py, atlas/rights.py, atlas/providers.py,
-  tests/test_fetch.py, tests/test_images.py, tests/test_rights.py, tests/test_providers.py.
-- Claude: everything else.
+- No Codex task running. Claude owns all files.
 
 ## Codex delegated tasks
 1. task-mv9a1vza-xi4tsp (2026-10-15) — atlas/transfer.py + tests/test_transfer.py (credits, collection zip,
    backup, restore with zip-slip/manifest/sha validation). Result inspected: 37 passed, ruff clean; code read.
    Finding accepted: server must not restore while the worker runs -> restore now refuses during a running
    job and joins the worker thread first (atlas/server.py).
-2. task-mv9al476-5imman (2026-10-15, running) — offline tests + bug fixes for fetch/images/rights/providers.
+2. task-mv9al476-5imman (2026-10-15) — offline tests + fixes for fetch/images/rights/providers: 136 tests; 7 fixes
+   (malformed URLs/redirects, empty userinfo, HTTP-date Retry-After, precise missing-image reason, CC BY link must match
+   the stated version, dict-shaped Commons pages). Diff read and accepted.
+3. task-mv9bjogp-h6q1pb (2026-10-15) — independent read-only architecture/code review. 20 verified findings; all accepted:
+   - Codex task 4 fixed #1 restore validation (integrity, FKs, version, tables, triggers, media), #4 backup reads media
+     references from its own snapshot, #6 starter path traversal, #16 starter images in collection exports.
+   - Claude fixed #2 (any live lease blocks a claim; image/analysis/annotation writes fenced in the same transaction),
+     #3 (web data hook never returns a previous page's record; image actions wait for the matching record),
+     #5 (generic insert/update only accept real column names), #7 (private-peer check at TCP connect via httpx trace,
+     before any HTTP bytes), #8 (adopt own image after a crash; cached analysis before budget; resume a missed
+     verification), #9 (verify/analyse jobs wait for retries), #10 (pause/cancel mid-call never marks failed),
+     #11 (filters no longer suppress candidates for other jobs), #12 (explicit budgets kept; candidate batch capped),
+     #13 (a model never checks its own proposal), #14 (documented intent must restate the description text),
+     #15 (only recognised PD names and policy-listed CC BY versions), #17 (paging cap 5000), #18 (honest privacy text),
+     #19 (malformed Claude envelopes are recorded failures), #20 (dead code removed).
+   - Gap noted by the review (adapter argv/env/event handling untested) closed by tests/test_adapters.py.
+4. task-mv9c6ruu-ej6r51 (2026-10-15) — transfer findings #1/#4/#6/#16 with tests: 57 passed in its files; full suite 283.
 
 ## Verification evidence
 - Offline: `uv run pytest` 245 passed; `npm --prefix web test` 6 passed; ruff clean; tsc clean (2026-10-15).

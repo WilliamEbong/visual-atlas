@@ -80,8 +80,14 @@ class Fetcher:
         for _ in range(MAX_REDIRECTS + 1):
             self.check_url(provider, url)
             self._throttle(provider)
+            def trace(event: str, info: dict):
+                if event == 'connection.connect_tcp.complete':
+                    peer = info['return_value'].get_extra_info('server_addr')
+                    if peer and not _public(str(peer[0])):
+                        raise FetchError('blocked_address', 'The connection reached a private address.')
+
             try:
-                with self.client.stream('GET', url, headers=headers or {}) as response:
+                with self.client.stream('GET', url, headers=headers or {}, extensions={'trace': trace}) as response:
                     stream = response.extensions.get('network_stream')
                     if stream is not None:
                         peer = stream.get_extra_info('server_addr')

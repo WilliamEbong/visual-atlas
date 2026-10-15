@@ -30,12 +30,6 @@ def home_dir(home: Path | str | None = None) -> Path:
     return path
 
 
-def media_dir(home: Path, kind: str) -> Path:
-    if kind not in ('originals', 'analysis', 'thumbs', 'tmp'):
-        raise ValueError('unknown media kind')
-    return home / 'media' / kind
-
-
 def local_setting(name: str, home: Path | None = None) -> str | None:
     """Read one allowed setting from the environment or the data home's .env file."""
     if name not in ('VISUAL_ATLAS_PORT', 'SMITHSONIAN_API_KEY'):

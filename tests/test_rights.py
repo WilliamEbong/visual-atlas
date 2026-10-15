@@ -148,3 +148,15 @@ def test_commons_allowed_licenses_keep_credits_and_restrictions(commons, name, u
 
 def test_labels_never_claim_safety():
     assert all('safe' not in label.lower() for label in rights.LABELS.values())
+
+
+@pytest.mark.parametrize('name, url', [('PD-not-a-real-licence', ''), ('CC BY 9.9', 'https://creativecommons.org/licenses/by/9.9/')])
+def test_unknown_licence_names_and_versions_are_not_accepted(name, url):
+    from atlas import catalog
+    _, policies, *_ = catalog.load()
+    policy = catalog.policy(policies, 'commons')
+    candidate = {'source_url': 'https://commons.wikimedia.org/wiki/File:X.jpg', 'title': 'X',
+                 'image_url': 'https://upload.wikimedia.org/x.jpg',
+                 'raw': {'extmetadata': {'LicenseShortName': {'value': name}, 'LicenseUrl': {'value': url},
+                                         'Artist': {'value': 'Someone'}}}}
+    assert rights.check(candidate, policy)['eligible'] is False

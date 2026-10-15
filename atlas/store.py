@@ -130,13 +130,26 @@ class Store:
         found = self.rows(query, parameters)
         return found[0] if found else None
 
+    def _columns(self, table: str) -> set[str]:
+        cache = self.__dict__.setdefault('_column_cache', {})
+        if table not in cache:
+            cache[table] = {row[1] for row in self.connection.execute(f'PRAGMA table_info({table})')}
+        return cache[table]
+
+    def _check_columns(self, table: str, names) -> None:
+        unknown = set(names) - self._columns(table)
+        if unknown:  # never interpolate a name that is not a real column (imported data is untrusted)
+            raise ValueError(f'unknown field(s) for {table}: {", ".join(sorted(map(str, unknown)))[:200]}')
+
     def _insert(self, table: str, record: dict) -> int:
+        self._check_columns(table, record)
         columns = ','.join(record)
         marks = ','.join('?' for _ in record)
         return self.connection.execute(f'INSERT INTO {table}({columns}) VALUES({marks})',
                                        tuple(record.values())).lastrowid
 
     def _update(self, table: str, key: str, value, changes: dict) -> int:
+        self._check_columns(table, [*changes, key])
         assignments = ','.join(f'{column}=?' for column in changes)
         return self.connection.execute(f'UPDATE {table} SET {assignments} WHERE {key}=?',
                                        (*changes.values(), value)).rowcount
@@ -186,8 +199,10 @@ class Store:
                 self.refresh_search(image['id'])
 
     # ---- images ------------------------------------------------------------------------------
-    def add_image(self, image: dict, rights: dict, metrics: dict) -> int:
+    def add_image(self, image: dict, rights: dict, metrics: dict, fence: tuple | None = None) -> int:
         with self.transaction():
+            if fence:
+                self._fence(*fence)
             image_id = self._insert('images', {**image, 'created_at': now()})
             self._insert('rights_records', {**rights, 'image_id': image_id})
             self._insert('image_metrics', {**metrics, 'image_id': image_id})
@@ -269,15 +284,19 @@ class Store:
             return image_id
 
     # ---- analyses and annotations ------------------------------------------------------------
-    def add_analysis(self, record: dict) -> int:
+    def add_analysis(self, record: dict, fence: tuple | None = None) -> int:
         with self.transaction():
+            if fence:
+                self._fence(*fence)
             return self._insert('analyses', {**record, 'created_at': now()})
 
     def apply_analysis(self, image_id: int, analysis_id: int, techniques: list[dict], changed_by: str,
-                       min_confidence: float = .4) -> dict:
+                       min_confidence: float = .4, fence: tuple | None = None) -> dict:
         """Merge model-proposed techniques without ever overwriting a person's decision."""
         applied, kept = [], []
         with self.transaction():
+            if fence:
+                self._fence(*fence)
             for item in techniques:
                 existing = self.one('SELECT * FROM annotations WHERE image_id=? AND technique_id=?',
                                     (image_id, item['technique_id']))
@@ -306,15 +325,23 @@ class Store:
             self.refresh_search(image_id)
         return {'applied': applied, 'kept_human': kept}
 
-    def apply_verdicts(self, image_id: int, analysis_id: int, verdicts: list[dict], changed_by: str) -> dict:
+    def apply_verdicts(self, image_id: int, analysis_id: int, verdicts: list[dict], changed_by: str,
+                       fence: tuple | None = None) -> dict:
         """A second model agreeing promotes proposed -> model_reviewed; disagreement is noted, never deleted."""
         promoted, disputed = [], []
         with self.transaction():
+            if fence:
+                self._fence(*fence)
+            checker = (self.one('SELECT backend FROM analyses WHERE id=?', (analysis_id,)) or {}).get('backend')
             for verdict in verdicts:
-                row = self.one("SELECT * FROM annotations WHERE image_id=? AND technique_id=?",
+                row = self.one("SELECT a.*, p.backend AS proposer FROM annotations a LEFT JOIN analyses p ON "
+                               "p.id=a.analysis_id WHERE a.image_id=? AND a.technique_id=?",
                                (image_id, verdict['technique_id']))
                 if row is None or row['human_locked'] or row['state'] != 'proposed':
                     continue
+                if row['proposer'] == checker:
+                    continue  # a model checking its own proposal is not a second opinion
+                row.pop('proposer')
                 if verdict['holds']:
                     self._update('annotations', 'id', row['id'], {
                         'state': 'model_reviewed', 'changed_by': changed_by, 'updated_at': now(),
@@ -376,8 +403,10 @@ class Store:
         """Take the next runnable job if no other worker holds a live lease (one job at a time)."""
         clock = time.time()
         with self.transaction():
-            busy = self.one("SELECT id FROM jobs WHERE state IN ('running','cancelling') AND lease_until>? "
-                            "AND lease_owner!=?", (clock, owner))
+            # Any live lease held by someone else blocks a claim, whatever the job's state: a worker that was
+            # paused and quickly resumed keeps its lease until it has really stopped.
+            busy = self.one('SELECT id FROM jobs WHERE lease_until>? AND lease_owner IS NOT NULL AND lease_owner!=?',
+                            (clock, owner))
             if busy:
                 return None
             query = ("SELECT * FROM jobs WHERE state IN ('queued','running','cancelling') "

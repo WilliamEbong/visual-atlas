@@ -97,8 +97,9 @@ Work only from what is visible in the image.
    debatable; under 0.4 means leave it out. Do not give every technique a high score.
 5. ambiguities: record genuinely uncertain readings instead of resolving them.
 6. subjects: up to 6 short nouns for what is depicted (subject, not technique).
-7. creator_intent: null, unless a supplied metadata field explicitly states the maker's intention;
-   then give a short statement and the exact metadata field name.
+7. creator_intent: null, unless the supplied description explicitly states what the maker intended;
+   then restate it closely in the description's own words and give "description" as the field. Titles,
+   names and dates never establish intent.
 8. If the picture is unusable (blank, mostly text, a colour chart, badly damaged), set image_usable
    to false, explain in unusable_reason, and list no techniques.
 9. Qualities that come from the medium or from catalogue photography are not techniques: a
@@ -125,7 +126,7 @@ def analyze_schema(technique_ids: list[str]) -> dict:
                          'evidence': _array({'type': 'string', 'pattern': '^o[0-9]{1,2}$'}, 6),
                          'effect': _string(260), 'confidence': {'type': 'number', 'minimum': 0, 'maximum': 1}})
     intent = {'anyOf': [{'type': 'null'}, _object({'statement': _string(300),
-                                                   'metadata_field': {'type': 'string', 'enum': list(METADATA_FIELDS)}})]}
+                                                   'metadata_field': {'type': 'string', 'enum': ['description']}})]}
     return _object({'image_usable': {'type': 'boolean'}, 'unusable_reason': {'type': ['string', 'null']},
                     'observations': _array(observation, 12), 'techniques': _array(technique, 6),
                     'ambiguities': _array(_string(220), 4), 'subjects': _array(_string(40), 6),
@@ -200,9 +201,11 @@ def validate_analysis(raw: dict, technique_ids: set[str], metadata: dict) -> dic
         raise InvalidResult('only one primary technique')
     intent = result['creator_intent']
     if intent is not None:
-        field = intent['metadata_field']
-        if not str(metadata.get(field) or '').strip():
-            raise InvalidResult('creator intent must come from a supplied metadata field')
+        source = str(metadata.get(intent['metadata_field']) or '') if intent['metadata_field'] == 'description' else ''
+        claimed = set(re.findall(r'[a-z]{4,}', intent['statement'].lower()))
+        backed = claimed & set(re.findall(r'[a-z]{4,}', source.lower()))
+        if not source.strip() or not claimed or len(backed) / len(claimed) < .6:
+            raise InvalidResult('creator intent is not supported by the source description')
         intent['statement'] = _text(intent['statement'], 300, 'creator intent')
     result['summary'] = _text(result['summary'], 420, 'summary')
     result['ambiguities'] = [_text(a, 220, 'ambiguity') for a in result['ambiguities']]

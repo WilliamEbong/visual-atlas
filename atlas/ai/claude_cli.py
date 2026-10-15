@@ -100,12 +100,13 @@ def run(prompt: str, schema: dict, images: list[Path], *, model: str, record=Non
     for line in result.stdout.decode('utf-8', errors='replace').splitlines():
         try:
             event = json_object(line)
-        except (ValueError, RecursionError):
+            if event.get('type') == 'assistant':
+                for block in event['message'].get('content') or []:
+                    if isinstance(block, dict) and block.get('type') == 'tool_use' and block.get('name') != 'StructuredOutput':
+                        violation = 'tool_call'
+        except (ValueError, RecursionError, KeyError, TypeError, AttributeError):
+            violation = violation or ('invalid_response' if '"type"' in line else None)
             continue
-        if event.get('type') == 'assistant':
-            for block in (event.get('message') or {}).get('content') or []:
-                if isinstance(block, dict) and block.get('type') == 'tool_use' and block.get('name') != 'StructuredOutput':
-                    violation = 'tool_call'
         if event.get('type') == 'result':
             final = event
     if final is None:
@@ -116,7 +117,7 @@ def run(prompt: str, schema: dict, images: list[Path], *, model: str, record=Non
         inputs = sum(token_count(usage.get(key, 0)) for key in
                      ('input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens'))
         outputs = token_count(usage.get('output_tokens', 0))
-    except ValueError:
+    except (ValueError, AttributeError, TypeError):
         inputs = outputs = 0
     metadata = {'input_tokens': inputs, 'output_tokens': outputs, 'cli_version': version}
     if result.failure:

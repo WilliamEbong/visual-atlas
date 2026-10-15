@@ -57,7 +57,9 @@ def library(tmp_path, monkeypatch):
         collection = store.create_collection('Blue / studies')
         store.collect(collection, first)
         store.collect(collection, removed)
-        store.remove_image(removed, 'test removal')
+        removed_image = store.remove_image(removed, 'test removal')
+        for key in ('original_path', 'analysis_path', 'thumb_path'):
+            (tmp_path / 'media' / removed_image[key]).unlink()
         technique = store.one('SELECT id FROM techniques ORDER BY id LIMIT 1')['id']
         analysis = store.add_analysis({
             'image_id': first, 'task': 'analyze', 'backend': 'fake', 'model': 'test',
@@ -174,9 +176,7 @@ def test_backup_restore(library):
             assert hashlib.sha256(archive.read(name)).hexdigest() == digest
     with Store(home / 'atlas.db') as store:
         add_image(store, home, 4)
-        original = store.one('SELECT original_path FROM images WHERE id=?', (first,))['original_path']
         mutated_images = store.rows('SELECT * FROM images ORDER BY id')
-    (home / 'media' / original).unlink()
     mutated = state(home)
     restored = transfer.restore(home, saved['name'])
     assert restored['restored'] == saved['name'] and restored['images'] == 2
@@ -210,6 +210,110 @@ def test_backup_includes_live_wal(library, tmp_path):
         assert db.execute('SELECT id FROM images WHERE id=?', (added,)).fetchone() == (added,)
     finally:
         db.close()
+
+
+def test_backup_uses_snapshot_references(library, monkeypatch):
+    home, *_ = library
+    expected = media_files(home)
+    original_backup = Store.backup_to
+
+    def backup_then_add(store, path):
+        original_backup(store, path)
+        add_image(store, home, 4)
+
+    monkeypatch.setattr(Store, 'backup_to', backup_then_add)
+    orphan = home / 'media' / 'originals' / 'orphan.jpg'
+    orphan.write_bytes(b'orphan')
+    saved = transfer.backup(home)
+    assert saved['images'] == 2
+    with zipfile.ZipFile(home / 'backups' / saved['name']) as archive:
+        assert set(archive.namelist()) == {'atlas.db', 'manifest.json', *expected}
+        snapshot = home / 'snapshot.db'
+        snapshot.write_bytes(archive.read('atlas.db'))
+    db = sqlite3.connect(snapshot)
+    try:
+        assert db.execute('SELECT COUNT(*) FROM images WHERE removed_at IS NULL').fetchone() == (2,)
+    finally:
+        db.close()
+
+
+@pytest.mark.parametrize('when', ['before snapshot', 'after snapshot'])
+def test_backup_missing_media_leaves_no_zip(library, monkeypatch, when):
+    home, first, *_ = library
+    with Store(home / 'atlas.db') as store:
+        relative = store.one('SELECT original_path FROM images WHERE id=?', (first,))['original_path']
+    missing = home / 'media' / relative
+    if when == 'before snapshot':
+        missing.unlink()
+    else:
+        original_backup = Store.backup_to
+
+        def backup_then_remove(store, path):
+            original_backup(store, path)
+            missing.unlink()
+
+        monkeypatch.setattr(Store, 'backup_to', backup_then_remove)
+    before = (home / 'atlas.db').read_bytes()
+    with pytest.raises(ValueError, match=r'^The library changed during the backup; try again\.$'):
+        transfer.backup(home)
+    assert (home / 'atlas.db').read_bytes() == before
+    assert list((home / 'backups').iterdir()) == []
+
+
+@pytest.mark.parametrize('problem', [
+    'version 999', 'missing table', 'missing trigger', 'integrity', 'foreign key', 'missing media',
+    'traversal', 'absolute', 'empty path',
+])
+def test_restore_rejects_unusable_database(library, problem):
+    home, first, *_ = library
+    saved = transfer.backup(home)
+    path = home / 'backups' / saved['name']
+    with zipfile.ZipFile(path) as archive:
+        payload = {name: archive.read(name) for name in archive.namelist()}
+    snapshot = home / 'invalid.db'
+    snapshot.write_bytes(payload['atlas.db'])
+    db = sqlite3.connect(snapshot)
+    try:
+        if problem == 'version 999':
+            db.execute('PRAGMA user_version=999')
+        elif problem == 'missing table':
+            db.execute('DROP TABLE job_items')
+        elif problem == 'missing trigger':
+            db.execute('DROP TRIGGER rights_records_update')
+        elif problem == 'foreign key':
+            db.execute('UPDATE images SET analysis_id=999999 WHERE id=?', (first,))
+        elif problem in ('traversal', 'absolute', 'empty path'):
+            relative = {'traversal': 'originals/../../escape.jpg',
+                        'absolute': '/originals/aa/' + 'a' * 64 + '.jpg', 'empty path': ''}[problem]
+            db.execute('UPDATE images SET original_path=? WHERE id=?', (relative, first))
+        elif problem == 'missing media':
+            relative = db.execute('SELECT original_path FROM images WHERE id=?', (first,)).fetchone()[0]
+            payload.pop(f'media/{relative}')
+        db.commit()
+    finally:
+        db.close()
+    payload['atlas.db'] = snapshot.read_bytes()
+    if problem == 'integrity':
+        # Claim one freelist page without a freelist: readable DB, failed integrity_check.
+        payload['atlas.db'] = payload['atlas.db'][:36] + (1).to_bytes(4, 'big') + payload['atlas.db'][40:]
+        snapshot.write_bytes(payload['atlas.db'])
+        db = sqlite3.connect(snapshot)
+        try:
+            assert db.execute('PRAGMA integrity_check').fetchall() != [('ok',)]
+        finally:
+            db.close()
+    manifest = json.loads(payload.pop('manifest.json'))
+    manifest['files'] = {name: hashlib.sha256(data).hexdigest() for name, data in payload.items()}
+    with zipfile.ZipFile(path, 'w') as archive:
+        for name, data in payload.items():
+            archive.writestr(name, data)
+        archive.writestr('manifest.json', json.dumps(manifest))
+    before = state(home)
+    with pytest.raises(ValueError):
+        transfer.restore(home, saved['name'])
+    assert state(home) == before
+    assert len(transfer.list_backups(home)) == 1
+    assert not list(home.glob('.restore-*'))
 
 
 @pytest.mark.parametrize('name', ['..\\x.zip', '../x.zip', '/x.zip', 'C:evil.zip',

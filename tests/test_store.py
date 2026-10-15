@@ -23,8 +23,8 @@ def add(store, n=1, **image):
     return store.add_image(record, rights, metrics)
 
 
-def analysis(store, image_id, task='analyze', result='{"observations":[],"summary":"s","subjects":[]}'):
-    return store.add_analysis({'image_id': image_id, 'task': task, 'backend': 'fake', 'model': 'practice',
+def analysis(store, image_id, task='analyze', result='{"observations":[],"summary":"s","subjects":[]}', backend='fake'):
+    return store.add_analysis({'image_id': image_id, 'task': task, 'backend': backend, 'model': 'practice',
                                'prompt_sha': 'p', 'taxonomy_sha': 't', 'input_sha': 'i', 'cache_key': 'c',
                                'result_json': result})
 
@@ -89,7 +89,7 @@ def test_verification_promotes_only_unlocked_proposals(store):
     store.apply_analysis(image_id, analysis(store, image_id), [proposal('negative-space'), proposal('framing', .8, 'supporting'),
                                                                proposal('symmetry', .6, 'supporting')], 'model:codex/m')
     store.human_annotation(image_id, 'symmetry', state='rejected')
-    store.apply_verdicts(image_id, analysis(store, image_id, 'verify'), [
+    store.apply_verdicts(image_id, analysis(store, image_id, 'verify', backend='claude'), [
         {'technique_id': 'negative-space', 'holds': True, 'reason': 'clear'},
         {'technique_id': 'framing', 'holds': False, 'reason': 'no frame'},
         {'technique_id': 'symmetry', 'holds': True, 'reason': 'centred'}], 'model:claude/m')
@@ -150,3 +150,16 @@ def test_catalog_sync_refuses_removing_a_used_technique(store, tmp_path):
     with pytest.raises(ValueError, match='still used'):
         store.replace_catalog(taxonomy, policies, 'a', 'b')
     assert store.one("SELECT id FROM techniques WHERE id='negative-space'")
+
+
+def test_a_model_cannot_check_its_own_proposal(store):
+    image_id = add(store)
+    store.apply_analysis(image_id, analysis(store, image_id, backend='codex'), [proposal('negative-space')], 'model:codex/m')
+    store.apply_verdicts(image_id, analysis(store, image_id, 'verify', backend='codex'),
+                         [{'technique_id': 'negative-space', 'holds': True, 'reason': 'same model'}], 'model:codex/m')
+    assert store.one('SELECT state FROM annotations')['state'] == 'proposed'
+
+
+def test_imported_records_cannot_smuggle_sql_through_field_names(store):
+    with pytest.raises(ValueError, match='unknown field'):
+        store._insert('settings', {'key': 'a', "value) SELECT value FROM settings --": 'x'})

@@ -2,21 +2,23 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { request } from './client'
 import type { Taxonomy } from './types'
 
-/** Load one API path; reload() refetches. Errors become plain messages for the page. */
+/** Load one API path; reload() refetches. Data from a previous path is never returned for a new one, so a page
+ *  can never act on a record it is no longer showing. Errors become plain messages for the page. */
 export function useData<T>(path: string | null, deps: unknown[] = []) {
-  const [data, setData] = useState<T | null>(null)
+  const [state, setState] = useState<{ path: string | null; data: T | null }>({ path: null, data: null })
   const [error, setError] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
   useEffect(() => {
     if (!path) return
     let live = true
-    request<T>(path).then((value) => { if (live) { setData(value); setError(null) } })
+    request<T>(path).then((value) => { if (live) { setState({ path, data: value }); setError(null) } })
       .catch((reason: Error) => { if (live) setError(reason.message) })
     return () => { live = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, tick, ...deps])
   const reload = useCallback(() => setTick((value) => value + 1), [])
-  return { data, error, reload, setData }
+  const setData = useCallback((value: T | null) => setState({ path, data: value }), [path])
+  return { data: state.path === path ? state.data : null, error, reload, setData }
 }
 
 /** Poll while a condition holds (job progress). */

@@ -25,7 +25,7 @@ export default function ImagePage({ id }: { id: number }) {
   const [showHistory, setShowHistory] = useState(false)
   useEffect(() => { if (data) document.title = `${data.image.title} · Visual Atlas` }, [data])
   if (error) return <div className="empty"><h1>Not found</h1><p className="notice error" role="alert">{error}</p><a href="#/">Back to the library</a></div>
-  if (!data) return <p className="mono" aria-live="polite">Loading…</p>
+  if (!data || data.image.id !== id) return <p className="mono" aria-live="polite">Loading…</p>
   const { image, rights, metrics, analysis } = data
   const picked = compare.some((p) => p.id === image.id)
 

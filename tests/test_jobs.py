@@ -1,5 +1,6 @@
 """Jobs: discovery end to end (offline), leases, interruption and resume, cancel/pause, failures, budgets."""
 
+import json
 import time
 import types
 
@@ -220,3 +221,22 @@ def test_an_analysis_error_retries_that_picture_only(home, monkeypatch):
     with jobs.open_store(home) as store:
         assert store.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] == 'done'
         assert len(store.rows("SELECT * FROM job_items WHERE state='added'")) == 2
+
+
+def test_pause_then_quick_resume_cannot_hand_a_live_job_to_a_second_worker(home):
+    with jobs.open_store(home) as store:
+        job_id = find(store)
+        assert store.claim_job('A')['id'] == job_id
+        store.request_job_state(job_id, 'pause')
+        assert store.request_job_state(job_id, 'resume')['state'] == 'queued'
+        assert store.claim_job('B') is None  # A still holds the lease until it really stops
+        with pytest.raises(LeaseLost):
+            store.add_analysis({'task': 'plan', 'backend': 'x', 'model': 'y', 'prompt_sha': 'p', 'taxonomy_sha': 't',
+                                'input_sha': 'i', 'cache_key': 'c', 'result_json': '{}'}, fence=(job_id, 'B'))
+
+
+def test_explicit_budgets_are_kept(home):
+    with jobs.open_store(home) as store:
+        job_id = find(store, target_new_images=1, budgets={'max_analyses': 1})
+        spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (job_id,))['spec_json'])
+        assert spec['budgets']['max_analyses'] == 1

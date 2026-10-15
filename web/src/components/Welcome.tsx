@@ -25,7 +25,9 @@ export default function Welcome() {
           <li><strong>Learn why they work.</strong> An assistant on your computer (Codex or Claude Code, with your own sign-in) describes what it sees and names the techniques. You can confirm or correct every reading.</li>
           <li><strong>Use them.</strong> Save images to collections, compare them, and ask for directions for your own project.</li>
         </ol>
-        <p className="mono">Nothing leaves your computer except searches to the collections and the images you choose to analyse.</p>
+        <p className="mono">Your library stays on this computer. Searches go to the collections. When an assistant is used, the
+          request it needs goes to that assistant's service: the picture and its catalogue details for an analysis, or your brief
+          and short summaries of library images for project directions.</p>
         <div className="row">
           <button type="button" className="primary" onClick={() => close('#/find')}>Find my first images</button>
           <button type="button" onClick={() => close('#/settings')}>Check AI setup</button>

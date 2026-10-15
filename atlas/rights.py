@@ -116,12 +116,14 @@ def _commons(candidate, raw, policy):
     if name.upper() in ('CC0', 'CC0 1.0', 'CC-ZERO'):
         return _yes('CC0', candidate, policy, code='CC0', version='1.0', url=CC0_URL, evidence=evidence,
                     restrictions=flag, attribution=_commons_credit(candidate, value('Artist'), 'CC0'))
-    if name.lower() in ('public domain', 'pdm', 'public domain mark') or name.lower().startswith('pd-'):
+    if name.lower() in ('public domain', 'pdm', 'public domain mark', 'public domain mark 1.0'):
         if value('Copyrighted').lower() == 'true':
             return _no('public-domain tag conflicts with a copyrighted flag')
         return _yes('PD', candidate, policy, code='PD', version='', url=PD_URL, evidence=evidence,
                     restrictions=flag, attribution=_commons_credit(candidate, value('Artist'), 'Public domain'))
     match = _BY.match(name)
+    if match and f'CC-BY-{match.group(1)}' not in policy.get('accepted_licenses', []):
+        return _no(f'{name} is not a licence version this source policy accepts')
     if match:
         url = value('LicenseUrl')
         artist = value('Artist')

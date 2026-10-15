@@ -166,7 +166,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         order = SORTS.get(sort, SORTS['newest'])
         if collection and sort == 'collection':
             order = '(SELECT position FROM collection_items c WHERE c.image_id=i.id AND c.collection_id=%d)' % collection
-        limit = max(1, min(limit, 200))
+        limit = max(1, min(limit, 5000))
         with db() as store:
             total = store.one(f"SELECT COUNT(*) AS n FROM images i LEFT JOIN image_metrics m ON m.image_id=i.id "
                               f"WHERE {' AND '.join(where)}", params)['n']
