@@ -545,9 +545,15 @@ class Worker:
                       'effect': r['effect']} for r in rows]
         self._set(stage='analyzing', message='Checking the analysis with a second model…')
         try:
-            answer = self._call('verify', tasks.verify_prompt(proposals, self.techniques),
-                                tasks.verify_schema(sorted(self.techniques)), [self.media / image['analysis_path']],
-                                item_id=item_id, backend=verifier)
+            for attempt in (1, 2):  # one quick retry: the subscription CLIs occasionally report a transient error
+                try:
+                    answer = self._call('verify', tasks.verify_prompt(proposals, self.techniques),
+                                        tasks.verify_schema(sorted(self.techniques)),
+                                        [self.media / image['analysis_path']], item_id=item_id, backend=verifier)
+                    break
+                except BackendError as error:
+                    if attempt == 2 or error.code not in ('provider_error', 'timeout'):
+                        raise
             result = tasks.validate_verify(answer['result'], {p['technique_id'] for p in proposals})
         except tasks.InvalidResult:
             return  # leave annotations as 'proposed'; the verification simply did not count
