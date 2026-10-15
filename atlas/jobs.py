@@ -56,7 +56,7 @@ def backend_message(code: str, backend: str) -> str:
     name = BACKEND_NAMES.get(backend, backend)
     return {
         'unavailable': f'{name} is not installed or could not be found on this computer.',
-        'subscription_auth_required': f'{name} is not signed in. Open AI setup for the one-time sign-in steps.',
+        'subscription_auth_required': f'{name} is not signed in. Open Settings > Assistants for the one-time sign-in steps.',
         'quota': f'{name} reached its usage limit. Resume later, or switch to the other assistant.',
         'daily_cap': 'Today\'s AI limit in Settings was reached. Resume tomorrow or raise the limit.',
         'timeout': f'{name} took too long to answer.',

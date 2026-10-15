@@ -64,7 +64,7 @@ try {
     Write-Host ''
     Write-Host 'All done. Visual Atlas is opening now. Next time, double-click the Visual Atlas icon.' -ForegroundColor Green
     Write-Host 'Closing the Visual Atlas window stops it. Your library is stored in the VisualAtlas folder in your user profile.'
-    Write-Host 'Optional: to analyse images, sign in once to Codex ("codex login") or Claude Code ("claude"). See Settings > AI setup.'
+    Write-Host 'Optional: to analyse images, sign in once to Codex ("codex login") or Claude Code ("claude"). See Settings > Assistants.'
     if (-not $NoLaunch) { Start-Process $app }
 } catch {
     Write-Host ''

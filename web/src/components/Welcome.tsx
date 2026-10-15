@@ -30,7 +30,7 @@ export default function Welcome() {
         catalogue details for an analysis, or your brief and short summaries of library images for project directions.</p>
       <div className="row" style={{ justifyContent: 'flex-start', marginTop: 20 }}>
         <button type="button" className="primary" onClick={() => close('#/find')}>Find my first images</button>
-        <button type="button" onClick={() => close('#/settings')}>Check AI setup</button>
+        <button type="button" onClick={() => close('#/settings')}>Check the assistants</button>
         <button type="button" className="quiet" onClick={() => close('#/')}>Look around first</button>
       </div>
     </dialog>
