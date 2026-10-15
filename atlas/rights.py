@@ -51,6 +51,8 @@ def check(candidate: dict, policy: dict) -> dict:
     if rule is None:
         return _no('no eligibility rule for this source')
     decision = rule(candidate, candidate.get('raw') or {}, policy)
+    if decision['eligible'] and not candidate.get('image_url'):
+        return _no('no image available')
     if decision['eligible'] and not _host_ok(candidate.get('image_url'), policy):
         return _no('image is not hosted by the provider')
     return decision
@@ -123,7 +125,9 @@ def _commons(candidate, raw, policy):
     if match:
         url = value('LicenseUrl')
         artist = value('Artist')
-        if not url.startswith(('https://creativecommons.org/licenses/by/', 'http://creativecommons.org/licenses/by/')):
+        licence_path = '/'.join((match.group(1) + match.group(2)).lower().split())
+        if not re.fullmatch(r'https?://creativecommons\.org/licenses/by/' + re.escape(licence_path)
+                            + r'(?:/(?:deed|legalcode)(?:\.[a-zA-Z_-]+)?)?/?', url):
             return _no(f'{name} without a matching licence link')
         if not artist:
             return _no(f'{name} requires an author credit, but no author is recorded')

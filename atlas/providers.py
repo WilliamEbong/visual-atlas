@@ -130,6 +130,8 @@ def _commons(fetcher, query, page, per_page):
         'iiurlwidth': '1280', 'iiextmetadatafilter': 'LicenseShortName|LicenseUrl|Artist|Credit|'
         'AttributionRequired|Restrictions|Copyrighted|ObjectName|ImageDescription|DateTimeOriginal|NonFree|UsageTerms'})
     pages = (data.get('query') or {}).get('pages') or []
+    if isinstance(pages, dict):
+        pages = pages.values()
     results = []
     for item in sorted(pages, key=lambda p: p.get('index', 0)):
         info = (item.get('imageinfo') or [{}])[0]

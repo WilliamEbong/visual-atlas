@@ -5,6 +5,7 @@ import json
 import socket
 import threading
 import time
+from email.utils import parsedate_to_datetime
 from urllib.parse import urljoin, urlsplit
 
 import httpx
@@ -50,9 +51,13 @@ class Fetcher:
         policy = self.policies.get(provider)
         if policy is None:
             raise FetchError('provider_disabled', f'{provider} is not an enabled source.')
-        parts = urlsplit(url)
+        try:
+            parts = urlsplit(url)
+            port = parts.port
+        except ValueError:
+            raise FetchError('blocked_url', 'Only plain https addresses are fetched.') from None
         host = (parts.hostname or '').lower()
-        if parts.scheme != 'https' or parts.username or parts.password or parts.port not in (None, 443):
+        if parts.scheme != 'https' or parts.username is not None or parts.password is not None or port not in (None, 443):
             raise FetchError('blocked_url', 'Only plain https addresses are fetched.')
         if host not in policy['hosts']:
             raise FetchError('blocked_host', f'{host or "That address"} is not one of {policy["name"]}\'s hosts.')
@@ -84,12 +89,20 @@ class Fetcher:
                             raise FetchError('blocked_address', 'The connection reached a private address.')
                     if response.is_redirect:
                         location = response.headers.get('location', '')
-                        url = urljoin(url, location)
+                        try:
+                            url = urljoin(url, location)
+                        except ValueError:
+                            raise FetchError('blocked_url', 'The redirect contains an invalid address.') from None
                         continue
                     if response.status_code in (429, 503):
                         retry = response.headers.get('retry-after', '')
+                        try:
+                            retry_after = (float(retry) if retry.isdigit() else
+                                           max(0.0, parsedate_to_datetime(retry).timestamp() - time.time()))
+                        except (TypeError, ValueError, OverflowError):
+                            retry_after = None
                         raise FetchError('rate_limited', f'{self.policies[provider]["name"]} asked us to slow down.',
-                                         float(retry) if retry.isdigit() else None)
+                                         retry_after)
                     if response.status_code != 200:
                         raise FetchError(f'http_{response.status_code}',
                                          f'{self.policies[provider]["name"]} answered HTTP {response.status_code}.')
@@ -113,6 +126,7 @@ class Fetcher:
 
     def get_json(self, provider: str, url: str, params: dict | None = None, headers=None) -> dict:
         if params:
+            self.check_url(provider, url)  # Validate before HTTPX can normalize away invalid userinfo.
             url = str(httpx.URL(url, params=params))
         data = self.get(provider, url, max_bytes=MAX_JSON_BYTES, types=('application/json',), headers=headers)
         try:

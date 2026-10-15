@@ -48,7 +48,7 @@ def open_checked(data: bytes) -> tuple[Image.Image, str]:
 def dhash(image: Image.Image) -> str:
     """64-bit difference hash: robust to resizing and re-encoding, used for near-duplicates."""
     small = image.convert('L').resize((9, 8), Image.Resampling.LANCZOS)
-    pixels = list(small.getdata())
+    pixels = list(small.get_flattened_data())
     bits = 0
     for row in range(8):
         for column in range(8):
@@ -82,7 +82,7 @@ def metrics(image: Image.Image) -> dict:
     aspect = width / height
     small = image.resize((96, 96), Image.Resampling.BILINEAR)
     luma = ImageStat.Stat(small.convert('L'))
-    pixels = list(small.getdata())
+    pixels = list(small.get_flattened_data())
     rg = [r - g for r, g, b in pixels]
     yb = [(r + g) / 2 - b for r, g, b in pixels]
 
