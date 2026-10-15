@@ -59,7 +59,7 @@ try {
         $shortcut.Description = 'Visual Atlas - find free-to-use images and learn why they work'
         $shortcut.Save()
     }
-    Write-Host 'Added Visual Atlas to your Desktop and Start menu.'
+    if (-not $NoShortcuts) { Write-Host 'Added Visual Atlas to your Desktop and Start menu.' }
 
     Write-Host ''
     Write-Host 'All done. Visual Atlas is opening now. Next time, double-click the Visual Atlas icon.' -ForegroundColor Green
