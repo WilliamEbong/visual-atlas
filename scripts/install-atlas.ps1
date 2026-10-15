@@ -3,6 +3,8 @@
 # then opens Visual Atlas. Safe to run again (for example after downloading a newer version).
 # Adapted from Qualia's installer (same owner).
 
+param([switch]$NoShortcuts, [switch]$NoLaunch)  # for automated install tests only
+
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
@@ -46,8 +48,10 @@ try {
 
     Step 5 'Creating the Visual Atlas shortcuts'
     $app = Join-Path $root '.venv\Scripts\visual-atlas.exe'
+    if (-not (Test-Path $app)) { throw 'The Visual Atlas program was not created. Run Install Visual Atlas again.' }
     $shell = New-Object -ComObject WScript.Shell
-    foreach ($folder in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) {
+    $folders = if ($NoShortcuts) { @() } else { @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs')) }
+    foreach ($folder in $folders) {
         $shortcut = $shell.CreateShortcut((Join-Path $folder 'Visual Atlas.lnk'))
         $shortcut.TargetPath = $app
         $shortcut.WorkingDirectory = $root
@@ -61,7 +65,7 @@ try {
     Write-Host 'All done. Visual Atlas is opening now. Next time, double-click the Visual Atlas icon.' -ForegroundColor Green
     Write-Host 'Closing the Visual Atlas window stops it. Your library is stored in the VisualAtlas folder in your user profile.'
     Write-Host 'Optional: to analyse images, sign in once to Codex ("codex login") or Claude Code ("claude"). See Settings > AI setup.'
-    Start-Process $app
+    if (-not $NoLaunch) { Start-Process $app }
 } catch {
     Write-Host ''
     Write-Host "Setup stopped: $($_.Exception.Message)" -ForegroundColor Red

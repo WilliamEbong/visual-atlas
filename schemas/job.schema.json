@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visual-atlas/job/1",
+  "title": "Visual Atlas job request",
+  "description": "Validated by atlas/jobs.py::create_job. Create from the app (POST /api/jobs {kind, spec}) or the CLI; any worker (app, `atlas worker` from Claude Code or Codex) resumes it under a lease.",
+  "type": "object",
+  "required": [
+    "kind",
+    "spec"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "find",
+        "grow",
+        "analyze",
+        "verify",
+        "compare",
+        "directions"
+      ]
+    },
+    "spec": {
+      "type": "object",
+      "properties": {
+        "backend": {
+          "enum": [
+            "codex",
+            "claude",
+            "fake"
+          ]
+        },
+        "verify_with": {
+          "enum": [
+            "codex",
+            "claude",
+            null
+          ]
+        },
+        "goal": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "subject": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "intended_use": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "technique_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "orientation": {
+          "enum": [
+            "landscape",
+            "portrait",
+            "square",
+            null
+          ]
+        },
+        "color": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "aic",
+              "met",
+              "cma",
+              "smithsonian",
+              "commons"
+            ]
+          }
+        },
+        "target_new_images": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "budgets": {
+          "type": "object",
+          "properties": {
+            "max_searches": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "max_candidates": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "max_downloads": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "max_analyses": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        },
+        "image_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "brief_id": {
+          "type": "integer"
+        },
+        "models": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

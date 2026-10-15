@@ -1,0 +1,14 @@
+[
+  {"file": "01-aic-69533.jpg", "techniques": ["color-contrast", "texture-contrast"], "note": "small blue eggs against dark greens and browns; busy surround, so not negative space"},
+  {"file": "02-aic-56905.jpg", "techniques": ["color-harmony", "color-contrast", "negative-space"], "note": "near-monochrome nocturne with one small orange light; very low contrast is the point"},
+  {"file": "03-met-437878.jpg", "techniques": ["framing", "layered-depth"], "note": "doorway opens onto a second room; eyes closed, so no gaze reading"},
+  {"file": "04-cma-539189.jpg", "techniques": ["value-contrast", "gaze-direction"], "note": "single candle source; sitter looks out at the viewer"},
+  {"file": "05-cma-143278.jpg", "techniques": ["asymmetric-balance", "color-contrast"], "note": "abstract; red mass upper left balanced by small yellow and blue; the large white field could also be read as negative space"},
+  {"file": "06-aic-27992.jpg", "techniques": ["rhythm-pattern", "layered-depth"], "note": "repeated upright figures, trunks and parasols; ambiguous and crowded"},
+  {"file": "07-met-39799.jpg", "techniques": ["scale-contrast", "implied-motion", "framing"], "note": "the wave dwarfs a tiny Mount Fuji and the boats; the wave's curl frames Fuji"},
+  {"file": "08-commons-123683561.jpg", "techniques": ["atmospheric-perspective", "color-harmony"], "note": "fog and a near-monochrome blue; negative space is debatable because the tree fills the frame"},
+  {"file": "09-commons-188335632.jpg", "techniques": ["leading-lines", "rhythm-pattern", "framing"], "note": "converging arcade, repeated arches and doors, arches frame the far door"},
+  {"file": "10-cma-152543.jpg", "techniques": [], "note": "catalogue photo of a furniture object on a plain ground; any isolation is incidental to museum photography, so no technique is expected"},
+  {"file": "11-met-269256.jpg", "techniques": ["gaze-direction"], "note": "sitter looks out of frame to the left; the oval mount and monochrome come from the medium, not a choice"},
+  {"file": "12-commons-105312710.jpg", "techniques": ["proximity-grouping"], "note": "a crowd clustered under awnings against empty walls; ambiguous sketch"}
+]

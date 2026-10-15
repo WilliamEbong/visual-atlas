@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visual-atlas/analysis/1",
+  "title": "Visual Atlas image analysis (shared by the Claude Code and Codex backends)",
+  "description": "Validated by atlas/ai/tasks.py::validate_analysis before anything is saved: ids must exist, evidence must cite observation ids, no links or markup, creator_intent only from a supplied metadata field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "image_usable",
+    "unusable_reason",
+    "observations",
+    "techniques",
+    "ambiguities",
+    "subjects",
+    "summary",
+    "creator_intent"
+  ],
+  "properties": {
+    "image_usable": {
+      "type": "boolean"
+    },
+    "unusable_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "text",
+          "region"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^o[0-9]{1,2}$"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 220
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "whole",
+              "center",
+              "top",
+              "bottom",
+              "left",
+              "right",
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right",
+              "foreground",
+              "middle-ground",
+              "background"
+            ]
+          }
+        }
+      },
+      "maxItems": 12
+    },
+    "techniques": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "technique_id",
+          "role",
+          "evidence",
+          "effect",
+          "confidence"
+        ],
+        "properties": {
+          "technique_id": {
+            "type": "string",
+            "description": "An id from atlas/data/taxonomy.json; the live schema sent to the CLI lists them as an enum."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "supporting"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^o[0-9]{1,2}$"
+            },
+            "maxItems": 6
+          },
+          "effect": {
+            "type": "string",
+            "maxLength": 260
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "maxItems": 6
+    },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 220
+      },
+      "maxItems": 4
+    },
+    "subjects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 40
+      },
+      "maxItems": 6
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 420
+    },
+    "creator_intent": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "statement",
+            "metadata_field"
+          ],
+          "properties": {
+            "statement": {
+              "type": "string",
+              "maxLength": 300
+            },
+            "metadata_field": {
+              "type": "string",
+              "enum": [
+                "title",
+                "creator",
+                "date",
+                "medium",
+                "credit_line",
+                "description",
+                "source"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
