@@ -13,7 +13,9 @@ photos something like look looks feel feels should would could make making made 
 very more most less lot lots about over under than then there these those what when where which while who will
 can may might also just only into onto off out up down any each every other another such own same so too again
 poster posters slide slides cover page website site logo banner talk event project brief audience people person
-family families adult adults top bottom small large big title date sponsor sponsors format portrait landscape""".split())
+family families adult adults top bottom small large big title date sponsor sponsors format portrait landscape
+against flyer leaflet brochure booklet invitation programme program album sleeve newsletter campaign hero spread zine
+post opener""".split())
 GENERIC = STOPWORDS | {'contrast', 'balance', 'view', 'space', 'frame', 'pattern', 'colour', 'light', 'line', 'thing',
                        'stand', 'order', 'size', 'idea', 'visible', 'together', 'belong', 'point', 'direction', 'ground',
                        'figure', 'middle', 'background', 'foreground', 'central', 'energy', 'focus', 'perspective',
@@ -53,6 +55,16 @@ def _distinctive(entries: dict[str, list[str]]) -> dict[str, str]:
     return {word: next(iter(codes)) for word, codes in owners.items() if len(codes) == 1}
 
 
+def _cues(codes: list[dict], joined: str, found: dict[str, dict], used: set[str]):
+    """Descriptive phrases from the codebook ("backlit" for silhouette): weaker than a name, so never exact."""
+    for code in codes:
+        for cue in code.get('request_cues', []):
+            phrase = ' '.join(words(cue))
+            if phrase and f' {phrase} ' in joined and code['id'] not in found:
+                found[code['id']] = {'id': code['id'], 'exact': False, 'why': f'“{cue}”'}
+                used.update(phrase.split())
+
+
 def code_request(text: str, taxonomy: dict, technique_ids=(), goal_ids=(), subject: str = '') -> dict:
     """{'techniques': [{id, exact, why}], 'goals': [{id, exact, why}], 'subject_terms': [...]} for a request."""
     tokens = words(f'{text} {subject}')
@@ -72,7 +84,9 @@ def code_request(text: str, taxonomy: dict, technique_ids=(), goal_ids=(), subje
         if token in single and single[token] not in techniques:
             techniques[single[token]] = {'id': single[token], 'exact': False, 'why': f'“{token}”'}
             used.add(token)
+    _cues(taxonomy['techniques'], joined, techniques, used)
     goals: dict[str, dict] = {g: {'id': g, 'exact': True, 'why': 'chosen in the form'} for g in goal_ids}
+    _cues(taxonomy['goals'], joined, goals, used)
     goal_words = _distinctive({g['id']: [g['name'], g['description']] for g in taxonomy['goals']})
     for token in tokens:
         if token in goal_words and goal_words[token] not in goals:

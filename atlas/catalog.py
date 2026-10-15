@@ -26,6 +26,10 @@ class Named(Strict):
     description: Text
 
 
+class Goal(Named):
+    request_cues: list[str] = []  # descriptive phrases a person writes for this goal (request coding)
+
+
 class Domain(Named):
     variables: list[str] = Field(min_length=1)
 
@@ -49,6 +53,7 @@ class Technique(Strict):
     id: Slug
     name: str = Field(min_length=1, max_length=80)
     aliases: list[str]
+    request_cues: list[str] = []  # descriptive phrases that suggest the technique without naming it
     definition: Text
     explanation: Text
     when_it_helps: list[str] = Field(min_length=1)
@@ -68,7 +73,7 @@ class Technique(Strict):
 class Taxonomy(Strict):
     version: str
     note: str
-    goals: list[Named] = Field(min_length=1)
+    goals: list[Goal] = Field(min_length=1)
     operations: list[Named] = Field(min_length=1)
     domains: list[Domain] = Field(min_length=1)
     techniques: list[Technique] = Field(min_length=1)

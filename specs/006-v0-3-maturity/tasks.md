@@ -25,8 +25,8 @@
 - [x] T616 Live smoke per enabled new source (tests marked live)
 
 ## Phase 5: Request coding (US6)
-- [ ] T617 request_cues in the taxonomy, coder phrase matching and stopword fixes + tests (atlas/data/taxonomy.json, atlas/coding.py, tests/test_coding.py)
-- [ ] T618 Coding evaluation: dev decision, final once, report (scripts/eval_v03.py, docs/evaluation/v0.3/)
+- [x] T617 request_cues in the taxonomy, coder phrase matching and stopword fixes + tests (atlas/data/taxonomy.json, atlas/coding.py, tests/test_coding.py)
+- [x] T618 Coding evaluation: dev decision, final once, report (scripts/eval_v03.py, docs/evaluation/v0.3/)
 
 ## Phase 6: Metadata filter (US7)
 - [ ] T619 Deterministic rules and Jev arm evaluated per METADATA-GATE.md; integrate only a passing arm (skip reason, Settings switch) + tests (atlas/data/metadata_filter.json, atlas/jobs.py, atlas/server.py, tests/)

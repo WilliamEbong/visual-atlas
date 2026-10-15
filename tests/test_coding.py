@@ -118,3 +118,14 @@ def test_grounded_directions_are_saved_and_insufficient_evidence_keeps_earlier_o
     job, kept = directions(home, Empty, brief)
     assert job['state'] == 'done' and 'Not enough matching evidence' in job['message'] and 'night sky' in job['message']
     assert [r['id'] for r in kept] == [r['id'] for r in saved]  # an empty answer never wipes earlier suggestions
+
+
+def test_descriptive_cue_phrases_tag_a_technique_without_its_name():
+    reading = coding.code_request('Backlit figures against a pale evening sky for a festival flyer', TAXONOMY)
+    tags = {t['id']: t for t in reading['techniques']}
+    assert 'silhouette' in tags and tags['silhouette']['exact'] is False and tags['silhouette']['why'] == '“backlit”'
+    assert 'against' not in reading['subject_terms'] and 'flyer' not in reading['subject_terms']
+    assert 'festival' in reading['subject_terms']
+    calm = coding.code_request('A serene, misty morning by the lake', TAXONOMY)
+    assert {'create-calm'} <= {g['id'] for g in calm['goals']}
+    assert 'atmospheric-perspective' in {t['id'] for t in calm['techniques']}
