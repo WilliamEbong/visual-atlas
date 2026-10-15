@@ -29,16 +29,17 @@ Anthropic for Claude Code).
 - **Codex** (ChatGPT plan): install, then run `codex login` once in a terminal, or
 - **Claude Code** (Claude plan): install, then run `claude` once in a terminal and sign in.
 
-Check **Settings → AI setup** shows *Ready*. Then:
+Check **Settings → Assistants** shows *Ready*. Then:
 
-1. **Find images** → describe what you want to see → **Find images**.
-2. Watch it go: Searching → Checking permissions → Analyzing → Ready.
+1. **Find images** → describe what you want to see (the line under the box shows how it reads your words) →
+   **Start finding**.
+2. Watch the timeline: Search → Check permissions → Analyse → Ready.
 3. New images appear in the library with their credits.
 
 ## 4. Use them
 
-- **✓ Confirm / ✕ Reject / Edit** any reading — your decision always wins.
-- **Save to collection**, then **Export zip** with credits.
+- **Confirm / Reject / Edit evidence** on any reading — your decision always wins.
+- **Save to a collection**, then **Export zip** with credits. Most actions show a notice with **Undo**.
 - Pick two to four images with **+ Compare**.
 - **My project** → describe your project → **Suggest directions** grounded in your images.
 

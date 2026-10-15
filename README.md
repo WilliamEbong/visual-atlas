@@ -19,7 +19,8 @@ you turn those ideas into directions for your own brief.
 
 - **It finds images for you.** Describe what you want to see, or let it *grow your library* where your
   technique examples are thinnest. It searches the Art Institute of Chicago, The Met, the Cleveland
-  Museum of Art, Smithsonian Open Access and Wikimedia Commons.
+  Museum of Art, Smithsonian Open Access, Wikimedia Commons, the Rijksmuseum and, if you switch it on, the
+  National Gallery of Art.
 - **Only images you may actually use.** Each item's licence is checked against the source's own record
   by ordinary code — never by an AI. Unclear means skipped. Credits are kept with every image and
   travel into every export. Labels say what was checked (*CC0 — source checked*, *Free with
@@ -32,6 +33,10 @@ you turn those ideas into directions for your own brief.
   *rejected*. A second model agreeing is never presented as human review, and your corrections always
   win over later analysis.
 - **Analyse once.** Browsing, searching, sorting, collections and comparison never call a model.
+- **Calm and forgiving.** Every screen shows what is happening while it loads, when it is empty, when something
+  fails and while a backup is restored. Removing an image from a collection, dismissing a direction or unstarring
+  can be undone; deleting asks first, inside the app. Everything works from the keyboard, and the main screens have
+  no serious accessibility issues in an automated scan.
 - **Your own assistants, your own accounts.** Analysis uses the Claude Code or Codex app already on your
   computer, signed in to your own Claude or ChatGPT plan and run with every tool switched off; there are no API keys
   to manage. Your library stays on your computer, but an AI step is processed by that assistant's service
@@ -41,20 +46,23 @@ you turn those ideas into directions for your own brief.
 ## A quick tour
 
 ### The library
-Search, filter by technique, goal, shape, colour, source or review state, and sort. Images lead; the
-interface stays out of the way.
+Every picture keeps its own proportions in a justified grid, captioned like a plate in an atlas. Search,
+technique, goal and sort stay in view; more filters open in a panel, and each filter in use can be removed with
+one click. The arrow keys move through the grid.
 
 ![Library grid with filters and licence labels](docs/media/library.png)
 
 ### Why an image may work
-Numbered observations of the picture, each technique with the evidence it rests on, a hedged effect,
-who proposed it and who checked it — and the exact credit line.
+Numbered observations of the picture, each linked to the area it describes, each technique with the evidence
+it rests on, a hedged effect, who proposed it and who checked it, and the exact credit line. The arrow keys move
+to the previous and next result.
 
 ![An image page with observations, technique readings and credits](docs/media/image.png)
 
 ### Find images
-Plain words plus optional goal, technique, subject, shape, colour, intended use and quantity. Progress
-reads Searching → Checking permissions → Analyzing → Ready, with every skipped item explained.
+Plain words plus optional goal, technique, subject, shape, colour, intended use and quantity. As you type, the
+app shows how it reads your request (goal, technique, subject words), without AI. Progress is a four-step
+timeline (search, check permissions, analyse, ready) with counts, and every skipped item explained.
 
 ![Find images with job progress](docs/media/find.png)
 
@@ -67,8 +75,9 @@ text list for keyboard and screen-reader users).
 ![Connection map focused on one technique](docs/media/connections.png)
 
 ### Help with my project
-Describe a project and get three to five directions, each built only on techniques and images that
-are really in your library, with execution notes and tradeoffs.
+Describe a project and get up to five directions, each built only on techniques and images that are really in
+your library, with execution notes and tradeoffs, or a plain "not enough evidence yet". The app shows how it read
+your brief, including ideas you described rather than named ("backlit figures" reads as silhouette).
 
 ![Project directions grounded in library images](docs/media/project.png)
 
@@ -129,9 +138,13 @@ are passed as untrusted data. A daily limit protects your plan; jobs pause polit
 | Cleveland Museum of Art | `share_license_status = CC0` |
 | Smithsonian Open Access | the image media itself is `CC0` |
 | Wikimedia Commons | CC0, public domain or CC BY with author and licence link (no SA, NC or ND) |
+| Rijksmuseum | the image's own rights statement is the Public Domain Mark, CC0 or CC BY 4.0 (the catalogue record's CC0 is not read as an image licence) |
+| National Gallery of Art (off until you tick it) | its open data marks the image `openaccess = 1` with no size cap (CC0); the first search downloads that data, about 190 MB, and keeps a small index in your library folder |
 
 Unsplash, Pexels and Pixabay are deliberately **not** used: their terms require hotlinking or restrict
-AI and machine-learning use in ways that are unclear for this app. The policy file with evidence links
+AI and machine-learning use in ways that are unclear for this app. The Library of Congress and NASA are not used
+either: their rights are written as free text, not a field the app can check
+([research](docs/evaluation/v0.3/SOURCES.md)). The policy file with evidence links
 is [`atlas/data/source_policies.json`](atlas/data/source_policies.json). For a researched list of
 free-to-use inspiration sites — and the popular ones that are *not* free to use — see
 [docs/FREE-IMAGE-SOURCES.md](docs/FREE-IMAGE-SOURCES.md).
@@ -191,7 +204,8 @@ npm --prefix web run build
 Build history, decisions and verification evidence: [BUILD-STATE.md](BUILD-STATE.md). Evaluation of the
 technique readings, the checker, project-help retrieval and the TypeSafe Jev decision:
 [docs/evaluation/v1.1/REPORT.md](docs/evaluation/v1.1/REPORT.md) (the v1 development set is in
-[docs/evaluation/HELDOUT.md](docs/evaluation/HELDOUT.md)).
+[docs/evaluation/HELDOUT.md](docs/evaluation/HELDOUT.md)). Request coding, the documentation-photo filter, the new
+sources and the accessibility scan: [docs/evaluation/v0.3/REPORT.md](docs/evaluation/v0.3/REPORT.md).
 
 ## Known limits
 
@@ -200,9 +214,12 @@ technique readings, the checker, project-help retrieval and the TypeSafe Jev dec
   alternative, and the second model, now forming its own reading first, still accepted 2 of 5 wrong ones on the
   final split. Treat *proposed* and *agreed by a second model* as starting points, and confirm or correct what
   matters to you ([report](docs/evaluation/v1.1/REPORT.md)).
-- **Request coding is conservative.** The built-in reading of a brief rarely tags wrongly but misses techniques
-  that are described rather than named; project help still finds relevant references mainly through subject
-  words.
+- **Request coding catches about half of what a brief describes.** It now understands many descriptions
+  ("backlit", "misty", "odd one out"), and on 20 new test briefs it found 54% of the intended codes at 73%
+  precision, up from 20% at 53%
+  ([report](docs/evaluation/v0.3/REPORT.md)). It still misses ideas phrased in words it does not know.
+- **Every eligible image is analysed.** A filter that would skip documentation photos and text pages before
+  download was tested and not adopted, because it also skipped good pictures.
 - **Near-copies.** Exact and near-identical files are caught; two different frames of the same burst of
   photos can both be added. Remove one with a click if that happens.
 - **Smithsonian** works without a key but its shared demo key allows only a few searches an hour; add your

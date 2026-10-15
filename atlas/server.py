@@ -652,6 +652,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         html = index.read_text(encoding='utf-8') if index.exists() else (
             '<!doctype html><html><head><title>Visual Atlas</title></head><body><h1>Visual Atlas</h1>'
             '<p>Build the web app with: npm --prefix web run build</p></body></html>')
-        return HTMLResponse(html.replace('</head>', f'<meta name="atlas-token" content="{app.state.token}"></head>'))
+        # Never cached: after an upgrade the window must load the new build's asset names, not the old ones.
+        return HTMLResponse(html.replace('</head>', f'<meta name="atlas-token" content="{app.state.token}"></head>'),
+                            headers={'Cache-Control': 'no-store'})
 
     return app

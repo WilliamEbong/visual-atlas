@@ -11,7 +11,7 @@ const KIND: Record<string, string> = { find: 'Find images', grow: 'Grow my libra
 export default function Jobs({ id }: { id?: string }) {
   const { data, error, busy, reload } = useData<Job[]>(id ? null : 'jobs?limit=50')
   usePoll(useCallback(reload, [reload]), !id && !!data?.some((job) => ['queued', 'running', 'cancelling'].includes(job.state)), 3000)
-  if (id) return <><PageHead kicker={<><a href="#/jobs">Jobs</a> / {id.slice(0, 8)}</>} title="Job" /><div style={{ marginTop: 32, maxWidth: 900 }}><JobProgress jobId={id} /></div></>
+  if (id) return <><PageHead kicker={<><a href="#/jobs">Jobs</a> / {id.slice(0, 8)}</>} title="Job progress" /><div style={{ marginTop: 32, maxWidth: 900 }}><JobProgress jobId={id} /></div></>
   return (
     <>
       <PageHead kicker="Jobs · one at a time, in the background" title="Jobs" />

@@ -32,7 +32,7 @@
 - [x] T619 Deterministic rules and Jev arm evaluated per METADATA-GATE.md; integrate only a passing arm (skip reason, Settings switch) + tests (atlas/data/metadata_filter.json, atlas/jobs.py, atlas/server.py, tests/)
 
 ## Phase 7: Polish, verification and release
-- [ ] T620 axe scans (light, dark) and layout-shift measurement; fix findings (web/package.json devDependency axe-core)
-- [ ] T621 Docs and screenshots (README.md, QUICK-START.md, docs/USER-GUIDE.md, design-review/v0.3/)
+- [x] T620 axe scans (light, dark) and layout-shift measurement; fix findings (web/package.json devDependency axe-core)
+- [x] T621 Docs and screenshots (README.md, QUICK-START.md, docs/USER-GUIDE.md, design-review/v0.3/)
 - [ ] T622 Full checks; Playwright journeys desktop and 375 px; fresh install and upgrade from published v0.2.0; local release zip
 - [ ] T623 Independent review (≤ 2 rounds), fixes, converge, BUILD-STATE handoff

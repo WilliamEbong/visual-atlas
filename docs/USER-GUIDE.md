@@ -112,7 +112,7 @@ ranking is used.
 | **Codex** (ChatGPT plan) | `npm install -g @openai/codex` | run `codex login` in a terminal |
 | **Claude Code** (Claude plan) | see [claude.com/claude-code](https://claude.com/claude-code) | run `claude` in a terminal and sign in |
 
-Open **Settings → AI setup** to see whether each one is ready. Choose which one **analyses images** and
+Open **Settings → Assistants** to see whether each one is ready. Choose which one **analyses images** and
 which one does the **second-model check**. The recommended split is Codex analysing and Claude Code
 checking, so the work is spread over both plans. A **daily AI limit** (number of calls) protects your
 plan; jobs pause politely when it is reached.
@@ -133,8 +133,12 @@ of the artist's intention that the museum record does not support — are discar
 1. Describe what you want to see, in plain words. Optionally pick a **goal**, a **technique**, a
    **subject**, an **intended use**, a **shape** (landscape, portrait, square), a **main colour** and how
    many new images you want.
-2. Choose which collections to search and who analyses.
-3. Select **Find images**. The job runs in the background; you can keep browsing.
+   Under the box, **Read as** shows how Visual Atlas understood your words (goal, technique, subject words) as
+   you type. It is ordinary matching against the taxonomy, not AI, and it understands many descriptions
+   ("backlit figures" reads as silhouette, "misty hills" as atmospheric perspective).
+2. Choose which collections to search and who analyses. The National Gallery of Art is off until you tick it,
+   because its first search downloads its open data (about 190 MB).
+3. Select **Start finding**. The job runs in the background; you can keep browsing.
 
 What happens, in order:
 
@@ -148,8 +152,9 @@ What happens, in order:
    check each reading.
 5. **Ready** — only images with at least one clear technique are added.
 
-The panel shows how many were checked, how many were free to use, what was added, and why the rest
-were skipped.
+The panel shows the four steps as a timeline, then counts (found, free to use, analysed, added) and the
+latest results one by one, each with what happened to it. **Not added — see why** lists every skipped item and
+its reason.
 
 **Did it find what you asked for?** When you pick a technique, or name one in your words (for example
 "negative space"), each added image is marked by whether its own analysis shows that technique; it is never
@@ -174,17 +179,24 @@ planning. Run it a few times to build a balanced library.
 ## 6. The library
 
 - **Search** finds words in titles, makers, what the assistant saw, and technique names and aliases.
-- **Filters**: technique, goal, shape, source, review state, main colour and favourites. **Sort** by
-  newest, oldest, title, maker, most techniques, most colourful, lightest or darkest. Filters live in
-  the address, so Back and reload keep them.
-- Use the arrow keys to move between images; Enter opens one.
+- Pictures keep their own proportions: each row is filled edge to edge and every picture in it has the same
+  height.
+- **Filters**: technique, goal and sort are always visible; **More filters** opens shape, source, review state,
+  main colour and favourites. The filters in use are listed above the pictures; select one to remove it, or
+  **Clear all**. **Sort** by newest, oldest, title, maker, most techniques, most colourful, lightest or darkest.
+  Filters live in the address, so Back and reload keep them.
+- Use the arrow keys to move between images (up and down go to the nearest picture in the row above or below);
+  Enter opens one.
 - **+ Compare** adds an image to the comparison tray (up to four).
 - If a job stopped before analysing some downloaded images, a notice offers **Analyse them now**.
 
 ## 7. An image, its evidence and its credits
 
-- **What you can see** — numbered observations of the picture, each with where it is. Open questions
-  are listed as *Left open*. These are a model's description of the pixels, not a catalogue record.
+- **What you can see** — numbered observations of the picture. Point at one, or move to it with the keyboard,
+  and its area is outlined on the picture (foreground, middle ground and background are approximate bands).
+  **Show every marked area** outlines them all. Open questions are listed as *Left open*. These are a model's
+  description of the pixels, not a catalogue record.
+- **← Previous / Next →** (or the arrow keys) move through the results you came from.
 - **Why it may work** — each technique with its **evidence** (the observations it rests on), a hedged
   **possible effect**, its review state, who proposed it and who checked it.
 - **Documented intent** appears only when the museum's own record states the maker's intention.
@@ -193,7 +205,9 @@ planning. Run it a few times to build a balanced library.
   — credit included*), the exact credit line, the licence link, what was checked and when, restrictions,
   and a link to the source page. Labels describe what was checked; they are not legal advice. Check the
   source before publishing.
-- **Remove from library** deletes the image, its copies and readings; it will not be collected again.
+- **Remove from library…** asks first, inside the app, naming what will go. It deletes the image, its copies,
+  readings and places in collections; it will not be collected again.
+- **☆ Favourite** and saving to or removing from a collection show a short notice with **Undo**.
 
 ## 8. Correct a reading
 
@@ -239,19 +253,20 @@ Describe a project — audience, message, format, mood, constraints — and sele
   of the direction's techniques; a direction that fails this is dropped. If your library has no good evidence
   for the brief, you get an honest "not enough matching evidence" message with a suggestion of what to find,
   and earlier suggestions are kept.
-- **Keeping directions.** **Keep** the ones you like; asking again replaces only the unkept ones. Briefs and
-  suggestions are saved.
+- **Keeping directions.** **Keep** the ones you like; asking again replaces only the unkept ones. **Dismiss**
+  shows a notice with **Undo**. Briefs and suggestions are saved; **Delete this brief…** asks first.
 
 ## 12. Collections
 
 Save images to collections from any image page. A collection page lets you rename it, reorder images
-(← →), remove images, download its **credits**, or **Export zip**: the original files, `CREDITS.md` and
-`annotations.json`.
+(← →), remove images (with **Undo**), download its **credits**, or **Export zip**: the original files,
+`CREDITS.md` and `annotations.json`. **Delete this collection…** asks first; the images stay in your library.
 
 ## 13. Compare
 
-Pick two to four images with **+ Compare**, then **Compare side by side**. Shared techniques are
-highlighted. **Ask an assistant to compare them** writes a saved comparison (what they share, how they
+Pick two to four images with **+ Compare**, then **Compare side by side**. The pictures stand on one
+baseline; below them a table marks each technique per image (■ agreed by a second model, ● confirmed by you,
+□ proposed, — not seen), with palettes and contrast. **Ask an assistant to compare them** writes a saved comparison (what they share, how they
 differ, one note per image).
 
 ## 14. Jobs: progress, pause, cancel, resume
@@ -271,9 +286,17 @@ the job pauses with a plain message; resume later or switch assistant in Setting
 | Cleveland Museum of Art | `share_license_status` is `CC0` |
 | Smithsonian Open Access | the image media itself is marked `CC0` (metadata alone is not enough) |
 | Wikimedia Commons | the file's licence is CC0, public domain or CC BY (with author and licence link); share-alike, non-commercial and no-derivatives licences are excluded |
+| Rijksmuseum | the image's own rights statement is the Public Domain Mark, CC0 or CC BY 4.0; the catalogue record's CC0 covers only its text and is not read as an image licence |
+| National Gallery of Art | its open data marks the image `openaccess = 1` with no size cap, and it is the object's main view (CC0) |
 
 Unsplash, Pexels and Pixabay are **not used**: their terms either require hotlinking or restrict AI and
-machine-learning use in ways that are unclear for this app. Settings → *Image sources and permissions*
+machine-learning use in ways that are unclear for this app. The Library of Congress and NASA are **not used**
+either: their rights are free text that differs from item to item, so no rule can read them reliably.
+
+**The National Gallery of Art** has no search service. The first search that includes it downloads its open
+data (about 190 MB), keeps only the open-access pictures in a small index in your library folder (`sources\nga`)
+and deletes the download. Later searches use the index; it refreshes after 30 days, and if a refresh fails the
+old index keeps working. Settings → *Sources*
 shows every source, its rule, its evidence links and when it was last checked. The policies live in
 `atlas/data/source_policies.json`.
 
@@ -340,7 +363,7 @@ removed until those readings are rejected or removed.
 |---|---|
 | Windows says the installer is from the internet | You skipped **Unblock**: right-click the zip → Properties → Unblock, extract again. |
 | “Port 8775 is used by another program” | Close that program, or add `VISUAL_ATLAS_PORT=8776` to a `.env` file in your library folder. |
-| AI setup shows “not signed in” | Sign in once in a terminal (`codex login` or `claude`), then **Check again**. |
+| Settings → Assistants shows “Not ready” | Sign in once in a terminal (`codex login` or `claude`), then **Check again**. |
 | A job paused with a usage-limit message | Wait for your plan to reset, or switch assistant in Settings, then **Resume**. |
 | A source keeps failing | Museums occasionally go offline; the job records the failure and moves on. Try again later. |
 | Smithsonian searches fail | The shared demo key is limited; add your own free key (section 15). |

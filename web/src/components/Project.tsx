@@ -121,7 +121,7 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
             {directions.map((d, index) => (
               <article key={d.id} className={`tray-col ${RULES[index % RULES.length]}`} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <p className="mono">Direction {index + 1}{d.state === 'kept' ? ' · kept' : ''}</p>
-                <h3 style={{ fontSize: 26 }}>{d.title}</h3>
+                <h3 className="direction-title">{d.title}</h3>
                 {d.images.length > 0 ? <div className="contact" style={{ height: 104, gap: 8 }}>
                   {d.images.slice(0, 3).map((img, i) => <a key={img.id} href={href(`image/${img.id}`)} aria-label={img.title}>
                     <img src={media(img.thumb)} alt="" style={{ height: THUMB_HEIGHTS[i] }} /></a>)}</div>

@@ -64,7 +64,7 @@ export default function SettingsPage() {
               {(['codex', 'claude'] as const).map((name) => (
                 <div key={name} className="status-card">
                   <div className="section-title"><span className="label" style={{ fontSize: 17 }}>{name === 'codex' ? 'Codex (ChatGPT plan)' : 'Claude Code (Claude plan)'}</span>
-                    <span className="mono" style={{ color: !status ? 'var(--caption)' : status[name].ready ? 'var(--green)' : 'var(--danger)' }}>{status ? (status[name].ready ? 'Ready' : 'Not ready') : 'Checking…'}</span></div>
+                    <span className="mono" style={{ color: !status ? 'var(--graphite)' : status[name].ready ? 'var(--green-strong)' : 'var(--danger)' }}>{status ? (status[name].ready ? 'Ready' : 'Not ready') : 'Checking…'}</span></div>
                   {status && <p className="mono" style={{ color: 'var(--graphite)' }}>{status[name].ready ? `Signed in${status[name].version && status[name].version !== 'unknown' ? ` · version ${status[name].version}` : ''}` : status[name].message}</p>}
                   {status && !status[name].ready && <p style={{ fontSize: 14 }}>{SIGN_IN[name]}</p>}
                 </div>))}

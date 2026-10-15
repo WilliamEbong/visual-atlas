@@ -4,7 +4,7 @@
   --ground: #F3EFE4; --paper: #FBF9F3; --card: #E9E1CD; --ink: #1D1C1A; --graphite: #3C3A35; --caption: #6B665C;
   --axis: rgba(29, 28, 26, .35); --keyline: rgba(29, 28, 26, .3); --hair: rgba(29, 28, 26, .16); --rule: rgba(29, 28, 26, .3);
   --rule-strong: rgba(29, 28, 26, .5); --field-line: rgba(29, 28, 26, .42);
-  --accent: #A2573B; --green: #4E6A58; --blue: #6E8496; --ochre: #8A6420; --ochre-mark: #B98A3E; --danger: #9B3324;
+  --accent: #A2573B; --green: #4E6A58; --green-strong: #3A5243; --blue: #6E8496; --ochre: #8A6420; --ochre-mark: #B98A3E; --danger: #9B3324;
   --focus: #236292; --peach: #EBC6A8; --skeleton: #E9E1CD;
   --display: Perpetua, 'Cormorant Garamond', Georgia, serif;
   --text: 'Franklin Gothic Book', 'Libre Franklin Variable', 'Libre Franklin', system-ui, sans-serif;
@@ -18,7 +18,7 @@
     --ground: #2C2A27; --paper: #24221F; --card: #34312C; --ink: #F3EFE4; --graphite: #DCD5C6; --caption: #B8B0A0;
     --axis: rgba(243, 239, 228, .38); --keyline: rgba(243, 239, 228, .28); --hair: rgba(243, 239, 228, .16); --rule: rgba(243, 239, 228, .25);
     --rule-strong: rgba(243, 239, 228, .5); --field-line: rgba(243, 239, 228, .42);
-    --accent: #D4A25A; --green: #9DB8A4; --blue: #A9C1D3; --ochre: #D4A25A; --ochre-mark: #D4A25A; --danger: #E08A7A;
+    --accent: #D4A25A; --green: #9DB8A4; --green-strong: #9DB8A4; --blue: #A9C1D3; --ochre: #D4A25A; --ochre-mark: #D4A25A; --danger: #E08A7A;
     --focus: #A9C1D3; --peach: #EBC6A8; --skeleton: #3A3631; color-scheme: dark;
   }
 }
@@ -26,7 +26,7 @@
   --ground: #2C2A27; --paper: #24221F; --card: #34312C; --ink: #F3EFE4; --graphite: #DCD5C6; --caption: #B8B0A0;
   --axis: rgba(243, 239, 228, .38); --keyline: rgba(243, 239, 228, .28); --hair: rgba(243, 239, 228, .16); --rule: rgba(243, 239, 228, .25);
   --rule-strong: rgba(243, 239, 228, .5); --field-line: rgba(243, 239, 228, .42);
-  --accent: #D4A25A; --green: #9DB8A4; --blue: #A9C1D3; --ochre: #D4A25A; --ochre-mark: #D4A25A; --danger: #E08A7A;
+  --accent: #D4A25A; --green: #9DB8A4; --green-strong: #9DB8A4; --blue: #A9C1D3; --ochre: #D4A25A; --ochre-mark: #D4A25A; --danger: #E08A7A;
   --focus: #A9C1D3; --peach: #EBC6A8; --skeleton: #3A3631; color-scheme: dark;
 }
 
@@ -138,6 +138,8 @@ legend { font: 12px/1.4 var(--mono); color: var(--caption); padding: 0; margin-b
 .drawer strong { font: 500 16px var(--label); display: block; }
 .drawer span.text { font-size: 14px; color: var(--graphite); line-height: 1.35; display: block; margin-top: 4px; }
 .slip { background: var(--card); padding: 22px 24px; outline: 1px solid var(--keyline); outline-offset: -1px; }
+/* Caption grey falls below 4.5:1 on cream, so small text on slips and cards uses graphite. */
+.slip .mono, .slip .kicker, .slip label.field, .slip legend, .status-card .mono { color: var(--graphite); }
 .slip .slip-text { font: 15px/1.6 var(--mono); color: var(--ink); white-space: pre-line; }
 .trays { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; }
 .tray-col { border-top: 3px solid var(--rule-color, var(--blue)); padding-top: 12px; }
@@ -145,6 +147,7 @@ legend { font: 12px/1.4 var(--mono); color: var(--caption); padding: 0; margin-b
 .tray-col ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 15px; }
 .tray-col li strong { font: 500 15px var(--label); display: block; }
 .tray-col li span { color: var(--graphite); }
+.tray-col .direction-title { font: 26px/1.08 var(--display); margin: 0; }
 .rule-blue { --rule-color: var(--blue); } .rule-green { --rule-color: var(--green); } .rule-ochre { --rule-color: var(--ochre-mark); }
 .rule-rust { --rule-color: var(--accent); } .rule-ink { --rule-color: var(--graphite); }
 .section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px 24px; flex-wrap: wrap; }
@@ -263,7 +266,7 @@ dialog .row { justify-content: flex-end; margin-top: 20px; }
 
 /* ── compare, collections, tables, graph ──────────────────────────────── */
 .baseline { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 32px; align-items: end; border-bottom: 1px solid var(--axis); }
-.baseline figure { margin: 0; display: flex; justify-content: center; align-items: flex-end; height: 380px; }
+.baseline figure { margin: 0; display: flex; justify-content: center; align-items: flex-end; }
 .baseline figure img { max-height: 380px; max-width: 100%; width: auto; outline: 1px solid var(--keyline); outline-offset: -1px; object-fit: contain; }
 .baseline-captions { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 32px; padding-top: 16px; }
 table.plain { border-collapse: collapse; width: 100%; font-size: 15px; }

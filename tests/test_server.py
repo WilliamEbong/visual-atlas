@@ -37,6 +37,7 @@ def test_requests_need_loopback_host_same_origin_and_token(client):
     assert 'name="atlas-token" content="test-token"' in response.text
     assert "frame-ancestors 'none'" in response.headers['content-security-policy']
     assert response.headers['cross-origin-resource-policy'] == 'same-origin'
+    assert response.headers['cache-control'] == 'no-store'  # an upgraded app never runs a cached old page
 
 
 def test_media_is_confined_to_the_library(library):

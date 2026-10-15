@@ -39,6 +39,12 @@ export async function demoRequest<T>(path: string, init?: RequestInit): Promise<
     const offset = Number(query.get('offset') ?? 0)
     return { items: items.slice(offset, offset + Number(query.get('limit') ?? 60)), total: items.length } as T
   }
+  if (route === 'compare') {  // assembled from the image records already in the snapshot; no written comparison
+    const ids = (new URLSearchParams(search).get('ids') ?? '').split(',').filter(Boolean)
+    const images = ids.map((id) => data.responses[`images/${id}`]).filter(Boolean)
+    if (images.length < 2) throw new Error('These images are not in the online demo.')
+    return { images, comparison: null } as T
+  }
   if (route === 'settings') return { backend: 'fake', verify_with: 'none', daily_ai_cap: 0, welcomed: true } as T
   if (route.startsWith('jobs') || route === 'backups') return [] as T
   if (route === 'health') return { version: 'demo', home: 'online demo' } as T
