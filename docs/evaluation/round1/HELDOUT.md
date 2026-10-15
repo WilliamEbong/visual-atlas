@@ -1,5 +1,12 @@
 # Held-out challenge: technique readings
 
+> **How to read this (added in v1.1).** This is a *development / regression* set, not a fresh held-out test:
+> round 1 was run, the prompts were then revised after reading its results, and round 2 (below) re-ran the same
+> twelve images. The expected techniques are the builder's own judgment (Claude, while building), not expert or
+> human ground truth. All numbers are label-level agreement (how many proposed labels match an expected label),
+> not image-level accuracy. The v1.1 evaluation with separate development and final splits is in
+> [v1.1/REPORT.md](../v1.1/REPORT.md).
+
 Twelve images that were never in the library, chosen to include clear, subtle and ambiguous cases.
 Expected techniques were written by the builder (Claude, while building Visual Atlas) after looking at
 each image and before any model ran. **They are builder judgment, not expert ground truth**; treat the
