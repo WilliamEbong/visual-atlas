@@ -1,0 +1,38 @@
+{
+ "A_restore": {
+  "collection_post": 201,
+  "restore": 200,
+  "collection_survived": false
+ },
+ "B_sweep": {
+  "analysis_file_exists_after_start": false
+ },
+ "C_verify": {
+  "job": {
+   "state": "done",
+   "message": "Ready. Second-model check finished."
+  },
+  "item": {
+   "state": "added",
+   "reason": "checked"
+  },
+  "verify_analyses_saved": 0
+ },
+ "D_reanalysis": {
+  "active_after_4_then_3": 7,
+  "verify_schema_max": 6,
+  "labels_after_empty_analysis": 7,
+  "status_after_empty": "unanalyzed"
+ },
+ "4A_directions_validator": {
+  "accepted_empty_image_ids_single_direction": 1
+ },
+ "4A_prompt_json_complete": false,
+ "5A_retry_after_used": false,
+ "5B_budgets_for_40": {
+  "max_analyses": 44,
+  "max_candidates": 80,
+  "max_downloads": 30,
+  "max_searches": 10
+ }
+}

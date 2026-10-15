@@ -4,8 +4,24 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-None: v0.1.0 is built, verified and published. Next work comes from the owner (WELCOME-BACK.md, local only, has
-the handoff). Ideas if asked: Openverse/Rijksmuseum/NGA connectors, burst-frame detection, upload/URL import.
+v1.1 (spec 005, package 0.2.0): implement tasks in specs/005-v1-1-dependability/tasks.md in order, starting T502
+(migration + version) and T503 (maintenance coordination). Rerun docs/evaluation/v1.1/repro_v1_findings.py after
+each root-cause fix.
+
+## v1.1 status (2026-10-15)
+- Baseline on 680b199 (scratch home): pytest 290 passed / 7 live deselected; ruff clean; taxonomy check OK;
+  tsc clean; vitest 6 passed; web build OK; data guard clean; pip-audit and npm audit clean. Python 3.14.3,
+  uv 0.11.29, Node 24.14.1, codex-cli 0.160.0, Claude Code 2.1.284.
+- Reproduced on 680b199 (docs/evaluation/v1.1/repro-before.json): restore loses an acknowledged collection;
+  second server start deletes a worker's media; quota verifier reported "checked" with 0 saved; 4+3 proposals
+  leave 7 active vs a 6-verdict contract, empty analysis leaves 7 labels with status unanalyzed; a direction with
+  no images accepted; directions prompt JSON truncated mid-record; Retry-After unused; target 40 gets 30 downloads.
+- Working principles recorded in specs/005-v1-1-dependability/spec.md.
+- Owner input mid-run: (1) evaluate "request coding" like Qualia's qualitative coding -> adopted as FR-12
+  (deterministic coder; Jev as gate arm). (2) "The public version must not use my key; users bring their own"
+  -> any Jev integration is bring-your-own-key, off by default. Live Jev eval with the owner's key is NOT
+  authorised yet (OWNER-NEEDED.md); harness + criteria proceed, live run deferred.
+- Version decision: 0.2.0 (repo uses 0.x semver + v tags; behaviour change + migration -> minor bump).
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —
@@ -41,7 +57,8 @@ the handoff). Ideas if asked: Openverse/Rijksmuseum/NGA connectors, burst-frame 
 5 connections + briefs · 6 packaging + docs · 7 ingestion (~60 refs) + held-out · 8 converge, reviews, release.
 
 ## File ownership
-- No Codex task running. Claude owns all files.
+- Claude owns all tracked files for v1.1. `.codex-remote-attachments/` (untracked, created 09:28 by the Codex
+  desktop app) is not ours: left untouched and excluded locally via .git/info/exclude.
 
 ## Codex delegated tasks
 1. task-mv9a1vza-xi4tsp (2026-10-15) — atlas/transfer.py + tests/test_transfer.py (credits, collection zip,
