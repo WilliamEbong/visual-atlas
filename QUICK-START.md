@@ -8,7 +8,8 @@ apply the ideas to your own projects.
 
 1. Download the newest `VisualAtlas-….zip` from
    [Releases](https://github.com/WilliamEbong/visual-atlas/releases/latest).
-2. Right-click the zip → **Properties** → tick **Unblock** → **OK**. Extract it to a folder you keep.
+2. Right-click the zip → **Properties** → tick **Unblock** → **OK**. Extract it to a folder you keep, with a short path
+   (for example `C:\VisualAtlas`; very deep folders can exceed Windows's path-length limit).
 3. Double-click **Install Visual Atlas**. When it says *All done*, Visual Atlas opens.
 
 From then on, double-click the **Visual Atlas** icon on your Desktop or in the Start menu. Close the

@@ -86,7 +86,8 @@ is kept at full size. Credits: [starter/CREDITS.md](starter/CREDITS.md).
 **On Windows (no terminal):**
 
 1. Download `VisualAtlas-<version>.zip` from [Releases](https://github.com/WilliamEbong/visual-atlas/releases/latest),
-   right-click it → **Properties** → tick **Unblock**, and extract it to a folder you keep.
+   right-click it → **Properties** → tick **Unblock**, and extract it to a folder you keep with a short path
+   (for example `C:\VisualAtlas`; very deep folders can exceed Windows's path-length limit).
 2. Double-click **Install Visual Atlas**. It installs what it needs, adds the starter library and puts a
    **Visual Atlas** icon on your Desktop and Start menu.
 3. Double-click the icon whenever you want to work. Visual Atlas opens in its own window; closing the
@@ -187,15 +188,21 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-Build history, decisions and verification evidence: [BUILD-STATE.md](BUILD-STATE.md). Held-out check of
-the technique readings: [docs/evaluation/HELDOUT.md](docs/evaluation/HELDOUT.md).
+Build history, decisions and verification evidence: [BUILD-STATE.md](BUILD-STATE.md). Evaluation of the
+technique readings, the checker, project-help retrieval and the TypeSafe Jev decision:
+[docs/evaluation/v1.1/REPORT.md](docs/evaluation/v1.1/REPORT.md) (the v1 development set is in
+[docs/evaluation/HELDOUT.md](docs/evaluation/HELDOUT.md)).
 
 ## Known limits
 
-- **Readings are suggestions, not expert judgment.** On a held-out set the analysing model matched the
-  builder's own reading on about 6 in 10 images and tends to name more techniques than strictly needed;
-  the second model agrees too easily. Treat *proposed* and *agreed by a second model* as starting points,
-  and confirm or correct what matters to you ([details](docs/evaluation/HELDOUT.md)).
+- **Readings are suggestions, not expert judgment.** In the v1.1 evaluation (25 new images; reference readings
+  by the builder, not experts) about 8 in 10 proposed techniques were the builder's reading or an acceptable
+  alternative, and the second model, now forming its own reading first, still accepted 2 of 5 wrong ones on the
+  final split. Treat *proposed* and *agreed by a second model* as starting points, and confirm or correct what
+  matters to you ([report](docs/evaluation/v1.1/REPORT.md)).
+- **Request coding is conservative.** The built-in reading of a brief rarely tags wrongly but misses techniques
+  that are described rather than named; project help still finds relevant references mainly through subject
+  words.
 - **Near-copies.** Exact and near-identical files are caught; two different frames of the same burst of
   photos can both be added. Remove one with a click if that happens.
 - **Smithsonian** works without a key but its shared demo key allows only a few searches an hour; add your

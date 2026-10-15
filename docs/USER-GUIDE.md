@@ -62,6 +62,9 @@ describe how it works.
    window stops it a few minutes later (a running job finishes first).
 
 To update, download the newer zip, extract it over the old folder and run **Install Visual Atlas** again.
+Your library is upgraded in place; a copy of the old database is kept first (for example `atlas.db.v1.bak`).
+
+Use a short folder such as `C:\VisualAtlas` or your Downloads folder: a very deep folder can exceed Windows's path-length limit and stop the installer.
 Your library is not touched. To remove Visual Atlas, delete its folder and the two shortcuts; your
 library stays in `%USERPROFILE%\VisualAtlas` until you delete that too.
 
@@ -148,6 +151,20 @@ What happens, in order:
 The panel shows how many were checked, how many were free to use, what was added, and why the rest
 were skipped.
 
+**Did it find what you asked for?** When you pick a technique, or name one in your words (for example
+"negative space"), each added image is marked by whether its own analysis shows that technique; it is never
+forced onto a picture. Only those count toward your number, and the summary says how many show what you asked
+for and how many show other techniques (those are kept as references too). If a job runs out of its budget,
+it says so ("Stopped at this job's analysis limit"), which is different from the collections having nothing
+more to offer; the heading then reads **Stopped short** rather than **Ready**. A larger request gets
+proportionally larger limits. If a collection asks Visual Atlas to slow down, the job says which one and how
+long it is waiting.
+
+**Second-model checks are reported honestly.** Only a check that was really carried out and saved counts as
+checked. If the checking assistant is over its limit, signed out, slow or gives an unusable answer, the image
+is still added, marked "not checked", and the summary says how many were checked. The checker first forms its
+own reading of the picture and then judges the proposals; it never marks anything as reviewed by you.
+
 ## 5. Grow my library
 
 **Find images → Fill gaps in technique coverage** looks for examples of the techniques that have the
@@ -190,6 +207,11 @@ On any reading:
 Every change is kept in the **annotation history** (who, what, when). Your decisions always win over
 later model output.
 
+When an image is analysed again, its model readings become exactly the new analysis's readings: an earlier
+model reading that the new analysis does not name is **superseded**. It disappears from the image page but
+stays in the history, marked "superseded (no longer current)". Your confirmations, rejections and edits are
+never touched.
+
 ## 9. Explore goals and techniques
 
 **Explore** starts from goals. A goal page lists the techniques that can serve it. A technique page
@@ -206,9 +228,19 @@ Select a node to make it the new focus; select the centre to open it. Use **Zoom
 ## 11. Help with my project
 
 Describe a project — audience, message, format, mood, constraints — and select **Suggest directions**.
-You get three to five directions, each with the idea, why it suits the brief, the techniques it uses,
-reference images **from your library** (never invented), how to execute it and the tradeoffs. **Keep** the
-ones you like; asking again replaces only the unkept ones. Briefs and suggestions are saved.
+
+- **How the brief is read.** The page shows how Visual Atlas read the brief: the goals, techniques and subject
+  words it recognised, using the taxonomy as a codebook (no AI is involved in this step).
+- **Which references are offered.** The assistant is offered the most relevant images in your library, up to
+  about forty, ranked by those goals, techniques and subject words. Older images count as much as new ones.
+- **What you get back.** Up to five directions, each with the idea, why it suits the brief, the techniques it
+  uses, reference images **from your library**, how to execute it and the tradeoffs.
+- **Every direction is checked.** It must cite at least one image, and each cited image must really carry one
+  of the direction's techniques; a direction that fails this is dropped. If your library has no good evidence
+  for the brief, you get an honest "not enough matching evidence" message with a suggestion of what to find,
+  and earlier suggestions are kept.
+- **Keeping directions.** **Keep** the ones you like; asking again replaces only the unkept ones. Briefs and
+  suggestions are saved.
 
 ## 12. Collections
 
@@ -261,9 +293,19 @@ see [FREE-IMAGE-SOURCES.md](FREE-IMAGE-SOURCES.md).
 ## 17. Back up and restore
 
 **Settings → Back up now** saves the whole library (database, images, readings) into
-`%USERPROFILE%\VisualAtlas\backups`, with a manifest of checksums. **Restore…** checks the backup first,
-makes a safety backup of what you have now, then swaps it in. Restoring is refused while a job is
-running. From a terminal: `uv run atlas backup` and `uv run atlas restore <file name>` (close the app first).
+`%USERPROFILE%\VisualAtlas\backups`, with a manifest of checksums. **Restore…** checks the whole backup first
+(a backup from an older Visual Atlas is upgraded in a temporary copy), makes a safety backup of what you have
+now, adds the backup's images and then replaces the library's contents in one step. From a terminal:
+`uv run atlas backup` and `uv run atlas restore <file name>`; the app can stay open.
+
+- **Nothing you save is lost.** While a restore (or the start-up tidy-up of leftover files) runs, any change
+  from the app, a terminal or another window is refused with "Visual Atlas is restoring a backup…" and you can
+  simply try again; nothing is accepted and then thrown away. Restoring waits until no job is running.
+- **If a restore is interrupted** (power cut, crash), you keep either the previous library or the restored one,
+  never a half of each. Leftover image files are cleaned up the next time Visual Atlas starts, and the library
+  unlocks itself automatically.
+- **Ways back:** the safety backup made before every restore is listed with your backups; and before a new
+  version changes the database it keeps a copy next to it (`atlas.db.v1.bak` and so on).
 
 ## 18. Using Visual Atlas from Claude Code or Codex
 
