@@ -492,7 +492,7 @@ class Worker:
         if outcome == 'retry':
             return self._retry_or_fail(item, 'invalid_response', backend_message('invalid_response', self.job['backend']))
         if outcome == 'added':
-            return self._item(item['id'], state='added')
+            return self._item(item['id'], state='added', reason='')
         self._remove_unhelpful(image, outcome)
         self._item(item['id'], state='no_technique', reason=outcome)
 
