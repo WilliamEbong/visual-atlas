@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from atlas import __version__, catalog, images, jobs, transfer
 from atlas.home import REPO, home_dir
-from atlas.store import Store
+from atlas.store import LibraryBusy, Store
 
 SORTS = {'newest': 'i.created_at DESC, i.id DESC', 'oldest': 'i.created_at, i.id', 'title': 'i.title COLLATE NOCASE',
          'maker': 'i.creator COLLATE NOCASE', 'colorful': 'm.colorfulness DESC', 'bright': 'm.mean_luma DESC',
@@ -67,8 +67,9 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     app.state.activity = 0
     web = dist or REPO / 'web/dist'
     media_root = (home / 'media').resolve()
-    with jobs.open_store(home) as store:  # migrate + sync knowledge files once at start
-        images.sweep_orphans(home / 'media', transfer.referenced_media(store))
+    with jobs.open_store(home):  # migrate + sync knowledge files once at start
+        pass
+    transfer.sweep(home)  # crash leftovers; skipped while another window's job is downloading
     worker = jobs.Worker(home)
     app.state.worker = worker
     app.state.stop = threading.Event()
@@ -120,6 +121,10 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     @app.exception_handler(ValueError)
     async def invalid(request, exc):
         return JSONResponse({'detail': str(exc)}, status_code=400)
+
+    @app.exception_handler(LibraryBusy)
+    async def busy(request, exc):  # refused, not lost: nothing was written
+        return JSONResponse({'detail': str(exc)}, status_code=503)
 
     @app.exception_handler(sqlite3.IntegrityError)
     async def conflict(request, exc):
@@ -596,18 +601,9 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
 
     @app.post('/api/backups/{name}/restore')
     def restore(name: str):
-        with db() as store:
-            if store.one("SELECT id FROM jobs WHERE state IN ('queued','running','cancelling')"):
-                raise ValueError('A job is still running. Pause or cancel it, then restore.')
-        app.state.stop.set()  # stop the background worker while files are swapped
-        if app.state.thread is not None:
-            app.state.thread.join(timeout=30)
-            if app.state.thread.is_alive():
-                raise ValueError('The background worker is still busy. Try again in a minute.')
-        try:
-            return transfer.restore(home, name)
-        finally:
-            start()
+        # Maintenance mode refuses to start while a job is active and blocks every write (this app's worker,
+        # other windows, the CLI) until the restore has finished or failed.
+        return transfer.restore(home, name)
 
     @app.get('/media/{path:path}', include_in_schema=False)
     def media(path: str):

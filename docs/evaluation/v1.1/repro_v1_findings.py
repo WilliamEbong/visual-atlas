@@ -14,9 +14,9 @@ SCRATCH = Path(tempfile.mkdtemp(prefix='va-repro-'))
 os.environ['VISUAL_ATLAS_HOME'] = str(SCRATCH / 'unused')  # nothing may touch the real library
 
 from fastapi.testclient import TestClient  # noqa: E402
-from helpers import aic_fetcher, jpeg  # noqa: E402
+from helpers import aic_fetcher  # noqa: E402
 
-from atlas import catalog, images, jobs, transfer  # noqa: E402
+from atlas import catalog, jobs, transfer  # noqa: E402
 from atlas.ai import fake, tasks  # noqa: E402
 from atlas.ai.process import BackendError  # noqa: E402
 from atlas.server import create_app  # noqa: E402
@@ -63,14 +63,33 @@ with jobs.open_store(path) as store:
 results['A_restore'] = {'collection_post': status.get('collection'), 'restore': response.status_code,
                         'collection_survived': kept}
 
-# B. a second app start deletes a running worker's freshly written media
-path = seeded('sweep', 1)
-data = jpeg(99)
-picture, kind = images.open_checked(data)
-files = images.store_files(data, picture, kind, path / 'media')  # written; the DB row comes next
-create_app(path, token='t')  # another server starts at that moment
-results['B_sweep'] = {'analysis_file_exists_after_start': (path / 'media' / files['analysis_path']).is_file()}
+# B. another server starts while a worker is saving a downloaded image (same hook point in old and new code)
+path = home('sweep')
+with jobs.open_store(path) as store:
+    job_b = jobs.create_job(store, 'find', {'goal': 'harbour', 'providers': ['aic'], 'backend': 'fake',
+                                            'target_new_images': 1})
+from atlas.store import Store  # noqa: E402
 
+real_add = Store.add_image
+
+
+def add_with_second_start(self, *args, **kwargs):
+    create_app(path, token='other')  # a second window/server starts at this moment
+    return real_add(self, *args, **kwargs)
+
+
+Store.add_image = add_with_second_start
+try:
+    jobs.Worker(path, owner='b', fetcher=aic_fetcher(), backends={'fake': fake}).run_once(job_b)
+    crash = None
+except Exception as error:  # noqa: BLE001 - the old code crashed here
+    crash = repr(error)[:160]
+Store.add_image = real_add
+with jobs.open_store(path) as store:
+    job = store.one('SELECT state, message FROM jobs WHERE id=?', (job_b,))
+    image = store.one('SELECT analysis_path FROM images WHERE removed_at IS NULL')
+results['B_sweep'] = {'worker_crash': crash, 'job': job,
+                      'analysis_file_exists': bool(image) and (path / 'media' / image['analysis_path']).is_file()}
 
 # C. verification failure reported as a successful check
 class QuotaVerifier:
@@ -140,6 +159,7 @@ except ValueError:
 
 # 5A. Retry-After ignored by retry scheduling
 import inspect  # noqa: E402
+
 results['5A_retry_after_used'] = 'retry_after' in inspect.getsource(jobs.Worker._retry_or_fail)
 
 # 5B. budgets for 40 images

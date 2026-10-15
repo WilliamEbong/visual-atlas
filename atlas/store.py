@@ -1,18 +1,52 @@
 """The only SQL write boundary. Other modules read with rows()/one() and write through methods here."""
 
 import json
+import os
 import sqlite3
 import time
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
+if os.name == 'nt':
+    import msvcrt
+else:
+    import fcntl
+
 APPEND_ONLY = ('rights_records', 'analyses', 'annotation_history', 'attempts', 'tombstones', 'comparisons')
 ANNOTATION_STATES = ('proposed', 'model_reviewed', 'human_reviewed', 'rejected')
+MAINTENANCE_KEY = 'maintenance'
 
 
 class LeaseLost(RuntimeError):
     """Another worker took over the job; the current worker must stop writing."""
+
+
+class LibraryBusy(Exception):
+    """The library is being restored or cleaned up; nothing may be written until that finishes."""
+
+
+def take_lock(path: Path):
+    """An exclusive operating-system lock on `path`, or None if someone holds it. The OS releases it if the
+    process dies, so a held lock always means a live holder."""
+    handle = open(path, 'a+')
+    try:
+        if os.name == 'nt':
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        handle.close()
+        return None
+    return handle
+
+
+def release_lock(handle):
+    if os.name == 'nt':
+        handle.seek(0)
+        msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+    handle.close()
 
 
 def now() -> str:
@@ -27,6 +61,9 @@ class Store:
     def __init__(self, path: Path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.lock_path = self.path.with_name('maintenance.lock')
+        self.maintenance_token = None  # set while this store holds the library's maintenance mode
+        self._lock = None
         self.connection = self._connect(self.path)
         self.migrate()
 
@@ -85,6 +122,8 @@ class Store:
         outer = not self.connection.in_transaction
         self.connection.execute('BEGIN IMMEDIATE' if outer else 'SAVEPOINT atlas_tx')
         try:
+            if outer:
+                self._check_maintenance()
             yield self
             if outer:
                 self.connection.commit()
@@ -97,6 +136,59 @@ class Store:
                 self.connection.execute('ROLLBACK TO atlas_tx')
                 self.connection.execute('RELEASE atlas_tx')
             raise
+
+    def _check_maintenance(self):
+        """Every write transaction (API, worker, CLI, any process) runs this after BEGIN IMMEDIATE, so a write either
+        commits before maintenance starts (and is in its safety backup) or is refused; it is never lost."""
+        row = self.connection.execute('SELECT value FROM settings WHERE key=?', (MAINTENANCE_KEY,)).fetchone()
+        if row is None or (self.maintenance_token and row[0] == self.maintenance_token):
+            return
+        if self._lock is not None:  # we hold the lock, so any other marker was left by a holder that died
+            self.connection.execute('DELETE FROM settings WHERE key=?', (MAINTENANCE_KEY,))
+            return
+        lock = take_lock(self.lock_path)
+        if lock is None:
+            raise LibraryBusy('Visual Atlas is restoring a backup or tidying files. Try again in a moment.')
+        try:  # the holder died mid-maintenance (the OS freed its lock); the library itself is consistent
+            self.connection.execute('DELETE FROM settings WHERE key=?', (MAINTENANCE_KEY,))
+        finally:
+            release_lock(lock)
+
+    @contextmanager
+    def maintenance(self, *, idle: str):
+        """Hold the library's maintenance mode: an OS lock (one holder across all processes, freed if this process
+        dies) plus a marker every write transaction checks. Always released, whatever happens inside.
+
+        idle='jobs' refuses while any job is queued, running or stopping (restore); idle='leases' refuses only while
+        a worker holds a live lease, the only time media files are being written (cleanup)."""
+        lock = take_lock(self.lock_path)
+        if lock is None:
+            raise LibraryBusy('Another restore or clean-up is already running.')
+        self._lock = lock
+        try:
+            with self.transaction():
+                if idle == 'jobs':
+                    busy = self.one("SELECT id FROM jobs WHERE state IN ('queued','running','cancelling') OR "
+                                    "(lease_owner IS NOT NULL AND lease_until>?) LIMIT 1", (time.time(),))
+                else:
+                    busy = self.one('SELECT id FROM jobs WHERE lease_owner IS NOT NULL AND lease_until>? LIMIT 1',
+                                    (time.time(),))
+                if busy:
+                    raise LibraryBusy('A job is still running or waiting. Pause or cancel it, then try again.')
+                token = os.urandom(8).hex()
+                self.connection.execute('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE '
+                                        'SET value=excluded.value', (MAINTENANCE_KEY, token))
+            self.maintenance_token = token
+            yield self
+        finally:
+            try:
+                if self.maintenance_token:
+                    with self.transaction():
+                        self.connection.execute('DELETE FROM settings WHERE key=? AND value=?',
+                                                (MAINTENANCE_KEY, self.maintenance_token))
+            finally:
+                self.maintenance_token, self._lock = None, None
+                release_lock(lock)
 
     @contextmanager
     def reading(self):

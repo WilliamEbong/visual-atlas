@@ -136,18 +136,25 @@ def _jpeg(image: Image.Image, edge: int) -> bytes:
     return out.getvalue()
 
 
-def store_files(data: bytes, image: Image.Image, kind: str, media_root: Path) -> dict:
-    """Content-addressed original, ≤1024 px analysis copy and thumbnail. Returns paths relative to media_root."""
+def prepare_files(data: bytes, image: Image.Image, kind: str) -> tuple[dict, dict]:
+    """Content-addressed original, ≤1024 px analysis copy and thumbnail, without writing anything yet.
+
+    Returns (record fields with paths relative to the media folder, {path: bytes}). Callers commit the database
+    row first and write the files after it, so clean-up never mistakes a new file for a crash leftover."""
     sha = hashlib.sha256(data).hexdigest()
     extension, mime = FORMATS[kind]
     analysis = _jpeg(image, ANALYSIS_EDGE)
     paths = {'original_path': f'originals/{sha[:2]}/{sha}.{extension}',
              'analysis_path': f'analysis/{sha[:2]}/{sha}.jpg', 'thumb_path': f'thumbs/{sha[:2]}/{sha}.jpg'}
-    _write(media_root / paths['original_path'], data)
-    _write(media_root / paths['analysis_path'], analysis)
-    _write(media_root / paths['thumb_path'], _jpeg(image, THUMB_EDGE))
-    return {**paths, 'file_sha256': sha, 'analysis_sha256': hashlib.sha256(analysis).hexdigest(),
-            'mime': mime, 'bytes': len(data), 'width': image.size[0], 'height': image.size[1]}
+    record = {**paths, 'file_sha256': sha, 'analysis_sha256': hashlib.sha256(analysis).hexdigest(),
+              'mime': mime, 'bytes': len(data), 'width': image.size[0], 'height': image.size[1]}
+    return record, {paths['original_path']: data, paths['analysis_path']: analysis,
+                    paths['thumb_path']: _jpeg(image, THUMB_EDGE)}
+
+
+def write_files(media_root: Path, blobs: dict):
+    for relative, content in blobs.items():
+        _write(media_root / relative, content)
 
 
 def delete_files(media_root: Path, image: dict):

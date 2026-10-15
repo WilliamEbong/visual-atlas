@@ -1,4 +1,4 @@
-"""Credits and portable archives. Callers must quiesce database/media users before restore."""
+"""Credits, portable archives, restore and media clean-up (the last two under the library's maintenance mode)."""
 
 import csv
 import hashlib
@@ -16,8 +16,8 @@ from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from atlas import __version__
-from atlas.store import APPEND_ONLY, Store
+from atlas import __version__, images
+from atlas.store import APPEND_ONLY, MAINTENANCE_KEY, LibraryBusy, Store
 
 MAX_ARCHIVE_BYTES = 20 * 1024**3
 MAX_ARCHIVE_MEMBERS = 200_000
@@ -161,6 +161,17 @@ def _reference_schema() -> tuple[int, set[tuple]]:
     return _REFERENCE['version'], _REFERENCE['schema']
 
 
+def _upgrade_staged(path):
+    """A backup from an older Visual Atlas is migrated in its staging copy (never in place) before validation."""
+    with closing(sqlite3.connect(path.resolve().as_uri() + '?mode=ro&immutable=1', uri=True)) as db:
+        found = db.execute('PRAGMA user_version').fetchone()[0]
+    if not 1 <= found <= _reference_schema()[0]:
+        raise ValueError('unsupported backup database version')
+    if found < _reference_schema()[0]:
+        with Store(path):
+            pass
+
+
 def _validate_database(path, members, missing=frozenset()):
     # immutable keeps validation read-only, including for a database saved in WAL mode.
     with closing(sqlite3.connect(path.resolve().as_uri() + '?mode=ro&immutable=1', uri=True)) as db:
@@ -203,6 +214,10 @@ def backup(home, allow_missing: bool = False) -> dict:
         snapshot = temporary / 'atlas.db'
         with Store(home / 'atlas.db') as store:
             store.backup_to(snapshot)
+        with closing(sqlite3.connect(snapshot)) as db:  # a backup never carries a restore's maintenance marker
+            if db.execute('SELECT 1 FROM settings WHERE key=?', (MAINTENANCE_KEY,)).fetchone():
+                db.execute('DELETE FROM settings WHERE key=?', (MAINTENANCE_KEY,))
+                db.commit()
         files = {'atlas.db': snapshot}
         media = (home / 'media').resolve()
         with closing(sqlite3.connect(snapshot.resolve().as_uri() + '?mode=ro&immutable=1', uri=True)) as db:
@@ -275,53 +290,71 @@ def _validate_archive(archive):
 
 
 def restore(home, name) -> dict:
-    """Validate and stage first; roll back completed renames if the swap fails."""
+    """Replace the library with a backup without ever losing an acknowledged change.
+
+    Everything is validated (and an older backup migrated) in a staging copy first. Then, under maintenance mode
+    (no job running, every other write refused): a safety backup of the current library, media copied in
+    additively, and the database contents replaced in one atomic SQLite backup step. No file is renamed, so an
+    interruption leaves either the previous library or the restored one; files left over are cleaned up."""
     if not isinstance(name, str) or not re.fullmatch(r'visual-atlas-backup-[0-9-]+\.zip', name):
         raise ValueError('invalid backup name')
     home = Path(home).resolve()
     path = home / 'backups' / name
     if not path.is_file() or path.resolve().parent != (home / 'backups').resolve():
         raise ValueError('backup not found')
-    with tempfile.TemporaryDirectory(prefix='.restore-', dir=home) as temporary:
-        stage = Path(temporary)
+    with tempfile.TemporaryDirectory(prefix='visual-atlas-restore-') as temporary:  # outside the library
+        staged = Path(temporary) / 'atlas.db'
         try:
             with zipfile.ZipFile(path) as archive:
                 missing = _validate_archive(archive)
-                with archive.open('atlas.db') as source, (stage / 'atlas.db').open('wb') as target:
+                with archive.open('atlas.db') as source, staged.open('wb') as target:
                     shutil.copyfileobj(source, target)
-                count = _validate_database(stage / 'atlas.db', set(archive.namelist()), missing)
-                safety = backup(home, allow_missing=True)
-                (stage / 'media').mkdir()
-                for item in archive.infolist():
-                    if not item.filename.startswith('media/'):
-                        continue
-                    target_path = stage / item.filename
-                    target_path.parent.mkdir(parents=True, exist_ok=True)
-                    with archive.open(item) as source, target_path.open('wb') as target:
-                        shutil.copyfileobj(source, target)
-        except (zipfile.BadZipFile, sqlite3.DatabaseError, UnicodeError, RuntimeError) as error:
+                hashes = json.loads(archive.read('manifest.json'))['files']
+            _upgrade_staged(staged)
+            count = _validate_database(staged, set(hashes) | {'manifest.json'}, missing)
+        except (zipfile.BadZipFile, sqlite3.DatabaseError, UnicodeError, KeyError, RuntimeError) as error:
             raise ValueError('invalid backup archive') from error
-
-        previous = Path(tempfile.mkdtemp(prefix=f'pre-restore-{datetime.now(UTC):%Y%m%d-%H%M%S}-',
-                                         dir=home / 'backups'))
-        moved = []
-        try:
-            for filename in ('atlas.db', 'atlas.db-wal', 'atlas.db-shm', 'media'):
-                source, target = home / filename, previous / filename
-                if source.exists():
-                    os.replace(source, target)
-                    moved.append((source, target))
-            for filename in ('atlas.db', 'media'):
-                source, target = stage / filename, home / filename
-                os.replace(source, target)
-                moved.append((source, target))
-        except BaseException:
-            for source, target in reversed(moved):
-                os.replace(target, source)
-            shutil.rmtree(previous)
-            raise
-        shutil.rmtree(previous)
+        with zipfile.ZipFile(path) as archive, Store(home / 'atlas.db') as live, live.maintenance(idle='jobs'):
+            safety = backup(home, allow_missing=True)
+            _copy_media(archive, hashes, home / 'media')
+            with closing(sqlite3.connect(staged)) as source:
+                source.backup(live.connection)  # atomic: other connections see the old or the new library, never a mix
+            images.sweep_orphans(home / 'media', referenced_media(live))
     return {'restored': name, 'images': count, 'safety_backup': safety['name']}
+
+
+def _copy_media(archive, hashes: dict, media: Path):
+    """Add the backup's media files; content-addressed names make this safe for the current library too."""
+    for item in archive.infolist():
+        if not item.filename.startswith('media/'):
+            continue
+        target = media / item.filename.removeprefix('media/')
+        if target.is_file() and hashlib.sha256(target.read_bytes()).hexdigest() == hashes[item.filename]:
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        part = target.with_name(target.name + '.part')
+        digest = hashlib.sha256()
+        with archive.open(item) as source, part.open('wb') as out:
+            while chunk := source.read(1024 * 1024):
+                digest.update(chunk)
+                out.write(chunk)
+        if digest.hexdigest() != hashes[item.filename]:  # the backup file changed since it was validated
+            part.unlink()
+            raise ValueError('backup checksum mismatch')
+        os.replace(part, target)
+
+
+def sweep(home) -> int | None:
+    """Delete media no row refers to (crash leftovers) and stale restore folders, under maintenance mode so no
+    worker can be mid-download. Skipped (None) while a job holds a live lease or other maintenance runs."""
+    home = Path(home)
+    try:
+        with Store(home / 'atlas.db') as store, store.maintenance(idle='leases'):
+            for folder in home.glob('.restore-*'):  # staging left in the library by a 0.1 restore that crashed
+                shutil.rmtree(folder, ignore_errors=True)
+            return images.sweep_orphans(home / 'media', referenced_media(store))
+    except LibraryBusy:
+        return None
 
 
 STARTER_IMAGE_FIELDS = ('provider', 'provider_item_id', 'title', 'creator', 'date_text', 'medium', 'description',
@@ -384,11 +417,6 @@ def import_starter(store: Store, home: Path, source: Path) -> int:
             if key == 'analysis_path' and hashlib.sha256((source / 'media' / relative).read_bytes()).hexdigest() != \
                     image['analysis_sha256']:
                 raise ValueError('starter image does not match its checksum')
-        for relative in paths.values():
-            target = home / 'media' / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            if not target.exists():
-                shutil.copyfile(source / 'media' / relative, target)
         provenance = json.loads(reference['rights']['provenance_json'])
         provenance['starter_copy'] = 'Bundled reduced copy (≤1024 px); the full original is at the source.'
         rights = {**reference['rights'], 'provenance_json': json.dumps(provenance, ensure_ascii=False, sort_keys=True)}
@@ -396,4 +424,11 @@ def import_starter(store: Store, home: Path, source: Path) -> int:
             {**image, 'original_path': paths['analysis_path'], **paths}, rights, reference['metrics'],
             reference['analyses'], reference['annotations'], reference['current_analysis'])
         added += image_id is not None
+        if image_id is not None or store.one('SELECT 1 FROM images WHERE file_sha256=? AND removed_at IS NULL',
+                                             (image['file_sha256'],)):
+            for relative in paths.values():  # written after the row commits, so clean-up never sees them as strays
+                target = home / 'media' / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if not target.exists():
+                    shutil.copyfile(source / 'media' / relative, target)
     return added

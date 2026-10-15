@@ -5,7 +5,12 @@
   "collection_survived": false
  },
  "B_sweep": {
-  "analysis_file_exists_after_start": false
+  "worker_crash": "FileNotFoundError(2, 'No such file or directory')",
+  "job": {
+   "state": "running",
+   "message": "Analyzing \u201cRocks at the Lighthouse, Biarritz\u201d\u2026"
+  },
+  "analysis_file_exists": false
  },
  "C_verify": {
   "job": {

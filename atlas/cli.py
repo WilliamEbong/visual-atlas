@@ -172,7 +172,7 @@ def backup():
 
 @app.command()
 def restore(name: str = typer.Argument(..., help='A backup file name from the backups folder.')):
-    """Restore a backup. A safety backup of the current library is made first. Close the app before restoring."""
+    """Restore a backup. A safety backup is made first; other changes are refused until it finishes."""
     _print(transfer.restore(home_dir(), name))
 
 

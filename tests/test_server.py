@@ -101,7 +101,7 @@ def test_restore_refuses_while_a_job_is_running(client):
     client.post('/api/jobs', json={'kind': 'find', 'spec': {'goal': 'fog', 'backend': 'fake'}})
     backup = client.post('/api/backups').json()
     response = client.post(f"/api/backups/{backup['name']}/restore")
-    assert response.status_code == 400 and 'job is still running' in response.json()['detail']
+    assert response.status_code == 503 and 'job is still running' in response.json()['detail']
 
 
 def test_brief_and_directions_flow(library, home):

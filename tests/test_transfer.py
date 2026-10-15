@@ -6,8 +6,11 @@ import os
 import re
 import sqlite3
 import stat
+import tempfile
 import zipfile
+from contextlib import closing
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from PIL import Image
@@ -85,8 +88,18 @@ def media_files(home):
             for path in (home / 'media').rglob('*') if path.is_file()}
 
 
+def content(source) -> list[str]:
+    """The database's logical content (restore replaces contents in place, so file bytes are not compared)."""
+    if isinstance(source, bytes):
+        path = Path(tempfile.mkdtemp()) / 'copy.db'
+        path.write_bytes(source)
+        source = path
+    with closing(sqlite3.connect(source)) as db:
+        return list(db.iterdump())
+
+
 def state(home):
-    return (home / 'atlas.db').read_bytes(), media_files(home)
+    return content(home / 'atlas.db'), media_files(home)
 
 
 def test_credits(library):
@@ -167,7 +180,7 @@ def test_backup_restore(library):
     archive_path = home / 'backups' / saved['name']
     with zipfile.ZipFile(archive_path) as archive:
         original_archive = archive_path.read_bytes()
-        expected_db = archive.read('atlas.db')
+        expected_db = content(archive.read('atlas.db'))
         manifest = json.loads(archive.read('manifest.json'))
         assert manifest['format'] == 'visual-atlas-backup' and manifest['version'] == 1
         assert manifest['app_version'] and manifest['created'] == saved['created']
@@ -191,7 +204,7 @@ def test_backup_restore(library):
     # The safety archive can itself recover the state that was just replaced.
     transfer.restore(home, restored['safety_backup'])
     with zipfile.ZipFile(home / 'backups' / restored['safety_backup']) as archive:
-        assert state(home) == (archive.read('atlas.db'), mutated[1])
+        assert state(home) == (content(archive.read('atlas.db')), mutated[1])
     with Store(home / 'atlas.db') as store:
         assert store.rows('SELECT * FROM images ORDER BY id') == mutated_images
 
@@ -294,12 +307,14 @@ def test_restore_rejects_unusable_database(library, problem):
         db.close()
     payload['atlas.db'] = snapshot.read_bytes()
     if problem == 'integrity':
-        # Claim one freelist page without a freelist: readable DB, failed integrity_check.
-        payload['atlas.db'] = payload['atlas.db'][:36] + (1).to_bytes(4, 'big') + payload['atlas.db'][40:]
+        # Claim pages the file does not have: a database SQLite reports as malformed.
+        claimed = int.from_bytes(payload['atlas.db'][28:32], 'big') + 5
+        payload['atlas.db'] = payload['atlas.db'][:28] + claimed.to_bytes(4, 'big') + payload['atlas.db'][32:]
         snapshot.write_bytes(payload['atlas.db'])
         db = sqlite3.connect(snapshot)
         try:
-            assert db.execute('PRAGMA integrity_check').fetchall() != [('ok',)]
+            with pytest.raises(sqlite3.DatabaseError, match='malformed'):
+                db.execute('PRAGMA integrity_check').fetchall()
         finally:
             db.close()
     manifest = json.loads(payload.pop('manifest.json'))
@@ -391,36 +406,50 @@ def test_archive_limits(library, monkeypatch, limit):
     assert state(home) == before
 
 
-@pytest.mark.parametrize('phase', ['extract', 'swap'])
+@pytest.mark.parametrize('phase', ['media', 'swap'])
 def test_restore_failure_preserves_current_data(library, monkeypatch, phase):
     home, *_ = library
     saved = transfer.backup(home)
     with Store(home / 'atlas.db') as store:
         add_image(store, home, 4)
-    before = state(home)
-    if phase == 'extract':
-        original_copy = transfer.shutil.copyfileobj
-
-        def fail_copy(source, target, *args):
-            if 'media' in str(target.name):
-                raise OSError('simulated extraction failure')
-            return original_copy(source, target, *args)
-
-        monkeypatch.setattr(transfer.shutil, 'copyfileobj', fail_copy)
-    else:
-        original_replace = transfer.os.replace
+    if phase == 'media':  # a file the backup must bring back cannot be written
+        with Store(home / 'atlas.db') as store:
+            missing = store.one('SELECT original_path FROM images WHERE removed_at IS NULL ORDER BY id')['original_path']
+        (home / 'media' / missing).unlink()
+        real_replace = transfer.os.replace
 
         def fail_replace(source, target):
-            if '.restore-' in str(source) and target == home / 'media':
-                raise OSError('simulated rename failure')
-            return original_replace(source, target)
+            if str(source).endswith('.part'):
+                raise OSError('simulated write failure')
+            return real_replace(source, target)
 
         monkeypatch.setattr(transfer.os, 'replace', fail_replace)
-    with pytest.raises(OSError, match='simulated'):
+    else:  # the database swap itself fails
+        real_connect = transfer.sqlite3.connect
+
+        class FailingSwap:
+            def __init__(self, connection):
+                self.connection = connection
+
+            def backup(self, *args, **kwargs):
+                raise sqlite3.OperationalError('simulated swap failure')
+
+            def close(self):
+                self.connection.close()
+
+        def connect(path, *args, **kwargs):
+            connection = real_connect(path, *args, **kwargs)
+            return FailingSwap(connection) if 'visual-atlas-restore-' in str(path) and str(path).endswith('.db')                 else connection
+
+        monkeypatch.setattr(transfer.sqlite3, 'connect', connect)
+    before = content(home / 'atlas.db')
+    with pytest.raises((OSError, sqlite3.OperationalError), match='simulated'):
         transfer.restore(home, saved['name'])
-    assert state(home) == before
-    assert len(transfer.list_backups(home)) == 2
-    assert not list((home / 'backups').glob('pre-restore-*'))
+    assert content(home / 'atlas.db') == before  # the previous library, untouched
+    assert len(transfer.list_backups(home)) == 2  # the safety backup was kept
+    with Store(home / 'atlas.db') as store:  # maintenance was released: writes work again
+        store.create_collection('after a failed restore')
+        assert store.one("SELECT 1 FROM settings WHERE key='maintenance'") is None
 
 
 def test_list_backups_ordering(library):

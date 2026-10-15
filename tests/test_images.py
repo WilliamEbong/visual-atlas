@@ -98,12 +98,14 @@ def test_quality_problem(size, flat, problem):
 @pytest.mark.parametrize(('kind', 'extension', 'mime'), [
     ('JPEG', 'jpg', 'image/jpeg'), ('PNG', 'png', 'image/png'), ('WEBP', 'webp', 'image/webp'),
 ])
-def test_store_files_is_content_addressed_and_strips_analysis_metadata(tmp_path, kind, extension, mime):
+def test_prepared_files_are_content_addressed_and_strips_analysis_metadata(tmp_path, kind, extension, mime):
     exif = Image.Exif()
     exif[315] = 'Private artist metadata'
     data = encode(Image.new('RGB', (1600, 1200), 'red'), kind, exif=exif)
     image, actual_kind = images.open_checked(data)
-    stored = images.store_files(data, image, actual_kind, tmp_path)
+    stored, blobs = images.prepare_files(data, image, actual_kind)
+    assert not any(tmp_path.iterdir())  # nothing is written until the caller has saved the row
+    images.write_files(tmp_path, blobs)
     sha = hashlib.sha256(data).hexdigest()
     assert stored['file_sha256'] == sha
     assert stored['original_path'] == f'originals/{sha[:2]}/{sha}.{extension}'
@@ -120,7 +122,7 @@ def test_store_files_is_content_addressed_and_strips_analysis_metadata(tmp_path,
             assert not copy.getexif()
         if key == 'analysis_path':
             assert stored['analysis_sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
-    assert images.store_files(data, image, actual_kind, tmp_path) == stored
+    assert images.prepare_files(data, image, actual_kind)[0] == stored  # deterministic, so a resume can rewrite
     assert len([p for p in tmp_path.rglob('*') if p.is_file()]) == 3
     assert not list(tmp_path.rglob('*.part'))
 

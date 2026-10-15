@@ -15,12 +15,12 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
-from atlas import catalog, images, providers, rights
+from atlas import __version__, catalog, images, providers, rights
 from atlas.ai import claude_cli, codex_cli, fake, tasks
 from atlas.ai.process import BackendError
 from atlas.fetch import Fetcher, FetchError
 from atlas.home import home_dir
-from atlas.store import LeaseLost, Store, canonical, now
+from atlas.store import LeaseLost, LibraryBusy, Store, canonical, now
 
 BACKENDS = {'codex': codex_cli, 'claude': claude_cli, 'fake': fake}
 BACKEND_NAMES = {'codex': 'Codex', 'claude': 'Claude Code', 'fake': 'Practice mode'}
@@ -83,7 +83,10 @@ class Worker:
     def run_once(self, job_id: str | None = None) -> str | None:
         """Claim one job and work it until it finishes, pauses, is cancelled or the lease is lost."""
         with open_store(self.home) as store:
-            job = store.claim_job(self.owner, LEASE_SECONDS, job_id)
+            try:
+                job = store.claim_job(self.owner, LEASE_SECONDS, job_id)
+            except LibraryBusy:
+                return None  # a restore or clean-up is running; try again later
             if job is None:
                 return None
             self.store = store
@@ -96,6 +99,8 @@ class Worker:
                 self._work()
             except LeaseLost:
                 pass  # another worker took over after our lease expired; it continues from the same items
+            except LibraryBusy:
+                return None  # maintenance began after our lease lapsed: stop; the job resumes from its items later
             return job['id']
 
     def loop(self, stop: threading.Event, idle_seconds: float = 2):
@@ -217,7 +222,7 @@ class Worker:
                 while not done.wait(HEARTBEAT_SECONDS):
                     try:
                         job = side.heartbeat(self.job['id'], self.owner, LEASE_SECONDS)
-                    except LeaseLost:
+                    except (LeaseLost, LibraryBusy):
                         cancel.set()
                         return
                     if job['state'] not in ('running', 'queued'):
@@ -443,7 +448,8 @@ class Worker:
         mine = self.store.one('SELECT id FROM images WHERE file_sha256=? AND job_id=? AND provider=? '
                               'AND provider_item_id=? AND removed_at IS NULL',
                               (sha, self.job['id'], item['provider'], item['provider_item_id']))
-        if mine:  # saved just before a crash; carry on from where it stopped
+        if mine:  # saved just before a crash; write any file that did not make it, then carry on
+            images.write_files(self.media, images.prepare_files(data, picture, kind)[1])
             return self._item(item['id'], state='downloaded', image_id=mine['id'])
         stats = images.metrics(picture)
         problem = images.quality_problem(picture, stats)
@@ -464,7 +470,7 @@ class Worker:
                     break
         if duplicate is not None:
             return self._item(item['id'], state='duplicate', reason='same or nearly the same picture is already known')
-        files = images.store_files(data, picture, kind, self.media)
+        files, blobs = images.prepare_files(data, picture, kind)
         decision = candidate['rights']
         stamp = now()
         image_id = self.store.add_image(
@@ -482,10 +488,11 @@ class Worker:
              'policy_sha': hashlib.sha256(canonical(catalog.policy(self.policies, item['provider'])).encode()).hexdigest(),
              'provenance_json': canonical({'image_url': candidate['image_url'], 'job_id': self.job['id'],
                                            'search_rank': candidate['rank'], 'credit_line': candidate.get('credit_line', ''),
-                                           'retrieved_by': 'Visual Atlas 0.1'})},
+                                           'retrieved_by': f'Visual Atlas {__version__}'})},
             {**{k: stats[k] for k in ('aspect', 'orientation', 'mean_luma', 'contrast', 'colorfulness', 'saturation',
                                       'color_family')}, 'palette_json': canonical(stats['palette'])},
             fence=(self.job['id'], self.owner))
+        images.write_files(self.media, blobs)  # after the row commits, so clean-up never sees them as strays
         self._item(item['id'], state='downloaded', image_id=image_id)
 
     def _attempt(self, kind, item, status, code, started):
