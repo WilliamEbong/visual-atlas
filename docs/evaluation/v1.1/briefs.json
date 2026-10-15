@@ -1,0 +1,265 @@
+{
+ "written_by": "the builder (Claude Opus 5.5) on 2026-10-15, before the first retrieval run; relevance judged from contact sheets of the starter images, not from their stored labels",
+ "provisional": true,
+ "briefs": [
+  {
+   "id": 1,
+   "text": "A poster for a stargazing night by a lake: calm and wondrous, inviting people to look up.",
+   "techniques": [],
+   "goals": [
+    "create-calm"
+   ],
+   "relevant": [
+    "aic:16564",
+    "aic:71971",
+    "commons:89619356",
+    "commons:27178197",
+    "commons:95931081"
+   ]
+  },
+  {
+   "id": 2,
+   "text": "A book cover about loneliness: one small figure in a huge empty space.",
+   "techniques": [
+    "negative-space",
+    "scale-contrast"
+   ],
+   "goals": [
+    "show-scale"
+   ],
+   "relevant": [
+    "aic:65",
+    "commons:27178197",
+    "commons:184717527",
+    "commons:184717533",
+    "commons:138736609"
+   ]
+  },
+  {
+   "id": 3,
+   "text": "Silhouettes against a bright evening sky for a summer festival flyer.",
+   "techniques": [
+    "silhouette"
+   ],
+   "goals": [],
+   "relevant": [
+    "commons:89619356",
+    "commons:184717527",
+    "commons:184717533",
+    "commons:138736609",
+    "commons:32176387",
+    "commons:158909031"
+   ]
+  },
+  {
+   "id": 4,
+   "text": "A campaign that makes one product stand out from a row of identical ones: spot the odd one out.",
+   "techniques": [
+    "repetition-with-interruption"
+   ],
+   "goals": [
+    "draw-attention"
+   ],
+   "relevant": [
+    "commons:105187009",
+    "commons:101347260",
+    "commons:112833861",
+    "commons:95931081",
+    "commons:79338246",
+    "commons:106351696"
+   ]
+  },
+  {
+   "id": 5,
+   "text": "A dramatic theatre poster with deep shadows and a single source of light.",
+   "techniques": [
+    "value-contrast"
+   ],
+   "goals": [
+    "create-tension"
+   ],
+   "relevant": [
+    "aic:9",
+    "aic:48950",
+    "cma:109198",
+    "cma:109201",
+    "cma:109199",
+    "cma:109203",
+    "commons:92159104"
+   ]
+  },
+  {
+   "id": 6,
+   "text": "An annual report cover with calm, orderly, symmetrical architecture.",
+   "techniques": [
+    "symmetry"
+   ],
+   "goals": [
+    "create-calm"
+   ],
+   "relevant": [
+    "aic:9",
+    "aic:16179",
+    "smithsonian:ld1-1643399887910-1643399897456-0",
+    "smithsonian:ld1-1643399887910-1643399959474-1"
+   ]
+  },
+  {
+   "id": 7,
+   "text": "A children's book spread full of fantastic creatures and dreamlike strangeness.",
+   "techniques": [
+    "contextual-incongruity",
+    "visual-metaphor"
+   ],
+   "goals": [
+    "surprise"
+   ],
+   "relevant": [
+    "aic:79259",
+    "met:42138",
+    "met:334690",
+    "met:338460",
+    "cma:109202",
+    "cma:109206",
+    "cma:109200"
+   ]
+  },
+  {
+   "id": 8,
+   "text": "Botanical stationery: delicate plants on lots of blank paper.",
+   "techniques": [
+    "negative-space"
+   ],
+   "goals": [],
+   "relevant": [
+    "smithsonian:ld1-1643398757019-1643398760240-0",
+    "smithsonian:ld1-1643398757019-1643398759868-0",
+    "smithsonian:ld1-1643399887910-1643399904695-1",
+    "smithsonian:ld1-1643399887910-1643399904695-0",
+    "smithsonian:ld1-1777715310928-1777715313637-0",
+    "smithsonian:ld1-1777715310928-1777715319626-0"
+   ]
+  },
+  {
+   "id": 9,
+   "text": "A website hero image with a strong sense of depth: foreground, middle ground and far distance.",
+   "techniques": [
+    "layered-depth",
+    "atmospheric-perspective"
+   ],
+   "goals": [
+    "build-depth"
+   ],
+   "relevant": [
+    "aic:27992",
+    "aic:58702",
+    "met:436593",
+    "met:436594",
+    "met:436595",
+    "cma:124084",
+    "commons:32176387"
+   ]
+  },
+  {
+   "id": 10,
+   "text": "A portrait series where each sitter looks out of the frame, mostly in profile.",
+   "techniques": [
+    "gaze-direction"
+   ],
+   "goals": [],
+   "relevant": [
+    "cma:154283",
+    "aic:56109",
+    "aic:63640",
+    "aic:39903",
+    "aic:39609"
+   ]
+  },
+  {
+   "id": 11,
+   "text": "A bold graphic poster with bright clashing colours and abstract shapes.",
+   "techniques": [
+    "color-contrast"
+   ],
+   "goals": [],
+   "relevant": [
+    "commons:105187009",
+    "commons:140206665",
+    "commons:92159104",
+    "commons:95146237"
+   ]
+  },
+  {
+   "id": 12,
+   "text": "A museum exhibition banner about animals on display in a gallery.",
+   "techniques": [],
+   "goals": [],
+   "relevant": [
+    "met:42138",
+    "smithsonian:ld1-1646149545906-1646149748699-2",
+    "smithsonian:ld1-1646149545906-1646149875907-1"
+   ]
+  },
+  {
+   "id": 13,
+   "text": "A satirical newsletter illustration: crowded cartoon scenes with many figures.",
+   "techniques": [],
+   "goals": [
+    "tell-a-story"
+   ],
+   "relevant": [
+    "aic:16",
+    "commons:90127892",
+    "commons:89915033",
+    "commons:90031920"
+   ]
+  },
+  {
+   "id": 14,
+   "text": "A tech conference flyer: a glowing keyboard and modern devices seen close up.",
+   "techniques": [
+    "selective-focus",
+    "tight-cropping"
+   ],
+   "goals": [],
+   "relevant": [
+    "commons:130420382",
+    "commons:62117996"
+   ]
+  },
+  {
+   "id": 15,
+   "text": "A gothic horror novel cover: dark, unsettling, skulls and devils.",
+   "techniques": [
+    "value-contrast"
+   ],
+   "goals": [
+    "create-tension"
+   ],
+   "relevant": [
+    "cma:109206",
+    "cma:109198",
+    "cma:109205",
+    "cma:109199",
+    "cma:109203"
+   ]
+  },
+  {
+   "id": 16,
+   "text": "A calm misty morning landscape in soft pastel colours for a wellness app.",
+   "techniques": [
+    "atmospheric-perspective",
+    "color-harmony"
+   ],
+   "goals": [
+    "create-calm"
+   ],
+   "relevant": [
+    "aic:16564",
+    "aic:71971",
+    "aic:10926",
+    "aic:103302"
+   ]
+  }
+ ]
+}
