@@ -97,6 +97,13 @@ the picture and its catalogue text for an analysis or a check, your request for 
 compare, or your brief plus short summaries of up to about forty relevant library images for project directions.
 Browsing, filtering, collections, comparison you have already saved, credits and backups never call an AI.
 
+**Optional Jev ranking.** If you have your own TypeSafe account, you can put `TYPESAFE_API_KEY=your-key` in the
+`.env` file in your library folder and switch on **Settings → Use Jev to rank references for project help**. Jev
+then reorders which library images are offered to the assistant for a brief. Your brief and the titles, makers,
+dates, summaries and technique names of up to 120 library images are sent to TypeSafe and billed to your account
+(no picture is sent). It is off by default, it is never used for anything else, and if it fails the built-in
+ranking is used.
+
 | Assistant | Install | Sign in once |
 |---|---|---|
 | **Codex** (ChatGPT plan) | `npm install -g @openai/codex` | run `codex login` in a terminal |

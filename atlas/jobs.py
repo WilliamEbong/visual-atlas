@@ -15,10 +15,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from atlas import __version__, catalog, coding, images, providers, rights
-from atlas.ai import claude_cli, codex_cli, fake, tasks
+from atlas.ai import claude_cli, codex_cli, fake, jev, tasks
 from atlas.ai.process import BackendError
 from atlas.fetch import Fetcher, FetchError
-from atlas.home import home_dir
+from atlas.home import home_dir, local_setting
 from atlas.store import LeaseLost, LibraryBusy, Store, canonical, now
 
 BACKENDS = {'codex': codex_cli, 'claude': claude_cli, 'fake': fake}
@@ -862,7 +862,7 @@ class Worker:
             return self._done_failed('That brief no longer exists.')
         self._set(stage='analyzing', message='Thinking through directions for your brief…')
         reading = coding.code_request(f"{brief['title']}. {brief['text']}", self.taxonomy)
-        library = relevant_references(self.store, reading)
+        library, ranking = self._references_for(brief, reading)
         if not library:
             return self._done('Your library has no analysed images yet, so there is nothing to ground directions in. '
                               'Find some images first.')
@@ -875,7 +875,7 @@ class Worker:
         except tasks.InvalidResult as error:
             return self._done_failed(f'The suggestions did not pass checks ({error}).')
         result = answer['result']
-        analysis_id = self._save_analysis('directions', answer, {**result, 'reading': reading,
+        analysis_id = self._save_analysis('directions', answer, {**result, 'reading': reading, 'ranking': ranking,
                                                                  'supplied_ids': sorted(image_techniques)},
                                           input_sha=hashlib.sha256(brief['text'].encode()).hexdigest())
         if not result['directions']:
@@ -888,6 +888,32 @@ class Worker:
         if result['dropped']:
             message += f" {result['dropped']} more were dropped because they did not cite images showing their techniques."
         return self._done(message)
+
+    def _references_for(self, brief: dict, reading: dict) -> tuple[list[dict], dict]:
+        """Relevance-ranked references for a brief. With the optional Jev ranking switched on (Settings) and the
+        person's own TYPESAFE_API_KEY in the library's .env, Jev reorders the deterministic candidates; on any
+        problem, or past the daily AI limit, the deterministic order is used and the reason is recorded."""
+        enabled = self.store.one("SELECT value FROM settings WHERE key='jev_ranking'")
+        key = local_setting('TYPESAFE_API_KEY', self.home) if enabled and enabled['value'] == '1' else None
+        if not key:
+            return relevant_references(self.store, reading), {'method': 'deterministic'}
+        row = self.store.one("SELECT value FROM settings WHERE key='daily_ai_cap'")
+        if self._ai_today() >= (int(row['value']) if row else DAILY_AI_CAP):
+            return relevant_references(self.store, reading), {'method': 'deterministic', 'jev_skipped': 'daily_cap'}
+        candidates = relevant_references(self.store, reading, limit=jev.MAX_CANDIDATES, budget=10**9)
+        started = time.monotonic()
+        names = {t['id']: t['name'] for t in self.techniques.values()}
+        try:
+            order, info = jev.rank(f"{brief['title']}. {brief['text']}", candidates, names, key)
+        except jev.JevError as error:
+            self.store.record_attempt({'job_id': self.job['id'], 'kind': 'ai', 'backend': 'jev', 'model': jev.MODEL,
+                                       'status': 'error', 'error_code': error.code,
+                                       'latency_ms': int((time.monotonic() - started) * 1000)})
+            return relevant_references(self.store, reading), {'method': 'deterministic', 'jev_error': error.code}
+        self.store.record_attempt({'job_id': self.job['id'], 'kind': 'ai', 'backend': 'jev', 'model': info['model'],
+                                   'status': 'ok', 'input_tokens': info['input_tokens'], 'latency_ms': info['latency_ms']})
+        by_id = {r['image_id']: r for r in candidates}
+        return fit_records([by_id[i] for i in order]), info
 
     def _find_hint(self, reading: dict) -> str:
         names = [self.techniques[t['id']]['name'] for t in reading['techniques']][:2]
@@ -928,18 +954,22 @@ def relevant_references(store: Store, reading: dict, limit: int = 40, budget: in
         for row in store.rows('SELECT rowid AS id FROM images_fts WHERE images_fts MATCH ?', (f'"{term}"*',)):
             if row['id'] in score:
                 score[row['id']] += 1
-    records, size = [], 2
-    for image_id in sorted(images, key=lambda i: (-score[i], -i)):
-        image = images[image_id]
-        record = {'image_id': image_id, 'title': image['title'][:120], 'creator': image['creator'][:80],
-                  'date': image['date_text'][:40], 'summary': (image['summary'] or '')[:300],
-                  'techniques': labels.get(image_id, [])}
+    return fit_records([{'image_id': image_id, 'title': images[image_id]['title'][:120],
+                         'creator': images[image_id]['creator'][:80], 'date': images[image_id]['date_text'][:40],
+                         'summary': (images[image_id]['summary'] or '')[:300], 'techniques': labels.get(image_id, [])}
+                        for image_id in sorted(images, key=lambda i: (-score[i], -i))], limit, budget)
+
+
+def fit_records(records: list[dict], limit: int = 40, budget: int = 24000) -> list[dict]:
+    """Whole records, in order, while they fit the prompt budget (never a record cut in half)."""
+    kept, size = [], 2
+    for record in records:
         cost = len(json.dumps(record, ensure_ascii=False)) + 2
-        if len(records) >= limit or size + cost > budget:
+        if len(kept) >= limit or size + cost > budget:
             break
-        records.append(record)
+        kept.append(record)
         size += cost
-    return records
+    return kept
 
 
 def create_job(store: Store, kind: str, spec: dict) -> str:

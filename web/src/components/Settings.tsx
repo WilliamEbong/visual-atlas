@@ -64,6 +64,18 @@ export default function SettingsPage() {
             onBlur={(e) => save({ daily_ai_cap: Number(e.target.value) })} /></label>
         </div>}
         <p className="mono">A second-model agreement is shown as “agreed by a second model”. Only your own decisions count as reviewed by you.</p>
+        {settings.data && <div className="notice stack">
+          <h3>Optional: TypeSafe Jev ranking for project help</h3>
+          <p>Off unless you switch it on. When it is on, Jev reorders which library images are offered to the assistant for
+            your brief (in the v1.1 evaluation it found more of the relevant images than the built-in ranking). It needs your own
+            TypeSafe account and key: put <code>TYPESAFE_API_KEY=…</code> in the <code>.env</code> file in your library folder.
+            Your brief and the titles, makers, dates, summaries and technique names of up to {120} library images are sent to
+            TypeSafe (paid per use by your account, usually a fraction of a cent per brief); no picture is sent. If it fails, the
+            built-in ranking is used.</p>
+          <label className="choice"><input type="checkbox" checked={settings.data.jev_ranking} disabled={!settings.data.jev_key}
+            onChange={(e) => save({ jev_ranking: e.target.checked })} /> Use Jev to rank references for project help</label>
+          {!settings.data.jev_key && <p className="mono">No TYPESAFE_API_KEY found in your library's .env file.</p>}
+        </div>}
       </section>}
 
       <section className="stack" aria-labelledby="look">

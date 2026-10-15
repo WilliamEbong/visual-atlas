@@ -112,6 +112,7 @@ uv run visual-atlas
 | Codex | The Codex CLI signed in with your ChatGPT plan (`codex login`) | Analysing images, planning searches, comparisons, project directions |
 | Claude Code | Claude Code signed in with your Claude plan (`claude`) | The same, or the second-model check |
 | Practice mode | Nothing | Trying the workflow offline (answers are clearly marked as practice) |
+| TypeSafe Jev (optional, off by default) | Your own TypeSafe key in the library's `.env` (`TYPESAFE_API_KEY`), switched on in Settings | Reordering which library images are offered for a project brief. Text only: the brief and the images' titles, makers, dates, summaries and technique names go to TypeSafe and are billed to your account. Chosen because it beat the built-in ranking in the [v1.1 evaluation](docs/evaluation/v1.1/REPORT.md); nothing else uses it |
 
 Recommended: Codex analyses and Claude Code checks, which spreads the work across both plans.
 Each call runs the official CLI with a fixed command, every tool disabled (no shell, files, web or

@@ -32,7 +32,7 @@ def home_dir(home: Path | str | None = None) -> Path:
 
 def local_setting(name: str, home: Path | None = None) -> str | None:
     """Read one allowed setting from the environment or the data home's .env file."""
-    if name not in ('VISUAL_ATLAS_PORT', 'SMITHSONIAN_API_KEY'):
+    if name not in ('VISUAL_ATLAS_PORT', 'SMITHSONIAN_API_KEY', 'TYPESAFE_API_KEY'):
         raise ValueError('unknown setting')
     if os.environ.get(name):
         return os.environ[name]

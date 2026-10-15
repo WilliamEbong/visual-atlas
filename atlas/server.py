@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from pydantic import BaseModel, Field
 
 from atlas import __version__, catalog, coding, images, jobs, transfer
-from atlas.home import REPO, home_dir
+from atlas.home import REPO, home_dir, local_setting
 from atlas.store import LibraryBusy, Store
 
 # Every order ends with the image id, so offset pages never repeat or skip an image with an equal sort value.
@@ -568,7 +568,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             values = {r['key']: r['value'] for r in store.rows('SELECT * FROM settings')}
         return {'backend': values.get('backend', 'codex'), 'verify_with': values.get('verify_with', 'claude'),
                 'daily_ai_cap': int(values.get('daily_ai_cap', jobs.DAILY_AI_CAP)),
-                'welcomed': values.get('welcomed') == '1'}
+                'welcomed': values.get('welcomed') == '1', 'jev_ranking': values.get('jev_ranking') == '1',
+                'jev_key': bool(local_setting('TYPESAFE_API_KEY', home))}  # whether a key exists, never the key
 
     @app.put('/api/settings')
     def save_settings(body: dict):
@@ -581,6 +582,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                 store.set_setting('daily_ai_cap', str(max(0, min(int(body['daily_ai_cap']), 1000))))
             if 'welcomed' in body:
                 store.set_setting('welcomed', '1' if body['welcomed'] else '0')
+            if 'jev_ranking' in body:
+                store.set_setting('jev_ranking', '1' if body['jev_ranking'] else '0')
         return settings()
 
     @app.get('/api/coverage')
