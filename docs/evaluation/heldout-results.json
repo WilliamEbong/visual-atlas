@@ -1,0 +1,596 @@
+[
+  {
+    "file": "01-aic-69533.jpg",
+    "provider": "aic",
+    "query": "Hiroshige rain bridge",
+    "why": "diagonal rain, possible diagonal energy",
+    "title": "Bird's Nest and Ferns",
+    "creator": "Fidelia Bridges",
+    "date": "1863",
+    "source_url": "https://www.artic.edu/artworks/69533",
+    "licence": "CC0 — source checked",
+    "sha256": "5e4b743903afbd571b2865a7990d15a65a7f303a4433ebc1eeb6134d9a1ade7d",
+    "expected": {
+      "file": "01-aic-69533.jpg",
+      "techniques": [
+        "color-contrast",
+        "texture-contrast"
+      ],
+      "note": "small blue eggs against dark greens and browns; busy surround, so not negative space"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "color-contrast": 0.9,
+        "value-contrast": 0.85,
+        "texture-contrast": 0.77
+      },
+      "ambiguities": [
+        "The deep shadows make the exact support beneath the nest difficult to distinguish."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "color-contrast": 0.7,
+        "value-contrast": 0.5,
+        "tight-cropping": 0.45
+      },
+      "ambiguities": [
+        "The dark, earthy palette could be read as limited-palette harmony, with the blue eggs as the only exception.",
+        "Foliage around the nest might be read as framing, but it does not form a continuous border."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "color-contrast": true,
+      "value-contrast": true,
+      "texture-contrast": false
+    }
+  },
+  {
+    "file": "02-aic-56905.jpg",
+    "provider": "aic",
+    "query": "Whistler nocturne",
+    "why": "limited palette, very low contrast",
+    "title": "Nocturne: Blue and Gold—Southampton Water",
+    "creator": "James McNeill Whistler",
+    "date": "1872",
+    "source_url": "https://www.artic.edu/artworks/56905",
+    "licence": "CC0 — source checked",
+    "sha256": "c0133be73f9a190d8b0e06bd8338a9b87d7e529b6917c0707966c30509baeca5",
+    "expected": {
+      "file": "02-aic-56905.jpg",
+      "techniques": [
+        "color-harmony",
+        "color-contrast",
+        "negative-space"
+      ],
+      "note": "near-monochrome nocturne with one small orange light; very low contrast is the point"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "color-harmony": 0.96,
+        "atmospheric-perspective": 0.83,
+        "color-contrast": 0.9
+      },
+      "ambiguities": [
+        "The orange disk could depict the sun or moon; the image alone does not establish which.",
+        "The distant forms are too indistinct to separate buildings, ships, and individual masts reliably."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "color-harmony": 0.8,
+        "color-contrast": 0.7,
+        "negative-space": 0.55
+      },
+      "ambiguities": [
+        "The orange disc could be a setting sun or a moon; this does not change the reading of the colour accent.",
+        "Atmospheric perspective is plausible given the hazy, soft forms, but the whole picture is uniformly soft rather than graded by distance."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "color-harmony": true,
+      "atmospheric-perspective": false,
+      "color-contrast": true
+    }
+  },
+  {
+    "file": "03-met-437878.jpg",
+    "provider": "met",
+    "query": "Vermeer",
+    "why": "interior light, possible framing/value",
+    "title": "A Maid Asleep",
+    "creator": "Johannes Vermeer",
+    "date": "ca. 1656–57",
+    "source_url": "https://www.metmuseum.org/art/collection/search/437878",
+    "licence": "CC0 — source checked",
+    "sha256": "0f60071c28366b8f470fa3859375dbfece993bfaf9e96189a4028df9f945c366",
+    "expected": {
+      "file": "03-met-437878.jpg",
+      "techniques": [
+        "framing",
+        "layered-depth"
+      ],
+      "note": "doorway opens onto a second room; eyes closed, so no gaze reading"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "layered-depth": 0.96,
+        "value-contrast": 0.89,
+        "asymmetric-balance": 0.83
+      },
+      "ambiguities": [
+        "The lowered eyes and supported head could indicate sleep or quiet rest; the visible pose alone does not establish which.",
+        "Details of the shadowed wall objects and distant furniture are difficult to resolve."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "layered-depth": 0.7,
+        "texture-contrast": 0.55,
+        "color-harmony": 0.5
+      },
+      "ambiguities": [
+        "The open doorway could be read as a frame within a frame, but it sits beside the figure and does not surround her.",
+        "The dark foreground chair may be read as a repoussoir element within layered depth or as a separate framing device."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "layered-depth": true,
+      "value-contrast": false,
+      "asymmetric-balance": true
+    }
+  },
+  {
+    "file": "04-cma-539189.jpg",
+    "provider": "cma",
+    "query": "candlelight",
+    "why": "chiaroscuro",
+    "title": "A Scientist Seated at a Desk by Candlelight",
+    "creator": "Anna Dorothea Therbusch (German, 1721/22–1782)",
+    "date": "1755",
+    "source_url": "https://clevelandart.org/art/2023.1",
+    "licence": "CC0 — source checked",
+    "sha256": "9c95bf4af6c06646be7f97b656ba9f247887ec93e47a1d2c96208cb515cb68e1",
+    "expected": {
+      "file": "04-cma-539189.jpg",
+      "techniques": [
+        "value-contrast",
+        "gaze-direction"
+      ],
+      "note": "single candle source; sitter looks out at the viewer"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "value-contrast": 0.99,
+        "asymmetric-balance": 0.87,
+        "color-harmony": 0.79
+      },
+      "ambiguities": [
+        "The precise function of the cylindrical apparatus and the identities of the small tabletop pieces are not clear from their visible forms."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "value-contrast": 0.88,
+        "color-harmony": 0.55,
+        "gaze-direction": 0.4
+      },
+      "ambiguities": [
+        "The green jacket against the warm tones could be read as colour contrast, but it is muted and sits in shadow, so it may not be a defining feature."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "value-contrast": true,
+      "asymmetric-balance": true,
+      "color-harmony": true
+    }
+  },
+  {
+    "file": "05-cma-143278.jpg",
+    "provider": "cma",
+    "query": "abstract composition",
+    "why": "abstract: techniques ambiguous",
+    "title": "Composition with Red, Yellow, and Blue",
+    "creator": "Piet Mondrian (Dutch, 1872–1944)",
+    "date": "1927",
+    "source_url": "https://clevelandart.org/art/1967.215",
+    "licence": "CC0 — source checked",
+    "sha256": "79f82c7e28afc064bd19199dd6883d90d3bb42af26cd61517b6cd28e27dbe58e",
+    "expected": {
+      "file": "05-cma-143278.jpg",
+      "techniques": [
+        "asymmetric-balance",
+        "color-contrast"
+      ],
+      "note": "abstract; red mass upper left balanced by small yellow and blue; the large white field could also be read as negative space"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "asymmetric-balance": 0.96,
+        "color-contrast": 0.92,
+        "value-contrast": 0.88
+      },
+      "ambiguities": [],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "asymmetric-balance": 0.8,
+        "color-contrast": 0.65,
+        "negative-space": 0.4
+      },
+      "ambiguities": [
+        "The large central field could be read as negative space or simply as one more unit of the grid.",
+        "Asymmetric balance is a strong fit, but the whole grid structure could also be read as rhythm or pattern."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "asymmetric-balance": true,
+      "color-contrast": true,
+      "value-contrast": true
+    }
+  },
+  {
+    "file": "06-aic-27992.jpg",
+    "provider": "aic",
+    "query": "Seurat",
+    "why": "pattern/rhythm, figures",
+    "title": "A Sunday on La Grande Jatte — 1884",
+    "creator": "Georges Seurat",
+    "date": "1884–86, border added 1888–89",
+    "source_url": "https://www.artic.edu/artworks/27992",
+    "licence": "CC0 — source checked",
+    "sha256": "90197c037e6041fcae1c35606b921b5b626d868c2ff21cd653edb640b3f6e2dd",
+    "expected": {
+      "file": "06-aic-27992.jpg",
+      "techniques": [
+        "rhythm-pattern",
+        "layered-depth"
+      ],
+      "note": "repeated upright figures, trunks and parasols; ambiguous and crowded"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "layered-depth": 0.96,
+        "rhythm-pattern": 0.88,
+        "asymmetric-balance": 0.81
+      },
+      "ambiguities": [
+        "The large right-hand pair is visually prominent, but the distributed crowd makes a single main subject uncertain."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "layered-depth": 0.7,
+        "value-contrast": 0.55,
+        "color-contrast": 0.5,
+        "scale-contrast": 0.45
+      },
+      "ambiguities": [
+        "Static, frozen poses could be read as rhythm-pattern across the many upright figures, but spacing is irregular.",
+        "The painted dotted border is a surface feature; it is not treated as a frame within a frame."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "layered-depth": true,
+      "rhythm-pattern": true,
+      "asymmetric-balance": true
+    }
+  },
+  {
+    "file": "07-met-39799.jpg",
+    "provider": "met",
+    "query": "Hokusai wave",
+    "why": "scale contrast, motion",
+    "title": "Under the Wave off Kanagawa (Kanagawa oki nami ura), or The Great Wave, from the series Thirty-six Views of Mount Fuji (Fugaku sanjūrokkei)",
+    "creator": "Katsushika Hokusai",
+    "date": "ca. 1830–32",
+    "source_url": "https://www.metmuseum.org/art/collection/search/39799",
+    "licence": "CC0 — source checked",
+    "sha256": "b410eeec0473c4e63eef12434a5a7c4613401c6e18670718d7727f36a441495c",
+    "expected": {
+      "file": "07-met-39799.jpg",
+      "techniques": [
+        "scale-contrast",
+        "implied-motion",
+        "framing"
+      ],
+      "note": "the wave dwarfs a tiny Mount Fuji and the boats; the wave's curl frames Fuji"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "implied-motion": 0.98,
+        "scale-contrast": 0.96,
+        "rhythm-pattern": 0.89
+      },
+      "ambiguities": [
+        "The branching foam can resemble claws or fingers, but whether that resemblance constitutes a visual metaphor is uncertain."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "scale-contrast": 0.8,
+        "framing": 0.5,
+        "implied-motion": 0.6,
+        "color-harmony": 0.5
+      },
+      "ambiguities": [
+        "The mountain may be read as a framed focal point, or as just a small element set against the wave in a scale comparison.",
+        "The strong curved diagonal could be read as diagonal energy, but it is mainly part of the wave's shape and motion."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "implied-motion": true,
+      "scale-contrast": true,
+      "rhythm-pattern": true
+    }
+  },
+  {
+    "file": "08-commons-123683561.jpg",
+    "provider": "commons",
+    "query": "lone tree fog",
+    "why": "negative space, atmosphere",
+    "title": "Lone Tree in Yosemite Winter Fog (5783936988)",
+    "creator": "Chase Lindberg",
+    "date": "2008-02-06 10:46",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Lone_Tree_in_Yosemite_Winter_Fog_(5783936988).jpg",
+    "licence": "Free with attribution — credit included",
+    "sha256": "25c801e90face8a2d72ac2187e915ec065d8b325df3f6ec6e66e44c684428df5",
+    "expected": {
+      "file": "08-commons-123683561.jpg",
+      "techniques": [
+        "atmospheric-perspective",
+        "color-harmony"
+      ],
+      "note": "fog and a near-monochrome blue; negative space is debatable because the tree fills the frame"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "atmospheric-perspective": 0.91,
+        "color-harmony": 0.96
+      },
+      "ambiguities": [
+        "The visible atmospheric veil could include fog, falling snow, or both.",
+        "The image alone does not establish whether the blue cast comes from lighting, processing, or a combination."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "color-harmony": 0.7,
+        "atmospheric-perspective": 0.6,
+        "negative-space": 0.55
+      },
+      "ambiguities": [
+        "The tree is centered but the surroundings are not mirrored, so symmetry is only loosely applicable.",
+        "Fog depth and the limited palette overlap, so which is primary is debatable."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "atmospheric-perspective": true,
+      "color-harmony": true
+    }
+  },
+  {
+    "file": "09-commons-188335632.jpg",
+    "provider": "commons",
+    "query": "symmetrical corridor",
+    "why": "symmetry, leading lines",
+    "title": "Corridor of Vizianagaram Hall, University of Allahabad, Prayagraj, India",
+    "creator": "Sanskritidubey",
+    "date": "2025-12-04 02:31:39",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Corridor_of_Vizianagaram_Hall,_University_of_Allahabad,_Prayagraj,_India.jpg",
+    "licence": "Free with attribution — credit included",
+    "sha256": "c4a834f7124d0ccedec8e51d8fe057c0b10e6e128f2697d253a253e5adfb96d6",
+    "expected": {
+      "file": "09-commons-188335632.jpg",
+      "techniques": [
+        "leading-lines",
+        "rhythm-pattern",
+        "framing"
+      ],
+      "note": "converging arcade, repeated arches and doors, arches frame the far door"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "leading-lines": 0.98,
+        "rhythm-pattern": 0.97,
+        "framing": 0.88
+      },
+      "ambiguities": [],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "leading-lines": 0.8,
+        "rhythm-pattern": 0.75,
+        "color-harmony": 0.55
+      },
+      "ambiguities": [
+        "The nested arches could also be read as framing, since each arch frames the next and the far doorway.",
+        "The near-symmetric layout is broken by the doors on the left and columns on the right, so symmetry is debatable."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "leading-lines": true,
+      "rhythm-pattern": true,
+      "framing": false
+    }
+  },
+  {
+    "file": "10-cma-152543.jpg",
+    "provider": "cma",
+    "query": "map",
+    "why": "a map: probably unusable or no technique",
+    "title": "Map/Print Case",
+    "creator": "",
+    "date": "late 1800s",
+    "source_url": "https://clevelandart.org/art/1985.36",
+    "licence": "CC0 — source checked",
+    "sha256": "83601ec5dfbcc96d0bf03defb0ae1838d6554cd42ef7e984773bf3a59f037140",
+    "expected": {
+      "file": "10-cma-152543.jpg",
+      "techniques": [],
+      "note": "catalogue photo of a furniture object on a plain ground; any isolation is incidental to museum photography, so no technique is expected"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "diagonal-energy": 0.83,
+        "texture-contrast": 0.8
+      },
+      "ambiguities": [
+        "The furnishing's exact function and opening mechanism cannot be established from this view."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "visual-metaphor": 0.6,
+        "texture-contrast": 0.55,
+        "color-harmony": 0.4
+      },
+      "ambiguities": [
+        "The book resemblance may be functional form rather than a deliberate metaphor.",
+        "The tilted panel could also be read as diagonal energy, but it is a product of the object's design."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "diagonal-energy": true,
+      "texture-contrast": true
+    }
+  },
+  {
+    "file": "11-met-269256.jpg",
+    "provider": "met",
+    "query": "portrait looking",
+    "why": "gaze direction",
+    "title": "[Female Portrait, Standing, Looking Left]",
+    "creator": "Franz Antoine",
+    "date": "1850s–60s",
+    "source_url": "https://www.metmuseum.org/art/collection/search/269256",
+    "licence": "CC0 — source checked",
+    "sha256": "6eb86ab57d532ed786c01016c52a93729664ab078f73dd68c5006eafbc0532a9",
+    "expected": {
+      "file": "11-met-269256.jpg",
+      "techniques": [
+        "gaze-direction"
+      ],
+      "note": "sitter looks out of frame to the left; the oval mount and monochrome come from the medium, not a choice"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "value-contrast": 0.95,
+        "framing": 0.93
+      },
+      "ambiguities": [
+        "The dark support beneath the extended hand is too indistinct to identify confidently.",
+        "The visible oval enclosure could be a physical mount or part of the reproduced image."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "value-contrast": 0.55,
+        "color-harmony": 0.45,
+        "gaze-direction": 0.45
+      },
+      "ambiguities": [
+        "The oval mount could be read as a frame within a frame, but it is a print border rather than a scene element, so I left framing out.",
+        "The value contrast is moderate rather than dramatic, because the backdrop is mid-dark and the dress is mid-tone."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "value-contrast": true,
+      "framing": false
+    }
+  },
+  {
+    "file": "12-commons-105312710.jpg",
+    "provider": "commons",
+    "query": "market crowd",
+    "why": "busy scene: ambiguous",
+    "title": "A Market Place and Crowd title QS:P1476,en:\"A Market Place and Crowd \" label QS:Len,\"A Market Place and Crowd \"",
+    "creator": "George Chinnery",
+    "date": "",
+    "source_url": "https://commons.wikimedia.org/wiki/File:George_Chinnery_-_A_Market_Place_and_Crowd_-_B1977.14.4958_-_Yale_Center_for_British_Art.jpg",
+    "licence": "CC0 — source checked",
+    "sha256": "02a2d142a4517255d81c98180dcd05d6d8e1eba7f92bd5fc33859249bb0f6677",
+    "expected": {
+      "file": "12-commons-105312710.jpg",
+      "techniques": [
+        "proximity-grouping"
+      ],
+      "note": "a crowd clustered under awnings against empty walls; ambiguous sketch"
+    },
+    "codex": {
+      "usable": true,
+      "techniques": {
+        "layered-depth": 0.91,
+        "atmospheric-perspective": 0.74,
+        "color-harmony": 0.86
+      },
+      "ambiguities": [
+        "The faint architecture could reflect abbreviated drawing rather than an explicit depiction of atmospheric haze.",
+        "The contents of the containers and the precise activities of individual figures are not clearly resolved."
+      ],
+      "model": "gpt-6-astra"
+    },
+    "claude": {
+      "usable": true,
+      "techniques": {
+        "selective-focus": 0.55,
+        "proximity-grouping": 0.5,
+        "color-harmony": 0.45
+      },
+      "ambiguities": [
+        "The sketchiness may reflect an unfinished study rather than deliberate selective emphasis.",
+        "Monochrome ink is a medium choice, so color-harmony is debatable."
+      ],
+      "model": "claude-sonnet-5-5"
+    },
+    "claude_verify": {
+      "layered-depth": true,
+      "atmospheric-perspective": false,
+      "color-harmony": false
+    }
+  }
+]

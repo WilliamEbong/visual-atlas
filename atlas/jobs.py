@@ -596,14 +596,23 @@ class Worker:
         if image is None:
             self._item(item['id'], state='skipped', reason='image was removed')
             return True
-        self.store.set_image_status(image['id'], 'pending')
+        never_added = image['status'] == 'pending'  # downloaded by a job that stopped before analysing it
         self._set(stage='analyzing', message=f"Analyzing “{image['title'][:60]}”…")
-        outcome = self.analyze_image({**image, 'status': 'pending'}, item_id=item['id'])
+        try:
+            outcome = self.analyze_image(image, item_id=item['id'])
+        except BackendError as error:
+            if error.code in PAUSING:
+                raise
+            self._retry_or_fail(item, error.code, backend_message(error.code, self.job['backend']))
+            return True
         if outcome == 'retry':
             self._retry_or_fail(item, 'invalid_response', backend_message('invalid_response', self.job['backend']))
+        elif outcome == 'added':
+            self._item(item['id'], state='added', image_id=image['id'])
         else:
-            self._item(item['id'], state='added' if outcome == 'added' else 'no_technique', reason=outcome,
-                       image_id=image['id'])
+            if never_added:  # same rule as Find: only images with a clear technique join the library
+                self._remove_unhelpful(image, outcome)
+            self._item(item['id'], state='no_technique', reason=outcome, image_id=image['id'])
         return True
 
     def _compare_step(self):

@@ -10,3 +10,7 @@
 - [x] T208 Compare page and saved AI comparison job (web/src/components/Compare.tsx, atlas/jobs.py)
 - [x] T209 Codex tests for fetch, images, rights, providers (Codex task 2)
 - [ ] T210 Playwright journeys: find/progress/cancel, filters, corrections, collections, compare
+
+## Phase 1: Convergence
+
+- [ ] T211 Exercise job cancel and resume, library filter and sort controls, and a live AI comparison in Playwright per SC (partial)
