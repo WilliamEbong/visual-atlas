@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+    [[rules.allowlists]]
+    description = "Analysis cache keys in the starter library are SHA-256 / UUID hex digests, not secrets"
+    condition = "AND"
+    regexTarget = "line"
+    regexes = ['''^\s*"cache_key": "[0-9a-f]{32}(?:[0-9a-f]{32})?",?\s*$''']
+    paths = ['''^starter/library\.json$''']
