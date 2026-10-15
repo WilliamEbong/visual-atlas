@@ -1,0 +1,649 @@
+{
+ "run_on": "2026-10-15 11:02",
+ "records": [
+  {
+   "id": "02",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 23.1,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "leading-lines": 0.98,
+     "rhythm-pattern": 0.95,
+     "symmetry": 0.88
+    },
+    "evidence": {
+     "leading-lines": [
+      "Rails and platform edges extend inward from the lower edges toward the center of the distant station interior.",
+      "A vaulted roof spans both halves of the image, with a central glazed strip aligned above the central platform."
+     ],
+     "rhythm-pattern": [
+      "Curved metal roof ribs repeat at progressively smaller apparent intervals toward the far end.",
+      "Arched wall openings and platform lamps recur along both sides of the station."
+     ],
+     "symmetry": [
+      "Rails and platform edges extend inward from the lower edges toward the center of the distant station interior.",
+      "A vaulted roof spans both halves of the image, with a central glazed strip aligned above the central platform.",
+      "Arched wall openings and platform lamps recur along both sides of the station.",
+      "A train occupies the right track; the visible tracks on the left have no train."
+     ]
+    }
+   },
+   "proposals": [
+    "leading-lines",
+    "rhythm-pattern",
+    "symmetry"
+   ],
+   "shown": {
+    "seconds": 4.8,
+    "holds": {
+     "leading-lines": true,
+     "rhythm-pattern": true,
+     "symmetry": true
+    }
+   },
+   "independent": {
+    "seconds": 4.9,
+    "holds": {
+     "leading-lines": true,
+     "rhythm-pattern": true,
+     "symmetry": true
+    },
+    "own_reading": [
+     "leading-lines",
+     "rhythm-pattern",
+     "vantage-point",
+     "symmetry"
+    ]
+   }
+  },
+  {
+   "id": "04",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 16.2,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "rhythm-pattern": 0.91,
+     "texture-contrast": 0.76
+    },
+    "evidence": {
+     "rhythm-pattern": [
+      "Elongated standing stone figures repeat across the center and right, with long carved robes and rounded forms behind their heads.",
+      "Narrow columns alternate with the figures; their shafts carry repeating geometric and foliage carvings above stepped bases.",
+      "Bands of smaller carved figures and projecting architectural ornaments extend across the upper portion and continue beyond the top edge."
+     ],
+     "texture-contrast": [
+      "Narrow columns alternate with the figures; their shafts carry repeating geometric and foliage carvings above stepped bases.",
+      "Bands of smaller carved figures and projecting architectural ornaments extend across the upper portion and continue beyond the top edge.",
+      "Broad wooden panels on the left and a relatively plain stone panel on the right flank the densely carved central structure."
+     ]
+    }
+   },
+   "proposals": [
+    "rhythm-pattern",
+    "texture-contrast"
+   ],
+   "shown": {
+    "seconds": 4.5,
+    "holds": {
+     "rhythm-pattern": true,
+     "texture-contrast": true
+    }
+   },
+   "independent": {
+    "seconds": 4.8,
+    "holds": {
+     "rhythm-pattern": true,
+     "texture-contrast": true
+    },
+    "own_reading": [
+     "rhythm-pattern",
+     "texture-contrast",
+     "color-harmony",
+     "value-contrast"
+    ]
+   }
+  },
+  {
+   "id": "07",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 14.3,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "color-contrast": 0.98,
+     "asymmetric-balance": 0.83
+    },
+    "evidence": {
+     "color-contrast": [
+      "A large tree trunk right of center divides into thick branches extending across the upper frame; much of its bark is illuminated saturated blue.",
+      "A smaller branching tree left of center has vivid red illumination on its lower trunk and several limbs, surrounded by blue-lit branches and dark foliage.",
+      "Small cyan, blue, and magenta lights are visible in the grass along the bottom of the image."
+     ],
+     "asymmetric-balance": [
+      "A large tree trunk right of center divides into thick branches extending across the upper frame; much of its bark is illuminated saturated blue.",
+      "A smaller branching tree left of center has vivid red illumination on its lower trunk and several limbs, surrounded by blue-lit branches and dark foliage.",
+      "The large blue trunk occupies the right side while the smaller red trunk stands farther back to its left; their branches overlap against patches of blue sky."
+     ]
+    }
+   },
+   "proposals": [
+    "color-contrast",
+    "asymmetric-balance"
+   ],
+   "shown": {
+    "seconds": 4.0,
+    "holds": {
+     "color-contrast": true,
+     "asymmetric-balance": true
+    }
+   },
+   "independent": {
+    "seconds": 4.9,
+    "holds": {
+     "color-contrast": true,
+     "asymmetric-balance": false
+    },
+    "own_reading": [
+     "color-contrast",
+     "framing",
+     "layered-depth",
+     "value-contrast"
+    ]
+   }
+  },
+  {
+   "id": "09",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 16.3,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "negative-space": 0.92,
+     "asymmetric-balance": 0.81
+    },
+    "evidence": {
+     "negative-space": [
+      "A left-facing bird sits slightly right of center, with a gray and dark blue body, yellow underside, and long downward-pointing tail.",
+      "A thin branch extends from the lower left beneath the bird toward smaller leaves and reddish flowers on the right.",
+      "Large areas of pale paper remain unmarked above and around the bird and between the branches."
+     ],
+     "asymmetric-balance": [
+      "A left-facing bird sits slightly right of center, with a gray and dark blue body, yellow underside, and long downward-pointing tail.",
+      "A branching stem rises from the bottom toward the left, bearing dark blue and muted green leaves and a large reddish flower.",
+      "A thin branch extends from the lower left beneath the bird toward smaller leaves and reddish flowers on the right.",
+      "Vertical columns of dark calligraphy and two faint reddish square marks occupy the upper right."
+     ]
+    }
+   },
+   "proposals": [
+    "negative-space",
+    "asymmetric-balance"
+   ],
+   "shown": {
+    "seconds": 4.0,
+    "holds": {
+     "negative-space": true,
+     "asymmetric-balance": true
+    }
+   },
+   "independent": {
+    "seconds": 3.8,
+    "holds": {
+     "negative-space": true,
+     "asymmetric-balance": true
+    },
+    "own_reading": [
+     "asymmetric-balance",
+     "negative-space",
+     "color-harmony"
+    ]
+   }
+  },
+  {
+   "id": "10",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 18.1,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "color-contrast": 0.88,
+     "implied-motion": 0.78,
+     "atmospheric-perspective": 0.76
+    },
+    "evidence": {
+     "color-contrast": [
+      "A large tawny lioness stretches across the lower middle, with its tail extending left and its lowered head facing right.",
+      "The lioness's ochre and golden brown body stands against muted blue-green and grey terrain."
+     ],
+     "implied-motion": [
+      "An extended tongue hangs from the open mouth above pale splashes and ripples in the water."
+     ],
+     "atmospheric-perspective": [
+      "The paws, muzzle, and body contours have stronger definition than the soft blue-grey mountain slopes behind them.",
+      "Dark vegetation occupies the lower left, while grey clouds cross the sky above the mountainous terrain."
+     ]
+    }
+   },
+   "proposals": [
+    "color-contrast",
+    "implied-motion",
+    "atmospheric-perspective"
+   ],
+   "shown": {
+    "seconds": 4.8,
+    "holds": {
+     "color-contrast": false,
+     "implied-motion": true,
+     "atmospheric-perspective": true
+    }
+   },
+   "independent": {
+    "seconds": 5.0,
+    "holds": {
+     "color-contrast": false,
+     "implied-motion": true,
+     "atmospheric-perspective": true
+    },
+    "own_reading": [
+     "color-harmony",
+     "diagonal-energy",
+     "layered-depth",
+     "implied-motion"
+    ]
+   }
+  },
+  {
+   "id": "11",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 16.8,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "layered-depth": 0.94,
+     "leading-lines": 0.86
+    },
+    "evidence": {
+     "layered-depth": [
+      "Large pedestrians, horses, and wheeled carriages overlap and are partly cut off along the bottom of both views.",
+      "Dense groups of smaller pedestrians and vehicles fill the street beyond the foreground figures.",
+      "Rows of multistory buildings recede toward the left side of each view; their rooflines and facade edges converge into the distant street."
+     ],
+     "leading-lines": [
+      "Rows of multistory buildings recede toward the left side of each view; their rooflines and facade edges converge into the distant street."
+     ]
+    }
+   },
+   "proposals": [
+    "layered-depth",
+    "leading-lines"
+   ],
+   "shown": {
+    "seconds": 4.2,
+    "holds": {
+     "layered-depth": true,
+     "leading-lines": false
+    }
+   },
+   "independent": {
+    "seconds": 4.8,
+    "holds": {
+     "layered-depth": true,
+     "leading-lines": true
+    },
+    "own_reading": [
+     "layered-depth",
+     "color-harmony",
+     "symmetry",
+     "leading-lines"
+    ]
+   }
+  },
+  {
+   "id": "13",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 22.3,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "value-contrast": 0.95,
+     "layered-depth": 0.9,
+     "asymmetric-balance": 0.84
+    },
+    "evidence": {
+     "value-contrast": [
+      "A pale tablecloth covers the table and hangs across much of the lower half, against a dark green-gray wall.",
+      "Branches with dark green leaves and pale pink flowers fill the lower right, overlapping the tablecloth and tabletop objects and extending beyond the bottom and right edges.",
+      "The upper area is largely dark wall, with part of a rectangular picture frame entering from the upper left."
+     ],
+     "layered-depth": [
+      "Branches with dark green leaves and pale pink flowers fill the lower right, overlapping the tablecloth and tabletop objects and extending beyond the bottom and right edges.",
+      "A clear handled pitcher containing dark liquid stands on the left side of the tabletop beside a stemmed glass and a white cup and saucer.",
+      "A reflective metal vessel, a small tilted lid, a glass bottle, and a white bowl of yellow fruit occupy the center and right tabletop.",
+      "The upper area is largely dark wall, with part of a rectangular picture frame entering from the upper left."
+     ],
+     "asymmetric-balance": [
+      "Branches with dark green leaves and pale pink flowers fill the lower right, overlapping the tablecloth and tabletop objects and extending beyond the bottom and right edges.",
+      "A clear handled pitcher containing dark liquid stands on the left side of the tabletop beside a stemmed glass and a white cup and saucer.",
+      "The lower left contains a broad expanse of pale cloth with sparse folds, opposite the dense flowers and foliage on the right."
+     ]
+    }
+   },
+   "proposals": [
+    "value-contrast",
+    "layered-depth",
+    "asymmetric-balance"
+   ],
+   "shown": {
+    "seconds": 4.5,
+    "holds": {
+     "value-contrast": true,
+     "layered-depth": true,
+     "asymmetric-balance": true
+    }
+   },
+   "independent": {
+    "seconds": 4.4,
+    "holds": {
+     "value-contrast": true,
+     "layered-depth": true,
+     "asymmetric-balance": true
+    },
+    "own_reading": [
+     "value-contrast",
+     "asymmetric-balance",
+     "layered-depth",
+     "color-harmony"
+    ]
+   }
+  },
+  {
+   "id": "14",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 10.3,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "selective-focus": 0.94
+    },
+    "evidence": {
+     "selective-focus": [
+      "Facial wrinkles, moustache hairs, teeth, and the cap's woven fabric are sharply resolved.",
+      "Posts, overhead coverings, pale fabric, and building openings behind the man have visibly softer, blurred edges."
+     ]
+    }
+   },
+   "proposals": [
+    "selective-focus"
+   ],
+   "shown": {
+    "seconds": 3.5,
+    "holds": {
+     "selective-focus": true
+    }
+   },
+   "independent": {
+    "seconds": 4.2,
+    "holds": {
+     "selective-focus": true
+    },
+    "own_reading": [
+     "selective-focus",
+     "tight-cropping",
+     "texture-contrast"
+    ]
+   }
+  },
+  {
+   "id": "16",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 13.4,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "gaze-direction": 0.82
+    },
+    "evidence": {
+     "gaze-direction": [
+      "A seated bearded man occupies the center and lower right, wearing a dark jacket and waistcoat, light shirt, and bow tie.",
+      "His head is turned toward the right, with his eyes looking into the empty area beside his face.",
+      "A largely plain backdrop surrounds the head and extends across the upper portion of the photograph."
+     ]
+    }
+   },
+   "proposals": [
+    "gaze-direction"
+   ],
+   "shown": {
+    "error": "provider_error",
+    "seconds": 3.8
+   },
+   "independent": {
+    "seconds": 3.6,
+    "holds": {
+     "gaze-direction": false
+    },
+    "own_reading": [
+     "color-harmony",
+     "value-contrast",
+     "negative-space"
+    ]
+   }
+  },
+  {
+   "id": "18",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 13.2,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {},
+    "evidence": {}
+   },
+   "proposals": []
+  },
+  {
+   "id": "19",
+   "split": "final",
+   "proposer": {
+    "usable": false,
+    "seconds": 9.3,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {},
+    "evidence": {}
+   },
+   "proposals": []
+  },
+  {
+   "id": "21",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 22.0,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "atmospheric-perspective": 0.96,
+     "diagonal-energy": 0.89,
+     "value-contrast": 0.87
+    },
+    "evidence": {
+     "atmospheric-perspective": [
+      "White and pale grey cloud fills most of the left side and upper center, with faint darker landforms visible through gaps.",
+      "Trees at the upper right have dark, detailed foliage; trees and ground nearer the center are partly veiled by pale mist.",
+      "Thin grasses and brown seed heads cross the lower edge in front of the green slope."
+     ],
+     "diagonal-energy": [
+      "A steep vegetated slope rises diagonally from the lower center toward the upper right."
+     ],
+     "value-contrast": [
+      "White and pale grey cloud fills most of the left side and upper center, with faint darker landforms visible through gaps.",
+      "Trees at the upper right have dark, detailed foliage; trees and ground nearer the center are partly veiled by pale mist.",
+      "A small spreading tree stands on the slope's edge near the center against pale cloud."
+     ]
+    }
+   },
+   "proposals": [
+    "atmospheric-perspective",
+    "diagonal-energy",
+    "value-contrast"
+   ],
+   "shown": {
+    "seconds": 4.4,
+    "holds": {
+     "atmospheric-perspective": true,
+     "diagonal-energy": true,
+     "value-contrast": true
+    }
+   },
+   "independent": {
+    "seconds": 4.6,
+    "holds": {
+     "atmospheric-perspective": true,
+     "diagonal-energy": true,
+     "value-contrast": true
+    },
+    "own_reading": [
+     "atmospheric-perspective",
+     "diagonal-energy",
+     "layered-depth",
+     "value-contrast"
+    ]
+   }
+  },
+  {
+   "id": "23",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 20.6,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "rhythm-pattern": 0.97,
+     "framing": 0.92,
+     "value-contrast": 0.88
+    },
+    "evidence": {
+     "rhythm-pattern": [
+      "A series of masonry arches decreases in apparent size toward the lower center, with successive openings visible inside one another."
+     ],
+     "framing": [
+      "A series of masonry arches decreases in apparent size toward the lower center, with successive openings visible inside one another.",
+      "A broad foreground arch spans most of the image width and surrounds the smaller arches and vegetation beyond."
+     ],
+     "value-contrast": [
+      "A nearly white opening occupies much of the upper center, bordered by tall masonry walls and a dark curved band across the top.",
+      "Dense vegetation covers the corridor floor, with scattered exposed stones in the foreground and a low masonry wall along the right."
+     ]
+    }
+   },
+   "proposals": [
+    "rhythm-pattern",
+    "framing",
+    "value-contrast"
+   ],
+   "shown": {
+    "seconds": 4.5,
+    "holds": {
+     "rhythm-pattern": true,
+     "framing": true,
+     "value-contrast": true
+    }
+   },
+   "independent": {
+    "seconds": 4.3,
+    "holds": {
+     "rhythm-pattern": true,
+     "framing": true,
+     "value-contrast": true
+    },
+    "own_reading": [
+     "rhythm-pattern",
+     "framing",
+     "value-contrast",
+     "layered-depth"
+    ]
+   }
+  },
+  {
+   "id": "25",
+   "split": "final",
+   "proposer": {
+    "usable": true,
+    "seconds": 16.5,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "layered-depth": 0.96,
+     "texture-contrast": 0.87,
+     "leading-lines": 0.77
+    },
+    "evidence": {
+     "layered-depth": [
+      "Grass and scattered angular rocks occupy the bottom edge, including a large pale rock near the lower center.",
+      "A blue-green lake occupies the center and lower middle, with fine ripples and broad areas of relatively even surface.",
+      "Grassy, rocky banks curve inward from both sides around the lake toward its far shore.",
+      "Steep green slopes, pale scree, and jagged gray peaks rise behind the far shore across the upper portion."
+     ],
+     "texture-contrast": [
+      "Grass and scattered angular rocks occupy the bottom edge, including a large pale rock near the lower center.",
+      "A blue-green lake occupies the center and lower middle, with fine ripples and broad areas of relatively even surface.",
+      "Steep green slopes, pale scree, and jagged gray peaks rise behind the far shore across the upper portion."
+     ],
+     "leading-lines": [
+      "Grassy, rocky banks curve inward from both sides around the lake toward its far shore.",
+      "Steep green slopes, pale scree, and jagged gray peaks rise behind the far shore across the upper portion."
+     ]
+    }
+   },
+   "proposals": [
+    "layered-depth",
+    "texture-contrast",
+    "leading-lines"
+   ],
+   "shown": {
+    "seconds": 5.2,
+    "holds": {
+     "layered-depth": true,
+     "texture-contrast": true,
+     "leading-lines": false
+    }
+   },
+   "independent": {
+    "seconds": 6.0,
+    "holds": {
+     "layered-depth": true,
+     "texture-contrast": false,
+     "leading-lines": false
+    },
+    "own_reading": [
+     "layered-depth",
+     "color-harmony",
+     "atmospheric-perspective"
+    ]
+   }
+  }
+ ]
+}
