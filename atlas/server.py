@@ -137,7 +137,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     def library(q: str = '', technique: str = '', goal: str = '', provider: str = '', license: str = '',
                 orientation: str = '', color: str = '', state: str = '', favorite: bool = False,
                 collection: int = 0, sort: str = 'newest', limit: int = 60, offset: int = 0):
-        where, params = ['i.removed_at IS NULL'], []
+        where, params = ["i.removed_at IS NULL", "i.status!='pending'"], []
         if q.strip():
             where.append('i.id IN (SELECT rowid FROM images_fts WHERE images_fts MATCH ?)')
             params.append(fts_query(q) or '""')
@@ -186,10 +186,14 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                         "ORDER BY a.role='primary' DESC, a.confidence DESC", ids):
                     names.setdefault(row['image_id'], []).append(
                         {'id': row['technique_id'], 'name': row['name'], 'state': row['state']})
+            waiting = [r['id'] for r in store.rows("SELECT id FROM images WHERE removed_at IS NULL AND status='pending' "
+                                                   "AND id NOT IN (SELECT image_id FROM job_items j JOIN jobs b ON "
+                                                   "b.id=j.job_id WHERE b.state IN ('queued','running','cancelling','paused') "
+                                                   "AND j.image_id IS NOT NULL)")]
         items = [{**row, 'thumb': media_url(row.pop('thumb_path')),
                   'palette': [p['hex'] for p in json.loads(row.pop('palette_json') or '[]')][:4],
                   'techniques': names.get(row['id'], [])} for row in rows]
-        return {'items': items, 'total': total}
+        return {'items': items, 'total': total, 'waiting': waiting}
 
     @app.get('/api/images/{image_id}')
     def image(image_id: int):

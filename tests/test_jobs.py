@@ -153,7 +153,9 @@ def test_budgets_stop_the_job(home):
                                                       'budgets': {'max_analyses': 2}}, 'fake', 'practice')
     worker(home, 'A').run_once()
     with jobs.open_store(home) as store:
-        assert store.one("SELECT COUNT(*) AS n FROM attempts WHERE kind='ai' AND job_id=?", (job_id,))['n'] <= 2
+        assert store.one("SELECT COUNT(*) AS n FROM attempts WHERE kind='ai' AND job_id=? AND item_id IS NOT NULL",
+                         (job_id,))['n'] <= 2  # the planning call is not an image analysis
+        assert store.one("SELECT COUNT(*) AS n FROM images WHERE status='pending'")['n'] == 0  # nothing left unanalysed
         assert store.one("SELECT COUNT(*) AS n FROM job_items WHERE reason='analysis budget reached'")['n'] >= 1
 
 

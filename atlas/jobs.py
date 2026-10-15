@@ -127,6 +127,11 @@ class Worker:
         return self.store.rows(f"SELECT * FROM job_items WHERE job_id=? AND {where} ORDER BY id",
                                (self.job['id'], *parameters))
 
+    def _analysed(self) -> int:
+        """Images this job has sent for analysis (second-model checks are not counted against the budget)."""
+        return self.store.one("SELECT COUNT(*) AS n FROM attempts a JOIN job_items i ON i.id=a.item_id WHERE a.job_id=? "
+                              "AND a.kind='ai' AND a.backend=? AND i.kind='candidate'", (self.job['id'], self.job['backend']))['n']
+
     def _count(self, kind: str) -> int:
         return self.store.one('SELECT COUNT(*) AS n FROM attempts WHERE job_id=? AND kind=?',
                               (self.job['id'], kind))['n']
@@ -403,6 +408,8 @@ class Worker:
     def _download(self, item: dict):
         if self._count('download') >= self._budget('max_downloads'):
             return self._item(item['id'], state='skipped', reason='download budget reached')
+        if self._analysed() >= self._budget('max_analyses'):
+            return self._item(item['id'], state='skipped', reason='analysis budget reached')
         candidate = json.loads(item['payload_json'])
         self._set(stage='checking', message=f"Downloading “{candidate['title'][:60]}”…")
         started = time.monotonic()
@@ -470,7 +477,7 @@ class Worker:
             return self._item(item['id'], state='skipped', reason='image was removed')
         if image['status'] != 'pending':  # analysed already (e.g. before a crash after saving)
             return self._item(item['id'], state='added' if image['status'] == 'ready' else 'no_technique')
-        if self._count('ai') >= self._budget('max_analyses'):
+        if self._analysed() >= self._budget('max_analyses'):
             return self._item(item['id'], state='skipped', reason='analysis budget reached')
         self._set(stage='analyzing', message=f"Analyzing “{image['title'][:60]}”…")
         try:

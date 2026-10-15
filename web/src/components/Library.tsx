@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { media, readOnly } from '../lib/client'
+import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
 import { activeCount, apiPath, EMPTY, fromQuery, nextIndex, toQuery, type Filters } from '../lib/library'
 import { go, href } from '../lib/router'
-import type { LibraryItem } from '../lib/types'
+import type { LibraryItem, Settings } from '../lib/types'
 import { PROVIDERS } from '../lib/types'
 
 const COLORS: [string, string][] = [['red', '#A23B2E'], ['orange', '#C47A3A'], ['yellow', '#C9A646'], ['green', '#4E6A58'],
@@ -14,7 +14,15 @@ export default function Library({ query }: { query: URLSearchParams }) {
   const filters = fromQuery(query)
   const { taxonomy, compare, toggleCompare } = useApp()
   const [limit, setLimit] = useState(60)
-  const { data, error } = useData<{ items: LibraryItem[]; total: number }>(apiPath(filters, limit))
+  const { data, error } = useData<{ items: LibraryItem[]; total: number; waiting?: number[] }>(apiPath(filters, limit))
+  const [queued, setQueued] = useState<string | null>(null)
+  async function analyseWaiting(ids: number[]) {
+    try {
+      const settings = await request<Settings>('settings')
+      const job = await post<{ id: string }>('jobs', { kind: 'analyze', spec: { image_ids: ids, backend: settings.backend } })
+      setQueued(job.id)
+    } catch (reason) { setQueued(null); window.alert((reason as Error).message) }
+  }
   const [text, setText] = useState(filters.q)
   const grid = useRef<HTMLDivElement>(null)
   useEffect(() => setText(filters.q), [filters.q])
@@ -111,6 +119,10 @@ export default function Library({ query }: { query: URLSearchParams }) {
             <span className="mono" style={{ marginLeft: 'auto' }} aria-live="polite">{data ? `Showing ${data.items.length} of ${data.total}` : 'Loading…'}</span>
           </div>
           {error && <p className="notice error" role="alert">{error}</p>}
+          {!readOnly && !!data?.waiting?.length && <p className="notice" role="status">
+            {data.waiting.length} downloaded image{data.waiting.length === 1 ? ' is' : 's are'} waiting for analysis (a job stopped at its budget or was interrupted).{' '}
+            {queued ? <a href={href(`jobs/${queued}`)}>Analysis started — see progress</a>
+              : <button type="button" onClick={() => analyseWaiting(data.waiting!)}>Analyse them now</button>}</p>}
           {data && data.total === 0 && <div className="empty"><p>No images match these filters.</p>
             {!readOnly && <a className="button" href={href('find', { goal: filters.q, technique: filters.technique })}>Find new images like this</a>}</div>}
           <div className="plates" ref={grid} onKeyDown={onGridKey}>
