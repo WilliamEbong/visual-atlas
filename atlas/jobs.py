@@ -485,6 +485,8 @@ class Worker:
         except BackendError as error:
             if error.code in PAUSING:
                 raise
+            if error.code == 'cancelled':
+                return None  # paused or cancelled mid-call: the item stays as it was and resumes later
             # One picture's trouble (a timeout, a provider hiccup) never stops the whole job.
             return self._retry_or_fail(item, error.code, backend_message(error.code, self.job['backend']))
         if outcome == 'retry':
@@ -603,7 +605,8 @@ class Worker:
         except BackendError as error:
             if error.code in PAUSING:
                 raise
-            self._retry_or_fail(item, error.code, backend_message(error.code, self.job['backend']))
+            if error.code != 'cancelled':  # a pause or cancel leaves the item to be resumed
+                self._retry_or_fail(item, error.code, backend_message(error.code, self.job['backend']))
             return True
         if outcome == 'retry':
             self._retry_or_fail(item, 'invalid_response', backend_message('invalid_response', self.job['backend']))

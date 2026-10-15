@@ -24,6 +24,7 @@ from atlas.ai.process import (
 MIN_VERSION = '0.160.0'
 NAME = 'codex'
 PROVIDER_ID = 'atlas-subscription'
+QUOTA = re.compile(r'rate.?limit|quota|usage limit|too many requests|429')
 DISABLED_FEATURES = (
     'shell_tool', 'apps', 'plugins', 'browser_use', 'browser_use_external', 'browser_use_full_cdp_access',
     'computer_use', 'in_app_browser', 'image_generation', 'view_image', 'multi_agent', 'multi_agent_v2',
@@ -109,8 +110,7 @@ def _usage(data: bytes):
                 violation = 'tool_call'
             if event.get('type') in ('error', 'turn.failed'):
                 text = json.dumps(event).lower()
-                violation = violation or ('quota' if any(w in text for w in ('limit', 'quota', 'rate')) else
-                                          'provider_error')
+                violation = violation or ('quota' if QUOTA.search(text) else 'provider_error')
         except (ValueError, KeyError, TypeError, AttributeError, RecursionError):
             violation = violation or 'invalid_response'
     return inputs, outputs, seen, violation
@@ -163,15 +163,16 @@ def run(prompt: str, schema: dict, images: list[Path], *, model: str, record=Non
         check_unsupported_flag(result, argv, record, **metadata)
         if result.failure:
             raise BackendError(result.failure, record, **metadata)
-        if violation:
-            raise BackendError(violation, record, **metadata)
-        if result.returncode:
-            raise BackendError('provider_error', record, **metadata)
         try:
             data = output_path.read_bytes()
             if len(data) > 1_048_576 or not seen:
                 raise ValueError
             output = json_object(data)
         except (OSError, ValueError, UnicodeError, RecursionError):
-            raise BackendError('invalid_response', record, **metadata) from None
+            # No complete answer: report why (a provider error event, a usage limit, or a bad answer).
+            raise BackendError(violation or ('provider_error' if result.returncode else 'invalid_response'),
+                               record, **metadata) from None
+        # A completed turn with a valid answer wins over transient error events earlier in the stream.
+        if result.returncode and violation:
+            raise BackendError(violation, record, **metadata)
     return {'result': output, **metadata, 'model_version': model}

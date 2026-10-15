@@ -125,7 +125,7 @@ def run(prompt: str, schema: dict, images: list[Path], *, model: str, record=Non
         raise BackendError('tool_call', record, **metadata)
     if result.returncode or final.get('is_error') is True:
         text = str(final.get('result', '')).lower()
-        code = 'quota' if any(word in text for word in ('limit', 'quota', 'rate')) else 'provider_error'
+        code = 'quota' if re.search(r'rate.?limit|quota|usage limit|too many requests|429', text) else 'provider_error'
         raise BackendError(code, record, **metadata)
     output = final.get('structured_output')
     if not isinstance(output, dict):
