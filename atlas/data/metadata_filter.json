@@ -1,0 +1,19 @@
+{
+  "version": "2026-10-15.1",
+  "note": "Phrases that mark a candidate as a record shot rather than a picture worth filing for its technique: specimen and catalogue records, documentation and technical photographs, and pages of text. Matched as whole words in the title, medium and description before download. Written from the sources' own field vocabularies before any evaluation case was seen (docs/evaluation/v0.3/METADATA-GATE.md). Edit freely; a skipped candidate shows the phrase that matched.",
+  "fields": ["title", "medium", "description"],
+  "rules": [
+    {"id": "specimen-record", "label": "a specimen or catalogue record",
+     "phrases": ["herbarium specimen", "herbarium sheet", "specimen sheet", "type specimen", "voucher specimen", "botanical specimen",
+                 "zoological specimen", "catalog number", "catalogue number", "usnm", "nmnh", "specimen record"]},
+    {"id": "documentation-photo", "label": "a documentation or technical photograph",
+     "phrases": ["installation view", "exhibition view", "exhibit hall", "gallery view", "documentation photograph",
+                 "record photograph", "object photograph", "conservation photograph", "condition photograph", "x radiograph",
+                 "x ray", "infrared reflectogram", "ultraviolet fluorescence", "raking light", "verso", "reverse side",
+                 "back of the", "mount and label", "label text"]},
+    {"id": "text-page", "label": "a page of text",
+     "phrases": ["letter", "manuscript page", "typescript", "title page", "text page", "page of text", "handwritten letter",
+                 "certificate", "receipt", "invoice", "ledger", "deed", "document", "correspondence", "telegram",
+                 "transcript", "inventory list"]}
+  ]
+}

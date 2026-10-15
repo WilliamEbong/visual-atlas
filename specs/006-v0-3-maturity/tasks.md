@@ -3,7 +3,7 @@
 ## Phase 1: Setup and pre-registration
 - [x] T601 Version 0.3.0; principles recorded; v0.2.0 publish evidence in BUILD-STATE (pyproject.toml, atlas/__init__.py, web/package.json, BUILD-STATE.md)
 - [x] T602 Fresh final holdout briefs written and coded before any coder change; coding criteria fixed (docs/evaluation/v0.3/briefs-final.json, docs/evaluation/v0.3/CODING-GATE.md)
-- [ ] T603 Metadata-filter criteria and case set (≥ 10 negatives, labelled from thumbnails) fixed before any arm runs (docs/evaluation/v0.3/METADATA-GATE.md, docs/evaluation/v0.3/metadata-cases.json)
+- [x] T603 Metadata-filter criteria and case set (≥ 10 negatives, labelled from thumbnails) fixed before any arm runs (docs/evaluation/v0.3/METADATA-GATE.md, docs/evaluation/v0.3/metadata-cases.json)
 
 ## Phase 2: Foundation — visual system and shared states (US1, US2, US4)
 - [x] T604 Tokens, type, horizon header, buttons, fields, plates, trays, dark mode, reduced motion (web/src/styles.css)

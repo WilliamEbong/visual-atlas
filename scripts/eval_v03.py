@@ -98,9 +98,81 @@ def coding_eval(split: str):
     print(json.dumps({k: v for k, v in result.items() if not k.endswith('_rows')}, indent=1, ensure_ascii=False))
 
 
+# ---- metadata filter: case collection (labels come from thumbnails only; see METADATA-GATE.md) -------------
+QUERIES = {'smithsonian': ['insect specimen', 'herbarium', 'exhibit hall', 'letter', 'landscape'],
+           'commons': ['museum exhibit', 'handwritten letter', 'herbarium sheet', 'sunset'],
+           'met': ['fragment', 'letter', 'landscape'], 'aic': ['photograph', 'letter', 'portrait'],
+           'cma': ['textile fragment', 'landscape'], 'rijksmuseum': ['letter', 'ship'], 'nga': ['page', 'harbor']}
+CASES = EVAL / 'metadata-cases.json'
+
+
+def collect(scratch: Path):
+    """Live searches; keeps rights-eligible candidates and a small thumbnail of each. Prints no catalogue text."""
+    from io import BytesIO
+
+    from PIL import Image
+
+    from atlas import providers, rights
+    from atlas.fetch import Fetcher, FetchError
+    policies = catalog.load()[1]
+    fetcher = Fetcher(policies)
+    thumbs = scratch / 'thumbs'
+    thumbs.mkdir(parents=True, exist_ok=True)
+    cases, seen = [], set()
+    for provider, queries in QUERIES.items():
+        for query in queries:
+            try:
+                found = providers.search(fetcher, provider, query, 0, 6, home=scratch / 'home')
+            except FetchError as error:
+                print(f'{provider} "{query}": {error.code}')
+                continue
+            kept = 0
+            for candidate in found:
+                key = (candidate['provider'], candidate['provider_item_id'])
+                if key in seen or not rights.check(candidate, catalog.policy(policies, provider))['eligible']:
+                    continue
+                try:
+                    data = fetcher.get_image(provider, candidate['image_url'], headers=candidate.get('image_headers'))
+                except FetchError:
+                    continue
+                image = Image.open(BytesIO(data)).convert('RGB')
+                image.thumbnail((300, 300))
+                number = len(cases) + 1
+                image.save(thumbs / f'{number:03d}.jpg', quality=85)
+                seen.add(key)
+                cases.append({'case': number, 'provider': provider, 'provider_item_id': candidate['provider_item_id'],
+                              'query': query, 'title': candidate.get('title', ''), 'medium': candidate.get('medium', ''),
+                              'description': candidate.get('description', ''), 'source_url': candidate['source_url'],
+                              'image_sha256': hashlib.sha256(data).hexdigest(), 'label': None})
+                kept += 1
+                if kept == 3:
+                    break
+            print(f'{provider} "{query}": {kept} kept')
+    (scratch / 'cases-unlabelled.json').write_text(json.dumps(cases, indent=1, ensure_ascii=False), encoding='utf-8')
+    sheet(thumbs, scratch)
+    print(f'{len(cases)} cases; contact sheets in {scratch}')
+
+
+def sheet(thumbs: Path, scratch: Path, per_sheet: int = 30):
+    """Numbered contact sheets: pictures and numbers only, no catalogue text."""
+    from PIL import Image, ImageDraw
+    files = sorted(thumbs.glob('*.jpg'))
+    for start in range(0, len(files), per_sheet):
+        chunk = files[start:start + per_sheet]
+        board = Image.new('RGB', (6 * 310, 5 * 330), (243, 239, 228))
+        draw = ImageDraw.Draw(board)
+        for i, path in enumerate(chunk):
+            x, y = (i % 6) * 310 + 5, (i // 6) * 330 + 25
+            board.paste(Image.open(path), (x, y))
+            draw.text((x, y - 20), path.stem, fill=(29, 28, 26))
+        board.save(scratch / f'sheet-{start // per_sheet + 1}.png')
+
+
 if __name__ == '__main__':
     command = sys.argv[1:] or ['coding', 'dev']
     if command[0] == 'coding':
         coding_eval(command[1] if len(command) > 1 else 'dev')
+    elif command[0] == 'collect-metadata':
+        collect(Path(command[1]))
     else:
         raise SystemExit(__doc__)

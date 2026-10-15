@@ -27,4 +27,4 @@ catalogue text and the thumbnail's sha256, and the file's hash is recorded below
 rule. Settings can switch the filter off. The Jev arm, if adopted, stays off by default and needs the user's own
 key.
 
-**Case file hash:** recorded here when the case file is written, before scoring.
+**Case file hash:** `metadata-cases.json` sha256 prefix `962dfd24a47f717a`, recorded when the file was written, before any arm ran. It holds 47 cases, 18 of them negative.
