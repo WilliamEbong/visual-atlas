@@ -4,9 +4,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-Finish README screenshots + GIF from the real library (library, image, technique done), reset the real library's
-`welcomed` setting to 0, export the starter pack, build the demo, fresh-install test from the release zip, final
-gates, publish (repo, v0.1.0 tag, Pages), WELCOME-BACK.md.
+Publish: create public repo WilliamEbong/visual-atlas, push main, enable Pages (GitHub Actions), tag v0.1.0,
+check CI/release/Pages, then record the results here and give the owner the final report.
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —
@@ -23,6 +22,7 @@ gates, publish (repo, v0.1.0 tag, Pages), WELCOME-BACK.md.
 - `/design` is the Claude Desktop host command that creates a "Design" Artifact canvas (not a skill file); style input archive-of-looking.
 - Spec Kit project skills were installed after this session started, so the Skill tool cannot load them by name;
   the build follows the installed `.claude/skills/speckit-*/SKILL.md` instructions directly (read 2026-10-15, lean preset).
+- WELCOME-BACK.md (the owner handoff) stays local and gitignored: it is personal and lists local paths.
 - Manual upload / URL import skipped (brief marks upload optional); the SSRF-safe fetcher protects all provider downloads.
 
 ## Done
@@ -74,6 +74,13 @@ gates, publish (repo, v0.1.0 tag, Pages), WELCOME-BACK.md.
    conditional, then the state is read again). Review rounds stop here (bound of 3).
 
 ## Verification evidence
+- Release zip (local build, 24.6 MB) extracted to a scratch folder; `scripts/install-atlas.ps1 -NoShortcuts -NoLaunch`
+  with a scratch VISUAL_ATLAS_HOME: dependencies, screens, starter (85 references), `atlas doctor` (Codex 0.160.0 and
+  Claude 2.1.284 ready); the installed server showed the welcome dialog and 85 references (Playwright,
+  design-review/journeys/10-fresh-install-welcome.png).
+- Demo built from the starter (85 images, 20 MB) and checked in Playwright: library, image page, credits, no errors.
+- README media taken with Playwright from the real library and a scratch copy of it (find and project directions
+  were live runs there: 2 images added by Codex + Claude check; 4 grounded directions by Codex).
 - Offline: `uv run pytest` 290 passed (7 live deselected); `npm --prefix web test` 6 passed; ruff clean; tsc clean.
 - Real library (`%USERPROFILE%\VisualAtlas`): 85 ready references after curation (removed an order form and a burst
   frame), all 26 techniques with >=1 example, 24 with >=2; annotations 169 model_reviewed, 46 proposed.
