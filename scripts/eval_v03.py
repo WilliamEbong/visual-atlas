@@ -168,11 +168,70 @@ def sheet(thumbs: Path, scratch: Path, per_sheet: int = 30):
         board.save(scratch / f'sheet-{start // per_sheet + 1}.png')
 
 
+CASES_SHA = '962dfd24a47f717a'
+JEV_QUESTION = {'doc': {'type': 'noul', 'instructions': 'Based only on this catalogue record, is the image most likely a '
+                        'plain documentation photograph (an object on a plain background, a coin, a specimen) or a page '
+                        'of text, rather than a composed picture?'}}  # the v1.1 question, unchanged
+
+
+def decide(rows: list[dict], arm: str) -> dict:
+    negatives = [r for r in rows if r['label'] == 'negative']
+    positives = [r for r in rows if r['label'] == 'positive']
+    skipped_negatives = sum(r[arm] for r in negatives)
+    skipped_positives = sum(r[arm] for r in positives)
+    enough = len(negatives) >= 10
+    holds = skipped_positives == 0 and skipped_negatives * 2 >= len(negatives)
+    return {'negatives_skipped': eval_v11.rate(skipped_negatives, len(negatives)),
+            'positives_skipped': eval_v11.rate(skipped_positives, len(positives)),
+            'criteria_hold': holds, 'enough_negatives': enough,
+            'decision': 'integrate' if holds and enough else 'promising, deferred' if holds else 'not integrated'}
+
+
+RULES = EVAL / 'metadata-rules.json'  # the deterministic arm, written before the cases were collected
+
+
+def rule_match(case: dict, data: dict) -> dict | None:
+    """The first rule phrase found, as whole words, in the title, medium or description."""
+    text = f" {' '.join(coding.words(' '.join(str(case.get(field) or '') for field in data['fields'])))} "
+    for rule in data['rules']:
+        for phrase in rule['phrases']:
+            normal = ' '.join(coding.words(phrase))
+            if normal and f' {normal} ' in text:
+                return {'rule': rule['id'], 'label': rule['label'], 'phrase': phrase}
+    return None
+
+
+def metadata_eval(env_file: str | None):
+    data = json.loads(RULES.read_text(encoding='utf-8'))
+    digest = hashlib.sha256(CASES.read_bytes()).hexdigest()[:16]
+    if digest != CASES_SHA:
+        raise SystemExit(f'metadata-cases.json changed since it was frozen ({digest} != {CASES_SHA})')
+    cases = json.loads(CASES.read_text(encoding='utf-8'))['cases']
+    rows = []
+    for case in cases:
+        hit = rule_match(case, data)
+        rows.append({'case': case['case'], 'provider': case['provider'], 'label': case['label'],
+                     'uncertain': case['label_uncertain'], 'rules': bool(hit), 'rule': hit})
+    result = {'cases': len(rows), 'negatives': sum(r['label'] == 'negative' for r in rows), 'rules': decide(rows, 'rules')}
+    if env_file:
+        jev = eval_v11.Jev(eval_v11.jev_key(env_file))
+        for case, row in zip(cases, rows):
+            state = {k: case[k] for k in ('title', 'medium', 'description')} | {'source': case['provider']}
+            row['jev_p'] = round(jev.ask(state, JEV_QUESTION)['doc'], 3)
+            row['jev'] = row['jev_p'] >= 0.8
+        result['jev'] = decide(rows, 'jev') | {'calls': len(jev.calls), 'failures': jev.failures, 'spent_usd': round(jev.spent, 4)}
+    result['rows'] = rows
+    (EVAL / 'metadata-results.json').write_text(json.dumps(result, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
+    print(json.dumps({k: v for k, v in result.items() if k != 'rows'}, indent=1))
+
+
 if __name__ == '__main__':
     command = sys.argv[1:] or ['coding', 'dev']
     if command[0] == 'coding':
         coding_eval(command[1] if len(command) > 1 else 'dev')
     elif command[0] == 'collect-metadata':
         collect(Path(command[1]))
+    elif command[0] == 'metadata':
+        metadata_eval(command[2] if len(command) > 2 and command[1] == '--env-file' else None)
     else:
         raise SystemExit(__doc__)

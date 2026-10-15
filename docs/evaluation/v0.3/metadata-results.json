@@ -1,0 +1,589 @@
+{
+ "cases": 47,
+ "negatives": 18,
+ "rules": {
+  "negatives_skipped": {
+   "k": 11,
+   "n": 18,
+   "rate": 0.61,
+   "ci95": [
+    0.39,
+    0.8
+   ]
+  },
+  "positives_skipped": {
+   "k": 5,
+   "n": 29,
+   "rate": 0.17,
+   "ci95": [
+    0.08,
+    0.35
+   ]
+  },
+  "criteria_hold": false,
+  "enough_negatives": true,
+  "decision": "not integrated"
+ },
+ "jev": {
+  "negatives_skipped": {
+   "k": 10,
+   "n": 18,
+   "rate": 0.56,
+   "ci95": [
+    0.34,
+    0.75
+   ]
+  },
+  "positives_skipped": {
+   "k": 5,
+   "n": 29,
+   "rate": 0.17,
+   "ci95": [
+    0.08,
+    0.35
+   ]
+  },
+  "criteria_hold": false,
+  "enough_negatives": true,
+  "decision": "not integrated",
+  "calls": 47,
+  "failures": 0,
+  "spent_usd": 0.0008
+ },
+ "rows": [
+  {
+   "case": 1,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.19,
+   "jev": false
+  },
+  {
+   "case": 2,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.23,
+   "jev": false
+  },
+  {
+   "case": 3,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.6,
+   "jev": false
+  },
+  {
+   "case": 4,
+   "provider": "commons",
+   "label": "positive",
+   "uncertain": true,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.25,
+   "jev": false
+  },
+  {
+   "case": 5,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.92,
+   "jev": true
+  },
+  {
+   "case": 6,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.93,
+   "jev": true
+  },
+  {
+   "case": 7,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "specimen-record",
+    "label": "a specimen or catalogue record",
+    "phrase": "herbarium sheet"
+   },
+   "jev_p": 0.92,
+   "jev": true
+  },
+  {
+   "case": 8,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "specimen-record",
+    "label": "a specimen or catalogue record",
+    "phrase": "herbarium sheet"
+   },
+   "jev_p": 0.91,
+   "jev": true
+  },
+  {
+   "case": 9,
+   "provider": "commons",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "specimen-record",
+    "label": "a specimen or catalogue record",
+    "phrase": "herbarium sheet"
+   },
+   "jev_p": 0.9,
+   "jev": true
+  },
+  {
+   "case": 10,
+   "provider": "commons",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.03,
+   "jev": false
+  },
+  {
+   "case": 11,
+   "provider": "commons",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.04,
+   "jev": false
+  },
+  {
+   "case": 12,
+   "provider": "commons",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.03,
+   "jev": false
+  },
+  {
+   "case": 13,
+   "provider": "met",
+   "label": "positive",
+   "uncertain": true,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.83,
+   "jev": true
+  },
+  {
+   "case": 14,
+   "provider": "met",
+   "label": "positive",
+   "uncertain": true,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.8,
+   "jev": true
+  },
+  {
+   "case": 15,
+   "provider": "met",
+   "label": "negative",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.85,
+   "jev": true
+  },
+  {
+   "case": 16,
+   "provider": "met",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.9,
+   "jev": true
+  },
+  {
+   "case": 17,
+   "provider": "met",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.85,
+   "jev": true
+  },
+  {
+   "case": 18,
+   "provider": "met",
+   "label": "positive",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "documentation-photo",
+    "label": "a documentation or technical photograph",
+    "phrase": "verso"
+   },
+   "jev_p": 0.39,
+   "jev": false
+  },
+  {
+   "case": 19,
+   "provider": "met",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.28,
+   "jev": false
+  },
+  {
+   "case": 20,
+   "provider": "met",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.18,
+   "jev": false
+  },
+  {
+   "case": 21,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.23,
+   "jev": false
+  },
+  {
+   "case": 22,
+   "provider": "aic",
+   "label": "negative",
+   "uncertain": true,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.76,
+   "jev": false
+  },
+  {
+   "case": 23,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.29,
+   "jev": false
+  },
+  {
+   "case": 24,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.41,
+   "jev": false
+  },
+  {
+   "case": 25,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.13,
+   "jev": false
+  },
+  {
+   "case": 26,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.48,
+   "jev": false
+  },
+  {
+   "case": 27,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.38,
+   "jev": false
+  },
+  {
+   "case": 28,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.2,
+   "jev": false
+  },
+  {
+   "case": 29,
+   "provider": "aic",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.18,
+   "jev": false
+  },
+  {
+   "case": 30,
+   "provider": "cma",
+   "label": "positive",
+   "uncertain": true,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.83,
+   "jev": true
+  },
+  {
+   "case": 31,
+   "provider": "cma",
+   "label": "positive",
+   "uncertain": true,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.84,
+   "jev": true
+  },
+  {
+   "case": 32,
+   "provider": "cma",
+   "label": "positive",
+   "uncertain": true,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.84,
+   "jev": true
+  },
+  {
+   "case": 33,
+   "provider": "cma",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.26,
+   "jev": false
+  },
+  {
+   "case": 34,
+   "provider": "cma",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.07,
+   "jev": false
+  },
+  {
+   "case": 35,
+   "provider": "cma",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.1,
+   "jev": false
+  },
+  {
+   "case": 36,
+   "provider": "rijksmuseum",
+   "label": "positive",
+   "uncertain": true,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.7,
+   "jev": false
+  },
+  {
+   "case": 37,
+   "provider": "rijksmuseum",
+   "label": "positive",
+   "uncertain": true,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.55,
+   "jev": false
+  },
+  {
+   "case": 38,
+   "provider": "rijksmuseum",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "letter"
+   },
+   "jev_p": 0.79,
+   "jev": false
+  },
+  {
+   "case": 39,
+   "provider": "rijksmuseum",
+   "label": "negative",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.84,
+   "jev": true
+  },
+  {
+   "case": 40,
+   "provider": "rijksmuseum",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.07,
+   "jev": false
+  },
+  {
+   "case": 41,
+   "provider": "rijksmuseum",
+   "label": "negative",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.86,
+   "jev": true
+  },
+  {
+   "case": 42,
+   "provider": "nga",
+   "label": "negative",
+   "uncertain": true,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "title page"
+   },
+   "jev_p": 0.35,
+   "jev": false
+  },
+  {
+   "case": 43,
+   "provider": "nga",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "title page"
+   },
+   "jev_p": 0.45,
+   "jev": false
+  },
+  {
+   "case": 44,
+   "provider": "nga",
+   "label": "negative",
+   "uncertain": false,
+   "rules": true,
+   "rule": {
+    "rule": "text-page",
+    "label": "a page of text",
+    "phrase": "title page"
+   },
+   "jev_p": 0.71,
+   "jev": false
+  },
+  {
+   "case": 45,
+   "provider": "nga",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.12,
+   "jev": false
+  },
+  {
+   "case": 46,
+   "provider": "nga",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.13,
+   "jev": false
+  },
+  {
+   "case": 47,
+   "provider": "nga",
+   "label": "positive",
+   "uncertain": false,
+   "rules": false,
+   "rule": null,
+   "jev_p": 0.16,
+   "jev": false
+  }
+ ]
+}

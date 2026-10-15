@@ -29,7 +29,7 @@
 - [x] T618 Coding evaluation: dev decision, final once, report (scripts/eval_v03.py, docs/evaluation/v0.3/)
 
 ## Phase 6: Metadata filter (US7)
-- [ ] T619 Deterministic rules and Jev arm evaluated per METADATA-GATE.md; integrate only a passing arm (skip reason, Settings switch) + tests (atlas/data/metadata_filter.json, atlas/jobs.py, atlas/server.py, tests/)
+- [x] T619 Deterministic rules and Jev arm evaluated per METADATA-GATE.md; integrate only a passing arm (skip reason, Settings switch) + tests (atlas/data/metadata_filter.json, atlas/jobs.py, atlas/server.py, tests/)
 
 ## Phase 7: Polish, verification and release
 - [ ] T620 axe scans (light, dark) and layout-shift measurement; fix findings (web/package.json devDependency axe-core)

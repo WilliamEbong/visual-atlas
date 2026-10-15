@@ -1,6 +1,6 @@
 {
   "version": "2026-10-15.1",
-  "note": "Phrases that mark a candidate as a record shot rather than a picture worth filing for its technique: specimen and catalogue records, documentation and technical photographs, and pages of text. Matched as whole words in the title, medium and description before download. Written from the sources' own field vocabularies before any evaluation case was seen (docs/evaluation/v0.3/METADATA-GATE.md). Edit freely; a skipped candidate shows the phrase that matched.",
+  "note": "Evaluated arm, not part of the app (it failed the gate in METADATA-GATE.md; see REPORT.md). Phrases that mark a candidate as a record shot rather than a picture worth filing for its technique: specimen and catalogue records, documentation and technical photographs, and pages of text. Matched as whole words in the title, medium and description before download. Written from the sources' own field vocabularies before any evaluation case was seen (docs/evaluation/v0.3/METADATA-GATE.md). Edit freely; a skipped candidate shows the phrase that matched.",
   "fields": ["title", "medium", "description"],
   "rules": [
     {"id": "specimen-record", "label": "a specimen or catalogue record",
