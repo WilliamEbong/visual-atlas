@@ -301,14 +301,6 @@ class Store:
             self.refresh_search(image_id)
             return image_id
 
-    def set_image_status(self, image_id: int, status: str, analysis_id: int | None = None):
-        with self.transaction():
-            changes = {'status': status}
-            if analysis_id is not None:
-                changes['analysis_id'] = analysis_id
-            self._update('images', 'id', image_id, changes)
-            self.refresh_search(image_id)
-
     def set_favorite(self, image_id: int, favorite: bool):
         with self.transaction():
             if not self._update('images', 'id', image_id, {'favorite': int(favorite)}):
@@ -401,8 +393,11 @@ class Store:
 
     def apply_analysis(self, image_id: int, analysis_id: int, techniques: list[dict], changed_by: str,
                        min_confidence: float = .4, fence: tuple | None = None) -> dict:
-        """Merge model-proposed techniques without ever overwriting a person's decision."""
-        applied, kept = [], []
+        """Make `analysis_id` the image's current analysis. Its techniques become the active model labels; an
+        unlocked label it does not name is superseded (a history row, then removed), so old evidence stays auditable
+        without being shown as current. A person's decisions are never touched. An empty list supersedes every
+        model label (an unusable picture, or nothing clear)."""
+        applied, kept, superseded = [], [], []
         with self.transaction():
             if fence:
                 self._fence(*fence)
@@ -429,10 +424,21 @@ class Store:
                     self._insert('annotations', {**values, 'image_id': image_id,
                                                  'technique_id': item['technique_id'], 'state': 'proposed'})
                 applied.append(item['technique_id'])
+            for old in self.rows('SELECT * FROM annotations WHERE image_id=? AND human_locked=0', (image_id,)):
+                if old['technique_id'] in applied:
+                    continue
+                self._insert('annotation_history', {
+                    **{k: old[k] for k in ('image_id', 'technique_id', 'role', 'evidence_json', 'effect', 'confidence')},
+                    'annotation_id': old['id'], 'state': 'superseded', 'analysis_id': analysis_id, 'human_locked': 0,
+                    'changed_by': changed_by, 'note': f"superseded: the newer analysis does not name it (was {old['state']})",
+                    'created_at': now()})
+                self.connection.execute('DELETE FROM annotations WHERE id=?', (old['id'],))
+                superseded.append(old['technique_id'])
+            active = self.one("SELECT 1 FROM annotations WHERE image_id=? AND state!='rejected' LIMIT 1", (image_id,))
             self._update('images', 'id', image_id, {'analysis_id': analysis_id,
-                                                    'status': 'ready' if applied or kept else 'unanalyzed'})
+                                                    'status': 'ready' if active else 'unanalyzed'})
             self.refresh_search(image_id)
-        return {'applied': applied, 'kept_human': kept}
+        return {'applied': applied, 'kept_human': kept, 'superseded': superseded, 'active': active is not None}
 
     def apply_verdicts(self, image_id: int, analysis_id: int, verdicts: list[dict], changed_by: str,
                        fence: tuple | None = None) -> dict:
@@ -601,6 +607,14 @@ class Store:
         with self.transaction():
             self._fence(job_id, owner)
             self._update('job_items', 'id', item_id, {**changes, 'updated_at': now()})
+
+    def delay_provider(self, job_id: str, owner: str, provider: str, until: float):
+        """A provider asked us to wait: hold every pending search and download for it in this job until then."""
+        with self.transaction():
+            self._fence(job_id, owner)
+            self.connection.execute("UPDATE job_items SET next_attempt_at=MAX(next_attempt_at, ?), updated_at=? "
+                                    "WHERE job_id=? AND provider=? AND state IN ('pending','eligible')",
+                                    (until, now(), job_id, provider))
 
     def record_attempt(self, record: dict) -> int:
         with self.transaction():

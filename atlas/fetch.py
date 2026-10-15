@@ -42,6 +42,7 @@ class Fetcher:
                                    timeout=httpx.Timeout(30, connect=10),
                                    headers={'User-Agent': self.user_agent})
         self._last: dict[str, float] = {}
+        self._cooldown: dict[str, float] = {}  # provider -> monotonic time before which it asked us not to call
         self._lock = threading.Lock()
 
     def close(self):
@@ -77,6 +78,9 @@ class Fetcher:
             self._last[provider] = time.monotonic()
 
     def get(self, provider: str, url: str, *, max_bytes: int, types: tuple[str, ...], headers=None) -> bytes:
+        wait = self._cooldown.get(provider, 0) - time.monotonic()
+        if wait > 0:  # refuse at once instead of sleeping; the job schedules the retry
+            raise FetchError('rate_limited', f'{self.policies[provider]["name"]} asked us to slow down.', wait)
         for _ in range(MAX_REDIRECTS + 1):
             self.check_url(provider, url)
             self._throttle(provider)
@@ -101,12 +105,14 @@ class Fetcher:
                             raise FetchError('blocked_url', 'The redirect contains an invalid address.') from None
                         continue
                     if response.status_code in (429, 503):
-                        retry = response.headers.get('retry-after', '')
+                        retry = response.headers.get('retry-after', '').strip()
                         try:
                             retry_after = (float(retry) if retry.isdigit() else
                                            max(0.0, parsedate_to_datetime(retry).timestamp() - time.time()))
                         except (TypeError, ValueError, OverflowError):
-                            retry_after = None
+                            retry_after = None  # malformed: the job falls back to its own back-off
+                        if retry_after:
+                            self._cooldown[provider] = time.monotonic() + retry_after
                         raise FetchError('rate_limited', f'{self.policies[provider]["name"]} asked us to slow down.',
                                          retry_after)
                     if response.status_code != 200:

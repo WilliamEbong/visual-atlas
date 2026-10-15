@@ -27,6 +27,13 @@ BACKEND_NAMES = {'codex': 'Codex', 'claude': 'Claude Code', 'fake': 'Practice mo
 LEASE_SECONDS = 60
 HEARTBEAT_SECONDS = 5
 DEFAULT_BUDGETS = {'max_searches': 10, 'max_candidates': 80, 'max_downloads': 30, 'max_analyses': 12}
+MAX_PROVIDER_WAIT = 3600  # a provider asking for longer than an hour is capped and reported
+VERIFY_BATCH = 6  # the verifier contract judges at most six proposals per call
+MISSING_FILE = 'The image file is missing from the library folder; remove the image and find it again.'
+CHECK_NOTES = {'unavailable': 'not checked: the checking assistant is unavailable',
+               'invalid': 'not checked: the check did not pass validation',
+               'retry': 'not checked: the checking assistant reported an error',
+               'missing': 'not checked: the image file is missing'}
 DAILY_AI_CAP = 120
 clock = time.time  # retry back-off clock (tests replace it; leases use the real clock in store.py)
 RETRYABLE = {'timeout', 'network', 'rate_limited', 'http_500', 'http_502', 'http_503', 'http_504', 'http_521',
@@ -78,6 +85,7 @@ class Worker:
         self.backends = backends or BACKENDS
         self.sleep = sleep
         self.activity = 0  # bumped on every step; the app launcher treats a running job as activity
+        self._verifier_down = None  # set when the checking assistant is unavailable for the rest of a job
 
     # ---- entry points ---------------------------------------------------------------------------
     def run_once(self, job_id: str | None = None) -> str | None:
@@ -165,17 +173,26 @@ class Worker:
         self._set(state='paused', stage='paused', message=message[:500], error_code=code, lease_owner=None,
                   lease_until=None)
 
-    def _retry_or_fail(self, item: dict, code: str, message: str):
+    def _retry_or_fail(self, item: dict, code: str, message: str, retry_after: float | None = None):
         attempts = item['attempts'] + 1
         if code in RETRYABLE and attempts < 3:
-            self._item(item['id'], attempts=attempts, next_attempt_at=clock() + min(5 * 2 ** attempts, 300),
-                       reason=f'retrying: {message}')
+            delay = min(5 * 2 ** attempts, 300)
+            if retry_after is not None:  # the provider said how long to wait: never sooner, at most an hour
+                delay = max(delay, min(retry_after, MAX_PROVIDER_WAIT))
+                if retry_after > MAX_PROVIDER_WAIT:
+                    message += f' It asked for {round(retry_after / 60)} minutes; trying again in an hour.'
+            until = clock() + delay
+            if code == 'rate_limited':
+                self.store.delay_provider(self.job['id'], self.owner, item['provider'], until)
+            self._item(item['id'], attempts=attempts, next_attempt_at=until, reason=f'retrying: {message}')
         else:
             self._item(item['id'], attempts=attempts, state='failed', reason=message[:300])
 
     # ---- AI calls -----------------------------------------------------------------------------
     def _call(self, task: str, prompt: str, schema: dict, image_paths: list[Path], *, item_id=None,
-              backend: str | None = None) -> dict:
+              backend: str | None = None, validate=None) -> dict:
+        """Run one AI call. `validate(result)` checks the answer; an answer that fails is recorded in the attempt
+        ledger as invalid_response and raises tasks.InvalidResult (nothing is saved)."""
         backend = backend or self.job['backend']
         model = (self.spec.get('models') or {}).get(task) or tasks.DEFAULT_MODELS[backend][task]
         if backend != 'fake':
@@ -183,22 +200,25 @@ class Worker:
             if self._ai_today() >= (int(row['value']) if row else DAILY_AI_CAP):
                 raise BackendError('daily_cap')
         started = time.monotonic()
+        attempt = {'job_id': self.job['id'], 'item_id': item_id, 'kind': 'ai', 'backend': backend, 'model': model}
         try:
             answer = self.backends[backend].run(prompt, schema, image_paths, model=model, record=item_id,
                                                 cancel=self._cancel)
         except BackendError as error:
-            self.store.record_attempt({'job_id': self.job['id'], 'item_id': item_id, 'kind': 'ai', 'backend': backend,
-                                       'model': model, 'status': 'error', 'error_code': error.code,
+            self.store.record_attempt({**attempt, 'status': 'error', 'error_code': error.code,
                                        'input_tokens': error.input_tokens, 'output_tokens': error.output_tokens,
                                        'latency_ms': int((time.monotonic() - started) * 1000),
                                        'cli_version': error.cli_version})
             raise
-        self.store.record_attempt({'job_id': self.job['id'], 'item_id': item_id, 'kind': 'ai', 'backend': backend,
-                                   'model': model, 'status': 'ok', 'input_tokens': answer['input_tokens'],
-                                   'output_tokens': answer['output_tokens'],
-                                   'latency_ms': int((time.monotonic() - started) * 1000),
-                                   'cli_version': answer['cli_version']})
-        return {**answer, 'backend': backend, 'model': model}
+        usage = {'input_tokens': answer['input_tokens'], 'output_tokens': answer['output_tokens'],
+                 'latency_ms': int((time.monotonic() - started) * 1000), 'cli_version': answer['cli_version']}
+        try:
+            result = validate(answer['result']) if validate else answer['result']
+        except tasks.InvalidResult:
+            self.store.record_attempt({**attempt, **usage, 'status': 'error', 'error_code': 'invalid_response'})
+            raise
+        self.store.record_attempt({**attempt, **usage, 'status': 'ok'})
+        return {**answer, 'result': result, 'backend': backend, 'model': model}
 
     def _save_analysis(self, task: str, answer: dict, result: dict, *, image_id=None, input_sha='', cache_key=''):
         return self.store.add_analysis(fence=(self.job['id'], self.owner), record={
@@ -275,7 +295,7 @@ class Worker:
         if not self._items("kind='query'"):
             return self._plan()
         if self._added() >= target:
-            return self._done(f'Ready. Added {self._added()} images.')
+            return self._done(self._summary())
         now_ = clock()
         for state, step in (('downloaded', self._analyze), ('eligible', self._download), ('found', self._permission)):
             item = self.store.one("SELECT * FROM job_items WHERE job_id=? AND kind='candidate' AND state=? AND "
@@ -297,25 +317,69 @@ class Worker:
             return None
         return self._done(self._summary(exhausted=True))
 
+    def _check_summary(self, lead: str = 'Second-model check finished.') -> str:
+        """Verify and Analyse jobs: how many images were really checked, and why the others were not."""
+        rows = self.store.rows("SELECT state, reason, json_extract(payload_json,'$.check') AS checked FROM job_items "
+                               "WHERE job_id=? AND kind='candidate'", (self.job['id'],))
+        plural = 's' if len(rows) != 1 else ''
+        if self.job['kind'] == 'verify':
+            checked = sum(r['state'] == 'added' for r in rows)
+            parts = [f'Ready. {lead} Checked {checked} of {len(rows)} image{plural}.']
+            failed = [r for r in rows if r['state'] == 'failed']
+            skipped = [r for r in rows if r['state'] == 'skipped']
+            if failed:
+                parts.append(f"{len(failed)} could not be checked ({failed[0]['reason'][:120]}). Run the check again later.")
+            if skipped:
+                parts.append(f'{len(skipped)} had nothing to check.')
+            return ' '.join(parts)
+        added = sum(r['state'] == 'added' for r in rows)
+        parts = [f'Ready. {lead} {added} of {len(rows)} image{plural} have techniques.']
+        unchecked = sum(r['state'] == 'added' and r['checked'] not in (None, 'checked', 'nothing') for r in rows)
+        if unchecked:
+            parts.append(f'{unchecked} could not be checked by the second model.')
+        return ' '.join(parts)
+
     def _done(self, message: str):
         self._finish('done', message)
         return False
 
     def _summary(self, exhausted=False) -> str:
-        counts = {row['state']: row['n'] for row in self.store.rows(
-            "SELECT state, COUNT(*) AS n FROM job_items WHERE job_id=? AND kind='candidate' GROUP BY state",
-            (self.job['id'],))}
+        """What the job did, what the checks did, and (if it stopped short) exactly why."""
+        rows = self.store.rows("SELECT state, reason, json_extract(payload_json,'$.check') AS checked FROM job_items "
+                               "WHERE job_id=? AND kind='candidate'", (self.job['id'],))
+        counts = {}
+        for row in rows:
+            counts[row['state']] = counts.get(row['state'], 0) + 1
         added = counts.get('added', 0)
-        parts = [f'Added {added} image{"s" if added != 1 else ""}.']
+        target = int(self.spec.get('target_new_images', 8))
+        parts = [f'{"Ready. " if not exhausted or added >= target else ""}Added {added} image{"s" if added != 1 else ""}.']
+        if self.spec.get('verify_with') and added:
+            checked = sum(r['state'] == 'added' and r['checked'] == 'checked' for r in rows)
+            if checked < added:
+                parts.append(f'{added - checked} not checked by a second model.')
         labels = {'ineligible': 'without a usable free licence', 'duplicate': 'duplicates', 'low_quality':
                   'too small or unclear', 'no_technique': 'with no clear technique', 'failed': 'failed',
                   'filtered': 'outside your filters'}
         skipped = [f'{counts[k]} {v}' for k, v in labels.items() if counts.get(k)]
         if skipped:
             parts.append('Skipped ' + ', '.join(skipped) + '.')
-        if exhausted and added < int(self.spec.get('target_new_images', 8)):
-            parts.append('The searches ran out before reaching your number; try a broader request.')
+        if exhausted and added < target:
+            parts.append(self._stop_reason(rows))
         return ' '.join(parts)
+
+    def _stop_reason(self, rows: list[dict]) -> str:
+        """A budget running out is not the same as the collections having nothing more to offer."""
+        reasons = {row['reason'] for row in rows if row['state'] == 'skipped'}
+        for key, budget in (('analysis', 'max_analyses'), ('download', 'max_downloads')):
+            if f'{key} budget reached' in reasons:
+                return f"Stopped at this job's {key} limit ({self._budget(budget)}); start another job to find more."
+        pending = self._items("kind='query' AND state='pending'")
+        if pending and self._count('search') >= self._budget('max_searches'):
+            return f'Stopped at this job\'s search limit ({self._budget("max_searches")}); start another job to find more.'
+        if len(self._items("kind='candidate'")) >= self._budget('max_candidates'):
+            return (f'Stopped at this job\'s limit of {self._budget("max_candidates")} candidates; '
+                    'start another job to find more.')
+        return 'The searches ran out before reaching your number; try a broader request.'
 
     def _plan(self):
         self._set(stage='planning', message='Planning searches…')
@@ -334,8 +398,9 @@ class Worker:
             try:
                 schema = tasks.plan_schema(sorted(self.techniques), enabled)
                 answer = self._call('plan', tasks.plan_prompt(goal, list(self.techniques.values()), enabled),
-                                    schema, [])
-                planned = tasks.validate_plan(answer['result'], set(self.techniques), set(enabled))
+                                    schema, [], validate=lambda raw: tasks.validate_plan(
+                                        raw, set(self.techniques), set(enabled)))
+                planned = answer['result']
                 self._save_analysis('plan', answer, planned, input_sha=hashlib.sha256(goal.encode()).hexdigest())
             except (BackendError, tasks.InvalidResult) as error:
                 if isinstance(error, BackendError) and error.code in ('quota', 'daily_cap', 'cancelled'):
@@ -396,7 +461,7 @@ class Worker:
             self.store.record_attempt({'job_id': self.job['id'], 'item_id': query['id'], 'kind': 'search',
                                        'backend': query['provider'], 'status': 'error', 'error_code': error.code,
                                        'latency_ms': int((time.monotonic() - started) * 1000)})
-            return self._retry_or_fail(query, error.code, str(error))
+            return self._retry_or_fail(query, error.code, str(error), error.retry_after)
         self.store.record_attempt({'job_id': self.job['id'], 'item_id': query['id'], 'kind': 'search',
                                    'backend': query['provider'], 'status': 'ok',
                                    'latency_ms': int((time.monotonic() - started) * 1000)})
@@ -439,7 +504,7 @@ class Worker:
             picture, kind = images.open_checked(data)
         except FetchError as error:
             self._attempt('download', item, 'error', error.code, started)
-            return self._retry_or_fail(item, error.code, str(error))
+            return self._retry_or_fail(item, error.code, str(error), error.retry_after)
         except images.ImageRejected as error:
             self._attempt('download', item, 'error', error.code, started)
             return self._item(item['id'], state='low_quality', reason=str(error))
@@ -505,14 +570,14 @@ class Worker:
         if image is None or image['removed_at']:
             return self._item(item['id'], state='skipped', reason='image was removed')
         if image['status'] != 'pending':  # analysed already (e.g. a crash after saving)
-            if image['status'] == 'ready':
-                self._finish_verification(image['id'], item['id'])
-            return self._item(item['id'], state='added' if image['status'] == 'ready' else 'no_technique', reason='')
+            if image['status'] != 'ready':
+                return self._item(item['id'], state='no_technique', reason='')
+            return self._added_item(item, self._finish_verification(image['id'], item['id']))
         if self._analysed() >= self._budget('max_analyses') and not self._cached(image):
             return self._item(item['id'], state='skipped', reason='analysis budget reached')
         self._set(stage='analyzing', message=f"Analyzing “{image['title'][:60]}”…")
         try:
-            outcome = self.analyze_image(image, item_id=item['id'])
+            outcome, check = self.analyze_image(image, item_id=item['id'])
         except BackendError as error:
             if error.code in PAUSING:
                 raise
@@ -522,10 +587,18 @@ class Worker:
             return self._retry_or_fail(item, error.code, backend_message(error.code, self.job['backend']))
         if outcome == 'retry':
             return self._retry_or_fail(item, 'invalid_response', backend_message('invalid_response', self.job['backend']))
+        if outcome == 'missing':
+            return self._item(item['id'], state='failed', reason=MISSING_FILE)
         if outcome == 'added':
-            return self._item(item['id'], state='added', reason='')
+            return self._added_item(item, check)
         self._remove_unhelpful(image, outcome)
         self._item(item['id'], state='no_technique', reason=outcome)
+
+    def _added_item(self, item: dict, check: str | None, **changes):
+        """Mark an analysed image as added, recording whether its optional second-model check happened."""
+        payload = {**json.loads(item['payload_json']), 'check': check}
+        note = '' if check in (None, 'checked', 'nothing') else CHECK_NOTES[check]
+        self._item(item['id'], state='added', reason=note, payload_json=canonical(payload), **changes)
 
     def _cache_key(self, image: dict) -> str:
         backend = self.job['backend']
@@ -542,7 +615,8 @@ class Worker:
         verifier = self.spec.get('verify_with')
         if verifier and not self.store.one("SELECT 1 FROM analyses WHERE image_id=? AND task='verify' AND job_id=?",
                                            (image_id, self.job['id'])):
-            self.verify_image(image_id, verifier, item_id=item_id)
+            return self._optional_check(image_id, verifier, item_id)
+        return None
 
     def _remove_unhelpful(self, image: dict, reason: str):
         try:
@@ -551,8 +625,13 @@ class Worker:
             return  # someone is already using this image; keep it
         images.delete_files(self.media, removed)
 
-    def analyze_image(self, image: dict, *, item_id=None) -> str:
-        """Analyse (or reuse a cached analysis), validate, save, merge; optionally verify with the other model."""
+    def analyze_image(self, image: dict, *, item_id=None) -> tuple[str, str | None]:
+        """Analyse (or reuse a cached analysis), validate, save, apply; optionally check with the other model.
+
+        Returns (outcome, check): outcome is 'added', 'retry', 'missing' or the reason nothing was added; check is
+        None (no check asked for) or a verify_image outcome."""
+        if not image['analysis_path'] or not (self.media / image['analysis_path']).is_file():
+            return 'missing', None
         backend = self.job['backend']
         model = (self.spec.get('models') or {}).get('analyze') or tasks.DEFAULT_MODELS[backend]['analyze']
         metadata = {'title': image['title'], 'creator': image['creator'], 'date': image['date_text'],
@@ -566,60 +645,89 @@ class Worker:
         else:
             schema = tasks.analyze_schema(sorted(self.techniques))
             prompt = tasks.analyze_prompt(list(self.techniques.values()), metadata)
-            answer = self._call('analyze', prompt, schema, [self.media / image['analysis_path']], item_id=item_id)
             try:
-                result = tasks.validate_analysis(answer['result'], set(self.techniques), metadata)
+                answer = self._call('analyze', prompt, schema, [self.media / image['analysis_path']], item_id=item_id,
+                                    validate=lambda raw: tasks.validate_analysis(raw, set(self.techniques), metadata))
             except tasks.InvalidResult:
-                return 'retry'
+                return 'retry', None
+            result = answer['result']
             analysis_id = self._save_analysis('analyze', answer, result, image_id=image['id'],
                                               input_sha=image['analysis_sha256'], cache_key=cache_key)
-        if not result['image_usable']:
-            self.store.set_image_status(image['id'], 'unanalyzed', analysis_id)
-            return f"not a usable picture: {result['unusable_reason'] or 'unclear'}"
         texts = tasks.evidence_texts(result)
         proposals = [{'technique_id': t['technique_id'], 'evidence': texts[t['technique_id']], 'effect': t['effect'],
                       'confidence': t['confidence'], 'role': t['role']} for t in result['techniques']]
-        merged = self.store.apply_analysis(image['id'], analysis_id, proposals, f'model:{backend}/{model}',
-                                           fence=(self.job['id'], self.owner))
-        if not merged['applied'] and not merged['kept_human']:
-            return 'no technique was clear enough'
+        merged = self.store.apply_analysis(image['id'], analysis_id, proposals if result['image_usable'] else [],
+                                           f'model:{backend}/{model}', fence=(self.job['id'], self.owner))
+        if not result['image_usable']:
+            return f"not a usable picture: {result['unusable_reason'] or 'unclear'}", None
+        if not merged['active']:
+            return 'no technique was clear enough', None
         verifier = self.spec.get('verify_with')
+        check = None
         if verifier and verifier != backend and merged['applied']:
-            self.verify_image(image['id'], verifier, item_id=item_id)
-        return 'added'
+            check = self._optional_check(image['id'], verifier, item_id)
+        return 'added', check
 
-    def verify_image(self, image_id: int, verifier: str, *, item_id=None):
-        rows = self.store.rows("SELECT a.technique_id, a.evidence_json, a.effect FROM annotations a LEFT JOIN "
-                               "analyses p ON p.id=a.analysis_id WHERE a.image_id=? AND a.state='proposed' AND "
-                               "a.human_locked=0 AND COALESCE(p.backend,'')!=?", (image_id, verifier))
+    def _optional_check(self, image_id: int, verifier: str, item_id) -> str:
+        """A check that is part of Find/Grow/Analyse: its failure never discards the analysed image. Returns the
+        outcome; once the verifier is unavailable (signed out, over a limit) the job stops asking it."""
+        if self._verifier_down:
+            return 'unavailable'
+        outcome, message = self.verify_image(image_id, verifier, item_id=item_id)
+        if outcome == 'unavailable':
+            self._verifier_down = message
+        return outcome
+
+    def verify_image(self, image_id: int, verifier: str, *, item_id=None) -> tuple[str, str]:
+        """Second-model check of the proposals not yet judged, in batches the verifier contract allows.
+
+        Returns (outcome, message): 'checked' (every batch saved), 'nothing' (no proposal from another model is
+        waiting), 'missing' (image or file gone), 'unavailable' (not installed, signed out, over a limit),
+        'invalid' (the answer broke the contract) or 'retry' (a transient error). Earlier batches stay saved.
+        Raises BackendError for 'cancelled' and 'daily_cap', which stop the job where it is."""
+        rows = self.store.rows(
+            "SELECT a.technique_id, a.evidence_json, a.effect FROM annotations a LEFT JOIN analyses p ON "
+            "p.id=a.analysis_id WHERE a.image_id=? AND a.state='proposed' AND a.human_locked=0 AND "
+            "a.note NOT LIKE 'second model disagreed%' AND COALESCE(p.backend,'')!=? ORDER BY a.id", (image_id, verifier))
         if not rows:
-            return
-        image = self.store.one('SELECT analysis_path, analysis_sha256 FROM images WHERE id=?', (image_id,))
+            return 'nothing', 'Nothing to check: no proposal from another model is waiting.'
+        image = self.store.one('SELECT analysis_path, analysis_sha256 FROM images WHERE id=? AND removed_at IS NULL',
+                               (image_id,))
+        if image is None or not image['analysis_path'] or not (self.media / image['analysis_path']).is_file():
+            return 'missing', 'The image was removed or its file is missing.'
         proposals = [{'technique_id': r['technique_id'], 'evidence': json.loads(r['evidence_json']),
                       'effect': r['effect']} for r in rows]
         self._set(stage='analyzing', message='Checking the analysis with a second model…')
-        try:
-            for attempt in (1, 2):  # one quick retry: the subscription CLIs occasionally report a transient error
-                try:
-                    answer = self._call('verify', tasks.verify_prompt(proposals, self.techniques),
-                                        tasks.verify_schema(sorted(self.techniques)),
-                                        [self.media / image['analysis_path']], item_id=item_id, backend=verifier)
-                    break
-                except BackendError as error:
-                    if attempt == 2 or error.code not in ('provider_error', 'timeout'):
-                        raise
-            result = tasks.validate_verify(answer['result'], {p['technique_id'] for p in proposals})
-        except tasks.InvalidResult:
-            return  # leave annotations as 'proposed'; the verification simply did not count
-        except BackendError as error:
-            if error.code in ('daily_cap', 'cancelled'):
-                raise  # a pause or cancel leaves the check to be resumed
-            return  # verifier unavailable, over its limit or erroring: keep the proposal unverified and go on
-        with self.store.transaction():  # the saved answer and its effect commit together
-            analysis_id = self._save_analysis('verify', answer, result, image_id=image_id,
-                                              input_sha=image['analysis_sha256'])
-            self.store.apply_verdicts(image_id, analysis_id, result['verdicts'],
-                                      f"model:{answer['backend']}/{answer['model']}", fence=(self.job['id'], self.owner))
+        for start in range(0, len(proposals), VERIFY_BATCH):
+            batch = proposals[start:start + VERIFY_BATCH]
+            judged = {p['technique_id'] for p in batch}
+            try:
+                for attempt in (1, 2):  # one quick retry: the subscription CLIs occasionally report a transient error
+                    try:
+                        answer = self._call('verify', tasks.verify_prompt(batch, self.techniques),
+                                            tasks.verify_schema(sorted(self.techniques)),
+                                            [self.media / image['analysis_path']], item_id=item_id, backend=verifier,
+                                            validate=lambda raw, judged=judged: tasks.validate_verify(raw, judged))
+                        break
+                    except BackendError as error:
+                        if attempt == 2 or error.code not in ('provider_error', 'timeout'):
+                            raise
+            except tasks.InvalidResult:
+                return 'invalid', backend_message('invalid_response', verifier)
+            except BackendError as error:
+                if error.code in ('daily_cap', 'cancelled'):
+                    raise
+                message = backend_message(error.code, verifier)
+                if error.code in PAUSING:
+                    return 'unavailable', message
+                return ('retry' if error.code in RETRYABLE else 'invalid'), message
+            with self.store.transaction():  # the saved answer and its effect commit together
+                analysis_id = self._save_analysis('verify', answer, answer['result'], image_id=image_id,
+                                                  input_sha=image['analysis_sha256'])
+                self.store.apply_verdicts(image_id, analysis_id, answer['result']['verdicts'],
+                                          f"model:{answer['backend']}/{answer['model']}",
+                                          fence=(self.job['id'], self.owner))
+        return 'checked', ''
 
     # ---- follow-up jobs -------------------------------------------------------------------------
     def _image_items(self, state: str):
@@ -641,18 +749,30 @@ class Worker:
         self._seed_images('pending')
         item = self._image_items('pending')
         if item is None:
-            return None if self._waiting('pending') else self._done('Ready. Second-model check finished.')
+            return None if self._waiting('pending') else self._done(self._check_summary())
         image_id = int(item['provider_item_id'])
         self._item(item['id'], image_id=image_id)
-        self.verify_image(image_id, self.job['backend'], item_id=item['id'])
-        self._item(item['id'], state='added', reason='checked')
+        outcome, message = self.verify_image(image_id, self.job['backend'], item_id=item['id'])
+        if outcome == 'checked':
+            self._item(item['id'], state='added', reason='checked')
+        elif outcome in ('nothing', 'missing'):
+            self._item(item['id'], state='skipped', reason=message)
+        elif outcome == 'unavailable':  # pause the job; this image is checked when it resumes
+            raise BackendError(self._unavailable_code(image_id))
+        else:  # a bad answer or a transient error: retry this image, then give up on it with the reason
+            self._retry_or_fail(item, 'invalid_response' if outcome == 'invalid' else 'provider_error', message)
         return True
+
+    def _unavailable_code(self, image_id: int) -> str:
+        row = self.store.one("SELECT error_code FROM attempts WHERE job_id=? AND kind='ai' AND status='error' "
+                             "ORDER BY id DESC LIMIT 1", (self.job['id'],))
+        return row['error_code'] if row and row['error_code'] in PAUSING else 'unavailable'
 
     def _reanalyze_step(self):
         self._seed_images('pending')
         item = self._image_items('pending')
         if item is None:
-            return None if self._waiting('pending') else self._done('Ready. Analysis finished.')
+            return None if self._waiting('pending') else self._done(self._check_summary('Analysis finished.'))
         image = self.store.one('SELECT * FROM images WHERE id=? AND removed_at IS NULL', (int(item['provider_item_id']),))
         if image is None:
             self._item(item['id'], state='skipped', reason='image was removed')
@@ -660,7 +780,7 @@ class Worker:
         never_added = image['status'] == 'pending'  # downloaded by a job that stopped before analysing it
         self._set(stage='analyzing', message=f"Analyzing “{image['title'][:60]}”…")
         try:
-            outcome = self.analyze_image(image, item_id=item['id'])
+            outcome, check = self.analyze_image(image, item_id=item['id'])
         except BackendError as error:
             if error.code in PAUSING:
                 raise
@@ -669,8 +789,10 @@ class Worker:
             return True
         if outcome == 'retry':
             self._retry_or_fail(item, 'invalid_response', backend_message('invalid_response', self.job['backend']))
+        elif outcome == 'missing':
+            self._item(item['id'], state='failed', reason=MISSING_FILE, image_id=image['id'])
         elif outcome == 'added':
-            self._item(item['id'], state='added', image_id=image['id'])
+            self._added_item(item, check, image_id=image['id'])
         else:
             if never_added:  # same rule as Find: only images with a clear technique join the library
                 self._remove_unhelpful(image, outcome)
@@ -685,13 +807,14 @@ class Worker:
         self._set(stage='analyzing', message='Comparing images…')
         annotations = {str(i): [r['technique_id'] for r in self.store.rows(
             "SELECT technique_id FROM annotations WHERE image_id=? AND state!='rejected'", (i,))] for i in ids}
-        answer = self._call('compare', tasks.compare_prompt(ids, annotations),
-                            tasks.compare_schema(ids, sorted(self.techniques)),
-                            [self.media / r['analysis_path'] for r in rows])
         try:
-            result = tasks.validate_compare(answer['result'], set(ids), set(self.techniques))
+            answer = self._call('compare', tasks.compare_prompt(ids, annotations),
+                                tasks.compare_schema(ids, sorted(self.techniques)),
+                                [self.media / r['analysis_path'] for r in rows],
+                                validate=lambda raw: tasks.validate_compare(raw, set(ids), set(self.techniques)))
         except tasks.InvalidResult as error:
             return self._done_failed(f'The comparison did not pass checks ({error}).')
+        result = answer['result']
         analysis_id = self._save_analysis('compare', answer, result,
                                           input_sha='|'.join(r['analysis_sha256'] for r in rows))
         self.store.add_comparison(ids, analysis_id)
@@ -752,14 +875,14 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
         if kind == 'find' and not (goal or spec.get('subject') or technique_ids):
             raise ValueError('describe what you are looking for, or pick a technique')
         asked = spec.get('budgets') or {}
-        budgets = {k: max(1, min(int(asked.get(k, DEFAULT_BUDGETS[k])), 200)) for k in DEFAULT_BUDGETS}
-        if 'max_analyses' not in asked:  # by default leave room for a few pictures that turn out unclear
-            budgets['max_analyses'] = max(budgets['max_analyses'], min(target + 4, 200))
+        scaled = {'max_searches': max(10, -(-target // 3) + 4), 'max_candidates': max(80, 4 * target),
+                  'max_downloads': max(30, 2 * target), 'max_analyses': max(12, target + 4)}  # room for misses
+        budgets = {k: max(1, min(int(asked.get(k, scaled[k])), 200)) for k in DEFAULT_BUDGETS}
         clean.update(goal=goal[:1000], subject=str(spec.get('subject') or '')[:120],
                      intended_use=str(spec.get('intended_use') or '')[:200], technique_ids=technique_ids,
                      orientation=spec.get('orientation') if spec.get('orientation') in ('landscape', 'portrait', 'square') else None,
                      color=str(spec.get('color') or '')[:20] or None, providers=chosen, target_new_images=target,
-                     budgets=budgets, per_query=max(3, min(int(spec.get('per_query') or 8), 20)))
+                     budgets=budgets, per_query=max(3, min(int(spec.get('per_query') or max(8, target // 2)), 20)))
         verifier = spec.get('verify_with')
         clean['verify_with'] = verifier if verifier in ('codex', 'claude') and verifier != backend else None
     elif kind in ('verify', 'analyze', 'compare'):

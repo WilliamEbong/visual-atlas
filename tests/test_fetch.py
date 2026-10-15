@@ -183,3 +183,26 @@ def test_throttle_sleeps_between_requests_to_same_provider(make_fetcher, monkeyp
     assert sleeps == [pytest.approx(client.policies['aic']['min_interval_seconds'])]
     client.get_json('met', 'https://collectionapi.metmuseum.org/test')
     assert len(sleeps) == 1
+
+
+def test_a_provider_cooldown_refuses_at_once_without_calling_or_sleeping(make_fetcher, monkeypatch):
+    clock = [1000.0]
+    monkeypatch.setattr(fetch.time, 'monotonic', lambda: clock[0])
+    calls, slept = [], []
+
+    def handler(request):
+        calls.append(request.url)
+        return httpx.Response(429, headers={'Retry-After': '120'})
+
+    client = make_fetcher(handler, sleep=slept.append)
+    with pytest.raises(FetchError):
+        client.get_json('aic', URL)
+    clock[0] += 30
+    with pytest.raises(FetchError) as error:
+        client.get_image('aic', URL)  # any later request to that provider waits out the same cooldown
+    assert error.value.code == 'rate_limited' and error.value.retry_after == pytest.approx(90)
+    assert len(calls) == 1 and all(wait <= 1 for wait in slept)
+    clock[0] += 91
+    with pytest.raises(FetchError):
+        client.get_json('aic', URL)
+    assert len(calls) == 2  # asked again once the provider's wait was over

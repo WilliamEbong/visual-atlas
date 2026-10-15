@@ -323,3 +323,58 @@ def test_a_cancel_that_arrives_while_resuming_is_kept(home):
     with jobs.open_store(home) as store:
         assert store.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] == 'cancelled'
         assert store.rows('SELECT * FROM images') == []
+
+
+def held_worker(home, monkeypatch):
+    """A worker holding a fresh job with pending steps for two providers (for retry scheduling)."""
+    monkeypatch.setattr(jobs, 'clock', lambda: 1_000_000.0)
+    with jobs.open_store(home) as store:
+        job_id = find(store)
+        store.claim_job('A', 60, job_id)
+        store.add_items(job_id, 'A', [
+            {'kind': 'query', 'key': f'{provider}:{query}', 'provider': provider, 'payload': {'query': query}}
+            for provider, query in (('aic', 'a'), ('aic', 'b'), ('met', 'c'))] + [
+            {'kind': 'candidate', 'key': key, 'provider': 'aic', 'payload': {}, 'state': state}
+            for key, state in (('aic:1', 'eligible'), ('aic:2', 'found'))])
+    held = worker(home, 'A')
+    held.store, held.job, held.spec = jobs.open_store(home), {'id': job_id}, {}
+    return held
+
+
+def schedule(held):
+    return {r['key']: (r['next_attempt_at'], r['reason']) for r in held.store.rows('SELECT * FROM job_items')}
+
+
+@pytest.mark.parametrize(('retry_after', 'wait'), [(600, 600), (3, 10), (None, 10)])
+def test_retry_after_holds_the_item_and_every_network_step_for_that_provider(home, monkeypatch, retry_after, wait):
+    held = held_worker(home, monkeypatch)
+    item = held.store.one("SELECT * FROM job_items WHERE key='aic:a'")
+    held._retry_or_fail(item, 'rate_limited', 'AIC asked us to slow down.', retry_after)
+    times = {key: value[0] for key, value in schedule(held).items()}
+    assert times['aic:a'] == times['aic:b'] == times['aic:1'] == 1_000_000 + wait  # never sooner than asked
+    assert times['met:c'] == 0 and times['aic:2'] == 0  # other providers and offline checks are not held up
+
+
+def test_a_very_long_provider_wait_is_capped_and_reported(home, monkeypatch):
+    held = held_worker(home, monkeypatch)
+    item = held.store.one("SELECT * FROM job_items WHERE key='aic:a'")
+    held._retry_or_fail(item, 'rate_limited', 'AIC asked us to slow down.', 7200)
+    when, reason = schedule(held)['aic:a']
+    assert when == 1_000_000 + 3600 and '120 minutes' in reason
+
+
+def test_default_budgets_can_reach_the_largest_request(home):
+    with jobs.open_store(home) as store:
+        spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (find(store, target_new_images=40),))
+                          ['spec_json'])
+    assert spec['budgets']['max_downloads'] >= 40 and spec['budgets']['max_analyses'] >= 40
+    assert spec['budgets']['max_candidates'] >= spec['budgets']['max_downloads'] and spec['per_query'] == 20
+
+
+def test_a_budget_stop_is_reported_as_a_budget_not_as_running_out(home):
+    with jobs.open_store(home) as store:
+        job_id = find(store, target_new_images=5, budgets={'max_analyses': 1})
+    worker(home, 'A').run_once()
+    with jobs.open_store(home) as store:
+        message = store.one('SELECT message FROM jobs WHERE id=?', (job_id,))['message']
+    assert "Stopped at this job's analysis limit (1)" in message and 'ran out' not in message
