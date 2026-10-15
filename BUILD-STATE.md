@@ -19,8 +19,9 @@ each root-cause fix.
 - Working principles recorded in specs/005-v1-1-dependability/spec.md.
 - Owner input mid-run: (1) evaluate "request coding" like Qualia's qualitative coding -> adopted as FR-12
   (deterministic coder; Jev as gate arm). (2) "The public version must not use my key; users bring their own"
-  -> any Jev integration is bring-your-own-key, off by default. Live Jev eval with the owner's key is NOT
-  authorised yet (OWNER-NEEDED.md); harness + criteria proceed, live run deferred.
+  -> any Jev integration is bring-your-own-key, off by default. (3) "Use qualia key for local evaluation" ->
+  the live Jev evaluation may use the Qualia TypeSafe key, loaded into the eval process only (never printed,
+  logged, copied into this repo or used by the app).
 - Version decision: 0.2.0 (repo uses 0.x semver + v tags; behaviour change + migration -> minor bump).
 
 ## Owner decisions (2026-10-15 plan gate)

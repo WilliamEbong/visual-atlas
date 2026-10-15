@@ -90,6 +90,13 @@ words into searches, to compare images and to suggest project directions.
 Visual Atlas uses the assistants already installed on your computer, signed in with your own
 subscription. It never reads, stores or sends your passwords or tokens.
 
+**What leaves your computer.** The library itself (database, images, notes, collections) stays in your library
+folder. Searches go to the collections you tick. When an AI step runs, the assistant app sends what that step
+needs to its service (OpenAI for Codex, Anthropic for Claude Code), under that service's terms for your account:
+the picture and its catalogue text for an analysis or a check, your request for a search plan, the pictures you
+compare, or your brief plus short summaries of up to about forty relevant library images for project directions.
+Browsing, filtering, collections, comparison you have already saved, credits and backups never call an AI.
+
 | Assistant | Install | Sign in once |
 |---|---|---|
 | **Codex** (ChatGPT plan) | `npm install -g @openai/codex` | run `codex login` in a terminal |

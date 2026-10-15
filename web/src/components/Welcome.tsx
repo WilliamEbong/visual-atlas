@@ -26,8 +26,8 @@ export default function Welcome() {
           <li><strong>Use them.</strong> Save images to collections, compare them, and ask for directions for your own project.</li>
         </ol>
         <p className="mono">Your library stays on this computer. Searches go to the collections. When an assistant is used, the
-          request it needs goes to that assistant's service: the picture and its catalogue details for an analysis, or your brief
-          and short summaries of library images for project directions.</p>
+          request it needs goes to that assistant's service (OpenAI or Anthropic, under your own account): the picture and its
+          catalogue details for an analysis, or your brief and short summaries of library images for project directions.</p>
         <div className="row">
           <button type="button" className="primary" onClick={() => close('#/find')}>Find my first images</button>
           <button type="button" onClick={() => close('#/settings')}>Check AI setup</button>

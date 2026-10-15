@@ -5,8 +5,14 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  pull-requests: read
 jobs:
+  checks:  # the same checks as every push (Linux and Windows), on exactly the commit being released
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
   package:
+    needs: checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

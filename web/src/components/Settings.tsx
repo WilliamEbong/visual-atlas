@@ -44,7 +44,7 @@ export default function SettingsPage() {
       {message && <p className="notice" role="status">{message}</p>}
       {!readOnly && <section className="stack" aria-labelledby="ai">
         <h2 id="ai">AI setup</h2>
-        <p className="muted">Visual Atlas uses the assistants already on this computer, with your own subscription sign-in. It never sees or stores your password or tokens. Browsing, searching and collections work without any AI.</p>
+        <p className="muted">Visual Atlas uses the assistants already on this computer, with your own subscription sign-in. When one is used, the picture or text it needs goes to that assistant's service (OpenAI for Codex, Anthropic for Claude Code); your library stays here. Visual Atlas never sees or stores your password or tokens. Browsing, searching and collections work without any AI.</p>
         <div className="compare-grid">
           {(['codex', 'claude'] as const).map((name) => (
             <div key={name} className="notice stack">

@@ -1,5 +1,8 @@
 name: Checks
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_call:  # the release workflow runs these same checks on the commit it packages
 permissions:
   contents: read
   pull-requests: read # gitleaks lists a pull request's commits
@@ -30,3 +33,26 @@ jobs:
       - uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  windows:  # Visual Atlas is Windows-first: the tests, the installer and the starter library on Windows itself
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked --python 3.14
+      - run: uv run pytest -m "not live"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci && npm run build
+        working-directory: web
+      - name: Install into a scratch library and check it
+        shell: pwsh
+        run: |
+          $env:VISUAL_ATLAS_HOME = Join-Path $env:RUNNER_TEMP 'atlas-home'
+          powershell -ExecutionPolicy Bypass -File scripts\install-atlas.ps1 -NoShortcuts -NoLaunch
+          if ($LASTEXITCODE -ne 0) { throw 'installer failed' }
+          $count = (uv run atlas library --limit 500 | ConvertFrom-Json).Count
+          if ($count -lt 80) { throw "starter library has $count references" }

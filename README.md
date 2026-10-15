@@ -32,8 +32,11 @@ you turn those ideas into directions for your own brief.
   *rejected*. A second model agreeing is never presented as human review, and your corrections always
   win over later analysis.
 - **Analyse once.** Browsing, searching, sorting, collections and comparison never call a model.
-- **Your own assistants, your own sign-in.** Analysis uses the Claude Code or Codex app already on your
-  computer, run with every tool switched off. No API keys, no accounts, nothing in the cloud.
+- **Your own assistants, your own accounts.** Analysis uses the Claude Code or Codex app already on your
+  computer, signed in to your own Claude or ChatGPT plan and run with every tool switched off; there are no API keys
+  to manage. Your library stays on your computer, but an AI step is processed by that assistant's service
+  (Anthropic or OpenAI): the picture and its catalogue text for an analysis, your words for a search plan, your brief
+  and short summaries of library images for project directions. Without AI, nothing but searches leaves the computer.
 
 ## A quick tour
 
@@ -161,8 +164,9 @@ flowchart LR
 - **Jobs survive anything.** Every step is one recorded state change, so a crash or restart resumes
   without repeating finished work, and a lease stops two workers (the app and an `atlas worker` started
   from Claude Code or Codex) from sharing a job.
-- **Local by design.** The server binds to 127.0.0.1, checks Host and Origin and requires a per-launch
-  token. Your library lives in `%USERPROFILE%\VisualAtlas`, outside the app folder and outside OneDrive.
+- **Local library, remote AI only when you use it.** The server binds to 127.0.0.1, checks Host and Origin and
+  requires a per-launch token. Searches go to the collections you choose; AI requests go to the assistant's service
+  under your own account. Your library lives in `%USERPROFILE%\VisualAtlas`, outside the app folder and outside OneDrive.
 
 ## For Claude Code and Codex
 

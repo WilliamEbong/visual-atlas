@@ -21,7 +21,9 @@ and **usage and credits**. Try **Explore** to start from a goal such as *Make on
 
 ## 3. Let it find images for you (optional, needs an assistant)
 
-Visual Atlas uses the AI assistant you already have, with your own sign-in:
+Visual Atlas uses the AI assistant you already have, with your own account. Your library stays on your
+computer; each AI step sends the picture or text it needs to that assistant's service (OpenAI for Codex,
+Anthropic for Claude Code).
 
 - **Codex** (ChatGPT plan): install, then run `codex login` once in a terminal, or
 - **Claude Code** (Claude plan): install, then run `claude` once in a terminal and sign in.
