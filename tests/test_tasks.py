@@ -80,13 +80,19 @@ def test_schema_lists_only_known_techniques():
     assert schema['additionalProperties'] is False
 
 
-def test_verify_must_judge_exactly_the_proposals():
-    good = {'verdicts': [{'technique_id': 'negative-space', 'holds': True, 'reason': 'clear empty sky'}]}
-    assert tasks.validate_verify(good, {'negative-space'})['verdicts'][0]['holds'] is True
+def test_verify_forms_its_own_reading_and_judges_exactly_the_proposals():
+    good = {'own_reading': ['negative-space'],
+            'verdicts': [{'technique_id': 'negative-space', 'holds': True, 'reason': 'clear empty sky'}]}
+    result = tasks.validate_verify(good, {'negative-space'}, IDS)
+    assert result['verdicts'][0]['holds'] is True and result['own_reading'] == ['negative-space']
     with pytest.raises(tasks.InvalidResult):
-        tasks.validate_verify(good, {'negative-space', 'framing'})
+        tasks.validate_verify(good, {'negative-space', 'framing'}, IDS)
     with pytest.raises(tasks.InvalidResult):
-        tasks.validate_verify({'verdicts': good['verdicts'] * 2}, {'negative-space'})
+        tasks.validate_verify({**good, 'verdicts': good['verdicts'] * 2}, {'negative-space'}, IDS)
+    with pytest.raises(tasks.InvalidResult):
+        tasks.validate_verify({**good, 'own_reading': ['invented']}, {'negative-space'}, IDS)
+    with pytest.raises(tasks.InvalidResult):  # the independent reading is required, not optional
+        tasks.validate_verify({'verdicts': good['verdicts']}, {'negative-space'}, IDS)
 
 
 def test_plan_drops_bad_queries_and_unknown_ids():
@@ -148,7 +154,7 @@ def test_fake_backend_answers_satisfy_every_contract(tmp_path):
     proposals = [{'technique_id': t['technique_id'], 'evidence': ['x'], 'effect': 'y'} for t in analysis['techniques']]
     verdicts = fake.run(tasks.verify_prompt(proposals, {t['id']: t for t in TAXONOMY['techniques']}),
                         tasks.verify_schema(ids), [image])['result']
-    tasks.validate_verify(verdicts, {p['technique_id'] for p in proposals})
+    tasks.validate_verify(verdicts, {p['technique_id'] for p in proposals}, IDS)
     plan = fake.run(tasks.plan_prompt('foggy harbour', TAXONOMY['techniques'], ['aic']), tasks.plan_schema(ids, ['aic']), [])
     tasks.validate_plan(plan['result'], IDS, {'aic'})
     library = [{'image_id': 1, 'title': 'a', 'creator': '', 'date': '', 'summary': '',

@@ -742,7 +742,8 @@ class Worker:
                         answer = self._call('verify', tasks.verify_prompt(batch, self.techniques),
                                             tasks.verify_schema(sorted(self.techniques)),
                                             [self.media / image['analysis_path']], item_id=item_id, backend=verifier,
-                                            validate=lambda raw, judged=judged: tasks.validate_verify(raw, judged))
+                                            validate=lambda raw, judged=judged: tasks.validate_verify(
+                                                raw, judged, set(self.techniques)))
                         break
                     except BackendError as error:
                         if attempt == 2 or error.code not in ('provider_error', 'timeout'):

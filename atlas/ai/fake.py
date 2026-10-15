@@ -41,7 +41,8 @@ def run(prompt: str, schema: dict, images: list[Path], *, model: str = 'practice
             'creator_intent': None}
     elif 'verdicts' in properties:
         proposed = list(dict.fromkeys(re.findall(r'"technique_id": "([a-z0-9-]+)"', prompt)))
-        result = {'verdicts': [{'technique_id': t, 'holds': n % 2 == 0, 'reason': 'Practice verdict.'}
+        result = {'own_reading': proposed[:1],
+                  'verdicts': [{'technique_id': t, 'holds': n % 2 == 0, 'reason': 'Practice verdict.'}
                                for n, t in enumerate(proposed)]}
     elif 'queries' in properties:
         query = properties['queries']['items']['properties']

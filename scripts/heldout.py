@@ -4,7 +4,8 @@
   (a person writes docs/evaluation/heldout-expectations.json after looking at the images, before any model runs)
   uv run python scripts/heldout.py run     # Codex analyses, Claude checks Codex, Claude analyses independently
 
-The expectations are the builder's judgment, not expert ground truth; the report says so."""
+The expectations are the builder's judgment, not expert ground truth; the report says so.
+Superseded by scripts/eval_v11.py (separate development and final splits); kept to reproduce the v1 rounds."""
 
 import hashlib
 import json
@@ -100,7 +101,7 @@ def run():
             try:
                 answer = claude_cli.run(tasks.verify_prompt(proposals, techniques), tasks.verify_schema(sorted(ids)), [path],
                                         model='sonnet')
-                verdicts = tasks.validate_verify(answer['result'], {p['technique_id'] for p in proposals})['verdicts']
+                verdicts = tasks.validate_verify(answer['result'], {p['technique_id'] for p in proposals}, ids)['verdicts']
                 record['claude_verify'] = {v['technique_id']: v['holds'] for v in verdicts}
             except (BackendError, tasks.InvalidResult) as error:
                 record['claude_verify'] = {'error': str(getattr(error, 'code', error))}
