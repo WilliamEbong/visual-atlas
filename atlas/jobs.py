@@ -1021,6 +1021,8 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
                      orientation=spec.get('orientation') if spec.get('orientation') in ('landscape', 'portrait', 'square') else None,
                      color=str(spec.get('color') or '')[:20] or None, providers=chosen, target_new_images=target,
                      budgets=budgets, per_query=max(3, min(int(spec.get('per_query') or max(8, target // 2)), 20)))
+        # Strict constraints from the form are part of the reading too (applied in code before any AI call).
+        reading['constraints'] = {k: clean[k] for k in ('orientation', 'color', 'providers') if clean[k]}
         verifier = spec.get('verify_with')
         clean['verify_with'] = verifier if verifier in ('codex', 'claude') and verifier != backend else None
     elif kind in ('verify', 'analyze', 'compare'):

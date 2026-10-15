@@ -1,0 +1,43 @@
+{
+ "A_restore": {
+  "collection_post": 503,
+  "restore": 200,
+  "collection_survived": false
+ },
+ "B_sweep": {
+  "worker_crash": null,
+  "job": {
+   "state": "done",
+   "message": "Ready. Added 1 image."
+  },
+  "analysis_file_exists": true
+ },
+ "C_verify": {
+  "job": {
+   "state": "paused",
+   "message": "Claude Code reached its usage limit. Resume later, or switch to the other assistant."
+  },
+  "item": {
+   "state": "pending",
+   "reason": ""
+  },
+  "verify_analyses_saved": 0
+ },
+ "D_reanalysis": {
+  "active_after_4_then_3": 3,
+  "verify_schema_max": 6,
+  "labels_after_empty_analysis": 0,
+  "status_after_empty": "unanalyzed"
+ },
+ "4A_directions_validator": {
+  "accepted_empty_image_ids_single_direction": 0
+ },
+ "4A_prompt_json_complete": true,
+ "5A_retry_after_used": true,
+ "5B_budgets_for_40": {
+  "max_analyses": 44,
+  "max_candidates": 160,
+  "max_downloads": 80,
+  "max_searches": 18
+ }
+}

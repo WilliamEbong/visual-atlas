@@ -4,9 +4,9 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-v1.1 (spec 005, package 0.2.0): implement tasks in specs/005-v1-1-dependability/tasks.md in order, starting T502
-(migration + version) and T503 (maintenance coordination). Rerun docs/evaluation/v1.1/repro_v1_findings.py after
-each root-cause fix.
+v1.1 is implemented, verified and committed locally (package 0.2.0, not pushed or tagged; publishing needs the
+owner's go-ahead for this iteration). Pending: fold in the Codex adversarial review of 680b199..HEAD (round 1 of
+at most 2), rerun the gates, rebuild release/VisualAtlas-v0.2.0.zip from the final commit.
 
 ## v1.1 status (2026-10-15)
 - Baseline on 680b199 (scratch home): pytest 290 passed / 7 live deselected; ruff clean; taxonomy check OK;
@@ -23,6 +23,48 @@ each root-cause fix.
   the live Jev evaluation may use the Qualia TypeSafe key, loaded into the eval process only (never printed,
   logged, copied into this repo or used by the app).
 - Version decision: 0.2.0 (repo uses 0.x semver + v tags; behaviour change + migration -> minor bump).
+
+### v1.1 decisions (reversible, logged)
+- Restore swaps database contents with SQLite's backup API under a maintenance lock + marker (no file renames),
+  so an interruption leaves the old or the new library; media is copied additively and orphans swept.
+- Superseded model labels: a history row (state 'superseded') then the annotation row is removed; no schema change
+  to the annotations CHECK constraint. Verification batches of 6 remain as a guard for upgraded libraries.
+- Request coder (atlas/coding.py) uses technique names, aliases and distinctive name words, and goal names and
+  descriptions. Observable-cue sentences are NOT matched (T529): in trials their common words ("dark", "subject",
+  "background") produced spurious tags. Cue matching was dropped rather than tuned against the frozen briefs.
+- Coder stopword gaps seen in the browser ("against", "flyer") were left unfixed: those words occur in the frozen
+  evaluation briefs, so changing them now would tune on the test set. Fix in the next iteration with new briefs.
+- Find/Grow add analysed images that do not show the requested technique as ordinary references, reported
+  separately; only matching ones count toward the target.
+- Checker: the independent-first prompt was adopted on the pre-registered dev rule (weak evidence, equal cost).
+- Jev: only relevance ranking for project help is integrated (optional, off by default, bring-your-own key,
+  text only). Request coding, metadata classification and text-only review were not integrated (REPORT.md).
+- Release workflow calls the Checks workflow (Linux + new Windows job) and packages only after it passes; not yet
+  exercised on GitHub (no push in this iteration).
+
+### v1.1 evidence (2026-10-15)
+- Reproductions: docs/evaluation/v1.1/repro-before.json (run on a detached worktree of 680b199) vs repro-after.json:
+  write during restore now refused (503) instead of acknowledged and lost; second server start no longer deletes a
+  running job's files (job finishes, files present); quota verifier pauses the job (0 verifications counted);
+  4 then 3 proposals leave 3 active (old ones superseded with history); an uncited direction is rejected; prompt
+  JSON complete; Retry-After honoured; target 40 gets 80 downloads / 44 analyses.
+- Tests: 337 passed, 7 live deselected (290 at baseline); new files test_maintenance (9 deterministic
+  interleavings incl. a second process and a v0.1 backup), test_checks (10), test_coding (6), test_discovery (4),
+  test_jev (5), plus retry/budget/stop/pagination tests. ruff, tsc, vitest (7), build, data guard, pip-audit,
+  npm audit all clean. No key or token in the tree or history (prefix scan of the TypeSafe key: 0 hits).
+- Browser (Playwright, scratch libraries): pagination (offset=60 only, 85 unique, keyboard across pages), filter
+  reset and Back; stale page ignored after a filter change (delayed route, T527); targeted Find ending "Stopped
+  short" with matching vs other additions and the analysis-limit reason (found and fixed a real defect: a spent
+  job waited ~1 h on a rate-limited source); verify paused at a usage limit then resumed with real Claude under
+  the new prompt; a person's confirm/reject surviving CLI re-analysis with superseded history; grounded Codex
+  directions (5, none dropped) and the no-evidence message; live restore in the running app; a write refused during
+  maintenance held by another process, then accepted; 375 px on 6 screens without overflow; demo paging; console
+  errors only from deliberate restarts and the deliberate 503. Screenshots: design-review/v1.1/.
+- Install/upgrade: published v0.1.0 zip installed, used (collection, confirm, reject, removal, backup), then local
+  v0.2.0 zip installed over it: schema 2, atlas.db.v1.bak kept, decisions and collection intact, the removal
+  classified 'user', v0.1 backup restores under 0.2; fresh v0.2.0 install: 85 starter, doctor ready, serves 0.2.0.
+  Deep extraction paths (~25 chars deeper) broke uv's venv on Windows (path length): documented short-path advice.
+- Evaluation: docs/evaluation/v1.1/REPORT.md (dev/final splits, provisional builder labels, retrieval, Jev gate).
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —

@@ -55,6 +55,7 @@ def test_exact_technique_names_in_the_request_become_targets(home):
         spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (jobs.create_job(
             store, 'find', {'goal': 'a lighthouse with lots of negative space', 'backend': 'fake'}),))['spec_json'])
     assert spec['targets'] == ['negative-space'] and 'lighthouse' in spec['reading']['subject_terms']
+    assert spec['reading']['constraints']['providers']  # the form's strict constraints are part of the reading
 
 
 def test_an_automatic_rejection_is_reconsidered_only_by_a_newer_analysis_version(home):
