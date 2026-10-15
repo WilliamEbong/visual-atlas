@@ -83,4 +83,5 @@ export const STATE_LABEL: Record<State, string> = {
 
 export const PROVIDERS: Record<string, string> = {
   aic: 'Art Institute of Chicago', met: 'The Met', cma: 'Cleveland Museum of Art', smithsonian: 'Smithsonian', commons: 'Wikimedia Commons',
+  rijksmuseum: 'Rijksmuseum', nga: 'National Gallery of Art',
 }

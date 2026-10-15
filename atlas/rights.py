@@ -145,4 +145,45 @@ def _commons_credit(candidate, artist, licence):
     return f'"{title}" by {artist or "unknown author"}, {licence}, via Wikimedia Commons ({candidate["source_url"]}).'
 
 
-_RULES = {'aic': _aic, 'met': _met, 'cma': _cma, 'smithsonian': _smithsonian, 'commons': _commons}
+RIJKS_RIGHTS = {'https://creativecommons.org/publicdomain/mark/1.0/': 'PD',
+                'https://creativecommons.org/publicdomain/zero/1.0/': 'CC0',
+                'https://creativecommons.org/licenses/by/4.0/': 'BY'}
+
+
+def _rijksmuseum(candidate, raw, policy):
+    """The image's own rights statement (on the VisualItem). The CC0 on the object's metadata record covers the
+    catalogue data, not the picture, and is never read here."""
+    rights = [uri for uri in raw.get('rights') or [] if uri]
+    if not rights:
+        return _no('no rights statement on the image record')
+    if len(rights) > 1:
+        return _no(f'more than one rights statement ({", ".join(rights)}); not handled automatically')
+    kind = RIJKS_RIGHTS.get(rights[0].replace('http://', 'https://'))
+    if kind is None:
+        return _no(f'rights statement {rights[0]} is not one this source policy accepts')
+    evidence = {'visual_item': raw.get('visual_item', ''), 'rights': rights[0], 'digital_object': raw.get('digital_object', '')}
+    if kind == 'PD':
+        return _yes('PD', candidate, policy, code='PD', version='1.0', url=PD_URL, evidence=evidence)
+    if kind == 'CC0':
+        return _yes('CC0', candidate, policy, code='CC0', version='1.0', url=CC0_URL, evidence=evidence)
+    url = 'https://creativecommons.org/licenses/by/4.0/'
+    return _yes('BY', candidate, policy, code='CC BY', version='4.0', url=url, evidence=evidence,
+                attribution=credit_line(candidate, 'Rijksmuseum', f'CC BY 4.0 ({url})'))
+
+
+def _nga(candidate, raw, policy):
+    """National Gallery open data: openaccess 1 marks a CC0 image; a size cap (maxpixels) marks a restricted one."""
+    if str(raw.get('openaccess')) != '1':
+        return _no('not an open-access image in the Gallery\'s data')
+    if raw.get('maxpixels'):
+        return _no('image is size-restricted (maxpixels set), so not open access')
+    if raw.get('viewtype') != 'primary':
+        return _no('not the primary image of the object')
+    return _yes('CC0', candidate, policy, code='CC0', version='1.0', url=CC0_URL,
+                evidence={'openaccess': '1', 'maxpixels': '', 'viewtype': 'primary', 'iiifurl': raw.get('iiifurl', ''),
+                          'index_built': raw.get('index_built', '')},
+                attribution=credit_line(candidate, 'Courtesy National Gallery of Art, Washington', 'CC0'))
+
+
+_RULES = {'aic': _aic, 'met': _met, 'cma': _cma, 'smithsonian': _smithsonian, 'commons': _commons,
+          'rijksmuseum': _rijksmuseum, 'nga': _nga}

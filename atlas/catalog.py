@@ -12,7 +12,7 @@ from atlas.home import DATA
 
 Slug = Annotated[str, Field(pattern=r'^[a-z0-9]+(-[a-z0-9]+)*$', max_length=60)]
 Text = Annotated[str, Field(min_length=1, max_length=1200)]
-PROVIDERS = ('aic', 'met', 'cma', 'smithsonian', 'commons')
+PROVIDERS = ('aic', 'met', 'cma', 'smithsonian', 'commons', 'rijksmuseum', 'nga')  # connectors in atlas/providers.py
 RELATIONS = ('often_combined', 'opposite_strategy', 'similar_purpose', 'builds_on', 'can_create', 'related')
 
 

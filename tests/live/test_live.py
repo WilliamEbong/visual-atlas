@@ -28,6 +28,19 @@ def test_provider_search_and_rights(provider, query):
     assert all('eligible' in d for d in decisions)
 
 
+@pytest.mark.parametrize('provider, query', [('rijksmuseum', 'landscape'), ('nga', 'harbor')])
+def test_v03_sources_search_rights_and_one_image(provider, query, tmp_path):
+    """The National Gallery case downloads its open data (about 190 MB) into a temporary folder."""
+    fetcher = Fetcher(POLICIES)
+    candidates = providers.search(fetcher, provider, query, 0, 4, home=tmp_path)
+    assert candidates, f'{provider} returned nothing'
+    decisions = [rights.check(c, catalog.policy(POLICIES, provider)) for c in candidates]
+    eligible = [c for c, d in zip(candidates, decisions) if d['eligible']]
+    assert eligible, [d.get('reason') for d in decisions]
+    data = fetcher.get_image(provider, eligible[0]['image_url'])
+    assert Image.open(io.BytesIO(data)).size[0] > 400
+
+
 @pytest.fixture
 def picture(tmp_path):
     image = Image.new('RGB', (900, 600), (235, 232, 222))

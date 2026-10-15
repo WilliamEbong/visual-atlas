@@ -21,8 +21,8 @@
 
 ## Phase 4: Sources (US5)
 - [x] T614 Research record per source with official URLs and dates (docs/evaluation/v0.3/SOURCES.md)
-- [ ] T615 Connectors, rights rules, policies, fixtures and tests for each accepted source; disabled entries with evidence for the rest; search hints (atlas/providers.py, atlas/rights.py, atlas/data/source_policies.json, atlas/data/taxonomy.json, tests/)
-- [ ] T616 Live smoke per enabled new source (tests marked live)
+- [x] T615 Connectors, rights rules, policies, fixtures and tests for each accepted source; disabled entries with evidence for the rest; search hints (atlas/providers.py, atlas/rights.py, atlas/data/source_policies.json, atlas/data/taxonomy.json, tests/)
+- [x] T616 Live smoke per enabled new source (tests marked live)
 
 ## Phase 5: Request coding (US6)
 - [ ] T617 request_cues in the taxonomy, coder phrase matching and stopword fixes + tests (atlas/data/taxonomy.json, atlas/coding.py, tests/test_coding.py)

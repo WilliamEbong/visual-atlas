@@ -77,7 +77,8 @@ class Fetcher:
                 self.sleep(wait)
             self._last[provider] = time.monotonic()
 
-    def get(self, provider: str, url: str, *, max_bytes: int, types: tuple[str, ...], headers=None) -> bytes:
+    def get(self, provider: str, url: str, *, max_bytes: int, types: tuple[str, ...], headers=None, sink=None) -> bytes:
+        """The body, or b'' after streaming it into `sink` (an open binary file) for large open-data files."""
         wait = self._cooldown.get(provider, 0) - time.monotonic()
         if wait > 0:  # refuse at once instead of sleeping; the job schedules the retry
             raise FetchError('rate_limited', f'{self.policies[provider]["name"]} asked us to slow down.', wait)
@@ -125,10 +126,15 @@ class Fetcher:
                     if declared.isdigit() and int(declared) > max_bytes:
                         raise FetchError('too_large', 'The file is larger than the size limit.')
                     data = bytearray()
+                    size = 0
                     for chunk in response.iter_bytes():
-                        data.extend(chunk)
-                        if len(data) > max_bytes:
+                        size += len(chunk)
+                        if size > max_bytes:
                             raise FetchError('too_large', 'The file is larger than the size limit.')
+                        if sink is None:
+                            data.extend(chunk)
+                        else:
+                            sink.write(chunk)
                     return bytes(data)
             except httpx.TimeoutException:
                 raise FetchError('timeout', f'{self.policies[provider]["name"]} did not answer in time.') from None
@@ -136,11 +142,12 @@ class Fetcher:
                 raise FetchError('network', f'Could not reach {self.policies[provider]["name"]}.') from None
         raise FetchError('too_many_redirects', 'The address redirected too many times.')
 
-    def get_json(self, provider: str, url: str, params: dict | None = None, headers=None) -> dict:
+    def get_json(self, provider: str, url: str, params: dict | None = None, headers=None,
+                 types: tuple[str, ...] = ('application/json',)) -> dict:
         if params:
             self.check_url(provider, url)  # Validate before HTTPX can normalize away invalid userinfo.
             url = str(httpx.URL(url, params=params))
-        data = self.get(provider, url, max_bytes=MAX_JSON_BYTES, types=('application/json',), headers=headers)
+        data = self.get(provider, url, max_bytes=MAX_JSON_BYTES, types=types, headers=headers)
         try:
             value = json.loads(data)
         except (ValueError, UnicodeDecodeError):

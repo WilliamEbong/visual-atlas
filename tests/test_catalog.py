@@ -17,8 +17,8 @@ def test_shipped_files_are_valid_and_complete():
         assert technique['sources'] or technique['working_definition']
         assert technique['confusions'] and technique['related'] and technique['counterexample']
     enabled = {p['id'] for p in policies['providers'] if p['status'] == 'enabled'}
-    assert enabled == {'aic', 'met', 'cma', 'smithsonian', 'commons'}
-    assert {'unsplash', 'pexels', 'pixabay'} <= {p['id'] for p in policies['providers'] if p['status'] == 'disabled'}
+    assert enabled == {'aic', 'met', 'cma', 'smithsonian', 'commons', 'rijksmuseum', 'nga'}
+    assert {'unsplash', 'pexels', 'pixabay', 'nasa', 'loc'} <= {p['id'] for p in policies['providers'] if p['status'] == 'disabled'}
 
 
 def test_dangling_references_are_reported():

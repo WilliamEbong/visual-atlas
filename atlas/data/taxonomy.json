@@ -67,7 +67,9 @@
         "aic": ["solitary figure", "snow", "empty beach", "fog"],
         "cma": ["seascape", "winter landscape", "solitary"],
         "smithsonian": ["lone tree photograph", "desert landscape"],
-        "commons": ["minimalism photography", "lone tree field", "single boat lake"]
+        "commons": ["minimalism photography", "lone tree field", "single boat lake"],
+        "rijksmuseum": ["solitary figure", "snow"],
+        "nga": ["solitary figure", "snow"]
       },
       "sources": [{"citation": "Wikipedia, \"Negative space\"", "url": "https://en.wikipedia.org/wiki/Negative_space"}],
       "working_definition": true
@@ -99,7 +101,9 @@
         "aic": ["figures cliffs", "ships harbor", "giant"],
         "cma": ["mountain landscape figures", "ruins"],
         "smithsonian": ["canyon photograph", "redwood tree"],
-        "commons": ["person giant tree", "small boat big ship", "climber mountain"]
+        "commons": ["person giant tree", "small boat big ship", "climber mountain"],
+        "rijksmuseum": ["figures cliffs", "ships harbor"],
+        "nga": ["figures cliffs", "ships harbor"]
       },
       "sources": [{"citation": "Wikipedia, \"Scale (art)\"", "url": "https://en.wikipedia.org/wiki/Scale_(art)"}],
       "working_definition": true
@@ -131,7 +135,9 @@
         "aic": ["red dress", "orange", "sunset"],
         "cma": ["red", "sunset harbor"],
         "smithsonian": ["poster red blue", "parrot"],
-        "commons": ["red umbrella blue", "orange flower blue background", "complementary colors photography"]
+        "commons": ["red umbrella blue", "orange flower blue background", "complementary colors photography"],
+        "rijksmuseum": ["red dress", "orange"],
+        "nga": ["red dress", "orange"]
       },
       "sources": [{"citation": "Wikipedia, \"Contrast (vision)\"", "url": "https://en.wikipedia.org/wiki/Contrast_(vision)"}, {"citation": "Wikipedia, \"Complementary colors\"", "url": "https://en.wikipedia.org/wiki/Complementary_colors"}],
       "working_definition": true
@@ -163,7 +169,9 @@
         "aic": ["candle", "night", "interior lamp"],
         "cma": ["candlelight", "night"],
         "smithsonian": ["night photograph", "spotlight"],
-        "commons": ["chiaroscuro photography", "window light portrait", "single light dark room"]
+        "commons": ["chiaroscuro photography", "window light portrait", "single light dark room"],
+        "rijksmuseum": ["candle", "night"],
+        "nga": ["candle", "night"]
       },
       "sources": [{"citation": "Wikipedia, \"Chiaroscuro\"", "url": "https://en.wikipedia.org/wiki/Chiaroscuro"}],
       "working_definition": true
@@ -195,7 +203,9 @@
         "aic": ["row", "repeated", "pattern"],
         "cma": ["procession", "pattern"],
         "smithsonian": ["rows photograph", "uniform"],
-        "commons": ["odd one out", "row of chairs one different", "one red among white"]
+        "commons": ["odd one out", "row of chairs one different", "one red among white"],
+        "rijksmuseum": ["row", "repeated"],
+        "nga": ["row", "repeated"]
       },
       "sources": [{"citation": "Wikipedia, \"Pop-out effect\"", "url": "https://en.wikipedia.org/wiki/Pop-out_effect"}],
       "working_definition": true
@@ -227,7 +237,9 @@
         "aic": ["doorway", "window view", "arch"],
         "cma": ["interior doorway", "window"],
         "smithsonian": ["doorway photograph", "archway"],
-        "commons": ["view through window", "doorway silhouette", "arch frame"]
+        "commons": ["view through window", "doorway silhouette", "arch frame"],
+        "rijksmuseum": ["doorway", "window view"],
+        "nga": ["doorway", "window view"]
       },
       "sources": [{"citation": "Wikipedia, \"Framing (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Framing_(visual_arts)"}],
       "working_definition": true
@@ -259,7 +271,9 @@
         "aic": ["road", "avenue", "railroad", "river"],
         "cma": ["road", "canal", "street"],
         "smithsonian": ["railroad tracks photograph", "highway"],
-        "commons": ["leading lines road", "railway perspective", "pier perspective"]
+        "commons": ["leading lines road", "railway perspective", "pier perspective"],
+        "rijksmuseum": ["road", "avenue"],
+        "nga": ["road", "avenue"]
       },
       "sources": [{"citation": "Wikipedia, \"Composition (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Composition_(visual_arts)"}],
       "working_definition": true
@@ -291,7 +305,9 @@
         "aic": ["group", "family", "figures conversing"],
         "cma": ["group", "family"],
         "smithsonian": ["group portrait photograph", "family photograph"],
-        "commons": ["group of people apart", "birds on wire", "cluster"]
+        "commons": ["group of people apart", "birds on wire", "cluster"],
+        "rijksmuseum": ["group", "family"],
+        "nga": ["group", "family"]
       },
       "sources": [{"citation": "Wikipedia, \"Principles of grouping\"", "url": "https://en.wikipedia.org/wiki/Principles_of_grouping"}],
       "working_definition": true
@@ -323,7 +339,9 @@
         "aic": ["looking", "gaze", "pointing figure"],
         "cma": ["portrait looking", "woman reading"],
         "smithsonian": ["portrait looking away", "pointing photograph"],
-        "commons": ["person looking at", "looking through window", "pointing finger"]
+        "commons": ["person looking at", "looking through window", "pointing finger"],
+        "rijksmuseum": ["looking", "gaze"],
+        "nga": ["looking", "gaze"]
       },
       "sources": [{"citation": "Wikipedia, \"Gaze\"", "url": "https://en.wikipedia.org/wiki/Gaze"}],
       "working_definition": true
@@ -355,7 +373,9 @@
         "aic": ["close-up", "hands", "face detail"],
         "cma": ["head", "hands", "fragment"],
         "smithsonian": ["close-up photograph", "macro"],
-        "commons": ["extreme close-up", "macro photography", "cropped portrait"]
+        "commons": ["extreme close-up", "macro photography", "cropped portrait"],
+        "rijksmuseum": ["close-up", "hands"],
+        "nga": ["close-up", "hands"]
       },
       "sources": [{"citation": "Wikipedia, \"Cropping (image)\"", "url": "https://en.wikipedia.org/wiki/Cropping_(image)"}],
       "working_definition": true
@@ -387,7 +407,9 @@
         "aic": ["old and new", "city and nature"],
         "cma": ["ruins", "old and young"],
         "smithsonian": ["old and new photograph", "industry nature"],
-        "commons": ["old and new architecture", "juxtaposition photography", "nature versus city"]
+        "commons": ["old and new architecture", "juxtaposition photography", "nature versus city"],
+        "rijksmuseum": ["old and new", "city and nature"],
+        "nga": ["old and new", "city and nature"]
       },
       "sources": [{"citation": "Wikipedia, \"Juxtaposition\"", "url": "https://en.wikipedia.org/wiki/Juxtaposition"}],
       "working_definition": true
@@ -419,7 +441,9 @@
         "aic": ["silhouette", "stencil"],
         "cma": ["silhouette"],
         "smithsonian": ["poster silhouette", "cooper hewitt poster"],
-        "commons": ["figure ground illusion", "rubin vase", "optical illusion"]
+        "commons": ["figure ground illusion", "rubin vase", "optical illusion"],
+        "rijksmuseum": ["silhouette", "stencil"],
+        "nga": ["silhouette", "stencil"]
       },
       "sources": [{"citation": "Wikipedia, \"Figure–ground (perception)\"", "url": "https://en.wikipedia.org/wiki/Figure%E2%80%93ground_(perception)"}],
       "working_definition": true
@@ -451,7 +475,9 @@
         "aic": ["allegory", "symbol"],
         "cma": ["allegory", "vanitas"],
         "smithsonian": ["poster", "propaganda poster"],
-        "commons": ["vanitas", "allegory painting", "emblem book"]
+        "commons": ["vanitas", "allegory painting", "emblem book"],
+        "rijksmuseum": ["allegory", "symbol"],
+        "nga": ["allegory", "symbol"]
       },
       "sources": [{"citation": "Wikipedia, \"Visual metaphor\"", "url": "https://en.wikipedia.org/wiki/Visual_metaphor"}],
       "working_definition": true
@@ -483,7 +509,9 @@
         "aic": ["surrealism", "dream"],
         "cma": ["surreal", "fantasy"],
         "smithsonian": ["unusual photograph", "fantasy"],
-        "commons": ["surreal photography", "animal in city", "out of place"]
+        "commons": ["surreal photography", "animal in city", "out of place"],
+        "rijksmuseum": ["surrealism", "dream"],
+        "nga": ["surrealism", "dream"]
       },
       "sources": [{"citation": "Wikipedia, \"Surrealism\"", "url": "https://en.wikipedia.org/wiki/Surrealism"}],
       "working_definition": true
@@ -515,7 +543,9 @@
         "aic": ["facade", "reflection", "temple"],
         "cma": ["facade", "reflection"],
         "smithsonian": ["architecture facade", "reflection photograph"],
-        "commons": ["symmetry architecture", "reflection lake mountain", "symmetrical corridor"]
+        "commons": ["symmetry architecture", "reflection lake mountain", "symmetrical corridor"],
+        "rijksmuseum": ["facade", "reflection"],
+        "nga": ["facade", "reflection"]
       },
       "sources": [{"citation": "Wikipedia, \"Symmetry\"", "url": "https://en.wikipedia.org/wiki/Symmetry"}],
       "working_definition": true
@@ -547,7 +577,9 @@
         "aic": ["pattern", "columns", "rows"],
         "cma": ["pattern", "textile"],
         "smithsonian": ["pattern design", "wallpaper"],
-        "commons": ["repetition pattern architecture", "rows of windows", "colonnade"]
+        "commons": ["repetition pattern architecture", "rows of windows", "colonnade"],
+        "rijksmuseum": ["pattern", "columns"],
+        "nga": ["pattern", "columns"]
       },
       "sources": [{"citation": "Wikipedia, \"Rhythm (art)\"", "url": "https://en.wikipedia.org/wiki/Rhythm_(art)"}],
       "working_definition": true
@@ -579,7 +611,9 @@
         "aic": ["landscape", "valley", "view"],
         "cma": ["landscape", "view"],
         "smithsonian": ["landscape painting", "valley photograph"],
-        "commons": ["foreground middleground background", "mountain layers", "valley view"]
+        "commons": ["foreground middleground background", "mountain layers", "valley view"],
+        "rijksmuseum": ["landscape", "valley"],
+        "nga": ["landscape", "valley"]
       },
       "sources": [{"citation": "Wikipedia, \"Depth perception\" (occlusion cue)", "url": "https://en.wikipedia.org/wiki/Depth_perception"}],
       "working_definition": true
@@ -611,7 +645,9 @@
         "aic": ["mist", "mountains", "haze"],
         "cma": ["mist", "mountains"],
         "smithsonian": ["mountains mist", "hudson river school"],
-        "commons": ["mountain layers haze", "misty hills", "fog valley"]
+        "commons": ["mountain layers haze", "misty hills", "fog valley"],
+        "rijksmuseum": ["mist", "mountains"],
+        "nga": ["mist", "mountains"]
       },
       "sources": [{"citation": "Wikipedia, \"Aerial perspective\"", "url": "https://en.wikipedia.org/wiki/Aerial_perspective"}],
       "working_definition": true
@@ -643,7 +679,9 @@
         "aic": ["pictorialist photograph", "soft focus"],
         "cma": ["photograph portrait"],
         "smithsonian": ["photograph flower close", "soft focus"],
-        "commons": ["shallow depth of field", "bokeh flower", "macro insect"]
+        "commons": ["shallow depth of field", "bokeh flower", "macro insect"],
+        "rijksmuseum": ["pictorialist photograph", "soft focus"],
+        "nga": ["pictorialist photograph", "soft focus"]
       },
       "sources": [{"citation": "Wikipedia, \"Depth of field\"", "url": "https://en.wikipedia.org/wiki/Depth_of_field"}],
       "working_definition": true
@@ -675,7 +713,9 @@
         "aic": ["storm", "wind", "battle"],
         "cma": ["storm", "battle"],
         "smithsonian": ["staircase photograph", "bridge cables"],
-        "commons": ["diagonal composition", "staircase diagonal", "dutch angle"]
+        "commons": ["diagonal composition", "staircase diagonal", "dutch angle"],
+        "rijksmuseum": ["storm", "wind"],
+        "nga": ["storm", "wind"]
       },
       "sources": [{"citation": "Wikipedia, \"Composition (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Composition_(visual_arts)"}],
       "working_definition": true
@@ -707,7 +747,9 @@
         "aic": ["dancer", "galloping", "wave"],
         "cma": ["dancer", "horse"],
         "smithsonian": ["motion photograph", "muybridge"],
-        "commons": ["motion blur", "jumping person", "bird in flight"]
+        "commons": ["motion blur", "jumping person", "bird in flight"],
+        "rijksmuseum": ["dancer", "galloping"],
+        "nga": ["dancer", "galloping"]
       },
       "sources": [{"citation": "Wikipedia, \"Motion blur\"", "url": "https://en.wikipedia.org/wiki/Motion_blur"}],
       "working_definition": true
@@ -739,7 +781,9 @@
         "aic": ["silhouette", "sunset"],
         "cma": ["silhouette", "sunset"],
         "smithsonian": ["silhouette portrait", "cut paper silhouette"],
-        "commons": ["silhouette sunset", "backlit person", "silhouette tree"]
+        "commons": ["silhouette sunset", "backlit person", "silhouette tree"],
+        "rijksmuseum": ["silhouette", "sunset"],
+        "nga": ["silhouette", "sunset"]
       },
       "sources": [{"citation": "Wikipedia, \"Silhouette\"", "url": "https://en.wikipedia.org/wiki/Silhouette"}],
       "working_definition": true
@@ -771,7 +815,9 @@
         "aic": ["still life", "fur", "textile"],
         "cma": ["still life", "lace"],
         "smithsonian": ["texture photograph", "bark"],
-        "commons": ["rough smooth texture", "tree bark close-up", "weathered wood"]
+        "commons": ["rough smooth texture", "tree bark close-up", "weathered wood"],
+        "rijksmuseum": ["still life", "fur"],
+        "nga": ["still life", "fur"]
       },
       "sources": [{"citation": "Wikipedia, \"Texture (visual arts)\"", "url": "https://en.wikipedia.org/wiki/Texture_(visual_arts)"}],
       "working_definition": true
@@ -803,7 +849,9 @@
         "aic": ["view from above", "aerial"],
         "cma": ["view from above", "bird's eye"],
         "smithsonian": ["aerial photograph", "skyscraper looking up"],
-        "commons": ["looking up skyscraper", "aerial view pattern", "top-down view"]
+        "commons": ["looking up skyscraper", "aerial view pattern", "top-down view"],
+        "rijksmuseum": ["view from above", "aerial"],
+        "nga": ["view from above", "aerial"]
       },
       "sources": [{"citation": "Wikipedia, \"Camera angle\"", "url": "https://en.wikipedia.org/wiki/Camera_angle"}],
       "working_definition": true
@@ -835,7 +883,9 @@
         "aic": ["nocturne", "blue", "twilight"],
         "cma": ["nocturne", "twilight"],
         "smithsonian": ["tonalism", "nocturne"],
-        "commons": ["monochromatic photography", "blue hour city", "golden hour field"]
+        "commons": ["monochromatic photography", "blue hour city", "golden hour field"],
+        "rijksmuseum": ["nocturne", "blue"],
+        "nga": ["nocturne", "blue"]
       },
       "sources": [{"citation": "Wikipedia, \"Color scheme\"", "url": "https://en.wikipedia.org/wiki/Color_scheme"}],
       "working_definition": true
@@ -867,7 +917,9 @@
         "aic": ["landscape figure", "boat"],
         "cma": ["landscape", "boat"],
         "smithsonian": ["landscape photograph"],
-        "commons": ["rule of thirds", "lone boat lake", "lighthouse coast"]
+        "commons": ["rule of thirds", "lone boat lake", "lighthouse coast"],
+        "rijksmuseum": ["landscape figure", "boat"],
+        "nga": ["landscape figure", "boat"]
       },
       "sources": [{"citation": "Wikipedia, \"Rule of thirds\"", "url": "https://en.wikipedia.org/wiki/Rule_of_thirds"}],
       "working_definition": true

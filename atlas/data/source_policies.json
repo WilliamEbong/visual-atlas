@@ -1,7 +1,7 @@
 {
   "version": "2026-10-15.1",
   "note": "Which providers Visual Atlas may collect from, and why. atlas/rights.py applies each enabled provider's rule to every item; anything that does not meet the rule is ineligible. 'checked_on' is when a person last read the evidence pages. Re-check before changing a status.",
-  "user_agent": "VisualAtlas/0.1 (+https://github.com/WilliamEbong/visual-atlas; local personal research app)",
+  "user_agent": "VisualAtlas/0.3 (+https://github.com/WilliamEbong/visual-atlas; local personal research app)",
   "providers": [
     {
       "id": "aic",
@@ -145,6 +145,62 @@
       "checked_on": "2026-10-15"
     },
     {
+      "id": "rijksmuseum",
+      "name": "Rijksmuseum",
+      "status": "enabled",
+      "hosts": [
+        "data.rijksmuseum.nl",
+        "id.rijksmuseum.nl",
+        "iiif.micr.io"
+      ],
+      "requires_key": false,
+      "min_interval_seconds": 0.5,
+      "accepted_licenses": [
+        "PDM-1.0",
+        "CC0-1.0",
+        "CC-BY-4.0"
+      ],
+      "rule": "The image's own rights statement (VisualItem subject_to) is the Public Domain Mark 1.0, CC0 1.0 or CC BY 4.0. The CC0 on the object's metadata record covers the catalogue data only and is not read.",
+      "label": "Public domain or CC0 — source checked; CC BY credits Rijksmuseum",
+      "attribution": "Maker, Title, Date. Rijksmuseum, Amsterdam (object number); CC BY 4.0 images keep the licence link.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "In Copyright and any other rights statement are skipped. Searches match English titles.",
+      "evidence_urls": [
+        "https://data.rijksmuseum.nl/policy",
+        "https://data.rijksmuseum.nl/docs/search"
+      ],
+      "notes": "Three requests per item (object, VisualItem, DigitalObject); images are IIIF from iiif.micr.io.",
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "nga",
+      "name": "National Gallery of Art",
+      "status": "enabled",
+      "hosts": [
+        "raw.githubusercontent.com",
+        "api.nga.gov"
+      ],
+      "requires_key": false,
+      "min_interval_seconds": 0.5,
+      "default_on": false,
+      "setup": "First search downloads its open data (about 190 MB) and keeps a small index in your library folder.",
+      "accepted_licenses": [
+        "CC0-1.0"
+      ],
+      "rule": "The Gallery's open data marks the image openaccess = 1 with no maxpixels size cap, and it is the object's primary view. The Gallery releases such images as CC0.",
+      "label": "CC0 — source checked",
+      "attribution": "Maker, Title, Date. Courtesy National Gallery of Art, Washington. CC0.",
+      "permitted_mode": "Download a copy, store locally, display, analyse with AI for this library",
+      "restrictions": "Rights-restricted and size-capped images are skipped. The index refreshes after 30 days.",
+      "evidence_urls": [
+        "https://github.com/NationalGalleryOfArt/opendata",
+        "https://www.nga.gov/open-access-images.html",
+        "https://www.nga.gov/terms-and-notices"
+      ],
+      "notes": "No search API: the app searches a local index of the open-data CSV files.",
+      "checked_on": "2026-10-15"
+    },
+    {
       "id": "unsplash",
       "name": "Unsplash",
       "status": "disabled",
@@ -180,43 +236,35 @@
       "checked_on": "2026-10-15"
     },
     {
+      "id": "nasa",
+      "name": "NASA Image and Video Library",
+      "status": "disabled",
+      "reason": "No per-item rights field. NASA material is generally not copyrighted in the US, but third-party material is marked only in free-text credits and descriptions, so permission cannot be read mechanically.",
+      "evidence_urls": [
+        "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+        "https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
+      "id": "loc",
+      "name": "Library of Congress",
+      "status": "disabled",
+      "reason": "Rights are free text that varies by collection (rights_advisory, rights_information, collection-level rights), and its 'Free to Use' sets mix public domain, no known copyright and owner-cleared works without a per-item distinction. The JSON API was also blocked by a bot challenge during the check.",
+      "evidence_urls": [
+        "https://www.loc.gov/legal/",
+        "https://www.loc.gov/apis/json-and-yaml/working-within-limits/",
+        "https://www.loc.gov/free-to-use/"
+      ],
+      "checked_on": "2026-10-15"
+    },
+    {
       "id": "openverse",
       "name": "Openverse",
       "status": "candidate",
       "reason": "Aggregator that does not verify licences itself; each result would need checking at its original source. Not built yet.",
       "evidence_urls": [
         "https://docs.openverse.org/terms_of_service.html"
-      ],
-      "checked_on": "2026-10-15"
-    },
-    {
-      "id": "rijksmuseum",
-      "name": "Rijksmuseum",
-      "status": "candidate",
-      "reason": "New Linked Art search API is in beta and a per-image rights field was not verified. Not built yet.",
-      "evidence_urls": [
-        "https://data.rijksmuseum.nl/"
-      ],
-      "checked_on": "2026-10-15"
-    },
-    {
-      "id": "nga",
-      "name": "National Gallery of Art",
-      "status": "candidate",
-      "reason": "CC0 open data is published as CSV files rather than a search API; would need a different connector. Not built yet.",
-      "evidence_urls": [
-        "https://github.com/NationalGalleryOfArt/opendata",
-        "https://www.nga.gov/open-access-images.html"
-      ],
-      "checked_on": "2026-10-15"
-    },
-    {
-      "id": "nasa",
-      "name": "NASA Image and Video Library",
-      "status": "candidate",
-      "reason": "Generally not copyrighted, but some items are third-party and the usage guidelines need per-item checks. Not built yet.",
-      "evidence_urls": [
-        "https://www.nasa.gov/nasa-brand-center/images-and-media/"
       ],
       "checked_on": "2026-10-15"
     }

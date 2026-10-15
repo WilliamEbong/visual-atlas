@@ -421,7 +421,7 @@ class Worker:
 
     def _plan(self):
         self._set(stage='planning', message='Planning searches…')
-        enabled = [p for p in self.spec.get('providers') or providers.PROVIDERS
+        enabled = [p for p in self.spec.get('providers') or providers.DEFAULT_PROVIDERS
                    if catalog.policy(self.policies, p).get('status') == 'enabled']
         queries = []
         if self.job['kind'] == 'grow':
@@ -487,7 +487,7 @@ class Worker:
         started = time.monotonic()
         try:
             found = providers.search(self.fetcher, query['provider'], payload['query'], payload.get('page', 0),
-                                     int(self.spec.get('per_query', 8)))
+                                     int(self.spec.get('per_query', 8)), home=self.home)
         except FetchError as error:
             self.store.record_attempt({'job_id': self.job['id'], 'item_id': query['id'], 'kind': 'search',
                                        'backend': query['provider'], 'status': 'error', 'error_code': error.code,
@@ -1012,7 +1012,7 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
             raise ValueError('unknown technique')
         if kind == 'grow' and not technique_ids:
             technique_ids = [row['id'] for row in catalog.coverage(store)[:4]]
-        chosen = [p for p in spec.get('providers') or providers.PROVIDERS if p in providers.PROVIDERS]
+        chosen = [p for p in spec.get('providers') or providers.DEFAULT_PROVIDERS if p in providers.PROVIDERS]
         if not chosen:
             raise ValueError('choose at least one collection')
         target = int(spec.get('target_new_images') or 8)

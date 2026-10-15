@@ -4,14 +4,24 @@ provider, provider_item_id, title, creator, date_text, medium, description, sour
 image_headers, raw (the exact licence evidence fields rights.py checks)."""
 
 import re
+from pathlib import Path
 
+from atlas import nga
 from atlas.fetch import Fetcher, FetchError
-from atlas.home import local_setting
+from atlas.home import home_dir, local_setting
 from atlas.rights import plain
 
-PROVIDERS = ('aic', 'met', 'cma', 'smithsonian', 'commons')
+PROVIDERS = ('aic', 'met', 'cma', 'smithsonian', 'commons', 'rijksmuseum', 'nga')
 NAMES = {'aic': 'Art Institute of Chicago', 'met': 'The Met', 'cma': 'Cleveland Museum of Art',
-         'smithsonian': 'Smithsonian', 'commons': 'Wikimedia Commons'}
+         'smithsonian': 'Smithsonian', 'commons': 'Wikimedia Commons', 'rijksmuseum': 'Rijksmuseum',
+         'nga': 'National Gallery of Art'}
+# Searched when a job names no sources. The National Gallery is opt-in: its first search downloads ~190 MB.
+DEFAULT_PROVIDERS = tuple(p for p in PROVIDERS if p != 'nga')
+LINKED_ART = ('application/ld+json', 'application/json')
+ENGLISH = 'http://vocab.getty.edu/aat/300388277'
+CREATOR_NOTE = 'http://vocab.getty.edu/aat/300435417'
+MATERIAL_NOTE = 'http://vocab.getty.edu/aat/300435429'
+DESCRIPTION_NOTE = 'http://vocab.getty.edu/aat/300435452'
 # Commons structured-data licence statements used only to narrow searches; each file is still checked.
 COMMONS_LICENCES = ('haswbstatement:P275=Q6938433|P275=Q20007257|P275=Q14947546|P275=Q19125117'
                     '|P6216=Q19652')
@@ -23,7 +33,10 @@ def _clip(value, limit=500) -> str:
     return text.strip()[:limit]
 
 
-def search(fetcher: Fetcher, provider: str, query: str, page: int = 0, per_page: int = 10) -> list[dict]:
+def search(fetcher: Fetcher, provider: str, query: str, page: int = 0, per_page: int = 10,
+           home: Path | None = None) -> list[dict]:
+    if provider == 'nga':
+        return _nga(fetcher, query, page, per_page, home_dir(home))
     if provider not in _SEARCH:
         raise ValueError(f'unknown provider {provider}')
     return _SEARCH[provider](fetcher, query, page, per_page)
@@ -160,4 +173,86 @@ def _commons(fetcher, query, page, per_page):
     return results
 
 
-_SEARCH = {'aic': _aic, 'met': _met, 'cma': _cma, 'smithsonian': _smithsonian, 'commons': _commons}
+def _english(entries, classified: str | None = None) -> str:
+    """The English text of a Linked Art name or note list (optionally of one classification), else the first."""
+    matches = [e for e in entries or [] if isinstance(e, dict) and isinstance(e.get('content'), str)
+               and e.get('type') in ('Name', 'LinguisticObject')
+               and (classified is None or any(c.get('id') == classified for c in e.get('classified_as') or []))]
+    english = [e for e in matches if any(lang.get('id') == ENGLISH for lang in e.get('language') or [])]
+    return (english or matches or [{'content': ''}])[0]['content']
+
+
+def _first_id(entries) -> str:
+    entry = (entries or [{}])[0] if isinstance(entries, list) else {}
+    return entry.get('id', '') if isinstance(entry, dict) else ''
+
+
+def _linked(fetcher, url: str) -> dict:
+    if not url.startswith('https://id.rijksmuseum.nl/'):
+        return {}
+    return fetcher.get_json('rijksmuseum', url, headers={'Accept': 'application/ld+json'}, types=LINKED_ART)
+
+
+def _rijksmuseum(fetcher, query, page, per_page):
+    """Linked Art: the object gives title, maker and date; its VisualItem carries the image's own rights statement
+    and points to the DigitalObject whose access point is the IIIF image (three requests per item)."""
+    found = fetcher.get_json('rijksmuseum', 'https://data.rijksmuseum.nl/search/collection',
+                             params={'title': query, 'imageAvailable': 'true'}, types=LINKED_ART)
+    ids = [i.get('id', '') for i in found.get('orderedItems') or [] if isinstance(i, dict)]
+    ids = [i for i in ids if i.startswith('https://id.rijksmuseum.nl/')][page * per_page:(page + 1) * per_page]
+    results = []
+    for object_url in ids:
+        try:
+            item = _linked(fetcher, object_url)
+            visual_url = _first_id(item.get('shows'))
+            visual = _linked(fetcher, visual_url)
+            digital_url = _first_id(visual.get('digitally_shown_by'))
+            digital = _linked(fetcher, digital_url)
+        except FetchError as error:
+            if error.code == 'http_404':
+                continue
+            raise
+        produced = item.get('produced_by') or {}
+        makers = [_english(part.get('referred_to_by'), CREATOR_NOTE)
+                  for part in produced.get('part') or [] if isinstance(part, dict)]
+        pages = [_first_id(carrier.get('access_point')) for s in item.get('subject_of') or [] if isinstance(s, dict)
+                 for carrier in s.get('digitally_carried_by') or [] if isinstance(carrier, dict)]
+        page_url = next((u for u in pages if u.startswith('https://www.rijksmuseum.nl/')), '')
+        number = next((e.get('content', '') for e in item.get('identified_by') or []
+                       if isinstance(e, dict) and e.get('type') == 'Identifier'), '')
+        access = _first_id(digital.get('access_point'))
+        image_url = access.replace('/full/max/', '/full/1600,/') if access.startswith('https://iiif.micr.io/') else ''
+        rights = sorted({c.get('id', '') for r in visual.get('subject_to') or [] if isinstance(r, dict)
+                         for c in r.get('classified_as') or [] if isinstance(c, dict)})
+        results.append({
+            'provider': 'rijksmuseum', 'provider_item_id': object_url.rsplit('/', 1)[-1],
+            'title': _clip(_english(item.get('identified_by')), 300),
+            'creator': _clip(re.sub(r'\s*\([^)]*\)\s*$', '', next((m for m in makers if m), '')), 200),
+            'date_text': _clip(_english((produced.get('timespan') or {}).get('identified_by')), 80),
+            'medium': _clip(_english(item.get('referred_to_by'), MATERIAL_NOTE), 200),
+            'description': _clip(_english(item.get('referred_to_by'), DESCRIPTION_NOTE), 400),
+            'source_url': page_url or (f'https://www.rijksmuseum.nl/en/collection/{number}' if number else ''),
+            'image_url': image_url, 'image_headers': {},
+            'credit_line': f'Rijksmuseum, Amsterdam{f" ({number})" if number else ""}',
+            'raw': {'visual_item': visual_url, 'rights': rights, 'digital_object': digital_url, 'access_point': access}})
+    return results
+
+
+def _nga(fetcher, query, page, per_page, home: Path):
+    data = nga.load(fetcher, home)
+    results = []
+    for row in nga.search(data, query, page, per_page):
+        results.append({
+            'provider': 'nga', 'provider_item_id': row['id'], 'title': _clip(row['title'], 300),
+            'creator': _clip(row['creator'], 200), 'date_text': _clip(row['date'], 80), 'medium': _clip(row['medium'], 200),
+            'description': _clip(', '.join(row['terms'][:12]), 400),
+            'source_url': f"https://www.nga.gov/collection/art-object-page.{row['id']}.html",
+            'image_url': f"{row['iiif']}/full/!1600,1600/0/default.jpg", 'image_headers': {},
+            'credit_line': _clip(row['credit'], 300),
+            'raw': {'openaccess': '1', 'maxpixels': '', 'viewtype': 'primary', 'iiifurl': row['iiif'],
+                    'index_built': data['built'], 'index_source': data['source']}})
+    return results
+
+
+_SEARCH = {'aic': _aic, 'met': _met, 'cma': _cma, 'smithsonian': _smithsonian, 'commons': _commons,
+           'rijksmuseum': _rijksmuseum}
