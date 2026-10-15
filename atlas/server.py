@@ -202,8 +202,10 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             analysis = store.one('SELECT id, backend, model, model_version, created_at, result_json FROM analyses '
                                  'WHERE id=?', (row['analysis_id'],)) if row['analysis_id'] else None
             annotations = store.rows(
-                "SELECT a.*, t.name, t.data_json FROM annotations a JOIN techniques t ON t.id=a.technique_id "
-                "WHERE a.image_id=? ORDER BY a.state='rejected', a.role='primary' DESC, a.confidence DESC", (image_id,))
+                "SELECT a.*, t.name, t.data_json, p.backend AS proposed_backend, COALESCE(p.model_version, p.model) "
+                "AS proposed_model FROM annotations a JOIN techniques t ON t.id=a.technique_id LEFT JOIN analyses p "
+                "ON p.id=a.analysis_id WHERE a.image_id=? ORDER BY a.state='rejected', a.role='primary' DESC, "
+                "a.confidence DESC", (image_id,))
             history = store.rows('SELECT technique_id, state, changed_by, note, effect, created_at FROM annotation_history '
                                  'WHERE image_id=? ORDER BY id DESC LIMIT 60', (image_id,))
             related = store.rows(

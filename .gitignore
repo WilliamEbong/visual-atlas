@@ -31,3 +31,4 @@ __pycache__/
 web/test-results/
 .playwright-mcp/
 release/
+design-review/**/*.yml

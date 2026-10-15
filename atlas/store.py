@@ -114,8 +114,13 @@ class Store:
             raise ValueError('read query required')
         allowed = {sqlite3.SQLITE_SELECT, sqlite3.SQLITE_READ, sqlite3.SQLITE_FUNCTION,
                    sqlite3.SQLITE_RECURSIVE}
-        self.connection.set_authorizer(
-            lambda action, *args: sqlite3.SQLITE_OK if action in allowed else sqlite3.SQLITE_DENY)
+        def authorize(action, first, *rest):
+            # FTS5 checks PRAGMA data_version internally; every other pragma or write is refused.
+            if action in allowed or (action == sqlite3.SQLITE_PRAGMA and first == 'data_version'):
+                return sqlite3.SQLITE_OK
+            return sqlite3.SQLITE_DENY
+
+        self.connection.set_authorizer(authorize)
         try:
             return [dict(row) for row in self.connection.execute(query, parameters).fetchall()]
         finally:

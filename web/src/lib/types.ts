@@ -12,6 +12,7 @@ export interface LibraryItem {
 export interface Annotation {
   id: number; technique_id: string; name: string; definition: string; state: State; role: 'primary' | 'supporting'
   evidence: string[]; effect: string; confidence: number; changed_by: string; note: string; updated_at: string; human_locked: number
+  proposed_backend: string | null; proposed_model: string | null
 }
 
 export interface ImageDetail {

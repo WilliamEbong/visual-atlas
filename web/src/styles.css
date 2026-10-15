@@ -97,7 +97,7 @@ legend { font-family: var(--mono); font-size: 13px; color: var(--caption); paddi
 .plate .title { font-family: var(--display); font-size: 21px; line-height: 1.1; }
 .plate .maker { font-size: 13px; color: var(--graphite); }
 .plate .techs { font-size: 13px; color: var(--accent); }
-.plate .pick { position: absolute; top: 8px; right: 8px; background: var(--ground); min-height: 32px; padding: 4px 8px; font-size: 13px; }
+.pick { position: absolute; top: 8px; right: 8px; background: var(--ground); min-height: 32px; padding: 4px 8px; font-size: 13px; }
 .palette { display: flex; gap: 3px; }
 .palette span { width: 18px; height: 8px; }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { del, media, post, readOnly, request } from '../lib/client'
 import { date, useApp, useData } from '../lib/hooks'
 import { go, href } from '../lib/router'
@@ -23,6 +23,7 @@ export default function ImagePage({ id }: { id: number }) {
   const [editing, setEditing] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  useEffect(() => { if (data) document.title = `${data.image.title} · Visual Atlas` }, [data])
   if (error) return <div className="empty"><h1>Not found</h1><p className="notice error" role="alert">{error}</p><a href="#/">Back to the library</a></div>
   if (!data) return <p className="mono" aria-live="polite">Loading…</p>
   const { image, rights, metrics, analysis } = data
@@ -109,7 +110,10 @@ export default function ImagePage({ id }: { id: number }) {
             </div>
             <p><span className="muted">Evidence:</span> {a.evidence.join(' ') || '—'}</p>
             <p><span className="muted">Possible effect:</span> {a.effect || '—'}</p>
-            <p className="mono">{a.role === 'primary' ? 'Main technique · ' : ''}by {who(a.changed_by)}{a.changed_by !== 'human' ? ` · confidence ${Math.round(a.confidence * 100)}%` : ''}{a.note ? ` · ${a.note}` : ''}</p>
+            <p className="mono">{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
+              ? `proposed by ${backendName(a.proposed_backend)} (${a.proposed_model}) · confidence ${Math.round(a.confidence * 100)}%` : 'added by you'}
+              {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ` · checked by ${who(a.changed_by)}` : ''}
+              {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you' : ''}{a.note ? ` · ${a.note}` : ''}</p>
             {!readOnly && (editing === a.technique_id
               ? <TechniqueForm title="Correct this reading" fixed={a.technique_id} initialEvidence={a.evidence.join('\n')} initialEffect={a.effect}
                   onSave={(_, evidence, effect) => decide(a, 'human_reviewed', { evidence, effect })} onCancel={() => setEditing(null)} />

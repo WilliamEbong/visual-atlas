@@ -14,6 +14,12 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init, headers: { 'Content-Type': 'application/json', 'X-Atlas-Token': token(), ...init?.headers },
   })
   const data = await response.json().catch(() => null)
+  if (response.status === 401 && !sessionStorage.getItem('reloaded')) {
+    // The app was restarted with a new launch token: reload once to pick it up.
+    sessionStorage.setItem('reloaded', '1')
+    window.location.reload()
+  }
+  if (response.ok) sessionStorage.removeItem('reloaded')
   if (!response.ok) {
     const detail = data?.detail
     const message = typeof detail === 'string' ? detail : Array.isArray(detail)

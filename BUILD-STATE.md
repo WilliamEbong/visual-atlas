@@ -4,8 +4,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-Phase 0 spikes: prove Claude image input (stream-json base64 block, tools off) and Codex image
-input (`--image=`), live-smoke each provider and save fixtures under `tests/fixtures/providers/`.
+Playwright-verify the slice UI against a running server (scratch home with 3 live images), write
+Claude-owned tests (store, jobs, tasks, catalog, server), then fold in Codex task 2 results.
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —
@@ -25,6 +25,13 @@ input (`--image=`), live-smoke each provider and save fixtures under `tests/fixt
 - Manual upload / URL import skipped (brief marks upload optional); the SSRF-safe fetcher protects all provider downloads.
 
 ## Done
+- 2026-10-15: spikes passed — Codex `exec --image=` and Claude `--input-format stream-json` base64 image both read
+  real pixels with every tool disabled; all 5 providers live (Met search moved to /v1.1; AIC IIIF needs the
+  documented AIC-User-Agent header; Cleveland CDN had a temporary 521).
+- 2026-10-15: vertical slice live via CLI — `atlas find ... --backend codex --verify-with claude --count 3 --provider aic`
+  added 3 real AIC CC0 images; Codex (gpt-6-astra) analysed pixels, Claude (sonnet -> claude-sonnet-5-5) verified;
+  plan step by gpt-6-luna. Prompts then tightened (models over-proposed ~4 techniques each; verifier agreed with all).
+- 2026-10-15: /design canvas (4 artboards) https://claude.ai/artifact/6fHxDYjPYSVhEwWwoPgX8A ; React app built from it.
 - 2026-10-15: folder, `git init` (branch main), Spec Kit init + lean preset + Codex integration (claude default),
   CLAUDE.md = AGENTS.md, constitution v1.0.0, docs/FREE-IMAGE-SOURCES.md, .gitignore, keep-awake held.
 
@@ -33,10 +40,16 @@ input (`--image=`), live-smoke each provider and save fixtures under `tests/fixt
 5 connections + briefs · 6 packaging + docs · 7 ingestion (~60 refs) + held-out · 8 converge, reviews, release.
 
 ## File ownership
-- Claude: everything until a Codex task is recorded below.
+- Codex task 2 (running): atlas/fetch.py, atlas/images.py, atlas/rights.py, atlas/providers.py,
+  tests/test_fetch.py, tests/test_images.py, tests/test_rights.py, tests/test_providers.py.
+- Claude: everything else.
 
 ## Codex delegated tasks
-(none yet)
+1. task-mv9a1vza-xi4tsp (2026-10-15) — atlas/transfer.py + tests/test_transfer.py (credits, collection zip,
+   backup, restore with zip-slip/manifest/sha validation). Result inspected: 37 passed, ruff clean; code read.
+   Finding accepted: server must not restore while the worker runs -> restore now refuses during a running
+   job and joins the worker thread first (atlas/server.py).
+2. task-mv9al476-5imman (2026-10-15, running) — offline tests + bug fixes for fetch/images/rights/providers.
 
 ## Verification evidence
 (none yet)
