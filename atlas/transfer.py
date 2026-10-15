@@ -261,3 +261,73 @@ def restore(home, name) -> dict:
             raise
         shutil.rmtree(previous)
     return {'restored': name, 'images': count, 'safety_backup': safety['name']}
+
+
+STARTER_IMAGE_FIELDS = ('provider', 'provider_item_id', 'title', 'creator', 'date_text', 'medium', 'description',
+                        'source_url', 'file_sha256', 'analysis_sha256', 'dhash', 'width', 'height', 'bytes', 'mime',
+                        'status', 'favorite')
+
+
+def export_starter(store: Store, home: Path, out: Path) -> int:
+    """Write the library as a starter pack: library.json plus the ≤1024 px copies and thumbnails.
+
+    The full-size originals stay out (size); each record keeps the original's SHA-256 so a later download of the
+    same original is recognised as a duplicate."""
+    home, out = Path(home), Path(out)
+    if out.exists():
+        shutil.rmtree(out)
+    references = []
+    for row in store.rows('SELECT * FROM images WHERE removed_at IS NULL AND status=\'ready\' ORDER BY id'):
+        for key in ('analysis_path', 'thumb_path'):
+            target = out / 'media' / row[key]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(home / 'media' / row[key], target)
+        rights = store.one('SELECT * FROM rights_records WHERE image_id=? ORDER BY id DESC LIMIT 1', (row['id'],))
+        metrics = store.one('SELECT * FROM image_metrics WHERE image_id=?', (row['id'],))
+        analyses = store.rows("SELECT * FROM analyses WHERE image_id=? AND task IN ('analyze','verify') ORDER BY id",
+                              (row['id'],))
+        annotations = store.rows('SELECT technique_id, state, role, evidence_json, effect, confidence, analysis_id, '
+                                 'human_locked, changed_by, note, updated_at FROM annotations WHERE image_id=?', (row['id'],))
+        references.append({
+            'image': {**{k: row[k] for k in STARTER_IMAGE_FIELDS}, 'analysis_path': row['analysis_path'],
+                      'thumb_path': row['thumb_path']},
+            'rights': {k: v for k, v in rights.items() if k not in ('id', 'image_id')},
+            'metrics': {k: v for k, v in metrics.items() if k != 'image_id'},
+            'analyses': [{k: v for k, v in a.items() if k not in ('image_id', 'job_id')} for a in analyses],
+            'annotations': annotations, 'current_analysis': row['analysis_id']})
+    (out / 'library.json').write_text(json.dumps({'format': 'visual-atlas-starter', 'version': 1,
+                                                  'app_version': __version__, 'references': references},
+                                                 ensure_ascii=False, indent=1), encoding='utf-8')
+    return len(references)
+
+
+def import_starter(store: Store, home: Path, source: Path) -> int:
+    """Add the bundled starter references to a library (skips ones already present or removed)."""
+    home, source = Path(home), Path(source)
+    data = json.loads((source / 'library.json').read_text(encoding='utf-8'))
+    if data.get('format') != 'visual-atlas-starter' or data.get('version') != 1:
+        raise ValueError('not a Visual Atlas starter pack')
+    added = 0
+    for reference in data['references']:
+        image = dict(reference['image'])
+        paths = {key: image.pop(key) for key in ('analysis_path', 'thumb_path')}
+        for key, relative in paths.items():
+            parts = relative.split('/')
+            if len(parts) != 3 or parts[0] not in ('analysis', 'thumbs') or not re.fullmatch(r'[0-9a-f]{64}\.jpg', parts[2]):
+                raise ValueError('unexpected path in starter pack')
+            if key == 'analysis_path' and hashlib.sha256((source / 'media' / relative).read_bytes()).hexdigest() != \
+                    image['analysis_sha256']:
+                raise ValueError('starter image does not match its checksum')
+        for relative in paths.values():
+            target = home / 'media' / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if not target.exists():
+                shutil.copyfile(source / 'media' / relative, target)
+        provenance = json.loads(reference['rights']['provenance_json'])
+        provenance['starter_copy'] = 'Bundled reduced copy (≤1024 px); the full original is at the source.'
+        rights = {**reference['rights'], 'provenance_json': json.dumps(provenance, ensure_ascii=False, sort_keys=True)}
+        image_id = store.import_reference(
+            {**image, 'original_path': paths['analysis_path'], **paths}, rights, reference['metrics'],
+            reference['analyses'], reference['annotations'], reference['current_analysis'])
+        added += image_id is not None
+    return added

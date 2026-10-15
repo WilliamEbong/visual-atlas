@@ -1,12 +1,9 @@
-// Read-only public demo: answers a subset of GET requests from a bundled snapshot.json.
-// Built by scripts/build_demo.py from the starter library; no AI, no writes.
+// Read-only public demo: answers GET requests from a bundled snapshot.json (built by scripts/build_demo.py from
+// the starter library). No AI, no writes; the library list is filtered here in the browser.
 
-type Snapshot = Record<string, unknown> & {
-  library: { items: Record<string, unknown>[] }
-  images: Record<string, unknown>
-  techniques: Record<string, unknown>
-  goals: Record<string, unknown>
-}
+interface Item { id: number; title: string; creator: string; provider: string; orientation: string; color_family: string
+  favorite: number; techniques: { id: string; state?: string }[] }
+interface Snapshot { responses: Record<string, unknown>; library: { items: Item[]; total: number } }
 
 let snapshot: Promise<Snapshot> | null = null
 
@@ -19,30 +16,30 @@ function load(): Promise<Snapshot> {
 }
 
 export async function demoRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  if (init?.method && init.method !== 'GET') throw new Error('This is a read-only online demo. Download Visual Atlas to find and analyse images.')
+  if (init?.method && init.method !== 'GET') throw new Error('This is a read-only online demo. Download Visual Atlas to find, analyse and save images.')
   const data = await load()
-  const [route, search = ''] = path.split('?')
-  const query = new URLSearchParams(search)
-  const parts = route.split('/')
+  const key = decodeURIComponent(path)
+  if (key in data.responses) return data.responses[key] as T
+  const [route, search = ''] = key.split('?')
   if (route === 'library') {
-    let items = data.library.items as (Record<string, unknown> & { techniques: { id: string }[]; title: string; creator: string })[]
+    const query = new URLSearchParams(search)
     const q = (query.get('q') ?? '').toLowerCase()
-    const technique = query.get('technique')
-    const orientation = query.get('orientation')
-    const color = query.get('color')
-    const provider = query.get('provider')
+    let items = data.library.items
     if (q) items = items.filter((item) => JSON.stringify(item).toLowerCase().includes(q))
-    if (technique) items = items.filter((item) => item.techniques.some((t) => t.id === technique))
-    if (orientation) items = items.filter((item) => item.orientation === orientation)
-    if (color) items = items.filter((item) => item.color_family === color)
-    if (provider) items = items.filter((item) => item.provider === provider)
+    for (const [param, pick] of [['technique', (i: Item) => i.techniques.map((t) => t.id)], ['orientation', (i: Item) => [i.orientation]],
+      ['color', (i: Item) => [i.color_family]], ['provider', (i: Item) => [i.provider]],
+      ['state', (i: Item) => i.techniques.map((t) => t.state ?? '')]] as const) {
+      const wanted = query.get(param)
+      if (wanted) items = items.filter((item) => pick(item).includes(wanted))
+    }
+    const sort = query.get('sort')
+    if (sort === 'title') items = [...items].sort((a, b) => a.title.localeCompare(b.title))
+    if (sort === 'maker') items = [...items].sort((a, b) => a.creator.localeCompare(b.creator))
+    if (sort === 'oldest') items = [...items].reverse()
     return { items, total: items.length } as T
   }
-  if (parts[0] === 'images' && parts[1]) return (data.images[parts[1]] ?? Promise.reject(new Error('Not in the demo.'))) as T
-  if (parts[0] === 'techniques' && parts[1]) return data.techniques[parts[1]] as T
-  if (parts[0] === 'goals' && parts[1]) return data.goals[parts[1]] as T
-  if (parts[0] === 'jobs' || parts[0] === 'collections' || parts[0] === 'briefs' || parts[0] === 'backups') return [] as T
   if (route === 'settings') return { backend: 'fake', verify_with: 'none', daily_ai_cap: 0, welcomed: true } as T
-  if (route in data) return data[route] as T
+  if (route.startsWith('jobs') || route === 'backups') return [] as T
+  if (route === 'health') return { version: 'demo', home: 'online demo' } as T
   throw new Error('That part of Visual Atlas needs the downloaded app.')
 }

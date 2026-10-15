@@ -473,7 +473,13 @@ class Worker:
         if self._count('ai') >= self._budget('max_analyses'):
             return self._item(item['id'], state='skipped', reason='analysis budget reached')
         self._set(stage='analyzing', message=f"Analyzing “{image['title'][:60]}”…")
-        outcome = self.analyze_image(image, item_id=item['id'])
+        try:
+            outcome = self.analyze_image(image, item_id=item['id'])
+        except BackendError as error:
+            if error.code in PAUSING:
+                raise
+            # One picture's trouble (a timeout, a provider hiccup) never stops the whole job.
+            return self._retry_or_fail(item, error.code, backend_message(error.code, self.job['backend']))
         if outcome == 'retry':
             return self._retry_or_fail(item, 'invalid_response', backend_message('invalid_response', self.job['backend']))
         if outcome == 'added':
@@ -539,9 +545,9 @@ class Worker:
         except tasks.InvalidResult:
             return  # leave annotations as 'proposed'; the verification simply did not count
         except BackendError as error:
-            if error.code in PAUSING and error.code not in ('quota', 'daily_cap'):
-                return  # the verifier is unavailable: keep the proposal unverified rather than stop the job
-            raise
+            if error.code == 'daily_cap':
+                raise
+            return  # verifier unavailable, over its limit or erroring: keep the proposal unverified and go on
         analysis_id = self._save_analysis('verify', answer, result, image_id=image_id, input_sha=image['analysis_sha256'])
         self.store.apply_verdicts(image_id, analysis_id, result['verdicts'], f"model:{answer['backend']}/{answer['model']}")
 

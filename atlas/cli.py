@@ -167,6 +167,23 @@ def restore(name: str = typer.Argument(..., help='A backup file name from the ba
     _print(transfer.restore(home_dir(), name))
 
 
+@app.command(name='starter-import')
+def starter_import():
+    """Add the bundled starter library (used by the Windows installer; safe to run again)."""
+    from atlas.home import REPO
+    with jobs.open_store() as store:
+        added = transfer.import_starter(store, home_dir(), REPO / 'starter')
+    typer.echo(f'Starter library: {added} new reference(s) added.')
+
+
+@app.command(name='starter-export', hidden=True)
+def starter_export(out: str = typer.Option('starter', help='Folder to write (replaced).')):
+    """Maintainers: write the current library as the bundled starter pack."""
+    from pathlib import Path
+    with jobs.open_store() as store:
+        typer.echo(f'Exported {transfer.export_starter(store, home_dir(), Path(out))} references to {out}.')
+
+
 @app.command()
 def coverage():
     """Techniques by number of examples (fewest first)."""

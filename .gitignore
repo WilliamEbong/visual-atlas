@@ -32,3 +32,4 @@ web/test-results/
 .playwright-mcp/
 release/
 design-review/**/*.yml
+web/public-demo/

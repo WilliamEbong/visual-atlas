@@ -196,3 +196,25 @@ def test_job_requests_are_validated(home):
         grow = jobs.create_job(store, 'grow', {'backend': 'fake'})
         spec = store.one('SELECT spec_json FROM jobs WHERE id=?', (grow,))['spec_json']
         assert '"technique_ids"' in spec
+
+
+def test_a_verifier_error_keeps_the_proposal_and_the_job_going(home):
+    with jobs.open_store(home) as store:
+        job_id = find(store, verify_with='claude')
+    broken_verifier = Flaky(fail_on={1, 2, 3, 4}, error=BackendError('provider_error'))
+    jobs.Worker(home, owner='A', fetcher=aic_fetcher(), backends={'fake': fake, 'claude': broken_verifier}).run_once()
+    with jobs.open_store(home) as store:
+        assert store.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] == 'done'
+        assert {r['state'] for r in store.rows('SELECT state FROM annotations')} == {'proposed'}
+
+
+def test_an_analysis_error_retries_that_picture_only(home, monkeypatch):
+    clock = types.SimpleNamespace(now=1e9)
+    monkeypatch.setattr(jobs.time, 'time', lambda: setattr(clock, 'now', clock.now + 50) or clock.now)
+    with jobs.open_store(home) as store:
+        job_id = find(store)
+    hiccup = Flaky(fail_on={2}, error=BackendError('provider_error'))  # first image's analysis fails once
+    worker(home, 'A', hiccup).run_once()
+    with jobs.open_store(home) as store:
+        assert store.one('SELECT state FROM jobs WHERE id=?', (job_id,))['state'] == 'done'
+        assert len(store.rows("SELECT * FROM job_items WHERE state='added'")) == 2

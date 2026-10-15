@@ -242,6 +242,32 @@ class Store:
             self.refresh_search(image_id)
             return image
 
+    def import_reference(self, image: dict, rights: dict, metrics: dict, analyses: list[dict],
+                         annotations: list[dict], current_analysis: int | None = None) -> int | None:
+        """Add one reference exported from another library (the starter pack), keeping its review states.
+
+        Skips anything already present or removed by the user (tombstone)."""
+        with self.transaction():
+            known = self.one('SELECT 1 FROM images WHERE (provider=? AND provider_item_id=?) OR file_sha256=? UNION ALL '
+                             'SELECT 1 FROM tombstones WHERE provider=? AND provider_item_id=?',
+                             (image['provider'], image['provider_item_id'], image['file_sha256'], image['provider'],
+                              image['provider_item_id']))
+            if known:
+                return None
+            image_id = self._insert('images', {**image, 'analysis_id': None, 'created_at': now()})
+            self._insert('rights_records', {**rights, 'image_id': image_id})
+            self._insert('image_metrics', {**metrics, 'image_id': image_id})
+            mapping = {}
+            for analysis in analyses:
+                mapping[analysis['id']] = self._insert('analyses', {
+                    **{k: v for k, v in analysis.items() if k != 'id'}, 'image_id': image_id, 'job_id': None})
+            for annotation in annotations:
+                self._insert('annotations', {**annotation, 'image_id': image_id,
+                                             'analysis_id': mapping.get(annotation.get('analysis_id'))})
+            self._update('images', 'id', image_id, {'analysis_id': mapping.get(current_analysis)})
+            self.refresh_search(image_id)
+            return image_id
+
     # ---- analyses and annotations ------------------------------------------------------------
     def add_analysis(self, record: dict) -> int:
         with self.transaction():
