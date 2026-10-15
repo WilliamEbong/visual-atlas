@@ -383,6 +383,170 @@ def retrieval():
     print(json.dumps(summary, indent=1))
 
 
+# ---- TypeSafe Jev arms (text only; criteria in JEV-GATE.md, fixed before any call) -----------------------
+JEV_URL = 'https://api.typesafe.ai/v1/systemone'
+JEV_MODEL = 'jev-1.13.0'
+JEV_PRICE_PER_TOKEN = 0.042 / 1_000_000  # input tokens; outputs free (typesafe.ai launch post, checked 2026-10-15)
+JEV_SPEND_CAP = 0.50
+
+
+class Jev:
+    def __init__(self, key: str):
+        import httpx
+        self.client = httpx.Client(timeout=90, headers={'Authorization': f'Bearer {key}'})
+        self.spent, self.calls, self.failures = 0.0, [], 0
+
+    def ask(self, state, questions: dict) -> dict:
+        """One call; one retry on 429/5xx or a network error. Returns {question id: probability}."""
+        if self.spent >= JEV_SPEND_CAP:
+            raise SystemExit(f'Jev spend cap reached (${self.spent:.3f})')
+        for attempt in (1, 2):
+            started = time.monotonic()
+            try:
+                response = self.client.post(JEV_URL, json={'model': JEV_MODEL, 'state': state, 'questions': questions})
+            except Exception as error:  # noqa: BLE001 - recorded, never shown with request content
+                status, error_name = None, type(error).__name__
+            else:
+                status, error_name = response.status_code, None
+                if status == 200:
+                    body = response.json()
+                    answers = body.get('answers') or {}
+                    if set(answers) != set(questions) or not all(
+                            isinstance(a.get('noul'), (int, float)) and 0 <= a['noul'] <= 1 for a in answers.values()):
+                        raise SystemExit('Jev answer did not match the questions asked')
+                    tokens = int((body.get('usage') or {}).get('input_tokens') or 0)
+                    self.spent += tokens * JEV_PRICE_PER_TOKEN
+                    self.calls.append({'seconds': round(time.monotonic() - started, 1), 'input_tokens': tokens,
+                                       'model': body.get('model')})
+                    return {key: float(answer['noul']) for key, answer in answers.items()}
+            if attempt == 2 or (status is not None and status not in (429, 500, 502, 503, 529)):
+                self.failures += 1
+                raise RuntimeError(f'Jev call failed ({status or error_name})')
+            time.sleep(5)
+
+
+def jev_key(env_file: str | None) -> str:
+    """The key comes from the environment or from TYPESAFE_API_KEY in the given .env file; it is never printed."""
+    if os.environ.get('TYPESAFE_API_KEY'):
+        return os.environ['TYPESAFE_API_KEY']
+    if env_file:
+        for line in Path(env_file).read_text(encoding='utf-8').splitlines():
+            name, _, value = line.partition('=')
+            if name.strip() == 'TYPESAFE_API_KEY' and value.strip():
+                return value.strip().strip('"\'')
+    raise SystemExit('TYPESAFE_API_KEY is not set: the live Jev evaluation is deferred.')
+
+
+def code_questions(taxonomy: dict) -> dict:
+    questions = {}
+    for t in taxonomy['techniques']:
+        questions[f"t:{t['id']}"] = {
+            'type': 'noul', 'instructions': f"Does this design request ask for, or clearly call for, the visual technique "
+                                            f"“{t['name']}” ({t['definition']})?",
+            'criteria': {'true': f"It names the technique, a synonym ({', '.join(t['aliases'])}), or plainly describes "
+                                 'the effect it needs.', 'false': 'It does not ask for this technique.'}}
+    for g in taxonomy['goals']:
+        questions[f"g:{g['id']}"] = {
+            'type': 'noul', 'instructions': f"Does this design request want the image to “{g['name'].lower()}”? "
+                                            f"({g['description']})",
+            'criteria': {'true': 'That is part of what the request wants the image to do.',
+                         'false': 'It is not part of what the request wants.'}}
+    return questions
+
+
+def jev_coding(jev: Jev, taxonomy: dict) -> dict:
+    questions, rows = code_questions(taxonomy), []
+    with tempfile.TemporaryDirectory() as directory:
+        store, ids = starter_library(Path(directory))
+        with store:
+            for brief in load_briefs():
+                answers = jev.ask(brief['text'], questions)
+                tags = {k for k, p in answers.items() if p >= .5}
+                deterministic = coding.code_request(brief['text'], taxonomy)
+                reading = {'techniques': [{'id': k[2:], 'exact': True, 'why': 'jev'} for k in tags if k[0] == 't'],
+                           'goals': [{'id': k[2:], 'exact': True, 'why': 'jev'} for k in tags if k[0] == 'g'],
+                           'subject_terms': deterministic['subject_terms']}
+                ranked = [r['image_id'] for r in jobs.relevant_references(store, reading, limit=20, budget=10**9)]
+                rows.append({'id': brief['id'], 'jev_techniques': sorted(k[2:] for k in tags if k[0] == 't'),
+                             'jev_goals': sorted(k[2:] for k in tags if k[0] == 'g'),
+                             'relevance@20': len({ids[k] for k in brief['relevant']} & set(ranked)),
+                             'probabilities': {k: round(p, 3) for k, p in answers.items() if p >= .2}})
+                print(brief['id'], rows[-1]['jev_techniques'], rows[-1]['jev_goals'], rows[-1]['relevance@20'])
+            repeats = []
+            for brief in load_briefs()[:4]:
+                again = {k for k, p in jev.ask(brief['text'], questions).items() if p >= .5}
+                first = next(r for r in rows if r['id'] == brief['id'])
+                repeats.append(again == {f't:{t}' for t in first['jev_techniques']} | {f'g:{g}' for g in first['jev_goals']})
+    return {'briefs': rows, 'repeat_identical': repeats}
+
+
+def jev_ranking(jev: Jev, taxonomy: dict) -> dict:
+    names = {t['id']: t['name'] for t in taxonomy['techniques']}
+    rows = []
+    with tempfile.TemporaryDirectory() as directory:
+        store, ids = starter_library(Path(directory))
+        with store:
+            records = jobs.relevant_references(store, {'techniques': [], 'goals': [], 'subject_terms': []}, limit=200,
+                                               budget=10**9)
+            questions = {f"r:{r['image_id']}": {
+                'type': 'noul', 'instructions': 'Would a designer pick this library reference as useful visual evidence '
+                                                'for the request? Reference: ' + json.dumps(
+                    {'title': r['title'], 'maker': r['creator'], 'date': r['date'], 'summary': r['summary'],
+                     'techniques': [names[t['id']] for t in r['techniques']]}, ensure_ascii=False)} for r in records}
+            for brief in load_briefs():
+                answers = jev.ask(brief['text'], questions)
+                ranked = [int(k[2:]) for k, _ in sorted(answers.items(), key=lambda item: (-item[1], -int(item[0][2:])))]
+                relevant = {ids[k] for k in brief['relevant']}
+                rows.append({'id': brief['id'], 'relevant': len(relevant), 'jev@10': len(relevant & set(ranked[:10])),
+                             'jev@20': len(relevant & set(ranked[:20]))})
+                print(rows[-1])
+    return {'briefs': rows}
+
+
+def jev_metadata(jev: Jev) -> dict:
+    question = {'doc': {'type': 'noul', 'instructions': 'Based only on this catalogue record, is the image most likely a '
+                        'plain documentation photograph (an object on a plain background, a coin, a specimen) or a page '
+                        'of text, rather than a composed picture?'}}
+    rows = []
+    for case in load_cases():
+        state = {k: case[k] for k in ('title', 'creator', 'date', 'medium', 'description')} | {'source': case['provider']}
+        rows.append({'id': case['id'], 'negative': not case['reference'], 'p': round(jev.ask(state, question)['doc'], 3)})
+        print(rows[-1])
+    return {'cases': rows}
+
+
+def jev_review(jev: Jev, taxonomy: dict) -> dict:
+    techniques = {t['id']: t for t in taxonomy['techniques']}
+    rows = []
+    for split in ('dev', 'final'):
+        path = EVAL / f'results-{split}.json'
+        if not path.exists():
+            continue
+        for record in json.loads(path.read_text(encoding='utf-8'))['records']:
+            if not record.get('proposals'):
+                continue
+            questions = {f"p:{t}": {'type': 'noul', 'instructions': (
+                f"Does the cited evidence describe a defining use of “{techniques[t]['name']}” "
+                f"({techniques[t]['definition']}) in this picture? Evidence: "
+                + json.dumps(record['proposer']['evidence'][t], ensure_ascii=False))} for t in record['proposals']}
+            answers = jev.ask('Evidence sentences another model wrote about one picture (text only).', questions)
+            rows.append({'id': record['id'], 'split': split, 'holds': {k[2:]: p >= .5 for k, p in answers.items()}})
+            print(rows[-1])
+    return {'records': rows}
+
+
+def jev_main():
+    use = sys.argv[2]
+    env_file = sys.argv[sys.argv.index('--env-file') + 1] if '--env-file' in sys.argv else None
+    jev, taxonomy = Jev(jev_key(env_file)), catalog.load()[0]
+    result = {'coding': lambda: jev_coding(jev, taxonomy), 'ranking': lambda: jev_ranking(jev, taxonomy),
+              'metadata': lambda: jev_metadata(jev), 'review': lambda: jev_review(jev, taxonomy)}[use]()
+    result.update(run_on=time.strftime('%Y-%m-%d %H:%M'), model_pinned=JEV_MODEL, calls=jev.calls,
+                  failures=jev.failures, estimated_cost_usd=round(jev.spent, 5))
+    (EVAL / f'jev-{use}.json').write_text(json.dumps(result, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
+    print(f'{use}: {len(jev.calls)} calls, {jev.failures} failures, about ${jev.spent:.4f}')
+
+
 if __name__ == '__main__':
     command = sys.argv[1]
-    {'fetch': fetch, 'freeze': freeze, 'run': lambda: run(sys.argv[2]), 'retrieval': retrieval}[command]()
+    {'fetch': fetch, 'freeze': freeze, 'run': lambda: run(sys.argv[2]), 'retrieval': retrieval, 'jev': jev_main}[command]()

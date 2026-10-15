@@ -1,0 +1,186 @@
+{
+ "briefs": [
+  {
+   "id": 1,
+   "relevant": 5,
+   "jev@10": 5,
+   "jev@20": 5
+  },
+  {
+   "id": 2,
+   "relevant": 5,
+   "jev@10": 3,
+   "jev@20": 4
+  },
+  {
+   "id": 3,
+   "relevant": 6,
+   "jev@10": 6,
+   "jev@20": 6
+  },
+  {
+   "id": 4,
+   "relevant": 6,
+   "jev@10": 6,
+   "jev@20": 6
+  },
+  {
+   "id": 5,
+   "relevant": 7,
+   "jev@10": 5,
+   "jev@20": 7
+  },
+  {
+   "id": 6,
+   "relevant": 4,
+   "jev@10": 4,
+   "jev@20": 4
+  },
+  {
+   "id": 7,
+   "relevant": 7,
+   "jev@10": 6,
+   "jev@20": 6
+  },
+  {
+   "id": 8,
+   "relevant": 6,
+   "jev@10": 6,
+   "jev@20": 6
+  },
+  {
+   "id": 9,
+   "relevant": 7,
+   "jev@10": 3,
+   "jev@20": 5
+  },
+  {
+   "id": 10,
+   "relevant": 5,
+   "jev@10": 5,
+   "jev@20": 5
+  },
+  {
+   "id": 11,
+   "relevant": 4,
+   "jev@10": 3,
+   "jev@20": 4
+  },
+  {
+   "id": 12,
+   "relevant": 3,
+   "jev@10": 3,
+   "jev@20": 3
+  },
+  {
+   "id": 13,
+   "relevant": 4,
+   "jev@10": 4,
+   "jev@20": 4
+  },
+  {
+   "id": 14,
+   "relevant": 2,
+   "jev@10": 2,
+   "jev@20": 2
+  },
+  {
+   "id": 15,
+   "relevant": 5,
+   "jev@10": 5,
+   "jev@20": 5
+  },
+  {
+   "id": 16,
+   "relevant": 4,
+   "jev@10": 3,
+   "jev@20": 4
+  }
+ ],
+ "run_on": "2026-10-15 10:54",
+ "model_pinned": "jev-1.13.0",
+ "calls": [
+  {
+   "seconds": 0.3,
+   "input_tokens": 10407,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10399,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10398,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10405,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.2,
+   "input_tokens": 10398,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10398,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10401,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10399,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10403,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10400,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10397,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10396,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10398,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10399,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10401,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 10399,
+   "model": "jev-1.13.0"
+  }
+ ],
+ "failures": 0,
+ "estimated_cost_usd": 0.00699
+}

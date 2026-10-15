@@ -1,0 +1,533 @@
+{
+ "run_on": "2026-10-15 10:55",
+ "records": [
+  {
+   "id": "01",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 16.2,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "silhouette": 0.98,
+     "negative-space": 0.92
+    },
+    "evidence": {
+     "silhouette": [
+      "A small, nearly black human figure stands left of center on the ridge, with separated legs and arms visible mainly as outlines.",
+      "A nearly featureless dark landform spans the full width of the lower image, with a gently dipping upper edge.",
+      "An expansive sky occupies the upper image, grading from blue above to pale yellow and orange near the ridge."
+     ],
+     "negative-space": [
+      "A small, nearly black human figure stands left of center on the ridge, with separated legs and arms visible mainly as outlines.",
+      "A nearly featureless dark landform spans the full width of the lower image, with a gently dipping upper edge.",
+      "An expansive sky occupies the upper image, grading from blue above to pale yellow and orange near the ridge.",
+      "Thin purple-gray clouds stretch across the lower sky; most of the upper sky is clear."
+     ]
+    }
+   },
+   "proposals": [
+    "silhouette",
+    "negative-space"
+   ],
+   "shown": {
+    "seconds": 5.8,
+    "holds": {
+     "silhouette": true,
+     "negative-space": true
+    }
+   },
+   "independent": {
+    "seconds": 3.8,
+    "holds": {
+     "silhouette": true,
+     "negative-space": true
+    },
+    "own_reading": [
+     "silhouette",
+     "negative-space",
+     "color-contrast",
+     "asymmetric-balance"
+    ]
+   }
+  },
+  {
+   "id": "03",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 23.4,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "vantage-point": 0.93,
+     "texture-contrast": 0.83
+    },
+    "evidence": {
+     "vantage-point": [
+      "An enclosed settlement fills the lower center, with intersecting streets, rectangular blocks, small buildings, and a thick perimeter boundary.",
+      "The settlement layout, waterways, and routes are visible from above, while hills, trees, and many buildings also show side profiles; no horizon is shown."
+     ],
+     "texture-contrast": [
+      "An enclosed settlement fills the lower center, with intersecting streets, rectangular blocks, small buildings, and a thick perimeter boundary.",
+      "Numerous outlined hills, dark tree clusters, and small buildings occupy the upper center and extend down the left side.",
+      "A broad, lightly marked body of water lies between the hills and settlement, with several detailed island shapes.",
+      "Thin blue-green branching channels and intersecting routes cross a sparsely detailed field on the right."
+     ]
+    }
+   },
+   "proposals": [
+    "vantage-point",
+    "texture-contrast"
+   ],
+   "shown": {
+    "seconds": 3.9,
+    "holds": {
+     "vantage-point": false,
+     "texture-contrast": true
+    }
+   },
+   "independent": {
+    "seconds": 3.9,
+    "holds": {
+     "vantage-point": true,
+     "texture-contrast": true
+    },
+    "own_reading": [
+     "color-harmony",
+     "texture-contrast",
+     "vantage-point"
+    ]
+   }
+  },
+  {
+   "id": "05",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 15.7,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "diagonal-energy": 0.91,
+     "texture-contrast": 0.8
+    },
+    "evidence": {
+     "diagonal-energy": [
+      "A tree-covered rocky slope extends diagonally from the lower left toward the upper right.",
+      "A broad pale gray slope with sparse trees and scattered rocks occupies the upper left."
+     ],
+     "texture-contrast": [
+      "A broad pale gray slope with sparse trees and scattered rocks occupies the upper left.",
+      "Dark conifers, shrubs, exposed rock faces, and tan ground form a dense, irregular surface across the lower and right portions."
+     ]
+    }
+   },
+   "proposals": [
+    "diagonal-energy",
+    "texture-contrast"
+   ],
+   "shown": {
+    "seconds": 4.7,
+    "holds": {
+     "diagonal-energy": true,
+     "texture-contrast": true
+    }
+   },
+   "independent": {
+    "seconds": 4.1,
+    "holds": {
+     "diagonal-energy": true,
+     "texture-contrast": true
+    },
+    "own_reading": [
+     "diagonal-energy",
+     "texture-contrast",
+     "tight-cropping"
+    ]
+   }
+  },
+  {
+   "id": "06",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 18.7,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "value-contrast": 0.94,
+     "asymmetric-balance": 0.89,
+     "texture-contrast": 0.77
+    },
+    "evidence": {
+     "value-contrast": [
+      "The pale curled wig and illuminated face stand out against a dark brown patterned background.",
+      "A green-covered table on the left holds pale papers with red seals, small gold-colored vessels, a tall candleholder, and an upright feather quill.",
+      "One hand extends left over the papers; the other rests on the figure's lap beside a white lace cuff."
+     ],
+     "asymmetric-balance": [
+      "A seated figure occupies the center and right, with the head above and right of the picture's midpoint.",
+      "A green-covered table on the left holds pale papers with red seals, small gold-colored vessels, a tall candleholder, and an upright feather quill.",
+      "One hand extends left over the papers; the other rests on the figure's lap beside a white lace cuff."
+     ],
+     "texture-contrast": [
+      "Dense gold scrolling ornament covers the coat front and broad cuffs, beside gray patterned fabric, white lace, and the comparatively plain green tablecloth."
+     ]
+    }
+   },
+   "proposals": [
+    "value-contrast",
+    "asymmetric-balance",
+    "texture-contrast"
+   ],
+   "shown": {
+    "seconds": 4.9,
+    "holds": {
+     "value-contrast": true,
+     "asymmetric-balance": true,
+     "texture-contrast": false
+    }
+   },
+   "independent": {
+    "seconds": 4.2,
+    "holds": {
+     "value-contrast": true,
+     "asymmetric-balance": true,
+     "texture-contrast": true
+    },
+    "own_reading": [
+     "asymmetric-balance",
+     "texture-contrast",
+     "color-harmony",
+     "value-contrast"
+    ]
+   }
+  },
+  {
+   "id": "08",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 15.5,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "layered-depth": 0.91
+    },
+    "evidence": {
+     "layered-depth": [
+      "Tall branching trees stand on both sides of the landscape, with prominent trunks along the right edge.",
+      "Small figures and animal forms occupy the open ground near the lower center.",
+      "Houses and fences extend from the left toward a smaller cluster of buildings in the center, partly overlapped by trees.",
+      "Smaller, faintly outlined trees and buildings appear beyond the nearer trunks and open ground."
+     ]
+    }
+   },
+   "proposals": [
+    "layered-depth"
+   ],
+   "shown": {
+    "seconds": 3.4,
+    "holds": {
+     "layered-depth": true
+    }
+   },
+   "independent": {
+    "seconds": 3.5,
+    "holds": {
+     "layered-depth": true
+    },
+    "own_reading": [
+     "color-harmony",
+     "layered-depth",
+     "framing"
+    ]
+   }
+  },
+  {
+   "id": "12",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 16.4,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "tight-cropping": 0.98,
+     "color-contrast": 0.91,
+     "leading-lines": 0.83
+    },
+    "evidence": {
+     "tight-cropping": [
+      "A large white flower fills nearly the entire image, with petals cut off by all four edges."
+     ],
+     "color-contrast": [
+      "Near the center, a green oval and dark olive rounded forms sit within a ring of small orange-yellow shapes and a yellow surrounding area.",
+      "Broad ivory petals have soft gray-green shading; darker teal patches appear between pale scalloped forms in the upper corners."
+     ],
+     "leading-lines": [
+      "Long curved petal edges and pale green-gray folds extend inward from the perimeter toward the flower's center.",
+      "Near the center, a green oval and dark olive rounded forms sit within a ring of small orange-yellow shapes and a yellow surrounding area."
+     ]
+    }
+   },
+   "proposals": [
+    "tight-cropping",
+    "color-contrast",
+    "leading-lines"
+   ],
+   "shown": {
+    "seconds": 4.5,
+    "holds": {
+     "tight-cropping": true,
+     "color-contrast": true,
+     "leading-lines": false
+    }
+   },
+   "independent": {
+    "seconds": 4.1,
+    "holds": {
+     "tight-cropping": true,
+     "color-contrast": false,
+     "leading-lines": true
+    },
+    "own_reading": [
+     "tight-cropping",
+     "color-harmony",
+     "leading-lines"
+    ]
+   }
+  },
+  {
+   "id": "15",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 21.5,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "layered-depth": 0.96,
+     "rhythm-pattern": 0.83,
+     "framing": 0.74
+    },
+    "evidence": {
+     "layered-depth": [
+      "Four tall bare trunks occupy the left half and a fifth rises on the right; their tops extend beyond the depicted scene.",
+      "Dark, densely hatched ground and exposed tree roots span the lower edge.",
+      "A bridge crosses a waterway behind the foreground trunks, with clustered pitched-roof buildings on the left.",
+      "An elevated bank on the right supports fences, bare trees, and a tall roofed building partly hidden by the right foreground trunk.",
+      "Small buildings and lightly drawn terrain appear beyond the bridge beneath a broad, sparsely marked sky."
+     ],
+     "rhythm-pattern": [
+      "Four tall bare trunks occupy the left half and a fifth rises on the right; their tops extend beyond the depicted scene."
+     ],
+     "framing": [
+      "Four tall bare trunks occupy the left half and a fifth rises on the right; their tops extend beyond the depicted scene.",
+      "Dark, densely hatched ground and exposed tree roots span the lower edge.",
+      "A bridge crosses a waterway behind the foreground trunks, with clustered pitched-roof buildings on the left.",
+      "Small buildings and lightly drawn terrain appear beyond the bridge beneath a broad, sparsely marked sky."
+     ]
+    }
+   },
+   "proposals": [
+    "layered-depth",
+    "rhythm-pattern",
+    "framing"
+   ],
+   "shown": {
+    "seconds": 4.7,
+    "holds": {
+     "layered-depth": true,
+     "rhythm-pattern": true,
+     "framing": false
+    }
+   },
+   "independent": {
+    "seconds": 5.0,
+    "holds": {
+     "layered-depth": true,
+     "rhythm-pattern": true,
+     "framing": false
+    },
+    "own_reading": [
+     "layered-depth",
+     "framing",
+     "rhythm-pattern",
+     "texture-contrast"
+    ]
+   }
+  },
+  {
+   "id": "17",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 12.6,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {},
+    "evidence": {}
+   },
+   "proposals": []
+  },
+  {
+   "id": "20",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 23.1,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "rhythm-pattern": 0.94,
+     "repetition-with-interruption": 0.78
+    },
+    "evidence": {
+     "rhythm-pattern": [
+      "Closely spaced vertical gray bands fill the left panel, with brighter stripes concentrated toward its left edge and several wider dark intervals.",
+      "Fine parallel gray bands slope from lower left to upper right across the right panel, with stronger dark stripes toward its right edge."
+     ],
+     "repetition-with-interruption": [
+      "Closely spaced vertical gray bands fill the left panel, with brighter stripes concentrated toward its left edge and several wider dark intervals.",
+      "Fine parallel gray bands slope from lower left to upper right across the right panel, with stronger dark stripes toward its right edge.",
+      "A small pale kink interrupts the bands near the middle of the left panel; an elongated bright mark with a dark central segment appears above the middle of the right panel."
+     ]
+    }
+   },
+   "proposals": [
+    "rhythm-pattern",
+    "repetition-with-interruption"
+   ],
+   "shown": {
+    "seconds": 3.8,
+    "holds": {
+     "rhythm-pattern": true,
+     "repetition-with-interruption": true
+    }
+   },
+   "independent": {
+    "seconds": 3.9,
+    "holds": {
+     "rhythm-pattern": true,
+     "repetition-with-interruption": false
+    },
+    "own_reading": [
+     "rhythm-pattern",
+     "tight-cropping",
+     "texture-contrast"
+    ]
+   }
+  },
+  {
+   "id": "22",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 18.7,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "leading-lines": 0.96,
+     "layered-depth": 0.88
+    },
+    "evidence": {
+     "leading-lines": [
+      "A broad metal handrail runs from the bottom-left corner toward the central distance, alongside converging walkway edges and cables.",
+      "Overlapping pedestrians and mostly dark umbrellas extend from behind the foreground person toward the far end of the bridge."
+     ],
+     "layered-depth": [
+      "A person in a brown coat occupies the lower-right area beneath a pale umbrella covered in red floral marks.",
+      "Overlapping pedestrians and mostly dark umbrellas extend from behind the foreground person toward the far end of the bridge.",
+      "A large domed stone building rises at upper left, with rectangular towers farther across the skyline beneath pale grey sky.",
+      "The near railing, foreground pedestrians, smaller distant crowd, and skyline buildings occupy successive overlapping distances."
+     ]
+    }
+   },
+   "proposals": [
+    "leading-lines",
+    "layered-depth"
+   ],
+   "shown": {
+    "seconds": 4.0,
+    "holds": {
+     "leading-lines": true,
+     "layered-depth": true
+    }
+   },
+   "independent": {
+    "seconds": 4.1,
+    "holds": {
+     "leading-lines": true,
+     "layered-depth": true
+    },
+    "own_reading": [
+     "layered-depth",
+     "leading-lines",
+     "color-contrast",
+     "atmospheric-perspective"
+    ]
+   }
+  },
+  {
+   "id": "24",
+   "split": "dev",
+   "proposer": {
+    "usable": true,
+    "seconds": 17.8,
+    "model_version": "gpt-6-astra",
+    "cli_version": "0.160.0",
+    "raw": {
+     "layered-depth": 0.94,
+     "atmospheric-perspective": 0.87,
+     "vantage-point": 0.79
+    },
+    "evidence": {
+     "layered-depth": [
+      "A large building with a dark roof, chimney, and shuttered windows occupies the left edge and extends beyond the frame.",
+      "A steep roof with a tall chimney rises above a large wall on the right, overlapping smaller buildings toward the center.",
+      "Smaller roofs, walls, vegetation, and narrow ground passages occupy the gap between the two large buildings.",
+      "Distant buildings and a low ridge appear softer and lower in contrast than the dark foreground roofs."
+     ],
+     "atmospheric-perspective": [
+      "Distant buildings and a low ridge appear softer and lower in contrast than the dark foreground roofs."
+     ],
+     "vantage-point": [
+      "A steep roof with a tall chimney rises above a large wall on the right, overlapping smaller buildings toward the center.",
+      "Smaller roofs, walls, vegetation, and narrow ground passages occupy the gap between the two large buildings.",
+      "Roof surfaces and ground spaces between the buildings are visible from above."
+     ]
+    }
+   },
+   "proposals": [
+    "layered-depth",
+    "atmospheric-perspective",
+    "vantage-point"
+   ],
+   "shown": {
+    "seconds": 5.1,
+    "holds": {
+     "layered-depth": true,
+     "atmospheric-perspective": true,
+     "vantage-point": true
+    }
+   },
+   "independent": {
+    "seconds": 5.1,
+    "holds": {
+     "layered-depth": true,
+     "atmospheric-perspective": false,
+     "vantage-point": true
+    },
+    "own_reading": [
+     "layered-depth",
+     "vantage-point",
+     "texture-contrast",
+     "diagonal-energy"
+    ]
+   }
+  }
+ ]
+}

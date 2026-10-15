@@ -1,0 +1,16 @@
+{
+ "frozen_on": "2026-10-15 10:56",
+ "final_cases": "96a074f36c2c9f62",
+ "prompts": {
+  "analyze": "776968cf4532ab0f",
+  "verify": "b3652cd3f3216483",
+  "verify_independent": "2145210ed8d38812"
+ },
+ "models": {
+  "proposer": "gpt-6-astra",
+  "checker": "sonnet"
+ },
+ "min_confidence": 0.4,
+ "code": "054549203e0970bd",
+ "decision_rule": "On the development split only: adopt the independent-first checker if its false acceptance is at least 0.10 lower than the current checker's, its false rejection is at most 0.10 higher, and it has no more invalid answers plus one. The calls per image are equal (one each). The final split is run once afterwards and only reported; it never changes the decision."
+}

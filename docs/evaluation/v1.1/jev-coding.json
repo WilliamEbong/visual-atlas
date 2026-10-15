@@ -1,0 +1,504 @@
+{
+ "briefs": [
+  {
+   "id": 1,
+   "jev_techniques": [],
+   "jev_goals": [
+    "build-depth",
+    "create-calm",
+    "guide-the-eye",
+    "make-an-idea-visible",
+    "show-scale"
+   ],
+   "relevance@20": 1,
+   "probabilities": {
+    "t:negative-space": 0.2,
+    "g:draw-attention": 0.47,
+    "g:guide-the-eye": 0.54,
+    "g:show-scale": 0.53,
+    "g:create-calm": 0.93,
+    "g:group-and-relate": 0.3,
+    "g:tell-a-story": 0.33,
+    "g:build-depth": 0.71,
+    "g:make-an-idea-visible": 0.71
+   }
+  },
+  {
+   "id": 2,
+   "jev_techniques": [
+    "asymmetric-balance",
+    "juxtaposition",
+    "negative-space",
+    "scale-contrast"
+   ],
+   "jev_goals": [
+    "build-depth",
+    "create-calm",
+    "draw-attention",
+    "make-an-idea-visible",
+    "show-scale",
+    "tell-a-story"
+   ],
+   "relevance@20": 2,
+   "probabilities": {
+    "t:negative-space": 0.98,
+    "t:scale-contrast": 0.96,
+    "t:juxtaposition": 0.55,
+    "t:visual-metaphor": 0.48,
+    "t:silhouette": 0.21,
+    "t:asymmetric-balance": 0.77,
+    "g:draw-attention": 0.89,
+    "g:guide-the-eye": 0.39,
+    "g:show-scale": 0.98,
+    "g:create-tension": 0.46,
+    "g:create-calm": 0.53,
+    "g:surprise": 0.21,
+    "g:tell-a-story": 0.56,
+    "g:build-depth": 0.79,
+    "g:make-an-idea-visible": 0.96
+   }
+  },
+  {
+   "id": 3,
+   "jev_techniques": [
+    "silhouette",
+    "value-contrast"
+   ],
+   "jev_goals": [
+    "build-depth",
+    "suggest-motion"
+   ],
+   "relevance@20": 5,
+   "probabilities": {
+    "t:negative-space": 0.41,
+    "t:color-contrast": 0.21,
+    "t:value-contrast": 0.87,
+    "t:silhouette": 0.99,
+    "g:draw-attention": 0.37,
+    "g:guide-the-eye": 0.38,
+    "g:create-calm": 0.28,
+    "g:group-and-relate": 0.46,
+    "g:tell-a-story": 0.43,
+    "g:build-depth": 0.5,
+    "g:suggest-motion": 0.58,
+    "g:make-an-idea-visible": 0.49
+   }
+  },
+  {
+   "id": 4,
+   "jev_techniques": [
+    "contextual-incongruity",
+    "juxtaposition",
+    "repetition-with-interruption",
+    "rhythm-pattern"
+   ],
+   "jev_goals": [
+    "draw-attention",
+    "group-and-relate",
+    "guide-the-eye",
+    "make-an-idea-visible",
+    "surprise"
+   ],
+   "relevance@20": 6,
+   "probabilities": {
+    "t:color-contrast": 0.25,
+    "t:repetition-with-interruption": 0.98,
+    "t:juxtaposition": 0.75,
+    "t:contextual-incongruity": 0.55,
+    "t:rhythm-pattern": 0.74,
+    "g:draw-attention": 0.97,
+    "g:guide-the-eye": 0.84,
+    "g:create-tension": 0.33,
+    "g:group-and-relate": 0.63,
+    "g:surprise": 0.87,
+    "g:tell-a-story": 0.36,
+    "g:build-depth": 0.2,
+    "g:make-an-idea-visible": 0.72
+   }
+  },
+  {
+   "id": 5,
+   "jev_techniques": [
+    "value-contrast"
+   ],
+   "jev_goals": [
+    "build-depth",
+    "create-tension",
+    "draw-attention",
+    "guide-the-eye",
+    "tell-a-story"
+   ],
+   "relevance@20": 5,
+   "probabilities": {
+    "t:value-contrast": 0.98,
+    "g:draw-attention": 0.9,
+    "g:guide-the-eye": 0.79,
+    "g:create-tension": 0.72,
+    "g:surprise": 0.27,
+    "g:tell-a-story": 0.66,
+    "g:build-depth": 0.77,
+    "g:make-an-idea-visible": 0.49
+   }
+  },
+  {
+   "id": 6,
+   "jev_techniques": [
+    "symmetry"
+   ],
+   "jev_goals": [
+    "create-calm",
+    "group-and-relate",
+    "guide-the-eye",
+    "make-an-idea-visible"
+   ],
+   "relevance@20": 3,
+   "probabilities": {
+    "t:symmetry": 0.98,
+    "g:draw-attention": 0.24,
+    "g:guide-the-eye": 0.64,
+    "g:create-calm": 0.97,
+    "g:group-and-relate": 0.67,
+    "g:build-depth": 0.2,
+    "g:make-an-idea-visible": 0.6
+   }
+  },
+  {
+   "id": 7,
+   "jev_techniques": [],
+   "jev_goals": [
+    "surprise"
+   ],
+   "relevance@20": 5,
+   "probabilities": {
+    "t:contextual-incongruity": 0.32,
+    "g:guide-the-eye": 0.31,
+    "g:show-scale": 0.23,
+    "g:group-and-relate": 0.26,
+    "g:surprise": 0.62,
+    "g:tell-a-story": 0.49,
+    "g:build-depth": 0.32,
+    "g:suggest-motion": 0.26,
+    "g:make-an-idea-visible": 0.42
+   }
+  },
+  {
+   "id": 8,
+   "jev_techniques": [
+    "negative-space"
+   ],
+   "jev_goals": [
+    "create-calm"
+   ],
+   "relevance@20": 6,
+   "probabilities": {
+    "t:negative-space": 0.82,
+    "t:texture-contrast": 0.24,
+    "g:draw-attention": 0.4,
+    "g:guide-the-eye": 0.24,
+    "g:create-calm": 0.76,
+    "g:group-and-relate": 0.39,
+    "g:build-depth": 0.24,
+    "g:make-an-idea-visible": 0.31
+   }
+  },
+  {
+   "id": 9,
+   "jev_techniques": [
+    "layered-depth"
+   ],
+   "jev_goals": [
+    "build-depth",
+    "guide-the-eye",
+    "show-scale"
+   ],
+   "relevance@20": 4,
+   "probabilities": {
+    "t:scale-contrast": 0.22,
+    "t:layered-depth": 0.99,
+    "t:atmospheric-perspective": 0.35,
+    "g:draw-attention": 0.31,
+    "g:guide-the-eye": 0.71,
+    "g:show-scale": 0.68,
+    "g:group-and-relate": 0.27,
+    "g:build-depth": 0.98,
+    "g:make-an-idea-visible": 0.21
+   }
+  },
+  {
+   "id": 10,
+   "jev_techniques": [
+    "gaze-direction",
+    "rhythm-pattern"
+   ],
+   "jev_goals": [
+    "group-and-relate",
+    "guide-the-eye",
+    "tell-a-story"
+   ],
+   "relevance@20": 3,
+   "probabilities": {
+    "t:gaze-direction": 0.94,
+    "t:rhythm-pattern": 0.65,
+    "t:asymmetric-balance": 0.43,
+    "g:draw-attention": 0.24,
+    "g:guide-the-eye": 0.6,
+    "g:create-tension": 0.31,
+    "g:create-calm": 0.48,
+    "g:group-and-relate": 0.62,
+    "g:surprise": 0.23,
+    "g:tell-a-story": 0.61,
+    "g:build-depth": 0.4,
+    "g:suggest-motion": 0.25,
+    "g:make-an-idea-visible": 0.25
+   }
+  },
+  {
+   "id": 11,
+   "jev_techniques": [
+    "color-contrast"
+   ],
+   "jev_goals": [
+    "create-tension",
+    "suggest-motion",
+    "surprise"
+   ],
+   "relevance@20": 4,
+   "probabilities": {
+    "t:color-contrast": 0.85,
+    "t:juxtaposition": 0.24,
+    "g:draw-attention": 0.2,
+    "g:guide-the-eye": 0.32,
+    "g:create-tension": 0.76,
+    "g:group-and-relate": 0.21,
+    "g:surprise": 0.67,
+    "g:suggest-motion": 0.66,
+    "g:make-an-idea-visible": 0.33
+   }
+  },
+  {
+   "id": 12,
+   "jev_techniques": [],
+   "jev_goals": [],
+   "relevance@20": 3,
+   "probabilities": {
+    "g:draw-attention": 0.46,
+    "g:guide-the-eye": 0.46,
+    "g:create-calm": 0.38,
+    "g:group-and-relate": 0.48,
+    "g:surprise": 0.21,
+    "g:tell-a-story": 0.23,
+    "g:build-depth": 0.31,
+    "g:suggest-motion": 0.21,
+    "g:make-an-idea-visible": 0.32
+   }
+  },
+  {
+   "id": 13,
+   "jev_techniques": [],
+   "jev_goals": [
+    "build-depth",
+    "create-tension",
+    "make-an-idea-visible",
+    "suggest-motion",
+    "surprise",
+    "tell-a-story"
+   ],
+   "relevance@20": 2,
+   "probabilities": {
+    "t:proximity-grouping": 0.21,
+    "t:rhythm-pattern": 0.32,
+    "t:layered-depth": 0.25,
+    "g:guide-the-eye": 0.39,
+    "g:show-scale": 0.42,
+    "g:create-tension": 0.64,
+    "g:group-and-relate": 0.29,
+    "g:surprise": 0.57,
+    "g:tell-a-story": 0.7,
+    "g:build-depth": 0.53,
+    "g:suggest-motion": 0.59,
+    "g:make-an-idea-visible": 0.66
+   }
+  },
+  {
+   "id": 14,
+   "jev_techniques": [
+    "tight-cropping"
+   ],
+   "jev_goals": [
+    "draw-attention",
+    "group-and-relate",
+    "make-an-idea-visible",
+    "suggest-motion"
+   ],
+   "relevance@20": 2,
+   "probabilities": {
+    "t:value-contrast": 0.25,
+    "t:tight-cropping": 0.91,
+    "t:selective-focus": 0.32,
+    "g:draw-attention": 0.52,
+    "g:guide-the-eye": 0.41,
+    "g:show-scale": 0.31,
+    "g:create-calm": 0.21,
+    "g:group-and-relate": 0.59,
+    "g:surprise": 0.23,
+    "g:tell-a-story": 0.22,
+    "g:build-depth": 0.46,
+    "g:suggest-motion": 0.51,
+    "g:make-an-idea-visible": 0.5
+   }
+  },
+  {
+   "id": 15,
+   "jev_techniques": [],
+   "jev_goals": [
+    "create-tension",
+    "make-an-idea-visible",
+    "tell-a-story"
+   ],
+   "relevance@20": 4,
+   "probabilities": {
+    "g:draw-attention": 0.3,
+    "g:guide-the-eye": 0.34,
+    "g:create-tension": 0.95,
+    "g:group-and-relate": 0.27,
+    "g:surprise": 0.28,
+    "g:tell-a-story": 0.58,
+    "g:build-depth": 0.27,
+    "g:make-an-idea-visible": 0.72
+   }
+  },
+  {
+   "id": 16,
+   "jev_techniques": [
+    "atmospheric-perspective",
+    "color-harmony"
+   ],
+   "jev_goals": [
+    "build-depth",
+    "create-calm",
+    "make-an-idea-visible"
+   ],
+   "relevance@20": 2,
+   "probabilities": {
+    "t:atmospheric-perspective": 0.65,
+    "t:color-harmony": 0.61,
+    "g:guide-the-eye": 0.21,
+    "g:create-calm": 0.96,
+    "g:build-depth": 0.58,
+    "g:make-an-idea-visible": 0.69
+   }
+  }
+ ],
+ "repeat_identical": [
+  true,
+  false,
+  false,
+  true
+ ],
+ "run_on": "2026-10-15 10:54",
+ "model_pinned": "jev-1.13.0",
+ "calls": [
+  {
+   "seconds": 0.4,
+   "input_tokens": 3816,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3808,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3807,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3814,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3807,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3807,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3810,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3808,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3812,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3809,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3806,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3805,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3807,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3808,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3810,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3808,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3816,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3808,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3807,
+   "model": "jev-1.13.0"
+  },
+  {
+   "seconds": 0.1,
+   "input_tokens": 3814,
+   "model": "jev-1.13.0"
+  }
+ ],
+ "failures": 0,
+ "estimated_cost_usd": 0.0032
+}
