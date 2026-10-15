@@ -221,7 +221,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             history = store.rows('SELECT technique_id, state, changed_by, note, effect, created_at FROM annotation_history '
                                  'WHERE image_id=? ORDER BY id DESC LIMIT 60', (image_id,))
             related = store.rows(
-                "SELECT i.id, i.title, i.creator, i.thumb_path, COUNT(*) AS shared, group_concat(b.technique_id) AS via "
+                "SELECT i.id, i.title, i.creator, i.thumb_path, i.width, i.height, COUNT(*) AS shared, "
+                "group_concat(b.technique_id) AS via "
                 "FROM annotations a JOIN annotations b ON b.technique_id=a.technique_id AND b.image_id!=a.image_id "
                 "JOIN images i ON i.id=b.image_id WHERE a.image_id=? AND a.state!='rejected' AND b.state!='rejected' "
                 "AND i.removed_at IS NULL GROUP BY i.id ORDER BY shared DESC, i.id DESC LIMIT 12", (image_id,))
@@ -298,7 +299,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             data = json.loads(row['data_json'])
             names = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM techniques')}
             examples = store.rows(
-                "SELECT i.id, i.title, i.creator, i.date_text, i.thumb_path, a.state, a.effect, a.role FROM annotations a "
+                "SELECT i.id, i.title, i.creator, i.date_text, i.thumb_path, i.analysis_path, i.width, i.height, a.state, "
+                "a.effect, a.role FROM annotations a "
                 "JOIN images i ON i.id=a.image_id WHERE a.technique_id=? AND a.state!='rejected' AND i.removed_at IS NULL "
                 "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC LIMIT 24",
                 (technique_id,))
@@ -317,7 +319,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                     for r in used_by if r['kind'] == 'related' and r['id'] not in seen]
         return {**data, 'goals': goals, 'operations': operations, 'domains': domains, 'related': related,
                 'confusions': [{**c, 'name': names.get(c['technique'], c['technique'])} for c in data['confusions']],
-                'examples': [{**e, 'thumb': media_url(e.pop('thumb_path'))} for e in examples]}
+                'examples': [{**e, 'thumb': media_url(e.pop('thumb_path')), 'display': media_url(e.pop('analysis_path'))}
+                             for e in examples]}
 
     @app.get('/api/goals/{goal_id}')
     def goal(goal_id: str):
@@ -514,12 +517,21 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                               for i in data.pop('image_ids') if i in thumbs]
             data['techniques'] = [{'id': t, 'name': names.get(t, t)} for t in data.pop('technique_ids')]
             out.append({**d, **data})
+        return {**brief, 'directions': out, 'reading': read_request(f"{brief['title']}. {brief['text']}")}
+
+    def read_request(text: str, technique: str = '', goal: str = '') -> dict:
         taxonomy = catalog.load()[0]
-        reading = coding.code_request(f"{brief['title']}. {brief['text']}", taxonomy)
         names = {t['id']: t['name'] for t in taxonomy['techniques']} | {g['id']: g['name'] for g in taxonomy['goals']}
+        reading = coding.code_request(text, taxonomy, [technique] if technique in names else (),
+                                      [goal] if goal in names else ())
         for tag in reading['techniques'] + reading['goals']:
             tag['name'] = names[tag['id']]
-        return {**brief, 'directions': out, 'reading': reading}
+        return reading
+
+    @app.get('/api/reading')
+    def reading(text: str = '', technique: str = '', goal: str = '', subject: str = ''):
+        """How a Find request reads (no AI): shown live under the request box."""
+        return read_request(f'{text[:4000]} {subject[:400]}', technique, goal)
 
     @app.put('/api/briefs/{brief_id}')
     def edit_brief(brief_id: int, body: BriefInput):

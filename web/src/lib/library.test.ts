@@ -1,5 +1,33 @@
 import { describe, expect, it } from 'vitest'
-import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, nextPages, toQuery } from './library'
+import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextIndex, nextPages, toQuery } from './library'
+
+describe('justified grid keyboard movement', () => {
+  // two rows of different lengths: [0 wide][1][2] / [3][4 wide]
+  const boxes = [{ left: 0, top: 0, width: 500 }, { left: 520, top: 0, width: 200 }, { left: 740, top: 0, width: 260 },
+    { left: 0, top: 300, width: 300 }, { left: 320, top: 300, width: 680 }]
+  it('moves up and down to the nearest item in the next row', () => {
+    expect(nextByPosition(boxes, 0, 'ArrowDown')).toBe(3)   // centre 250 -> [3] centre 150
+    expect(nextByPosition(boxes, 2, 'ArrowDown')).toBe(4)   // centre 870 -> [4] centre 660
+    expect(nextByPosition(boxes, 4, 'ArrowUp')).toBe(1)     // centre 660 -> [1] centre 620
+    expect(nextByPosition(boxes, 1, 'ArrowUp')).toBe(1)     // no row above
+    expect(nextByPosition(boxes, 3, 'ArrowDown')).toBe(3)   // no row below
+  })
+  it('moves along the reading order and to the ends', () => {
+    expect(nextByPosition(boxes, 2, 'ArrowRight')).toBe(3)
+    expect(nextByPosition(boxes, 0, 'ArrowLeft')).toBe(0)
+    expect(nextByPosition(boxes, 2, 'End')).toBe(4)
+    expect(nextByPosition(boxes, 4, 'Home')).toBe(0)
+    expect(nextByPosition(boxes, 2, 'Enter')).toBe(2)
+  })
+})
+
+describe('active filter labels', () => {
+  it('names each filter in use with the change that removes it', () => {
+    const labels = activeFilters({ ...EMPTY, q: 'fog', technique: 'silhouette', favorite: true, sort: 'title' }, { silhouette: 'Silhouette' })
+    expect(labels.map((f) => f.label)).toEqual(['“fog”', 'Silhouette', 'Favourites'])
+    expect(labels[2].clear).toEqual({ favorite: false })
+  })
+})
 
 describe('library filters', () => {
   it('round-trips through the URL and drops defaults', () => {

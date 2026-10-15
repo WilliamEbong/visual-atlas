@@ -44,6 +44,9 @@ export function activeCount(filters: Filters): number {
 
 export const PAGE = 60
 
+/** A picture's width/height, clamped so extreme panoramas or strips still lay out. */
+export const aspect = (item: { width: number; height: number }) => Math.min(4, Math.max(0.25, item.width / Math.max(1, item.height) || 1))
+
 /** Add the next page, never repeating an image (new images can shift offsets between pages). */
 export function appendPage<T extends { id: number }>(current: T[], page: T[]): T[] {
   const seen = new Set(current.map((item) => item.id))
@@ -64,4 +67,46 @@ export function nextIndex(index: number, key: string, columns: number, count: nu
   const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns, Home: -index, End: count - 1 - index }[key]
   if (step === undefined || count === 0) return index
   return Math.min(count - 1, Math.max(0, index + step))
+}
+
+export interface Box { left: number; top: number; width: number }
+
+/** Arrow-key movement in a justified grid, where rows hold different numbers of items: up and down go to the
+ *  item in the previous or next row whose centre is nearest horizontally. `boxes` are in reading order. */
+export function nextByPosition(boxes: Box[], index: number, key: string): number {
+  const count = boxes.length
+  if (count === 0 || index < 0) return index
+  if (key === 'ArrowRight') return Math.min(count - 1, index + 1)
+  if (key === 'ArrowLeft') return Math.max(0, index - 1)
+  if (key === 'Home') return 0
+  if (key === 'End') return count - 1
+  if (key !== 'ArrowUp' && key !== 'ArrowDown') return index
+  const rows = [...new Set(boxes.map((box) => Math.round(box.top)))].sort((a, b) => a - b)
+  const row = rows.indexOf(Math.round(boxes[index].top)) + (key === 'ArrowDown' ? 1 : -1)
+  if (row < 0 || row >= rows.length) return index
+  const centre = boxes[index].left + boxes[index].width / 2
+  let best = index
+  let distance = Infinity
+  boxes.forEach((box, candidate) => {
+    if (Math.round(box.top) !== rows[row]) return
+    const gap = Math.abs(box.left + box.width / 2 - centre)
+    if (gap < distance) { distance = gap; best = candidate }
+  })
+  return best
+}
+
+/** The labels of the filters in use, each with the change that removes it. */
+export function activeFilters(filters: Filters, names: Record<string, string>): { label: string; clear: Partial<Filters> }[] {
+  const out: { label: string; clear: Partial<Filters> }[] = []
+  if (filters.q) out.push({ label: `“${filters.q}”`, clear: { q: '' } })
+  if (filters.technique) out.push({ label: names[filters.technique] ?? filters.technique, clear: { technique: '' } })
+  if (filters.goal) out.push({ label: names[filters.goal] ?? filters.goal, clear: { goal: '' } })
+  if (filters.orientation) out.push({ label: filters.orientation[0].toUpperCase() + filters.orientation.slice(1), clear: { orientation: '' } })
+  if (filters.provider) out.push({ label: names[filters.provider] ?? filters.provider, clear: { provider: '' } })
+  if (filters.license) out.push({ label: filters.license, clear: { license: '' } })
+  if (filters.color) out.push({ label: `Mostly ${filters.color}`, clear: { color: '' } })
+  if (filters.state) out.push({ label: names[filters.state] ?? filters.state, clear: { state: '' } })
+  if (filters.favorite) out.push({ label: 'Favourites', clear: { favorite: false } })
+  if (filters.collection) out.push({ label: 'In a collection', clear: { collection: 0 } })
+  return out
 }

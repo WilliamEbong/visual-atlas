@@ -31,7 +31,7 @@ export interface ImageDetail {
   history: { technique_id: string; state: string; changed_by: string; note: string; effect: string; created_at: string }[]
   goals: { id: string; name: string }[]
   collections: { id: number; name: string }[]
-  related: { id: number; title: string; creator: string; thumb?: string; shared: number; via: string[] }[]
+  related: { id: number; title: string; creator: string; thumb?: string; width: number; height: number; shared: number; via: string[] }[]
 }
 
 export interface Goal { id: string; name: string; description: string }
@@ -46,7 +46,8 @@ export interface TechniqueDetail {
   confusions: { technique: string; name: string; how_to_tell: string }[]
   related: { id: string; name: string; relation: string }[]
   goals: Goal[]; operations: Goal[]; domains: Goal[]
-  examples: { id: number; title: string; creator: string; date_text: string; thumb?: string; state: State; effect: string; role: string }[]
+  examples: { id: number; title: string; creator: string; date_text: string; thumb?: string; display?: string; width: number; height: number
+    state: State; effect: string; role: string }[]
 }
 
 export interface Job {

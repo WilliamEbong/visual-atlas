@@ -4,13 +4,14 @@ import { adjacency, layout, route } from '../lib/graph'
 import { useApp, useData } from '../lib/hooks'
 import { go, href } from '../lib/router'
 import type { GraphData } from '../lib/types'
+import { Failure, Loading, PageHead } from './ui'
 
 const KIND_LABEL = { goal: 'Goal', technique: 'Technique', image: 'Image' } as Record<string, string>
 
 export default function Connections({ focus }: { focus: string }) {
   const { taxonomy } = useApp()
   const start = focus || (taxonomy ? `goal:${taxonomy.goals[0].id}` : '')
-  const { data, error } = useData<GraphData>(start ? `graph?focus=${encodeURIComponent(start)}` : null)
+  const { data, error, busy, reload } = useData<GraphData>(start ? `graph?focus=${encodeURIComponent(start)}` : null)
   const [view, setView] = useState<'map' | 'list'>(() => (window.matchMedia?.('(max-width: 640px)').matches ? 'list' : 'map'))
   const box = useRef<HTMLDivElement>(null)
   const cy = useRef<import('cytoscape').Core | null>(null)
@@ -47,18 +48,16 @@ export default function Connections({ focus }: { focus: string }) {
     return () => { cancelled = true; cy.current?.destroy(); cy.current = null }
   }, [data, view])
 
-  if (error) return <p className="notice error" role="alert">{error}</p>
   const focusNode = data?.nodes.find((node) => node.id === data.focus)
+  const head = <PageHead kicker={<><a href="#/explore">Explore</a> / connections</>} title="See connections" asideClass="actions"
+    aside={<div className="segments" role="group" aria-label="View">
+      <button type="button" className={view === 'map' ? 'primary' : ''} aria-pressed={view === 'map'} onClick={() => setView('map')}>Map</button>
+      <button type="button" className={view === 'list' ? 'primary' : ''} aria-pressed={view === 'list'} onClick={() => setView('list')}>List</button></div>} />
+  if (error) return <>{head}<Failure message={error} busy={busy} retry={reload} /></>
   return (
     <div className="stack">
-      <div className="page-head">
-        <h1>See connections</h1>
-        <div className="row" role="group" aria-label="View">
-          <button type="button" aria-pressed={view === 'map'} onClick={() => setView('map')}>Map</button>
-          <button type="button" aria-pressed={view === 'list'} onClick={() => setView('list')}>List</button>
-        </div>
-      </div>
-      <p className="lede">One focus at a time: {focusNode ? <><strong>{KIND_LABEL[focusNode.kind]}: {focusNode.label}</strong> and what it connects to.</> : 'loading…'} Select a node to refocus the map on it; select the centre to open it.</p>
+      {head}
+      <p className="lede under">One focus at a time: {focusNode ? <><strong>{KIND_LABEL[focusNode.kind]}: {focusNode.label}</strong> and what it connects to.</> : 'loading…'} Select a node to refocus the map on it; select the centre to open it.</p>
       <label className="field" style={{ maxWidth: 420 }}>Focus on
         <select value={start} onChange={(event) => go('connections', { focus: event.target.value })}>
           <optgroup label="Goals">{taxonomy?.goals.map((g) => <option key={g.id} value={`goal:${g.id}`}>{g.name}</option>)}</optgroup>
@@ -74,7 +73,7 @@ export default function Connections({ focus }: { focus: string }) {
           <span className="legend"><span className="g">Goal</span><span className="t">Technique</span><span className="i">Image</span></span>
         </div>
         <div className="graph-box" ref={box} role="img" aria-label={`Connection map centred on ${focusNode?.label ?? 'the focus'}. Use the List view for a keyboard-friendly version.`} />
-      </> : data && (
+      </> : !data ? <Loading plates={false} /> : (
         <div className="stack">
           {adjacency(data).map((node) => (
             <section key={node.id} aria-label={`${KIND_LABEL[node.kind]} ${node.label}`}>

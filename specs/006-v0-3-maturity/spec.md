@@ -81,7 +81,7 @@ without the owner's go-ahead.
 - FR-9 Collections: drawers with contact strips, image counts and export or copy credits.
 - FR-10 Settings: sections with in-page navigation; the sources table shows each source's rule from the policy
   data.
-- FR-11 Phone widths (≤ 600 px): one column, a menu button for navigation, tabs on the image page, and no
+- FR-11 Phone widths (≤ 600 px): one column, a menu button for navigation, the image page's sections stacked in reading order, and no
   horizontal scrolling at 375 px.
 
 ### Polish

@@ -4,6 +4,9 @@ import { demoRequest } from './demo'
 
 export const readOnly = import.meta.env.VITE_DEMO === '1'
 
+/** The library is in maintenance (a restore is running): nothing failed, the change can be tried again shortly. */
+export class BusyError extends Error {}
+
 function token(): string {
   return document.querySelector<HTMLMetaElement>('meta[name="atlas-token"]')?.content ?? ''
 }
@@ -12,7 +15,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (readOnly) return demoRequest<T>(path, init)
   const response = await fetch(`/api/${path}`, {
     ...init, headers: { 'Content-Type': 'application/json', 'X-Atlas-Token': token(), ...init?.headers },
-  })
+  }).catch(() => { throw new Error('Visual Atlas is not answering. If you closed its window, open it again; otherwise try again in a moment.') })
   const data = await response.json().catch(() => null)
   if (response.status === 401 && !sessionStorage.getItem('reloaded')) {
     // The app was restarted with a new launch token: reload once to pick it up.
@@ -25,7 +28,7 @@ export async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const message = typeof detail === 'string' ? detail : Array.isArray(detail)
       ? detail.map((item: { loc?: unknown[]; msg?: string }) => `${item.loc?.slice(1).join('.') ?? 'Field'}: ${item.msg ?? 'invalid'}`).join('; ')
       : `Something went wrong (${response.status}). Try again.`
-    throw new Error(message)
+    throw response.status === 503 ? new BusyError(message) : new Error(message)
   }
   if (data === null) throw new Error('The local server returned an unreadable answer. Refresh and try again.')
   return data as T

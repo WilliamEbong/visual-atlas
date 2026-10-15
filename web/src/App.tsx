@@ -13,10 +13,11 @@ import Jobs from './components/Jobs'
 import Library from './components/Library'
 import Project from './components/Project'
 import SettingsPage from './components/Settings'
+import { NoticeProvider } from './components/ui'
 import Welcome from './components/Welcome'
 
-const NAV = [['', 'Library'], ['find', 'Find images'], ['explore', 'Explore'], ['project', 'My project'],
-  ['collections', 'Collections'], ['jobs', 'Jobs'], ['settings', 'Settings']] as const
+const NAV = [['', 'Library'], ['find', 'Find images'], ['explore', 'Explore'], ['project', 'My project'], ['collections', 'Collections']] as const
+const TOOLS = [['jobs', 'Jobs'], ['settings', 'Settings']] as const
 
 function readCompare(): Pick[] {
   try { return JSON.parse(sessionStorage.getItem('compare') ?? '[]') } catch { return [] }
@@ -28,7 +29,9 @@ export default function App() {
   const taxonomy = useData<Taxonomy>('taxonomy')
   const [compare, setCompare] = useState<Pick[]>(readCompare)
   const [running, setRunning] = useState<Job | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => { try { sessionStorage.setItem('compare', JSON.stringify(compare)) } catch { /* private mode */ } }, [compare])
+  useEffect(() => setMenuOpen(false), [route])
   const toggleCompare = useCallback((pick: Pick) => setCompare((picks) => picks.some((p) => p.id === pick.id)
     ? picks.filter((p) => p.id !== pick.id) : picks.length >= 4 ? picks : [...picks, pick]), [])
   const checkJobs = useCallback(() => {
@@ -39,7 +42,7 @@ export default function App() {
   useEffect(checkJobs, [checkJobs, section])
   usePoll(checkJobs, true, running ? 3000 : 30000)  // the 30 s ping also tells the launcher the window is open
   useEffect(() => {
-    const extra: Record<string, string> = { compare: 'Compare', connections: 'See connections', technique: 'Technique' }
+    const extra: Record<string, string> = { compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
     if (section !== 'image') document.title = `${NAV.find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Library'} · Visual Atlas`
   }, [section])
 
@@ -57,31 +60,40 @@ export default function App() {
     case 'settings': page = <SettingsPage />; break
     default: page = <Library query={route.query} />
   }
+  const current = (key: string) => section === key || (key === 'explore' && ['technique', 'connections'].includes(section))
+    || (key === '' && ['image', 'compare'].includes(section))
 
   return (
     <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]), refreshTaxonomy: taxonomy.reload }}>
-      <a className="skip" href="#content" onClick={(event) => { event.preventDefault(); document.getElementById('content')?.focus() }}>Skip to content</a>
-      <header className="topbar">
-        <a className="brand" href="#/">Visual Atlas</a>
-        <nav className="nav" aria-label="Main">
-          {NAV.map(([key, label]) => (
-            <a key={key} href={`#/${key}`} aria-current={section === key || (key === 'explore' && section === 'technique') ? 'page' : undefined}>{label}</a>
-          ))}
-        </nav>
-        {readOnly ? <span className="status-line">Read-only online demo</span>
-          : running && <a className="status-line" href={href(`jobs/${running.id}`)}>1 job running · {running.message || running.stage}</a>}
-      </header>
-      <main id="content" tabIndex={-1}>{page}</main>
-      {!readOnly && <Welcome />}
-      {compare.length > 0 && section !== 'compare' && (
-        <div className="tray" role="region" aria-label="Images chosen for comparison">
-          <span>Compare ({compare.length}/4)</span>
-          <span className="row">{compare.map((p) => <img key={p.id} alt={p.title} src={media(p.thumb)} />)}</span>
-          {compare.length >= 2 ? <a className="button" href={href('compare', { ids: compare.map((p) => p.id).join(',') })}>Compare side by side</a>
-            : <span>Pick at least one more image</span>}
-          <button type="button" onClick={() => setCompare([])}>Clear</button>
-        </div>
-      )}
+      <NoticeProvider>
+        <a className="skip" href="#content" onClick={(event) => { event.preventDefault(); document.getElementById('content')?.focus() }}>Skip to content</a>
+        <header className="topbar">
+          <div className="bar">
+            <a className="brand" href="#/">Visual Atlas</a>
+            <button type="button" className="menu-button small" aria-expanded={menuOpen} aria-controls="main-nav" onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? 'Close' : 'Menu'}</button>
+            <nav id="main-nav" className={`nav${menuOpen ? ' open' : ''}`} aria-label="Main">
+              {NAV.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
+              <span style={{ flex: '1 1 auto' }} aria-hidden="true" />
+              {TOOLS.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
+            </nav>
+            {readOnly ? <span className="status-line">Read-only online demo</span>
+              : running && <a className="status-line" href={href(`jobs/${running.id}`)}><span className="pulse" aria-hidden="true" />
+                {(running.message || running.stage).slice(0, 48)}</a>}
+          </div>
+        </header>
+        <main id="content" tabIndex={-1}>{page}</main>
+        {!readOnly && <Welcome />}
+        {compare.length > 0 && section !== 'compare' && (
+          <div className="tray" role="region" aria-label="Images chosen for comparison">
+            <span>Compare ({compare.length}/4)</span>
+            <span className="row">{compare.map((p) => <img key={p.id} alt={p.title} src={media(p.thumb)} />)}</span>
+            {compare.length >= 2 ? <a className="button" href={href('compare', { ids: compare.map((p) => p.id).join(',') })}>Compare side by side</a>
+              : <span>Pick at least one more image</span>}
+            <button type="button" onClick={() => setCompare([])}>Clear</button>
+          </div>
+        )}
+      </NoticeProvider>
     </AppContext.Provider>
   )
 }

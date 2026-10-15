@@ -128,3 +128,20 @@ def test_library_pages_never_repeat_or_skip_images_with_equal_sort_values(home, 
             seen += [item['id'] for item in client.get(f'/api/library?sort={sort}&limit=3&offset={offset}').json()['items']]
         assert sorted(seen) == sorted(ids) and len(seen) == len(set(seen))
     assert len(client.get('/api/library?limit=100000').json()['items']) <= 200  # pages are bounded
+
+
+def test_reading_shows_how_a_request_is_coded_without_ai(client):
+    reading = client.get('/api/reading', params={'text': 'one figure in a lot of empty negative space', 'technique': 'silhouette',
+                                                 'goal': 'no-such-goal'}).json()
+    ids = [t['id'] for t in reading['techniques']]
+    assert ids[0] == 'silhouette' and 'negative-space' in ids and reading['goals'] == []
+    assert all(t['name'] for t in reading['techniques'])
+
+
+def test_page_data_carries_image_sizes_for_layout(library):
+    first = library.get('/api/library').json()['items'][0]
+    detail = library.get(f"/api/images/{first['id']}").json()
+    technique = detail['annotations'][0]['technique_id']
+    example = library.get(f'/api/techniques/{technique}').json()['examples'][0]
+    assert example['width'] > 0 and example['height'] > 0 and example['display'].startswith('/media/analysis/')
+    assert all(r['width'] > 0 and r['height'] > 0 for r in detail['related'])
