@@ -10,3 +10,10 @@ id = "generic-api-key"
     regexTarget = "line"
     regexes = ['''^\s*"cache_key": "[0-9a-f]{32}(?:[0-9a-f]{32})?",?\s*$''']
     paths = ['''^starter/library\.json$''']
+
+    [[rules.allowlists]]
+    description = "Wikimedia Commons file names in evaluation records are public page links, not secrets"
+    condition = "AND"
+    regexTarget = "line"
+    regexes = ['''^\s*"source_url": "https://commons\.wikimedia\.org/wiki/File:[^"\s]+",?\s*$''']
+    paths = ['''^docs/evaluation/.*\.json$''']
