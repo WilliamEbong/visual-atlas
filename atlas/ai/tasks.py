@@ -66,7 +66,7 @@ def untrusted(value) -> str:
     inside the structure, so the JSON stays complete (callers bound the number of records)."""
     def clip(item):
         if isinstance(item, str):
-            return item[:1200]
+            return item[:4000]  # the longest text the app accepts (a brief), so accepted input is never cut
         if isinstance(item, list):
             return [clip(entry) for entry in item[:40]]
         if isinstance(item, dict):

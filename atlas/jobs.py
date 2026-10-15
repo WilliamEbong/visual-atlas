@@ -661,12 +661,11 @@ class Worker:
                               (self._cache_key(image),)) is not None
 
     def _finish_verification(self, image_id: int, item_id: int):
-        """After a crash between analysis and the second-model check, run the check that was missed."""
+        """After a crash, run the second-model check that was missed, or report the one that was already saved."""
         verifier = self.spec.get('verify_with')
-        if verifier and not self.store.one("SELECT 1 FROM analyses WHERE image_id=? AND task='verify' AND job_id=?",
-                                           (image_id, self.job['id'])):
-            return self._optional_check(image_id, verifier, item_id)
-        return None
+        if not verifier:
+            return None
+        return self._optional_check(image_id, verifier, item_id)
 
     def _rule_version(self) -> str:
         """The analysis version an automatic rejection was made under (prompt, taxonomy, backend, model)."""
@@ -747,7 +746,10 @@ class Worker:
             "SELECT a.technique_id, a.evidence_json, a.effect FROM annotations a LEFT JOIN analyses p ON "
             "p.id=a.analysis_id WHERE a.image_id=? AND a.state='proposed' AND a.human_locked=0 AND "
             "a.note NOT LIKE 'second model disagreed%' AND COALESCE(p.backend,'')!=? ORDER BY a.id", (image_id, verifier))
-        if not rows:
+        if not rows:  # after a crash, a check this job already saved still counts as checked
+            if self.store.one("SELECT 1 FROM analyses WHERE image_id=? AND task='verify' AND job_id=?",
+                              (image_id, self.job['id'])):
+                return 'checked', ''
             return 'nothing', 'Nothing to check: no proposal from another model is waiting.'
         image = self.store.one('SELECT analysis_path, analysis_sha256 FROM images WHERE id=? AND removed_at IS NULL',
                                (image_id,))

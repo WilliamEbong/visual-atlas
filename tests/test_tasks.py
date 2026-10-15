@@ -164,3 +164,10 @@ def test_fake_backend_answers_satisfy_every_contract(tmp_path):
     assert tasks.validate_directions(directions, IDS, {1: {ids[0]}})['directions']
     comparison = fake.run('', tasks.compare_schema([1, 2], ids), [image, image])['result']
     tasks.validate_compare(comparison, {1, 2}, IDS)
+
+
+def test_a_long_accepted_brief_reaches_the_prompt_whole():
+    text = 'Calm night poster. ' * 200 + 'Leave room at the bottom for sponsor logos.'
+    assert len(text) <= 4000
+    prompt = tasks.directions_prompt({'title': 'b', 'text': text}, TAXONOMY['techniques'], [])
+    assert json.loads(prompt.split('Brief (JSON data): ')[1])['text'] == text

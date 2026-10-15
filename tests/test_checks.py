@@ -228,3 +228,47 @@ def test_a_verifier_unavailable_in_one_job_is_asked_again_in_the_next(home):
             outcomes += [json.loads(r['payload_json'])['check'] for r in store.rows(
                 "SELECT payload_json FROM job_items WHERE job_id=? AND state='added'", (job_id,))]
     assert outcomes == ['unavailable', 'checked'] and verifier.calls == 2
+
+
+def crash_once(monkeypatch, name, when=lambda *a, **k: True):
+    real = getattr(jobs.Worker, name)
+    crashed = []
+
+    def wrapper(self, *args, **kwargs):
+        if not crashed and when(*args, **kwargs):
+            crashed.append(1)
+            raise RuntimeError('power cut after the check was saved')
+        return real(self, *args, **kwargs)
+    monkeypatch.setattr(jobs.Worker, name, wrapper)
+
+
+def resume(home, job_id, backends):
+    with jobs.open_store(home) as store:
+        store.update_job(job_id, None, lease_until=0)  # the crashed worker's lease runs out
+    jobs.Worker(home, owner='again', fetcher=aic_fetcher(), backends=backends).run_once(job_id)
+
+
+def test_a_saved_check_still_counts_after_a_crash_in_a_verify_job(home, monkeypatch):
+    ids = library(home)
+    crash_once(monkeypatch, '_item', lambda item_id, **changes: changes.get('reason') == 'checked')
+    with jobs.open_store(home) as store:
+        job_id = jobs.create_job(store, 'verify', {'image_ids': ids, 'backend': 'claude'})
+    with pytest.raises(RuntimeError):
+        jobs.Worker(home, owner='v', fetcher=aic_fetcher(), backends={'claude': Verifier(), 'codex': fake}).run_once(job_id)
+    resume(home, job_id, {'claude': Verifier(), 'codex': fake})
+    job, items, saved, _ = outcome(home, job_id)
+    assert saved == 1 and items == [{'state': 'added', 'reason': 'checked'}] and 'Checked 1 of 1' in job['message']
+
+
+def test_a_saved_check_still_counts_after_a_crash_in_a_find_job(home, monkeypatch):
+    crash_once(monkeypatch, '_added_item')
+    with jobs.open_store(home) as store:
+        job_id = jobs.create_job(store, 'find', {'goal': 'harbour', 'providers': ['aic'], 'backend': 'codex',
+                                                 'verify_with': 'claude', 'target_new_images': 1})
+    with pytest.raises(RuntimeError):
+        jobs.Worker(home, owner='f', fetcher=aic_fetcher(), backends={'codex': fake, 'claude': Verifier()}).run_once(job_id)
+    resume(home, job_id, {'codex': fake, 'claude': Verifier()})
+    with jobs.open_store(home) as store:
+        added = store.rows("SELECT payload_json FROM job_items WHERE job_id=? AND state='added'", (job_id,))
+        checks = store.one("SELECT COUNT(*) AS n FROM analyses WHERE task='verify'")['n']
+    assert [json.loads(r['payload_json'])['check'] for r in added] == ['checked'] and checks == 1
