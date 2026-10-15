@@ -449,7 +449,8 @@ class Store:
                 self._insert('annotation_history', {
                     **{k: old[k] for k in ('image_id', 'technique_id', 'role', 'evidence_json', 'effect', 'confidence')},
                     'annotation_id': old['id'], 'state': 'superseded', 'analysis_id': analysis_id, 'human_locked': 0,
-                    'changed_by': changed_by, 'note': f"superseded: the newer analysis does not name it (was {old['state']})",
+                    'changed_by': changed_by, 'note': 'superseded: the newer analysis does not name it (it was '
+                    + {'model_reviewed': 'agreed by a second model'}.get(old['state'], old['state']) + ')',
                     'created_at': now()})
                 self.connection.execute('DELETE FROM annotations WHERE id=?', (old['id'],))
                 superseded.append(old['technique_id'])

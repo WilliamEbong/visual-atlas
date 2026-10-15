@@ -35,6 +35,9 @@ export default function JobProgress({ jobId, compact = false }: { jobId: string;
   const free = (counts.eligible ?? 0) + (counts.downloaded ?? 0) + (counts.added ?? 0) + (counts.no_technique ?? 0) + (counts.duplicate ?? 0)
     + (counts.low_quality ?? 0) + (counts.filtered ?? 0)
   const skipped = Object.entries(counts).filter(([state]) => state in SKIP_LABELS && state !== 'skipped')
+  // A finished Find/Grow job that did not reach the number asked for is not presented as a plain success.
+  const reached = (job.spec.targets as string[] | undefined)?.length ? job.matching : counts.added ?? 0
+  const short = discovery && job.state === 'done' && reached < Number(job.spec.target_new_images ?? 0)
 
   async function control(action: string) {
     setBusy(true)
@@ -44,7 +47,7 @@ export default function JobProgress({ jobId, compact = false }: { jobId: string;
   return (
     <section className="stack" aria-label="Job progress" aria-live="polite">
       <div className="page-head">
-        <h2>{job.state === 'done' ? 'Ready' : job.state === 'cancelled' ? 'Cancelled' : job.state === 'failed' ? 'Stopped'
+        <h2>{short ? 'Stopped short' : job.state === 'done' ? (job.message.startsWith('Ready') ? 'Ready' : 'Finished') : job.state === 'cancelled' ? 'Cancelled' : job.state === 'failed' ? 'Stopped'
           : job.state === 'paused' ? 'Paused' : 'Working on it'}</h2>
         <span className="mono">{job.kind} · {job.backend}{job.spec.verify_with ? ` + ${job.spec.verify_with} check` : ''} · {date(job.created_at)}</span>
       </div>

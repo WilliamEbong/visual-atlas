@@ -359,7 +359,7 @@ class Worker:
                 parts.append(f'{len(skipped)} had nothing to check.')
             return ' '.join(parts)
         added = sum(r['state'] == 'added' for r in rows)
-        parts = [f'Ready. {lead} {added} of {len(rows)} image{plural} have techniques.']
+        parts = [f'Ready. {lead} Images with techniques: {added} of {len(rows)}.']
         unchecked = sum(r['state'] == 'added' and r['checked'] not in (None, 'checked', 'nothing') for r in rows)
         if unchecked:
             parts.append(f'{unchecked} could not be checked by the second model.')
