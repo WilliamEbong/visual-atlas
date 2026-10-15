@@ -4,8 +4,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-Publish: create public repo WilliamEbong/visual-atlas, push main, enable Pages (GitHub Actions), tag v0.1.0,
-check CI/release/Pages, then record the results here and give the owner the final report.
+None: v0.1.0 is built, verified and published. Next work comes from the owner (WELCOME-BACK.md, local only, has
+the handoff). Ideas if asked: Openverse/Rijksmuseum/NGA connectors, burst-frame detection, upload/URL import.
 
 ## Owner decisions (2026-10-15 plan gate)
 - Publish like Qualia: public repo `WilliamEbong/visual-atlas`, Releases zip, read-only Pages demo —
@@ -74,6 +74,13 @@ check CI/release/Pages, then record the results here and give the owner the fina
    conditional, then the state is read again). Review rounds stop here (bound of 3).
 
 ## Verification evidence
+- Published 2026-10-15: https://github.com/WilliamEbong/visual-atlas (public), Pages demo
+  https://williamebong.github.io/visual-atlas/ (Playwright: 85 references, technique page, images, no console errors),
+  release v0.1.0 with VisualAtlas-v0.1.0.zip (25.0 MB). CI "Checks" green on Ubuntu (ruff, pytest, taxonomy, data
+  guard, pip-audit, npm typecheck/test/build/audit, gitleaks). First run failed only on gitleaks false positives
+  (starter cache-key hex digests) -> .gitleaks.toml allowlist limited to that line shape in starter/library.json.
+  The tag push did not start the release workflow, so it was dispatched on the tag (`gh workflow run release.yml
+  --ref v0.1.0`). The published zip was downloaded, installed into a scratch home and passed `atlas doctor`.
 - Release zip (local build, 24.6 MB) extracted to a scratch folder; `scripts/install-atlas.ps1 -NoShortcuts -NoLaunch`
   with a scratch VISUAL_ATLAS_HOME: dependencies, screens, starter (85 references), `atlas doctor` (Codex 0.160.0 and
   Claude 2.1.284 ready); the installed server showed the welcome dialog and 85 references (Playwright,
