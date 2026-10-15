@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, toQuery } from './library'
+import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, nextPages, toQuery } from './library'
 
 describe('library filters', () => {
   it('round-trips through the URL and drops defaults', () => {
@@ -30,5 +30,16 @@ describe('appendPage', () => {
   it('adds the next page without repeating images whose offsets shifted', () => {
     const merged = appendPage([{ id: 3 }, { id: 2 }], [{ id: 2 }, { id: 1 }])
     expect(merged.map((item) => item.id)).toEqual([3, 2, 1])
+  })
+})
+
+describe('nextPages', () => {
+  it('keeps advancing the offset when new images make a page repeat what is shown, and stops on an empty page', () => {
+    let pages = nextPages({ key: '', items: [], consumed: 0, done: false }, 'k', [{ id: 9 }, { id: 8 }])
+    pages = nextPages(pages, 'k', [{ id: 9 }, { id: 8 }])  // shifted offsets: only repeats
+    expect(pages.items.map((item) => item.id)).toEqual([9, 8])
+    expect(pages.consumed).toBe(4)  // the next request asks for rows after these, not the same offset again
+    expect(nextPages(pages, 'k', []).done).toBe(true)
+    expect(nextPages(pages, 'other filters', [{ id: 1 }]).consumed).toBe(1)  // new filters start over
   })
 })

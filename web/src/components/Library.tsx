@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, PAGE, toQuery, type Filters } from '../lib/library'
+import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, nextPages, PAGE, toQuery, type Filters, type Pages } from '../lib/library'
 import { go, href } from '../lib/router'
 import type { LibraryItem, Settings } from '../lib/types'
 import { PROVIDERS } from '../lib/types'
@@ -18,18 +18,19 @@ export default function Library({ query }: { query: URLSearchParams }) {
   const first = apiPath(filters, PAGE, 0)
   const { data, error } = useData<LibraryPage>(first)
   // Later pages are fetched with an offset and kept per filter set; an answer for filters already left is ignored.
-  const [more, setMore] = useState<{ key: string; items: LibraryItem[] }>({ key: '', items: [] })
+  const [more, setMore] = useState<Pages<LibraryItem>>({ key: '', items: [], consumed: 0, done: false })
   const [loadingMore, setLoadingMore] = useState(false)
   const current = useRef(first)
   current.current = first
-  const items = appendPage(data?.items ?? [], more.key === first ? more.items : [])
+  const mine = more.key === first ? more : { key: first, items: [], consumed: 0, done: false }
+  const items = appendPage(data?.items ?? [], mine.items)
   async function showMore() {
     const requested = first
     setLoadingMore(true)
     try {
-      const page = await request<LibraryPage>(apiPath(filters, PAGE, items.length))
+      const page = await request<LibraryPage>(apiPath(filters, PAGE, (data?.items.length ?? 0) + mine.consumed))
       if (current.current !== requested) return
-      setMore((previous) => ({ key: requested, items: appendPage(previous.key === requested ? previous.items : [], page.items) }))
+      setMore((previous) => nextPages(previous, requested, page.items))
     } catch (reason) { window.alert((reason as Error).message) } finally { setLoadingMore(false) }
   }
   const [queued, setQueued] = useState<string | null>(null)
@@ -160,7 +161,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
               </div>
             ))}
           </div>
-          {data && items.length < data.total && <p style={{ marginTop: 24 }}><button type="button" disabled={loadingMore} onClick={showMore}>{loadingMore ? 'Loading…' : 'Show more'}</button></p>}
+          {data && items.length < data.total && !mine.done && <p style={{ marginTop: 24 }}><button type="button" disabled={loadingMore} onClick={showMore}>{loadingMore ? 'Loading…' : 'Show more'}</button></p>}
         </>
       )}
     </>

@@ -96,6 +96,7 @@ class Worker:
             self.store = store
             self.job = job
             self.spec = json.loads(job['spec_json'])
+            self._verifier_down = None  # a verifier that was unavailable in an earlier job is asked again
             taxonomy, policies, self.taxonomy_sha, _ = catalog.load()
             self.taxonomy = taxonomy
             self.policies = policies
@@ -312,7 +313,11 @@ class Worker:
             return self._done(self._summary())
         spent = (self._analysed() >= self._budget('max_analyses')
                  or self._count('download') >= self._budget('max_downloads'))
-        if spent and not self._items("kind='candidate' AND state='downloaded'"):
+        repairs = self.store.one(
+            "SELECT 1 FROM job_items j JOIN images i ON i.job_id=j.job_id AND i.provider=j.provider AND "
+            "i.provider_item_id=j.provider_item_id AND i.removed_at IS NULL WHERE j.job_id=? AND j.state='eligible' "
+            "LIMIT 1", (self.job['id'],))
+        if spent and not repairs and not self._items("kind='candidate' AND state='downloaded'"):
             return self._done(self._summary(exhausted=True))  # nothing more this job finds could still be analysed
         now_ = clock()
         for state, step in (('downloaded', self._analyze), ('eligible', self._download), ('found', self._permission)):
@@ -520,10 +525,16 @@ class Worker:
             return self._item(item['id'], state='ineligible', reason=decision['reason'])
         self._item(item['id'], state='eligible', payload_json=canonical({**candidate, 'rights': decision}))
 
+    def _saved_before_crash(self, item: dict) -> dict | None:
+        """This job's image row for the item, committed just before a crash (its files may not have been written)."""
+        return self.store.one('SELECT id, file_sha256 FROM images WHERE job_id=? AND provider=? AND provider_item_id=? '
+                              'AND removed_at IS NULL', (self.job['id'], item['provider'], item['provider_item_id']))
+
     def _download(self, item: dict):
-        if self._count('download') >= self._budget('max_downloads'):
+        earlier = self._saved_before_crash(item)  # finishing an already counted download, never a new one
+        if earlier is None and self._count('download') >= self._budget('max_downloads'):
             return self._item(item['id'], state='skipped', reason='download budget reached')
-        if self._analysed() >= self._budget('max_analyses'):
+        if earlier is None and self._analysed() >= self._budget('max_analyses'):
             return self._item(item['id'], state='skipped', reason='analysis budget reached')
         candidate = json.loads(item['payload_json'])
         self._set(stage='checking', message=f"Downloading “{candidate['title'][:60]}”…")
@@ -539,12 +550,12 @@ class Worker:
             return self._item(item['id'], state='low_quality', reason=str(error))
         self._attempt('download', item, 'ok', None, started)
         sha = hashlib.sha256(data).hexdigest()
-        mine = self.store.one('SELECT id FROM images WHERE file_sha256=? AND job_id=? AND provider=? '
-                              'AND provider_item_id=? AND removed_at IS NULL',
-                              (sha, self.job['id'], item['provider'], item['provider_item_id']))
-        if mine:  # saved just before a crash; write any file that did not make it, then carry on
+        if earlier:  # saved just before a crash: write any file that did not make it, then carry on
+            if earlier['file_sha256'] != sha:
+                return self._item(item['id'], state='failed', reason='The source file changed while the job was '
+                                  'interrupted; remove the waiting image and find it again.')
             images.write_files(self.media, images.prepare_files(data, picture, kind)[1])
-            return self._item(item['id'], state='downloaded', image_id=mine['id'])
+            return self._item(item['id'], state='downloaded', image_id=earlier['id'])
         stats = images.metrics(picture)
         problem = images.quality_problem(picture, stats)
         if problem:

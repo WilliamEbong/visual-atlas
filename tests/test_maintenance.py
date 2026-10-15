@@ -197,3 +197,51 @@ def test_abandoned_files_are_cleaned_up_only_when_no_worker_is_downloading(libra
     with jobs.open_store(library) as store:
         store.update_job(job_id, None, lease_owner=None, lease_until=None)
     assert transfer.sweep(library) == 1 and not stray.exists()
+
+
+def test_writes_stay_refused_until_the_restore_has_tidied_its_files(library, monkeypatch):
+    saved = transfer.backup(library)
+    attempts = []
+    real_sweep = images.sweep_orphans
+
+    def write_then_sweep(media_root, referenced):  # after the database swap, while files are tidied
+        with Store(library / 'atlas.db') as other:
+            try:
+                other.create_collection('during the sweep')
+                attempts.append('written')
+            except LibraryBusy:
+                attempts.append('refused')
+        return real_sweep(media_root, referenced)
+
+    monkeypatch.setattr(transfer.images, 'sweep_orphans', write_then_sweep)
+    transfer.restore(library, saved['name'])
+    assert attempts == ['refused']
+    with Store(library / 'atlas.db') as store:
+        store.create_collection('after the restore')  # and the barrier is gone once the restore has finished
+        assert store.one("SELECT 1 FROM settings WHERE key='maintenance'") is None
+
+
+def test_a_crash_between_saving_and_writing_files_is_repaired_even_with_the_budget_spent(home, monkeypatch):
+    with jobs.open_store(home) as store:
+        job_id = find(store, target_new_images=2, budgets={'max_downloads': 1})
+    real_write = images.write_files
+    calls = []
+
+    def power_cut_once(media_root, blobs):
+        calls.append(1)
+        if len(calls) == 1:
+            raise RuntimeError('power cut after the row was saved')
+        return real_write(media_root, blobs)
+
+    monkeypatch.setattr(jobs.images, 'write_files', power_cut_once)
+    with pytest.raises(RuntimeError):
+        jobs.Worker(home, owner='A', fetcher=aic_fetcher(), backends={'fake': fake}).run_once(job_id)
+    with jobs.open_store(home) as store:
+        store.update_job(job_id, None, lease_until=0)  # the crashed worker's lease runs out
+    jobs.Worker(home, owner='B', fetcher=aic_fetcher(), backends={'fake': fake}).run_once(job_id)
+    with jobs.open_store(home) as store:
+        image = store.one('SELECT * FROM images WHERE removed_at IS NULL')
+        job = store.one('SELECT state, message FROM jobs WHERE id=?', (job_id,))
+    assert job['state'] == 'done' and image['status'] == 'ready'
+    for key in ('original_path', 'analysis_path', 'thumb_path'):
+        assert (home / 'media' / image[key]).is_file()

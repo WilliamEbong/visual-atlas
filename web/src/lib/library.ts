@@ -50,6 +50,15 @@ export function appendPage<T extends { id: number }>(current: T[], page: T[]): T
   return [...current, ...page.filter((item) => !seen.has(item.id))]
 }
 
+/** Later pages of one filter set. `consumed` counts rows the server has returned, so the next offset keeps
+ * advancing even when a page only repeats images already shown; an empty page means there is nothing more. */
+export interface Pages<T> { key: string; items: T[]; consumed: number; done: boolean }
+
+export function nextPages<T extends { id: number }>(previous: Pages<T>, key: string, page: T[]): Pages<T> {
+  const base = previous.key === key ? previous : { key, items: [], consumed: 0, done: false }
+  return { key, items: appendPage(base.items, page), consumed: base.consumed + page.length, done: page.length === 0 }
+}
+
 /** Arrow-key movement in a grid of `count` items laid out in `columns` columns. */
 export function nextIndex(index: number, key: string, columns: number, count: number): number {
   const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns, Home: -index, End: count - 1 - index }[key]

@@ -213,3 +213,18 @@ def test_any_number_of_waiting_proposals_is_checked_in_batches(home):
     with jobs.open_store(home) as store:
         waiting = store.rows("SELECT 1 FROM annotations WHERE image_id=? AND state='proposed' AND note=''", (image_id,))
     assert waiting == []  # every proposal was judged
+
+
+def test_a_verifier_unavailable_in_one_job_is_asked_again_in_the_next(home):
+    verifier = Verifier(BackendError('quota'))  # over its limit once, then fine
+    worker = jobs.Worker(home, owner='app', fetcher=aic_fetcher(), backends={'codex': fake, 'claude': verifier})
+    outcomes = []
+    for goal in ('harbour', 'lighthouse'):
+        with jobs.open_store(home) as store:
+            job_id = jobs.create_job(store, 'find', {'goal': goal, 'providers': ['aic'], 'backend': 'codex',
+                                                     'verify_with': 'claude', 'target_new_images': 1})
+        worker.run_once(job_id)  # the app reuses one worker for every job
+        with jobs.open_store(home) as store:
+            outcomes += [json.loads(r['payload_json'])['check'] for r in store.rows(
+                "SELECT payload_json FROM job_items WHERE job_id=? AND state='added'", (job_id,))]
+    assert outcomes == ['unavailable', 'checked'] and verifier.calls == 2

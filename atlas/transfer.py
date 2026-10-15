@@ -318,6 +318,11 @@ def restore(home, name) -> dict:
             safety = backup(home, allow_missing=True)
             _copy_media(archive, hashes, home / 'media')
             with closing(sqlite3.connect(staged)) as source:
+                # The restored contents carry this restore's marker, so other writers stay refused through the
+                # file sweep below; leaving maintenance clears it (a crash leaves a stale marker that clears itself).
+                source.execute('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET '
+                               'value=excluded.value', (MAINTENANCE_KEY, live.maintenance_token))
+                source.commit()
                 source.backup(live.connection)  # atomic: other connections see the old or the new library, never a mix
             images.sweep_orphans(home / 'media', referenced_media(live))
     return {'restored': name, 'images': count, 'safety_backup': safety['name']}
