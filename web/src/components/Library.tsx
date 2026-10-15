@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { activeCount, apiPath, EMPTY, fromQuery, nextIndex, toQuery, type Filters } from '../lib/library'
+import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, PAGE, toQuery, type Filters } from '../lib/library'
 import { go, href } from '../lib/router'
 import type { LibraryItem, Settings } from '../lib/types'
 import { PROVIDERS } from '../lib/types'
@@ -10,11 +10,28 @@ const COLORS: [string, string][] = [['red', '#A23B2E'], ['orange', '#C47A3A'], [
   ['cyan', '#5F9A99'], ['blue', '#4A6A8C'], ['purple', '#6E5A86'], ['pink', '#C08A97'], ['brown', '#7A5A3C'],
   ['neutral', '#B8B0A0'], ['monochrome', '#55524C']]
 
+interface LibraryPage { items: LibraryItem[]; total: number; waiting?: number[] }
+
 export default function Library({ query }: { query: URLSearchParams }) {
   const filters = fromQuery(query)
   const { taxonomy, compare, toggleCompare } = useApp()
-  const [limit, setLimit] = useState(60)
-  const { data, error } = useData<{ items: LibraryItem[]; total: number; waiting?: number[] }>(apiPath(filters, limit))
+  const first = apiPath(filters, PAGE, 0)
+  const { data, error } = useData<LibraryPage>(first)
+  // Later pages are fetched with an offset and kept per filter set; an answer for filters already left is ignored.
+  const [more, setMore] = useState<{ key: string; items: LibraryItem[] }>({ key: '', items: [] })
+  const [loadingMore, setLoadingMore] = useState(false)
+  const current = useRef(first)
+  current.current = first
+  const items = appendPage(data?.items ?? [], more.key === first ? more.items : [])
+  async function showMore() {
+    const requested = first
+    setLoadingMore(true)
+    try {
+      const page = await request<LibraryPage>(apiPath(filters, PAGE, items.length))
+      if (current.current !== requested) return
+      setMore((previous) => ({ key: requested, items: appendPage(previous.key === requested ? previous.items : [], page.items) }))
+    } catch (reason) { window.alert((reason as Error).message) } finally { setLoadingMore(false) }
+  }
   const [queued, setQueued] = useState<string | null>(null)
   async function analyseWaiting(ids: number[]) {
     try {
@@ -116,7 +133,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
             ))}
             <label className="choice"><input type="checkbox" checked={filters.favorite} onChange={(event) => set({ favorite: event.target.checked })} /> Favourites</label>
             {activeCount(filters) > 0 && <button type="button" className="quiet" onClick={() => go('', toQuery({ ...EMPTY, sort: filters.sort }))}>Clear filters</button>}
-            <span className="mono" style={{ marginLeft: 'auto' }} aria-live="polite">{data ? `Showing ${data.items.length} of ${data.total}` : 'Loading…'}</span>
+            <span className="mono" style={{ marginLeft: 'auto' }} aria-live="polite">{data ? `Showing ${items.length} of ${data.total}` : 'Loading…'}</span>
           </div>
           {error && <p className="notice error" role="alert">{error}</p>}
           {!readOnly && !!data?.waiting?.length && <p className="notice" role="status">
@@ -126,7 +143,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
           {data && data.total === 0 && <div className="empty"><p>No images match these filters.</p>
             {!readOnly && <a className="button" href={href('find', { goal: filters.q, technique: filters.technique })}>Find new images like this</a>}</div>}
           <div className="plates" ref={grid} onKeyDown={onGridKey}>
-            {data?.items.map((item) => (
+            {items.map((item) => (
               <div key={item.id} style={{ position: 'relative' }}>
                 <a className="plate" href={href(`image/${item.id}`)}>
                   <div className="frame"><img src={media(item.thumb)} alt={`${item.title}${item.creator ? `, ${item.creator}` : ''}`} loading="lazy" /></div>
@@ -143,7 +160,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
               </div>
             ))}
           </div>
-          {data && data.items.length < data.total && <p style={{ marginTop: 24 }}><button type="button" onClick={() => setLimit(limit + 60)}>Show more</button></p>}
+          {data && items.length < data.total && <p style={{ marginTop: 24 }}><button type="button" disabled={loadingMore} onClick={showMore}>{loadingMore ? 'Loading…' : 'Show more'}</button></p>}
         </>
       )}
     </>

@@ -42,6 +42,14 @@ export function activeCount(filters: Filters): number {
   return Object.keys(toQuery(filters)).filter((key) => key !== 'sort').length
 }
 
+export const PAGE = 60
+
+/** Add the next page, never repeating an image (new images can shift offsets between pages). */
+export function appendPage<T extends { id: number }>(current: T[], page: T[]): T[] {
+  const seen = new Set(current.map((item) => item.id))
+  return [...current, ...page.filter((item) => !seen.has(item.id))]
+}
+
 /** Arrow-key movement in a grid of `count` items laid out in `columns` columns. */
 export function nextIndex(index: number, key: string, columns: number, count: number): number {
   const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns, Home: -index, End: count - 1 - index }[key]

@@ -36,7 +36,8 @@ export async function demoRequest<T>(path: string, init?: RequestInit): Promise<
     if (sort === 'title') items = [...items].sort((a, b) => a.title.localeCompare(b.title))
     if (sort === 'maker') items = [...items].sort((a, b) => a.creator.localeCompare(b.creator))
     if (sort === 'oldest') items = [...items].reverse()
-    return { items, total: items.length } as T
+    const offset = Number(query.get('offset') ?? 0)
+    return { items: items.slice(offset, offset + Number(query.get('limit') ?? 60)), total: items.length } as T
   }
   if (route === 'settings') return { backend: 'fake', verify_with: 'none', daily_ai_cap: 0, welcomed: true } as T
   if (route.startsWith('jobs') || route === 'backups') return [] as T

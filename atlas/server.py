@@ -16,9 +16,11 @@ from atlas import __version__, catalog, coding, images, jobs, transfer
 from atlas.home import REPO, home_dir
 from atlas.store import LibraryBusy, Store
 
-SORTS = {'newest': 'i.created_at DESC, i.id DESC', 'oldest': 'i.created_at, i.id', 'title': 'i.title COLLATE NOCASE',
-         'maker': 'i.creator COLLATE NOCASE', 'colorful': 'm.colorfulness DESC', 'bright': 'm.mean_luma DESC',
-         'dark': 'm.mean_luma', 'techniques': 'technique_count DESC, i.id DESC'}
+# Every order ends with the image id, so offset pages never repeat or skip an image with an equal sort value.
+SORTS = {'newest': 'i.created_at DESC, i.id DESC', 'oldest': 'i.created_at, i.id', 'title': 'i.title COLLATE NOCASE, i.id',
+         'maker': 'i.creator COLLATE NOCASE, i.id', 'colorful': 'm.colorfulness DESC, i.id DESC',
+         'bright': 'm.mean_luma DESC, i.id DESC', 'dark': 'm.mean_luma, i.id', 'techniques': 'technique_count DESC, i.id DESC'}
+PAGE_LIMIT = 200
 
 
 class JobRequest(BaseModel):
@@ -170,8 +172,9 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             params.append(collection)
         order = SORTS.get(sort, SORTS['newest'])
         if collection and sort == 'collection':
-            order = '(SELECT position FROM collection_items c WHERE c.image_id=i.id AND c.collection_id=%d)' % collection
-        limit = max(1, min(limit, 5000))
+            order = ('(SELECT position FROM collection_items c WHERE c.image_id=i.id AND c.collection_id=%d), i.id'
+                     % collection)
+        limit = max(1, min(limit, PAGE_LIMIT))
         with db() as store:
             total = store.one(f"SELECT COUNT(*) AS n FROM images i LEFT JOIN image_metrics m ON m.image_id=i.id "
                               f"WHERE {' AND '.join(where)}", params)['n']
@@ -401,9 +404,14 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                              (job['id'],))['n']
         added = store.rows("SELECT i.id, i.title, i.thumb_path FROM job_items j JOIN images i ON i.id=j.image_id WHERE "
                            "j.job_id=? AND j.state='added' AND i.removed_at IS NULL ORDER BY j.id", (job['id'],))
+        outcomes = store.one(
+            "SELECT SUM(json_array_length(payload_json,'$.match.techniques')>0) AS matching, "
+            "SUM(json_extract(payload_json,'$.check')='checked') AS checked FROM job_items "
+            "WHERE job_id=? AND kind='candidate' AND state='added'", (job['id'],))
         return {**{k: job[k] for k in ('id', 'kind', 'state', 'stage', 'message', 'error_code', 'backend', 'model',
                                        'created_at', 'started_at', 'finished_at')},
                 'spec': json.loads(job['spec_json']), 'counts': counts, 'searches': searches,
+                'matching': outcomes['matching'] or 0, 'checked': outcomes['checked'] or 0,
                 'added': [{**a, 'thumb': media_url(a.pop('thumb_path'))} for a in added]}
 
     @app.get('/api/jobs')

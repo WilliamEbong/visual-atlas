@@ -114,3 +114,17 @@ def test_brief_and_directions_flow(library, home):
     assert all(image['id'] in real for d in directions for image in d['images'])
     library.post(f"/api/directions/{directions[0]['id']}", json={'state': 'kept'})
     assert library.get(f'/api/briefs/{brief}').json()['directions'][0]['state'] == 'kept'
+
+
+def test_library_pages_never_repeat_or_skip_images_with_equal_sort_values(home, client):
+    from test_coding import add
+    with jobs.open_store(home) as store:
+        ids = [add(store, number, 'framing') for number in range(2, 9)]  # same technique count and similar titles
+        store.connection.execute("UPDATE images SET title='Same'")
+        store.connection.commit()
+    for sort in ('title', 'techniques', 'colorful', 'newest'):
+        seen = []
+        for offset in (0, 3, 6):
+            seen += [item['id'] for item in client.get(f'/api/library?sort={sort}&limit=3&offset={offset}').json()['items']]
+        assert sorted(seen) == sorted(ids) and len(seen) == len(set(seen))
+    assert len(client.get('/api/library?limit=100000').json()['items']) <= 200  # pages are bounded

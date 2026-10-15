@@ -53,6 +53,7 @@ export interface Job {
   id: string; kind: string; state: string; stage: string; message: string; error_code: string | null; backend: string; model: string
   created_at: string; started_at: string | null; finished_at: string | null; spec: Record<string, unknown>
   counts: Record<string, number>; searches: number; added: { id: number; title: string; thumb?: string }[]
+  matching: number; checked: number
   items?: { id: number; kind: string; provider: string; state: string; reason: string; image_id: number | null; title: string | null; query: string | null }[]
 }
 
@@ -64,7 +65,9 @@ export interface Direction {
   techniques: { id: string; name: string }[]; backend: string; model: string; model_version: string | null
 }
 
-export interface Brief { id: number; title: string; text: string; created_at: string; updated_at: string; directions?: Direction[] }
+export interface Tag { id: string; name: string; exact: boolean; why: string }
+export interface Reading { techniques: Tag[]; goals: Tag[]; subject_terms: string[] }
+export interface Brief { id: number; title: string; text: string; created_at: string; updated_at: string; directions?: Direction[]; reading?: Reading }
 
 export interface Settings { backend: 'codex' | 'claude' | 'fake'; verify_with: 'codex' | 'claude' | 'none'; daily_ai_cap: number; welcomed: boolean }
 

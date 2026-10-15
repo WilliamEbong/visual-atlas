@@ -53,12 +53,16 @@ export default function JobProgress({ jobId, compact = false }: { jobId: string;
           const state = index < now || job.state === 'done' ? 'done' : index === now && active ? 'now' : ''
           const detail = key === 'searching' ? `${job.searches} search${job.searches === 1 ? '' : 'es'}`
             : key === 'checking' ? `${checked} checked · ${free} free to use`
-            : key === 'analyzing' ? `${counts.added ?? 0} added of ${String(job.spec.target_new_images ?? '')}` : ''
+            : key === 'analyzing' ? ((job.spec.targets as string[] | undefined)?.length
+              ? `${job.matching} of ${String(job.spec.target_new_images ?? '')} show what you asked · ${counts.added ?? 0} added`
+              : `${counts.added ?? 0} added of ${String(job.spec.target_new_images ?? '')}`) : ''
           return <li key={key}><span className={`dot ${state}`} aria-hidden="true" />{state === 'now' ? <strong>{label}</strong> : label}
             {detail && <span className="mono">{detail}</span>}<span className="sr-only">{state === 'done' ? '(done)' : state === 'now' ? '(in progress)' : ''}</span></li>
         })}
       </ol>}
       <p className={job.state === 'failed' || (job.state === 'paused' && job.error_code) ? 'notice error' : 'muted'}>{job.message}</p>
+      {discovery && !!job.spec.verify_with && (counts.added ?? 0) > 0 &&
+        <p className="mono">{job.checked} of {counts.added} checked by a second model</p>}
       <div className="row">
         {(job.state === 'running' || job.state === 'queued') && <button type="button" disabled={busy} onClick={() => control('pause')}>Pause</button>}
         {(job.state === 'paused' || job.state === 'failed') && <button type="button" className="primary" disabled={busy} onClick={() => control('resume')}>Resume</button>}

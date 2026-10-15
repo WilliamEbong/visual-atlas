@@ -73,6 +73,9 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
         {!readOnly && <div className="row"><button type="button" onClick={() => setEditing(!editing)}>{editing ? 'Close' : 'Edit brief'}</button>
           <button type="button" className="quiet" onClick={async () => { await del(`briefs/${id}`); onChange(); go('project') }}>Delete</button></div>}</div>
       {editing ? <BriefForm brief={data} onSaved={() => { setEditing(false); reload(); onChange() }} /> : <p className="lede" style={{ whiteSpace: 'pre-line' }}>{data.text}</p>}
+      {data.reading && <p className="mono" aria-label="How the brief was read">Read as: {[
+        ...data.reading.goals.map((g) => g.name), ...data.reading.techniques.map((t) => t.name + (t.exact ? '' : ' (maybe)')),
+        ...data.reading.subject_terms].join(' · ') || 'no techniques or goals named; directions will lean on subject words and recent references'}</p>}
       {message && <p className="notice error" role="alert">{message}</p>}
       {!readOnly && <div className="row"><button type="button" className="primary" onClick={suggest}>{proposed.length || kept.length ? 'Suggest new directions' : 'Suggest directions'}</button>
         <span className="mono">Suggestions cite only images and techniques in your library. Kept directions stay when you ask again.</span></div>}

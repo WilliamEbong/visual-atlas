@@ -16,6 +16,12 @@ function who(changedBy: string) {
   return `${backendName(backend)}${model ? ` (${model})` : ''}`
 }
 
+// History rows keep earlier readings; a superseded one is no longer current evidence.
+const HISTORY_STATE: Record<string, string> = {
+  proposed: 'proposed', model_reviewed: 'agreed by a second model', human_reviewed: 'confirmed by you', rejected: 'rejected',
+  superseded: 'superseded (no longer current)', verify: 'second-model check',
+}
+
 export default function ImagePage({ id }: { id: number }) {
   const { data, error, reload, setData } = useData<ImageDetail>(`images/${id}`)
   const { taxonomy, compare, toggleCompare } = useApp()
@@ -129,7 +135,7 @@ export default function ImagePage({ id }: { id: number }) {
         {data.history.length > 0 && <p><button type="button" className="quiet" aria-expanded={showHistory} onClick={() => setShowHistory(!showHistory)}>{showHistory ? 'Hide' : 'Show'} annotation history ({data.history.length})</button></p>}
         {showHistory && <div className="scroll-x"><table className="plain"><thead><tr><th>When</th><th>Technique</th><th>State</th><th>By</th><th>Note</th></tr></thead>
           <tbody>{data.history.map((h, i) => <tr key={i}><td className="mono">{date(h.created_at)}</td><td>{h.technique_id === '*' ? 'all' : taxonomy?.techniques.find((t) => t.id === h.technique_id)?.name ?? h.technique_id}</td>
-            <td>{h.state}</td><td>{who(h.changed_by)}</td><td>{h.note}</td></tr>)}</tbody></table></div>}
+            <td>{HISTORY_STATE[h.state] ?? h.state}</td><td>{who(h.changed_by)}</td><td>{h.note}</td></tr>)}</tbody></table></div>}
 
         {rights && <section className="credit-card" aria-labelledby="credits">
           <h2 id="credits" style={{ fontSize: 26 }}>Usage and credits</h2>

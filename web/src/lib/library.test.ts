@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeCount, apiPath, EMPTY, fromQuery, nextIndex, toQuery } from './library'
+import { activeCount, apiPath, appendPage, EMPTY, fromQuery, nextIndex, toQuery } from './library'
 
 describe('library filters', () => {
   it('round-trips through the URL and drops defaults', () => {
@@ -23,5 +23,12 @@ describe('grid keyboard movement', () => {
     expect(nextIndex(3, 'End', 4, 10)).toBe(9)
     expect(nextIndex(7, 'Home', 4, 10)).toBe(0)
     expect(nextIndex(2, 'Enter', 4, 10)).toBe(2)
+  })
+})
+
+describe('appendPage', () => {
+  it('adds the next page without repeating images whose offsets shifted', () => {
+    const merged = appendPage([{ id: 3 }, { id: 2 }], [{ id: 2 }, { id: 1 }])
+    expect(merged.map((item) => item.id)).toEqual([3, 2, 1])
   })
 })
