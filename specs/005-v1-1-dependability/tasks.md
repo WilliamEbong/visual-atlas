@@ -38,7 +38,7 @@
 - [x] T523 Privacy wording everywhere; docs updated for final behaviour (README.md, QUICK-START.md, docs/USER-GUIDE.md, web/src/components/Welcome.tsx, Settings.tsx)
 - [x] T524 CI callable + Windows job; release needs checks (.github/workflows/*.yml)
 - [x] T525 Full checks; repro-after; Playwright journeys; fresh install + upgrade from v0.1.0; local release zip
-- [ ] T526 Independent review, fixes, converge, BUILD-STATE handoff
+- [x] T526 Independent review, fixes, converge, BUILD-STATE handoff
 
 ## Phase 8: Convergence
 - [x] T527 Exercise stale-response protection in the browser: delay a library page, change filters, confirm the late answer is ignored per SC-2 (partial)

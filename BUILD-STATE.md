@@ -4,9 +4,10 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-v1.1 is implemented, verified and committed locally (package 0.2.0, not pushed or tagged; publishing needs the
-owner's go-ahead for this iteration). Pending: fold in the Codex adversarial review of 680b199..HEAD (round 1 of
-at most 2), rerun the gates, rebuild release/VisualAtlas-v0.2.0.zip from the final commit.
+v1.1 is complete and committed locally on main (package 0.2.0; not pushed or tagged). Both review rounds are folded
+in and the gates pass. release/VisualAtlas-v0.2.0.zip is built from the commit that carries this file. Next, only on
+the owner's go-ahead: push main, tag v0.2.0 (the release workflow runs Checks on Linux and Windows, then packages),
+and let Pages rebuild the demo. Deferred scope is listed under "v1.1 decisions".
 
 ## v1.1 status (2026-10-15)
 - Baseline on 680b199 (scratch home): pytest 290 passed / 7 live deselected; ruff clean; taxonomy check OK;
@@ -48,7 +49,7 @@ at most 2), rerun the gates, rebuild release/VisualAtlas-v0.2.0.zip from the fin
   running job's files (job finishes, files present); quota verifier pauses the job (0 verifications counted);
   4 then 3 proposals leave 3 active (old ones superseded with history); an uncited direction is rejected; prompt
   JSON complete; Retry-After honoured; target 40 gets 80 downloads / 44 analyses.
-- Tests: 337 passed, 7 live deselected (290 at baseline); new files test_maintenance (9 deterministic
+- Tests: 343 passed, 7 live deselected after both review rounds (290 at baseline; 337 before review); new files test_maintenance (9 deterministic
   interleavings incl. a second process and a v0.1 backup), test_checks (10), test_coding (6), test_discovery (4),
   test_jev (5), plus retry/budget/stop/pagination tests. ruff, tsc, vitest (7), build, data guard, pip-audit,
   npm audit all clean. No key or token in the tree or history (prefix scan of the TypeSafe key: 0 hits).
@@ -132,6 +133,17 @@ at most 2), rerun the gates, rebuild release/VisualAtlas-v0.2.0.zip from the fin
    regression tests: [high] slow searches/downloads let the lease expire (the heartbeat now covers every step, not only
    AI calls); [medium] a cancel or pause arriving during a quick resume could be overwritten (queued->running is now
    conditional, then the state is read again). Review rounds stop here (bound of 3).
+7. v1.1 adversarial review round 1 (base 680b199, 2026-10-15): 4 reproduced findings, all accepted and fixed with
+   regression tests that fail on the old code (7760d43, 49fc78c): [high] restore let writes in during its file sweep
+   (the restored contents now carry the marker); [high] a crash between saving a row and writing its files was not
+   repaired once a budget was spent (repair now precedes budget checks); [medium] an unavailable verifier stayed
+   skipped for later jobs in the same worker (reset per job); [medium] library paging could stall when offsets
+   shifted (advance by server rows consumed). Round 2 is the last (bound of 2 for v1.1).
+8. v1.1 adversarial review round 2 (final, 2026-10-15): confirmed all four round-1 fixes; 2 new findings, both fixed
+   with regression tests that fail on the old code (be18152): [medium] a verification saved just before a crash was
+   reported as "not checked" when the job resumed, in Verify and in Find/Grow (a check this job already saved now
+   counts); [medium] prompt data was clipped at 1200 characters, cutting the end of accepted briefs (now 4000, the
+   longest accepted brief). Review rounds stop here (bound of 2); these two fixes are verified by tests only.
 
 ## Verification evidence
 - Published 2026-10-15: https://github.com/WilliamEbong/visual-atlas (public), Pages demo
