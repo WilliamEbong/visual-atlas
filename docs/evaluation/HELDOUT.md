@@ -28,3 +28,29 @@ numbers as a sanity check of behaviour, not as accuracy.
 - Claude agreed with 20 of 27 Codex proposals when asked to check them.
 
 Raw results: `heldout-results.json`. Expectations: `heldout-expectations.json`.
+
+## Two rounds, and what changed between them
+
+Round 1 ([round1/](round1/HELDOUT.md)) used the first analysis prompt. It showed two habits:
+
+- Codex attached *light–dark contrast* and *off-centre placement* to most pictures, and proposed two
+  techniques for a plain museum catalogue photo of a piece of furniture.
+- Claude often attached *limited palette harmony* to pictures whose single colour comes from the medium
+  (a monochrome photograph, an ink sketch).
+
+The prompt now tells both models that qualities imposed by the medium or by catalogue photography are not
+techniques, that light–dark contrast needs one area that clearly pulls the eye, and that an empty list is
+the right answer for a documentation photo. Round 2 (this page) used that prompt.
+
+| | Round 1 | Round 2 |
+|---|---:|---:|
+| Codex proposals | 33 | 27 |
+| … matching a builder expectation | 17 (52%) | 16 (59%) |
+| Builder expectations found by either model | 22 of 23 | 22 of 23 |
+| Claude agreed with Codex when checking | 26 of 33 | 20 of 27 |
+| Codex on the catalogue photo | 2 techniques | none (correct) |
+
+Claude, analysing independently, still over-uses *limited palette harmony* on monochrome material; in the
+app Claude is used as the checker, and readings remain "agreed by a second model", never "confirmed by
+you", until a person decides. Twelve images are far too few for accuracy claims: read this as a check
+that the prompt changes moved behaviour in the intended direction.
