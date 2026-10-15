@@ -115,17 +115,26 @@ export function NoticeProvider({ children }: { children: ReactNode }) {
 
 function Toast({ notice, onDone }: { notice: Notice; onDone: () => void }) {
   const [held, setHeld] = useState(false)
+  const [undoing, setUndoing] = useState(false)
+  const [failed, setFailed] = useState<string | null>(null)
   useEffect(() => {
-    if (held) return
+    if (held || undoing || failed) return  // a failed Undo stays until it is retried or dismissed
     const timer = window.setTimeout(onDone, notice.tone === 'error' ? 12000 : 8000)
     return () => window.clearTimeout(timer)
-  }, [held, notice.tone, onDone])
+  }, [held, undoing, failed, notice.tone, onDone])
+  async function undo() {
+    setUndoing(true)
+    try { await notice.undo!(); onDone() } catch (reason) {
+      setFailed(`Undo did not go through: ${reason instanceof Error ? reason.message : String(reason)}`)
+      setUndoing(false)
+    }
+  }
   return (
-    <div className={`toast ${notice.tone}`} role={notice.tone === 'error' ? 'alert' : undefined}
+    <div className={`toast ${failed ? 'error' : notice.tone}`} role={notice.tone === 'error' || failed ? 'alert' : undefined}
       onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)} onFocus={() => setHeld(true)} onBlur={() => setHeld(false)}>
-      <span>{notice.text}</span>
+      <span>{failed ?? notice.text}</span>
       <span className="row" style={{ gap: 14, flexWrap: 'nowrap' }}>
-        {notice.undo && <button type="button" onClick={async () => { onDone(); await notice.undo!() }}>Undo</button>}
+        {notice.undo && <button type="button" disabled={undoing} onClick={undo}>{undoing ? 'Undoing…' : failed ? 'Try again' : 'Undo'}</button>}
         <button type="button" className="close" aria-label="Dismiss notice" onClick={onDone}>×</button>
       </span>
     </div>

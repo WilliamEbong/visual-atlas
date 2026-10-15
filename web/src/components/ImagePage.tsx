@@ -271,9 +271,15 @@ function SaveToCollection({ imageId, member, onDone }: { imageId: number; member
   const [name, setName] = useState('')
   async function toggle(collection: { id: number; name: string }, add: boolean) {
     try {
+      // Undoing a removal puts the image back where it was, not at the end.
+      const before = add ? null : (await request<{ items: { id: number }[] }>(`library?collection=${collection.id}&sort=collection&limit=200`)).items.map((i) => i.id)
       await post(`collections/${collection.id}/items`, { image_id: imageId, add }); reload(); onDone()
       notify(add ? `Saved to “${collection.name}”.` : `Removed from “${collection.name}”.`, {
-        undo: async () => { await post(`collections/${collection.id}/items`, { image_id: imageId, add: !add }); reload(); onDone() } })
+        undo: async () => {
+          await post(`collections/${collection.id}/items`, { image_id: imageId, add: !add })
+          if (before) await post(`collections/${collection.id}/order`, { image_ids: before })
+          reload(); onDone()
+        } })
     } catch (reason) { fail(reason) }
   }
   async function create(event: React.FormEvent) {

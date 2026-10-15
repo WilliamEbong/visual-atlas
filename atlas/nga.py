@@ -19,6 +19,9 @@ FILES = ('published_images.csv', 'objects.csv', 'objects_terms.csv')
 MAX_FILE_BYTES = 150 * 1024 * 1024
 MAX_AGE = timedelta(days=30)
 SKIP_TERMS = {'Keywords', 'Themes', 'Styles', 'Schools', 'Techniques'}
+COLUMNS = {'published_images.csv': {'depictstmsobjectid', 'openaccess', 'maxpixels', 'viewtype', 'iiifurl'},
+           'objects.csv': {'objectid', 'title', 'attribution', 'displaydate', 'medium'},
+           'objects_terms.csv': {'objectid', 'term'}}
 csv.field_size_limit(10 * 1024 * 1024)
 
 
@@ -30,51 +33,72 @@ def _words(text: str) -> list[str]:
     return re.findall(r'[a-z0-9]{3,}', text.lower())
 
 
+def _rows(path: Path, name: str):
+    """CSV rows, after checking the file still has the columns this index reads (a changed format must not
+    quietly produce an empty index that lasts 30 days)."""
+    with path.open(encoding='utf-8', newline='') as handle:
+        reader = csv.DictReader(handle)
+        missing = COLUMNS[name] - set(reader.fieldnames or [])
+        if missing:
+            raise ValueError(f'{name} lacks {sorted(missing)}')
+        yield from reader
+
+
 def build(fetcher: Fetcher, home: Path, files: dict[str, Path] | None = None) -> Path:
     """Download (unless `files` gives local copies), filter to open-access primary images, write the index."""
     out = folder(home)
     out.mkdir(parents=True, exist_ok=True)
-    paths = files or {}
-    for name in FILES:
-        if name in paths:
-            continue
-        part = out / f'{name}.part'
-        with part.open('wb') as sink:
-            fetcher.get('nga', DATA + name, max_bytes=MAX_FILE_BYTES, types=('text/plain', 'text/csv'), sink=sink)
-        part.replace(out / name)
-        paths[name] = out / name
-    images: dict[str, dict] = {}
-    with paths['published_images.csv'].open(encoding='utf-8', newline='') as handle:
-        for row in csv.DictReader(handle):
-            object_id = row.get('depictstmsobjectid') or ''
-            if (row.get('openaccess') == '1' and not row.get('maxpixels') and row.get('viewtype') == 'primary'
-                    and object_id and object_id not in images and row.get('iiifurl', '').startswith('https://api.nga.gov/iiif/')):
-                images[object_id] = {'iiif': row['iiifurl'], 'width': int(row.get('width') or 0),
-                                     'height': int(row.get('height') or 0)}
-    terms: dict[str, list[str]] = {}
-    with paths['objects_terms.csv'].open(encoding='utf-8', newline='') as handle:
-        for row in csv.DictReader(handle):
-            if row.get('objectid') in images and row.get('term') and row['term'] not in SKIP_TERMS:
-                terms.setdefault(row['objectid'], []).append(row['term'])
-    rows = []
-    with paths['objects.csv'].open(encoding='utf-8', newline='') as handle:
-        for row in csv.DictReader(handle):
-            image = images.get(row.get('objectid') or '')
-            if image is None:
-                continue
-            rows.append({'id': row['objectid'], 'title': row.get('title', ''), 'creator': row.get('attribution', ''),
-                         'date': row.get('displaydate', ''), 'medium': row.get('medium', ''),
-                         'classification': row.get('classification', ''), 'credit': row.get('creditline', ''),
-                         'accession': row.get('accessionnum', ''), 'terms': sorted(set(terms.get(row['objectid'], [])))[:30],
-                         **image})
+    given = dict(files or {})
+    paths = dict(given)
     index = out / 'index.json.gz'
-    with gzip.open(index.with_suffix('.part'), 'wt', encoding='utf-8') as handle:
-        json.dump({'built': datetime.now(UTC).isoformat(timespec='seconds'), 'source': DATA, 'rows': rows}, handle)
-    index.with_suffix('.part').replace(index)
-    for name in FILES:
-        if not files or name not in files:
-            (out / name).unlink(missing_ok=True)
+    try:
+        for name in FILES:
+            if name in paths:
+                continue
+            part = out / f'{name}.part'
+            with part.open('wb') as sink:
+                fetcher.get('nga', DATA + name, max_bytes=MAX_FILE_BYTES, types=('text/plain', 'text/csv'), sink=sink)
+            part.replace(out / name)
+            paths[name] = out / name
+        rows = _index_rows(paths)
+        if not rows:
+            raise ValueError('no open-access images in the open data')
+        with gzip.open(index.with_suffix('.part'), 'wt', encoding='utf-8') as handle:
+            json.dump({'built': datetime.now(UTC).isoformat(timespec='seconds'), 'source': DATA, 'rows': rows}, handle)
+        index.with_suffix('.part').replace(index)
+    finally:  # downloads are large: never leave them (or half-written files) behind, whatever happened
+        for name in FILES:
+            if name not in given:
+                (out / name).unlink(missing_ok=True)
+                (out / f'{name}.part').unlink(missing_ok=True)
+        index.with_suffix('.part').unlink(missing_ok=True)
     return index
+
+
+def _index_rows(paths: dict[str, Path]) -> list[dict]:
+    images: dict[str, dict] = {}
+    for row in _rows(paths['published_images.csv'], 'published_images.csv'):
+        object_id = row.get('depictstmsobjectid') or ''
+        if (row.get('openaccess') == '1' and not row.get('maxpixels') and row.get('viewtype') == 'primary'
+                and object_id and object_id not in images and row.get('iiifurl', '').startswith('https://api.nga.gov/iiif/')):
+            images[object_id] = {'iiif': row['iiifurl'], 'width': int(row.get('width') or 0),
+                                 'height': int(row.get('height') or 0), 'openaccess': row['openaccess'],
+                                 'maxpixels': row['maxpixels'], 'viewtype': row['viewtype']}  # the record's own values
+    terms: dict[str, list[str]] = {}
+    for row in _rows(paths['objects_terms.csv'], 'objects_terms.csv'):
+        if row.get('objectid') in images and row.get('term') and row['term'] not in SKIP_TERMS:
+            terms.setdefault(row['objectid'], []).append(row['term'])
+    rows = []
+    for row in _rows(paths['objects.csv'], 'objects.csv'):
+        image = images.get(row.get('objectid') or '')
+        if image is None:
+            continue
+        rows.append({'id': row['objectid'], 'title': row.get('title', ''), 'creator': row.get('attribution', ''),
+                     'date': row.get('displaydate', ''), 'medium': row.get('medium', ''),
+                     'classification': row.get('classification', ''), 'credit': row.get('creditline', ''),
+                     'accession': row.get('accessionnum', ''), 'terms': sorted(set(terms.get(row['objectid'], [])))[:30],
+                     **image})
+    return rows
 
 
 _cache: dict[str, tuple[float, dict]] = {}
@@ -86,9 +110,11 @@ def load(fetcher: Fetcher, home: Path) -> dict:
     if not fresh:
         try:
             build(fetcher, home)
-        except FetchError:
-            if not index.exists():
-                raise  # an old index still serves searches when a refresh fails
+        except (FetchError, csv.Error, KeyError, ValueError, OSError) as error:
+            if not index.exists():  # an old index still serves searches when a refresh fails
+                if isinstance(error, FetchError):
+                    raise
+                raise FetchError('bad_data', 'The National Gallery open data could not be read.') from None
     stamp = index.stat().st_mtime
     key = str(index)
     if key not in _cache or _cache[key][0] != stamp:

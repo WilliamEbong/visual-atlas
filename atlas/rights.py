@@ -175,8 +175,8 @@ def _nga(candidate, raw, policy):
     """National Gallery open data: openaccess 1 marks a CC0 image; a size cap (maxpixels) marks a restricted one."""
     if str(raw.get('openaccess')) != '1':
         return _no('not an open-access image in the Gallery\'s data')
-    if raw.get('maxpixels'):
-        return _no('image is size-restricted (maxpixels set), so not open access')
+    if raw.get('maxpixels') != '':  # must be present and empty: a missing value is not evidence of no cap
+        return _no('image is size-restricted or its size cap is not recorded, so not open access')
     if raw.get('viewtype') != 'primary':
         return _no('not the primary image of the object')
     return _yes('CC0', candidate, policy, code='CC0', version='1.0', url=CC0_URL,

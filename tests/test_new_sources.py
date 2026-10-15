@@ -157,3 +157,36 @@ def test_jobs_without_chosen_sources_skip_the_opt_in_gallery(home):
         job_id = jobs.create_job(store, 'find', {'goal': 'harbour at dusk', 'backend': 'fake'})
         spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (job_id,))['spec_json'])
     assert 'rijksmuseum' in spec['providers'] and 'nga' not in spec['providers']
+
+
+def test_nga_unreadable_open_data_fails_plainly(home):
+    def handler(request: httpx.Request):
+        return httpx.Response(200, text='not,a,real\nfile', headers={'content-type': 'text/plain'})
+    with pytest.raises(FetchError) as raised:
+        providers.search(fetcher(handler), 'nga', 'jugs', home=home)
+    assert raised.value.code == 'bad_data'
+    assert not list(nga.folder(home).iterdir())  # nothing large or half-written is left behind
+
+
+def test_nga_evidence_comes_from_the_record_and_a_missing_cap_is_not_permission(home, tmp_path):
+    files = nga_files(tmp_path / 'csv')
+    nga.build(None, home, files)
+    found = providers.search(None, 'nga', 'jugs', home=home)[0]
+    assert found['raw']['maxpixels'] == '' and found['raw']['openaccess'] == '1'
+    assert 'not recorded' in rights.check({**found, 'raw': {**found['raw'], 'maxpixels': None}}, policy('nga'))['reason']
+    # a refresh whose file lost the maxpixels column (or has an unreadable number) keeps the previous index
+    files['published_images.csv'].write_text(IMAGES.replace(',maxpixels,', ',').replace('4332,,1', '4332,1'), encoding='utf-8')
+    old = time.time() - 40 * 86400
+    os.utime(nga.folder(home) / 'index.json.gz', (old, old))
+    with pytest.raises(ValueError):
+        nga.build(None, home, files)
+    files['published_images.csv'].write_text(IMAGES.replace('3365,4332', 'unknown,4332'), encoding='utf-8')
+    with pytest.raises(ValueError):
+        nga.build(None, home, files)
+
+    def refresh(request: httpx.Request):
+        name = request.url.path.rsplit('/', 1)[-1]
+        text = {'published_images.csv': IMAGES.replace('3365,4332', 'unknown,4332'), 'objects.csv': OBJECTS,
+                'objects_terms.csv': TERMS}[name]
+        return httpx.Response(200, text=text, headers={'content-type': 'text/plain'})
+    assert providers.search(fetcher(refresh), 'nga', 'jugs', home=home)[0]['provider_item_id'] == '17387'

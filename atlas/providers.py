@@ -249,8 +249,8 @@ def _nga(fetcher, query, page, per_page, home: Path):
             'source_url': f"https://www.nga.gov/collection/art-object-page.{row['id']}.html",
             'image_url': f"{row['iiif']}/full/!1600,1600/0/default.jpg", 'image_headers': {},
             'credit_line': _clip(row['credit'], 300),
-            'raw': {'openaccess': '1', 'maxpixels': '', 'viewtype': 'primary', 'iiifurl': row['iiif'],
-                    'index_built': data['built'], 'index_source': data['source']}})
+            'raw': {'openaccess': row.get('openaccess'), 'maxpixels': row.get('maxpixels'), 'viewtype': row.get('viewtype'),
+                    'iiifurl': row['iiif'], 'index_built': data['built'], 'index_source': data['source']}})
     return results
 
 

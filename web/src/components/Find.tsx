@@ -51,11 +51,12 @@ export default function Find() {
   }, [coverage.data, growTechniques.length])
   useEffect(() => {  // how the request reads, refreshed as you type (ordinary code, no AI)
     if (readOnly || mode !== 'find') return
+    let live = true  // an answer for words already changed is ignored, whichever order the answers arrive in
     const timer = window.setTimeout(() => {
       const query = new URLSearchParams({ text: `${goal} ${use}`.trim(), subject, technique, goal: goalId })
-      request<Reading>(`reading?${query}`).then(setReading).catch(() => setReading(null))
+      request<Reading>(`reading?${query}`).then((value) => { if (live) setReading(value) }).catch(() => { if (live) setReading(null) })
     }, 300)
-    return () => window.clearTimeout(timer)
+    return () => { live = false; window.clearTimeout(timer) }
   }, [goal, subject, use, technique, goalId, mode])
   if (readOnly) return <><PageHead kicker="Find" title="Find images" />
     <div className="slip under" style={{ marginTop: 32 }}><p>Finding and analysing images needs the downloaded app (it uses your own Claude Code or Codex sign-in). <a href="https://github.com/WilliamEbong/visual-atlas/releases/latest">Download Visual Atlas</a>.</p></div></>
