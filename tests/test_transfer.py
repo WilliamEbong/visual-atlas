@@ -434,8 +434,8 @@ def test_restore_failure_preserves_current_data(library, monkeypatch, phase):
             def backup(self, *args, **kwargs):
                 raise sqlite3.OperationalError('simulated swap failure')
 
-            def close(self):
-                self.connection.close()
+            def __getattr__(self, name):  # everything else (writing the marker, closing) is the real connection
+                return getattr(self.connection, name)
 
         def connect(path, *args, **kwargs):
             connection = real_connect(path, *args, **kwargs)
