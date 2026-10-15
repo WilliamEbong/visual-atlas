@@ -34,3 +34,4 @@ release/
 design-review/**/*.yml
 web/public-demo/
 scratch/
+docs/media/tour-frames/

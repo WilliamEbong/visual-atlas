@@ -24,9 +24,10 @@ you turn those ideas into directions for your own brief.
   by ordinary code — never by an AI. Unclear means skipped. Credits are kept with every image and
   travel into every export. Labels say what was checked (*CC0 — source checked*, *Free with
   attribution — credit included*), never "safe for every use".
-- **Evidence before interpretation.** Readings separate the visible evidence, the proposed technique,
-  the possible effect and (only when the museum record states it) the maker's intention. Ambiguity is
-  recorded, not resolved.
+- **Evidence before interpretation.** Readings separate the visible evidence, the proposed technique
+  and the possible effect. The maker's intention is never guessed: when the source's own record
+  describes the work, that text is shown separately, in its own words. Ambiguity is recorded, not
+  resolved.
 - **Honest review states.** *Proposed by a model* → *agreed by a second model* → *confirmed by you* /
   *rejected*. A second model agreeing is never presented as human review, and your corrections always
   win over later analysis.
@@ -67,6 +68,15 @@ Describe a project and get three to five directions, each built only on techniqu
 are really in your library, with execution notes and tradeoffs.
 
 ![Project directions grounded in library images](docs/media/project.png)
+
+## What you get on day one
+
+A starter library of **85 references** covering all **26 techniques**, every one licence-checked at its
+source: 69 CC0, 3 public domain and 13 free with attribution (credit included), from Wikimedia Commons
+(24), the Art Institute of Chicago (23), the Cleveland Museum of Art (16), Smithsonian Open Access (15) and
+The Met (7). Each was analysed by one model and checked by a second (167 readings agreed by both, 46 still
+marked as proposed). Starter images are reduced-size copies (at most 1024 px); anything you find yourself
+is kept at full size. Credits: [starter/CREDITS.md](starter/CREDITS.md).
 
 ## Get started
 
@@ -174,6 +184,19 @@ npm --prefix web run build
 
 Build history, decisions and verification evidence: [BUILD-STATE.md](BUILD-STATE.md). Held-out check of
 the technique readings: [docs/evaluation/HELDOUT.md](docs/evaluation/HELDOUT.md).
+
+## Known limits
+
+- **Readings are suggestions, not expert judgment.** On a held-out set the analysing model matched the
+  builder's own reading on about 6 in 10 images and tends to name more techniques than strictly needed;
+  the second model agrees too easily. Treat *proposed* and *agreed by a second model* as starting points,
+  and confirm or correct what matters to you ([details](docs/evaluation/HELDOUT.md)).
+- **Near-copies.** Exact and near-identical files are caught; two different frames of the same burst of
+  photos can both be added. Remove one with a click if that happens.
+- **Smithsonian** works without a key but its shared demo key allows only a few searches an hour; add your
+  own free key (`SMITHSONIAN_API_KEY` in `%USERPROFILE%\VisualAtlas\.env`) for more.
+- **Windows first.** The installer, shortcut and app window are Windows-only; other platforms run from
+  source in a browser.
 
 ## Credits and licences
 

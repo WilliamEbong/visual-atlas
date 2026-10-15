@@ -42,7 +42,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
     <>
       <div className="page-head">
         <h1>A library of ways of looking</h1>
-        {data && <span className="mono">{data.total} reference{data.total === 1 ? '' : 's'} · {taxonomy?.techniques.length ?? '…'} techniques · 5 open collections</span>}
+        {data && <span className="mono">{data.total} reference{data.total === 1 ? '' : 's'} · {taxonomy?.techniques.length ?? '…'} techniques</span>}
       </div>
       <p className="lede">Free-to-use images, filed by the visual techniques that make them work. Every image keeps its source, licence and the evidence behind each reading.</p>
       <div className="drawers">
