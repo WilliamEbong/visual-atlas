@@ -673,19 +673,31 @@ class Store:
             if not self.connection.execute('DELETE FROM collections WHERE id=?', (collection_id,)).rowcount:
                 raise ValueError('collection not found')
 
-    def collect(self, collection_id: int, image_id: int, add: bool = True, note: str = ''):
+    def collect(self, collection_id: int, image_id: int, add: bool = True, note: str = '',
+                position: int | None = None) -> int | None:
+        """Add (at the end, or back at `position` when undoing a removal) or remove an image. A removal returns the
+        position it had, so Undo can put it back exactly, however long the collection is."""
         with self.transaction():
             if add:
                 if not self.one('SELECT id FROM images WHERE id=? AND removed_at IS NULL', (image_id,)):
                     raise ValueError('image not found')
-                position = self.one('SELECT COALESCE(MAX(position),0)+1 AS p FROM collection_items '
-                                    'WHERE collection_id=?', (collection_id,))['p']
-                self.connection.execute('INSERT OR IGNORE INTO collection_items(collection_id,image_id,position,note,'
+                if self.one('SELECT 1 FROM collection_items WHERE collection_id=? AND image_id=?', (collection_id, image_id)):
+                    return None
+                if position is None:
+                    position = self.one('SELECT COALESCE(MAX(position),0)+1 AS p FROM collection_items '
+                                        'WHERE collection_id=?', (collection_id,))['p']
+                else:
+                    self.connection.execute('UPDATE collection_items SET position=position+1 WHERE collection_id=? '
+                                            'AND position>=?', (collection_id, position))
+                self.connection.execute('INSERT INTO collection_items(collection_id,image_id,position,note,'
                                         'added_at) VALUES(?,?,?,?,?)',
                                         (collection_id, image_id, position, note[:300], now()))
-            else:
-                self.connection.execute('DELETE FROM collection_items WHERE collection_id=? AND image_id=?',
-                                        (collection_id, image_id))
+                return position
+            row = self.one('SELECT position FROM collection_items WHERE collection_id=? AND image_id=?',
+                           (collection_id, image_id))
+            self.connection.execute('DELETE FROM collection_items WHERE collection_id=? AND image_id=?',
+                                    (collection_id, image_id))
+            return row['position'] if row else None
 
     def reorder_collection(self, collection_id: int, image_ids: list[int]):
         with self.transaction():

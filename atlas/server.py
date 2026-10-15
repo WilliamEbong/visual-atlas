@@ -45,6 +45,7 @@ class MembershipInput(BaseModel):
     image_id: int
     add: bool = True
     note: str = ''
+    position: int | None = Field(default=None, ge=1)  # where to put an image back (Undo of a removal)
 
 
 class BriefInput(BaseModel):
@@ -480,8 +481,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         with db() as store:
             if not store.one('SELECT id FROM collections WHERE id=?', (collection_id,)):
                 raise HTTPException(404, 'Collection not found.')
-            store.collect(collection_id, body.image_id, body.add, body.note)
-        return {'ok': True}
+            position = store.collect(collection_id, body.image_id, body.add, body.note, body.position)
+        return {'ok': True, 'position': position}
 
     @app.post('/api/collections/{collection_id}/order')
     def reorder(collection_id: int, body: dict):

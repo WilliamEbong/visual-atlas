@@ -64,11 +64,11 @@ function CollectionPage({ id, collection, onChange }: { id: number; collection?:
     run(() => order(ids))
   }
   async function remove(item: LibraryItem) {
-    const before = items.map((i) => i.id)
     try {
-      await post(`collections/${id}/items`, { image_id: item.id, add: false }); reload(); onChange()
+      const { position } = await post<{ position: number | null }>(`collections/${id}/items`, { image_id: item.id, add: false })
+      reload(); onChange()
       notify(`Removed “${item.title}” from this collection (it stays in your library).`, {
-        undo: async () => { await post(`collections/${id}/items`, { image_id: item.id, add: true }); await order(before); reload(); onChange() } })
+        undo: async () => { await post(`collections/${id}/items`, { image_id: item.id, add: true, position }); reload(); onChange() } })
     } catch (reason) { fail(reason) }
   }
   async function deleteCollection() {

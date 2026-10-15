@@ -93,11 +93,10 @@ def _index_rows(paths: dict[str, Path]) -> list[dict]:
         image = images.get(row.get('objectid') or '')
         if image is None:
             continue
-        rows.append({'id': row['objectid'], 'title': row.get('title', ''), 'creator': row.get('attribution', ''),
-                     'date': row.get('displaydate', ''), 'medium': row.get('medium', ''),
-                     'classification': row.get('classification', ''), 'credit': row.get('creditline', ''),
-                     'accession': row.get('accessionnum', ''), 'terms': sorted(set(terms.get(row['objectid'], [])))[:30],
-                     **image})
+        text = {key: str(row.get(field) or '') for key, field in (  # short rows give None: never store it
+            ('title', 'title'), ('creator', 'attribution'), ('date', 'displaydate'), ('medium', 'medium'),
+            ('classification', 'classification'), ('credit', 'creditline'), ('accession', 'accessionnum'))}
+        rows.append({'id': row['objectid'], **text, 'terms': sorted(set(terms.get(row['objectid'], [])))[:30], **image})
     return rows
 
 

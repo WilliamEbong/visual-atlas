@@ -146,3 +146,26 @@ def test_page_data_carries_image_sizes_for_layout(library):
     example = library.get(f'/api/techniques/{technique}').json()['examples'][0]
     assert example['width'] > 0 and example['height'] > 0 and example['display'].startswith('/media/analysis/')
     assert all(r['width'] > 0 and r['height'] > 0 for r in detail['related'])
+
+
+def test_undo_of_a_collection_removal_restores_the_exact_position(home, client):
+    from pathlib import Path
+
+    from atlas import transfer
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, Path(__file__).resolve().parent.parent / 'starter')
+    ids = [i['id'] for i in client.get('/api/library', params={'limit': 200}).json()['items']]
+    made = client.post('/api/collections', json={'name': 'Long board'}).json()
+    for image_id in ids:
+        client.post(f"/api/collections/{made['id']}/items", json={'image_id': image_id, 'add': True})
+
+    def order():
+        return [i['id'] for i in client.get('/api/library', params={'collection': made['id'], 'sort': 'collection', 'limit': 200}).json()['items']]
+    before = order()
+    removed = before[70]  # deep in the board, past any page a screen has loaded
+    answer = client.post(f"/api/collections/{made['id']}/items", json={'image_id': removed, 'add': False}).json()
+    assert answer['position'] == 71 and removed not in order()
+    client.post(f"/api/collections/{made['id']}/items", json={'image_id': removed, 'add': True, 'position': answer['position']})
+    assert order() == before
+    again = client.post(f"/api/collections/{made['id']}/items", json={'image_id': removed, 'add': True}).json()
+    assert again['position'] is None and order() == before  # adding an image already there changes nothing

@@ -190,3 +190,12 @@ def test_nga_evidence_comes_from_the_record_and_a_missing_cap_is_not_permission(
                 'objects_terms.csv': TERMS}[name]
         return httpx.Response(200, text=text, headers={'content-type': 'text/plain'})
     assert providers.search(fetcher(refresh), 'nga', 'jugs', home=home)[0]['provider_item_id'] == '17387'
+
+
+def test_nga_short_rows_never_break_the_index(home, tmp_path):
+    files = nga_files(tmp_path / 'csv')
+    files['objects.csv'].write_text(OBJECTS + '70,u\n', encoding='utf-8')  # a truncated row for an indexed object
+    nga.build(None, home, files)
+    data = nga.load(None, home)
+    assert all(isinstance(row[key], str) for row in data['rows'] for key in ('title', 'creator', 'medium'))
+    assert nga.search(data, 'jugs', 0, 5)[0]['id'] == '17387'
