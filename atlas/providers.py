@@ -3,6 +3,8 @@
 provider, provider_item_id, title, creator, date_text, medium, description, source_url, image_url,
 image_headers, raw (the exact licence evidence fields rights.py checks)."""
 
+import re
+
 from atlas.fetch import Fetcher, FetchError
 from atlas.home import local_setting
 from atlas.rights import plain
@@ -16,7 +18,9 @@ COMMONS_LICENCES = ('haswbstatement:P275=Q6938433|P275=Q20007257|P275=Q14947546|
 
 
 def _clip(value, limit=500) -> str:
-    return plain(value)[:limit]
+    # Commons templates leak Wikidata residue such as "1812 date QS:P571,+1812-00-00T00:00:00Z/9".
+    text = re.sub(r'\s*\b(?:date|title)\s+QS:P\d+,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
+    return text.strip()[:limit]
 
 
 def search(fetcher: Fetcher, provider: str, query: str, page: int = 0, per_page: int = 10) -> list[dict]:

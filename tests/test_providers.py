@@ -140,3 +140,10 @@ def test_met_skips_objects_the_object_api_no_longer_serves():
     fetcher = Fetcher(policies, transport=httpx.MockTransport(handler), resolver=public_resolver, sleep=lambda s: None)
     found = providers.search(fetcher, 'met', 'lighthouse', 0, 5)
     assert [c['provider_item_id'] for c in found] == [str(pd['objectID'])]
+
+
+def test_commons_template_residue_is_stripped_from_catalogue_text():
+    from atlas.providers import _clip
+    assert _clip('1812 date QS:P571,+1812-00-00T00:00:00Z/9') == '1812'
+    assert _clip('A Market Place and Crowd title QS:P1476,en:"A Market Place and Crowd"') == 'A Market Place and Crowd'
+    assert _clip('An ordinary title with dates 1890–1900') == 'An ordinary title with dates 1890–1900'
