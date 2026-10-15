@@ -24,8 +24,8 @@ Spec Kit project: plan and build features with the speckit-* skills (constitutio
 - Start app (window): `uv run visual-atlas` · server only: `uv run atlas serve`
 - Tests: `uv run pytest` (offline) · live CLIs/providers: `uv run pytest -m live`
 - Lint/types: `uv run ruff check atlas tests scripts` · `npm --prefix web run typecheck` · `npm --prefix web test` · `npm --prefix web run build`
-- Jobs: `uv run atlas find "goal" --backend codex` · `uv run atlas grow --backend codex` · `uv run atlas jobs` · `uv run atlas worker [--job ID] [--backend codex|claude]` (resumes unfinished jobs; leases stop two workers sharing a job)
-- Data: `uv run atlas taxonomy check` · `uv run atlas credits` · `uv run atlas backup` · `uv run atlas restore FILE` · `uv run atlas doctor`
+- Jobs: `uv run atlas find "goal" --backend codex` · `uv run atlas grow --backend codex` · `uv run atlas jobs` · `uv run atlas worker [--job ID] [--forever]` (resumes unfinished jobs; leases stop two workers sharing a job)
+- Data: `uv run atlas taxonomy check` · `uv run atlas credits` · `uv run atlas backup` · `uv run atlas restore NAME` (a file name in the backups folder) · `uv run atlas doctor`
 
 ## Verification
 Python 3.14 via uv; Windows PowerShell 5.1 compatible scripts. Offline tests by default; live tests marked `live`. Conventional Commit messages. Never force-push, hard-reset, broadly clean or delete branches.

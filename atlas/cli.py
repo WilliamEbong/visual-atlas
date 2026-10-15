@@ -191,6 +191,10 @@ def starter_export(out: str = typer.Option('starter', help='Folder to write (rep
     from pathlib import Path
     with jobs.open_store() as store:
         typer.echo(f'Exported {transfer.export_starter(store, home_dir(), Path(out))} references to {out}.')
+        credits = transfer.credits(store).replace(
+            'not legal advice.', 'not legal advice. The images here are reduced-size copies (at most 1024 px on the long '
+            'side) of the originals at each source; nothing else was changed.', 1)
+        (Path(out) / 'CREDITS.md').write_text(credits, encoding='utf-8', newline='\n')
 
 
 @app.command()
