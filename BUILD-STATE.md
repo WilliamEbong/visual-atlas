@@ -4,10 +4,27 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-v1.1 is complete and committed locally on main (package 0.2.0; not pushed or tagged). Both review rounds are folded
-in and the gates pass. release/VisualAtlas-v0.2.0.zip is built from the commit that carries this file. Next, only on
-the owner's go-ahead: push main, tag v0.2.0 (the release workflow runs Checks on Linux and Windows, then packages),
-and let Pages rebuild the demo. Deferred scope is listed under "v1.1 decisions".
+v0.3 (package 0.3.0) is in progress: spec, plan and tasks in specs/006-v0-3-maturity; both evaluation gates are
+fixed in docs/evaluation/v0.3. Next: the visual system and shared states (T604–T606), then the screens to the
+design canvas, then sources, coding cues and the metadata filter. v0.3.0 is published only on the owner's go-ahead.
+
+## v0.3 status (2026-10-15)
+- Owner choices (2026-10-15): polish and finish, plus the deferred features (new sources, better request coding,
+  metadata classification), but no uploads ("I won't be uploading my images yet"). Push the archive-of-looking
+  look. Fully autonomous, with no design gate. Publish v0.2.0 now and ship this as v0.3.0.
+- Design canvas (private Artifact): https://claude.ai/artifact/XLoCPcCUxu11FpCyK8AWd9. It has 10 artboards:
+  Library, Image page, Find, Technique, My project, Compare, Collections, Settings, Components and states, and
+  Phone. Images are starter references uploaded as assets.
+- v0.2.0 was published on 2026-10-15 on the owner's go-ahead. main was pushed (680b199..afdb439) and tagged
+  v0.2.0, which ran the release workflow.
+  - **Release run 38808395214:** checks / verify, checks / windows and package all passed. The release has
+    VisualAtlas-v0.2.0.zip (25.96 MB).
+  - **Checks on main:** the first run failed only on two gitleaks false positives, a Wikimedia Commons file name in
+    docs/evaluation/v1.1/{candidates,cases}.json. b5e4462 added a narrow allowlist (source_url Commons File: links
+    in evaluation JSON), and run 38809027702 is green on Linux and Windows.
+  - **Published zip:** downloaded, extracted to a short scratch path and installed with -NoShortcuts -NoLaunch. The
+    install reports 0.2.0, 85 images and schema 2, and doctor shows both assistants ready.
+  - **Pages demo (Playwright):** 60 then 85 unique plates after "Show more", no broken images, no console errors.
 
 ## v1.1 status (2026-10-15)
 - Baseline on 680b199 (scratch home): pytest 290 passed / 7 live deselected; ruff clean; taxonomy check OK;

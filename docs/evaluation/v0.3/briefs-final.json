@@ -1,0 +1,26 @@
+{
+ "written_by": "builder (Claude), 2026-10-15, before any v0.3 change to the request coder",
+ "provisional": "Codes are the builder's judgment of what each brief asks for, not an expert panel's. This is the v0.3 final holdout: it is run once, after the adoption decision on the development set, and never used to tune.",
+ "briefs": [
+  {"id": 101, "text": "Cover for a short story collection: a single lamp-lit figure in a dark room, the rest falling into shadow.", "techniques": ["value-contrast"], "goals": ["draw-attention"]},
+  {"id": 102, "text": "Banner for a hiking club: tiny walkers dwarfed by an enormous mountain wall.", "techniques": ["scale-contrast"], "goals": ["show-scale"]},
+  {"id": 103, "text": "Slide opener for a talk about change: a row of identical grey chairs with one bright yellow chair.", "techniques": ["repetition-with-interruption", "color-contrast"], "goals": ["draw-attention", "surprise"]},
+  {"id": 104, "text": "Album sleeve: backlit dancers seen only as dark shapes against a pink dusk.", "techniques": ["silhouette"], "goals": []},
+  {"id": 105, "text": "Museum leaflet on Japanese prints: hills fading paler and bluer into the distance.", "techniques": ["atmospheric-perspective"], "goals": ["build-depth"]},
+  {"id": 106, "text": "Bakery website hero: crusty bread next to smooth glazed ceramic so you can almost feel both surfaces.", "techniques": ["texture-contrast"], "goals": []},
+  {"id": 107, "text": "Running shoe ad that feels fast: streaks, blur and a runner caught mid-stride.", "techniques": ["implied-motion"], "goals": ["suggest-motion"]},
+  {"id": 108, "text": "Wedding invitation: everything mirrored around a central arch, formal and still.", "techniques": ["symmetry", "framing"], "goals": ["create-calm"]},
+  {"id": 109, "text": "A city guide map: streets and rails pulling your eye toward the station in the middle.", "techniques": ["leading-lines"], "goals": ["guide-the-eye"]},
+  {"id": 110, "text": "Portrait series poster where the sitters' gaze sends you across to the event title.", "techniques": ["gaze-direction"], "goals": ["guide-the-eye"]},
+  {"id": 111, "text": "Zine about ecology: a factory chimney that is also a tree trunk.", "techniques": ["visual-metaphor"], "goals": ["make-an-idea-visible"]},
+  {"id": 112, "text": "Theatre flyer that unsettles: a grand piano sitting in a field of snow.", "techniques": ["contextual-incongruity"], "goals": ["surprise"]},
+  {"id": 113, "text": "Festival programme: a bird's-eye view looking straight down on a market crowd.", "techniques": ["vantage-point"], "goals": []},
+  {"id": 114, "text": "Product shot where only the watch is sharp and everything behind dissolves into soft blur.", "techniques": ["selective-focus"], "goals": ["draw-attention"]},
+  {"id": 115, "text": "Poster for a dance festival: dancers seen through a doorway, with rooms layered one behind another.", "techniques": ["framing", "layered-depth"], "goals": ["build-depth"]},
+  {"id": 116, "text": "Calm spa brochure: soft sage, cream and stone tones only, nothing loud.", "techniques": ["color-harmony"], "goals": ["create-calm"]},
+  {"id": 117, "text": "Book cover for a thriller: a staircase tilted at a steep angle, everything leaning.", "techniques": ["diagonal-energy"], "goals": ["create-tension"]},
+  {"id": 118, "text": "Logo exploration where the white space between two faces becomes a vase.", "techniques": ["figure-ground-ambiguity"], "goals": ["surprise"]},
+  {"id": 119, "text": "Team page photo: three colleagues huddled close at one side of the frame, the other side left empty.", "techniques": ["proximity-grouping", "asymmetric-balance"], "goals": ["group-and-relate"]},
+  {"id": 120, "text": "Social post: a face cropped so close that only the eyes and a sliver of mouth remain.", "techniques": ["tight-cropping"], "goals": []}
+ ]
+}
