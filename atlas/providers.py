@@ -3,7 +3,7 @@
 provider, provider_item_id, title, creator, date_text, medium, description, source_url, image_url,
 image_headers, raw (the exact licence evidence fields rights.py checks)."""
 
-from atlas.fetch import Fetcher
+from atlas.fetch import Fetcher, FetchError
 from atlas.home import local_setting
 from atlas.rights import plain
 
@@ -57,7 +57,12 @@ def _met(fetcher, query, page, per_page):
     for object_id in (found.get('objectIDs') or [])[:per_page]:
         if not isinstance(object_id, int):
             continue
-        item = fetcher.get_json('met', f'https://collectionapi.metmuseum.org/public/collection/v1/objects/{object_id}')
+        try:
+            item = fetcher.get_json('met', f'https://collectionapi.metmuseum.org/public/collection/v1/objects/{object_id}')
+        except FetchError as error:
+            if error.code == 'http_404':
+                continue  # the search index lists some objects the object API no longer serves
+            raise
         results.append({
             'provider': 'met', 'provider_item_id': str(object_id), 'title': _clip(item.get('title'), 300),
             'creator': _clip(item.get('artistDisplayName'), 200), 'date_text': _clip(item.get('objectDate'), 80),

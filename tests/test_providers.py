@@ -119,3 +119,24 @@ def test_recorded_api_responses_and_rights(monkeypatch, provider, fixture, ids, 
             assert candidate['source_url'] in decision['required_attribution']
     else:
         assert all('share-alike or restricted licences are excluded' in d['reason'] for d in decisions)
+
+
+def test_met_skips_objects_the_object_api_no_longer_serves():
+    import httpx
+    from helpers import public_resolver
+
+    from atlas import catalog
+    from atlas.fetch import Fetcher
+    pd = json.loads((FIXTURES / 'met_object_pd.json').read_text(encoding='utf-8'))
+
+    def handler(request):
+        if request.url.path.endswith('/v1.1/search'):
+            return httpx.Response(200, json={'total': 2, 'objectIDs': [111, pd['objectID']]})
+        if request.url.path.endswith('/objects/111'):
+            return httpx.Response(404, json={'message': 'Not a valid object'})
+        return httpx.Response(200, json=pd)
+
+    _, policies, *_ = catalog.load()
+    fetcher = Fetcher(policies, transport=httpx.MockTransport(handler), resolver=public_resolver, sleep=lambda s: None)
+    found = providers.search(fetcher, 'met', 'lighthouse', 0, 5)
+    assert [c['provider_item_id'] for c in found] == [str(pd['objectID'])]
