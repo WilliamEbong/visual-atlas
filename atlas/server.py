@@ -12,7 +12,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from atlas import __version__, catalog, images, jobs, transfer
+from atlas import __version__, catalog, coding, images, jobs, transfer
 from atlas.home import REPO, home_dir
 from atlas.store import LibraryBusy, Store
 
@@ -506,7 +506,12 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                               for i in data.pop('image_ids') if i in thumbs]
             data['techniques'] = [{'id': t, 'name': names.get(t, t)} for t in data.pop('technique_ids')]
             out.append({**d, **data})
-        return {**brief, 'directions': out}
+        taxonomy = catalog.load()[0]
+        reading = coding.code_request(f"{brief['title']}. {brief['text']}", taxonomy)
+        names = {t['id']: t['name'] for t in taxonomy['techniques']} | {g['id']: g['name'] for g in taxonomy['goals']}
+        for tag in reading['techniques'] + reading['goals']:
+            tag['name'] = names[tag['id']]
+        return {**brief, 'directions': out, 'reading': reading}
 
     @app.put('/api/briefs/{brief_id}')
     def edit_brief(brief_id: int, body: BriefInput):

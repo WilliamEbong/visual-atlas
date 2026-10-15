@@ -98,15 +98,45 @@ def test_plan_drops_bad_queries_and_unknown_ids():
     assert result['queries'] == [{'provider': 'aic', 'query': 'lone figure snow', 'technique_id': 'negative-space'}]
 
 
-def test_directions_keep_only_real_references():
-    raw = {'directions': [{'title': 'Quiet air', 'idea': 'One figure, lots of sky.', 'rationale': 'Calm brief.',
-                           'technique_ids': ['negative-space', 'invented'], 'image_ids': [3, 999],
-                           'execution': ['Shoot low.'], 'tradeoffs': ['Can feel lonely.']},
-                          {'title': 'Nothing real', 'idea': 'x', 'rationale': 'y', 'technique_ids': ['invented'],
-                           'image_ids': [3], 'execution': ['z'], 'tradeoffs': ['w']}]}
-    result = tasks.validate_directions(raw, IDS, {3, 4})
-    assert len(result['directions']) == 1
-    assert result['directions'][0]['technique_ids'] == ['negative-space'] and result['directions'][0]['image_ids'] == [3]
+def direction(techniques, images, title='Quiet air'):
+    return {'title': title, 'idea': 'One figure, lots of sky.', 'rationale': 'Calm brief.',
+            'technique_ids': techniques, 'image_ids': images, 'execution': ['Shoot low.'],
+            'tradeoffs': ['Can feel lonely.']}
+
+
+CARRIED = {3: {'negative-space'}, 4: {'scale-contrast'}}
+
+
+def test_directions_keep_only_grounded_references():
+    raw = {'directions': [direction(['negative-space', 'invented'], [3, 4, 999]),
+                          direction(['invented'], [3], 'Nothing real')],
+           'insufficient_evidence': None}
+    result = tasks.validate_directions(raw, IDS, CARRIED)
+    assert [(d['technique_ids'], d['image_ids']) for d in result['directions']] == [(['negative-space'], [3])]
+    assert result['dropped'] == 1  # image 4 does not carry negative space, so it cannot support that direction
+
+
+def test_a_direction_without_supporting_images_is_not_grounded():
+    raw = {'directions': [direction(['negative-space'], []), direction(['negative-space'], [4], 'Mismatched')],
+           'insufficient_evidence': None}
+    result = tasks.validate_directions(raw, IDS, CARRIED)
+    assert result['directions'] == [] and result['dropped'] == 2
+
+
+def test_insufficient_evidence_is_a_valid_honest_answer():
+    raw = {'directions': [], 'insufficient_evidence': 'No reference shows a night sky.'}
+    result = tasks.validate_directions(raw, IDS, CARRIED)
+    assert result == {'directions': [], 'dropped': 0, 'insufficient_evidence': 'No reference shows a night sky.'}
+
+
+def test_prompt_inputs_stay_complete_json():
+    library = [{'image_id': i, 'title': 'x' * 400, 'summary': 'y' * 400, 'techniques': []} for i in range(40)]
+    prompt = tasks.directions_prompt({'title': 'b', 'text': 'b'}, TAXONOMY['techniques'], library)
+    segment = prompt.split('Library references (JSON): ')[1].split('\n\nBrief (JSON data)')[0]
+    assert len(json.loads(segment)) == 40
+    proposals = [{'technique_id': t, 'evidence': ['e' * 220] * 6, 'effect': 'f' * 260} for t in sorted(IDS)[:6]]
+    verify = tasks.verify_prompt(proposals, {t['id']: t for t in TAXONOMY['techniques']})
+    assert len(json.loads(verify.split('Proposals (JSON):\n', 1)[1])) == 6
 
 
 def test_fake_backend_answers_satisfy_every_contract(tmp_path):
@@ -121,7 +151,10 @@ def test_fake_backend_answers_satisfy_every_contract(tmp_path):
     tasks.validate_verify(verdicts, {p['technique_id'] for p in proposals})
     plan = fake.run(tasks.plan_prompt('foggy harbour', TAXONOMY['techniques'], ['aic']), tasks.plan_schema(ids, ['aic']), [])
     tasks.validate_plan(plan['result'], IDS, {'aic'})
-    directions = fake.run('', tasks.directions_schema(ids, [1, 2, 3]), [])['result']
-    tasks.validate_directions(directions, IDS, {1, 2, 3})
+    library = [{'image_id': 1, 'title': 'a', 'creator': '', 'date': '', 'summary': '',
+                'techniques': [{'id': ids[0], 'state': 'proposed'}]}]
+    prompt = tasks.directions_prompt({'title': 'b', 'text': 'b'}, TAXONOMY['techniques'], library)
+    directions = fake.run(prompt, tasks.directions_schema(ids, [1]), [])['result']
+    assert tasks.validate_directions(directions, IDS, {1: {ids[0]}})['directions']
     comparison = fake.run('', tasks.compare_schema([1, 2], ids), [image, image])['result']
     tasks.validate_compare(comparison, {1, 2}, IDS)

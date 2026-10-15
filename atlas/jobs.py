@@ -6,7 +6,6 @@ per step, so a crash or restart resumes exactly where it stopped. Usage: Worker(
 import hashlib
 import json
 import os
-import re
 import socket
 import threading
 import time
@@ -15,7 +14,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
-from atlas import __version__, catalog, images, providers, rights
+from atlas import __version__, catalog, coding, images, providers, rights
 from atlas.ai import claude_cli, codex_cli, fake, tasks
 from atlas.ai.process import BackendError
 from atlas.fetch import Fetcher, FetchError
@@ -40,9 +39,6 @@ RETRYABLE = {'timeout', 'network', 'rate_limited', 'http_500', 'http_502', 'http
              'http_522', 'provider_error', 'invalid_response'}
 PAUSING = {'quota', 'subscription_auth_required', 'unavailable', 'unsupported_version', 'unsupported_flag',
            'containment_unavailable', 'daily_cap'}
-STOPWORDS = set('a an and are as at be but by for from how i images image in into is it its me my of on or our '
-                'show showing some that the their them this to use used using want we with you your find need '
-                'picture pictures photo photos something like look looks'.split())
 
 
 def db_path(home: Path) -> Path:
@@ -101,6 +97,7 @@ class Worker:
             self.job = job
             self.spec = json.loads(job['spec_json'])
             taxonomy, policies, self.taxonomy_sha, _ = catalog.load()
+            self.taxonomy = taxonomy
             self.policies = policies
             self.techniques = {t['id']: t for t in taxonomy['techniques']}
             try:
@@ -288,7 +285,24 @@ class Worker:
 
     # ---- discovery: find and grow -------------------------------------------------------------
     def _added(self) -> int:
+        """Additions that count toward the target: those showing a requested technique when techniques were asked for
+        (or targeted by Grow), otherwise every addition."""
+        if self.spec.get('targets'):
+            return len(self._items("kind='candidate' AND state='added' AND "
+                                   "json_array_length(payload_json,'$.match.techniques')>0"))
         return len(self._items("kind='candidate' AND state='added'"))
+
+    def _match(self, image_id: int) -> dict:
+        """Which requested techniques an added image really carries (from its analysis, never forced onto it), and
+        whether the requested subject appears in its record."""
+        carried = {r['technique_id'] for r in self.store.rows(
+            "SELECT technique_id FROM annotations WHERE image_id=? AND state!='rejected'", (image_id,))}
+        subject = False
+        for term in (self.spec.get('reading') or {}).get('subject_terms', [])[:4]:
+            if self.store.one('SELECT 1 FROM images_fts WHERE rowid=? AND images_fts MATCH ?', (image_id, f'"{term}"*')):
+                subject = True
+                break
+        return {'techniques': sorted(carried & set(self.spec.get('targets') or [])), 'subject': subject}
 
     def _discovery_step(self):
         target = int(self.spec.get('target_new_images', 8))
@@ -352,7 +366,14 @@ class Worker:
             counts[row['state']] = counts.get(row['state'], 0) + 1
         added = counts.get('added', 0)
         target = int(self.spec.get('target_new_images', 8))
-        parts = [f'{"Ready. " if not exhausted or added >= target else ""}Added {added} image{"s" if added != 1 else ""}.']
+        parts = [f'{"Ready. " if not exhausted or self._added() >= target else ""}Added {added} '
+                 f'image{"s" if added != 1 else ""}.']
+        targets = self.spec.get('targets') or []
+        if targets and added:
+            matching = self._added()
+            names = ', '.join(self.techniques[t]['name'] for t in targets[:3] if t in self.techniques)
+            parts.append(f'{matching} show{"s" if matching == 1 else ""} what you asked for ({names}); '
+                         f'{added - matching} show other techniques.')
         if self.spec.get('verify_with') and added:
             checked = sum(r['state'] == 'added' and r['checked'] == 'checked' for r in rows)
             if checked < added:
@@ -363,7 +384,7 @@ class Worker:
         skipped = [f'{counts[k]} {v}' for k, v in labels.items() if counts.get(k)]
         if skipped:
             parts.append('Skipped ' + ', '.join(skipped) + '.')
-        if exhausted and added < target:
+        if exhausted and self._added() < target:
             parts.append(self._stop_reason(rows))
         return ' '.join(parts)
 
@@ -428,26 +449,19 @@ class Worker:
         return '. '.join(p for p in parts if p)[:1000]
 
     def _fallback_queries(self, goal: str, enabled: list[str]) -> list[dict]:
-        """No AI: match goal words to technique names and aliases, then use their curated search hints."""
-        words = {w for w in re.findall(r"[a-z]+", goal.lower()) if w not in STOPWORDS and len(w) > 2}
-        scored = []
-        for technique in self.techniques.values():
-            text = ' '.join([technique['name'], *technique['aliases']]).lower()
-            score = sum(1 for word in words if word in text)
-            if technique['id'] in (self.spec.get('technique_ids') or []):
-                score += 5
-            if score:
-                scored.append((score, technique['id']))
-        chosen = [tid for _, tid in sorted(scored, reverse=True)[:3]]
+        """No AI: the request's coded techniques (exact tags first) give curated search hints; its subject words
+        become a plain search on every collection."""
+        reading = self.spec.get('reading') or coding.code_request(goal, self.taxonomy,
+                                                                  self.spec.get('technique_ids') or [])
+        chosen = [t['id'] for t in sorted(reading['techniques'], key=lambda t: not t['exact'])][:3]
         queries = []
-        subject = (self.spec.get('subject') or '').strip()
         for technique_id in chosen:
             for provider in enabled:
                 for hint in (self.techniques[technique_id]['search_hints'].get(provider) or [])[:1]:
                     queries.append({'provider': provider, 'query': hint, 'technique_id': technique_id})
-        keywords = subject or ' '.join(sorted(words - {w for t in chosen for w in t.split('-')}))[:40]
+        keywords = (self.spec.get('subject') or '').strip() or ' '.join(reading['subject_terms'][:3])
         if keywords:
-            queries += [{'provider': provider, 'query': keywords, 'technique_id': None} for provider in enabled]
+            queries += [{'provider': provider, 'query': keywords[:40], 'technique_id': None} for provider in enabled]
         return queries[:12]
 
     def _search(self, query: dict):
@@ -467,12 +481,15 @@ class Worker:
                                    'latency_ms': int((time.monotonic() - started) * 1000)})
         fresh = []
         for rank, candidate in enumerate(found):
+            # Skip what is in the library, what a person removed, what an automatic check under the current
+            # analysis version rejected, and deterministic rejections (licence, duplicate, quality) from any job.
+            pair = (candidate['provider'], candidate['provider_item_id'])
             known = self.store.one(
-                "SELECT 1 FROM images WHERE provider=? AND provider_item_id=? UNION ALL "
-                "SELECT 1 FROM tombstones WHERE provider=? AND provider_item_id=? UNION ALL "
+                "SELECT 1 FROM images WHERE provider=? AND provider_item_id=? AND removed_at IS NULL UNION ALL "
+                "SELECT 1 FROM tombstone_kinds WHERE provider=? AND provider_item_id=? AND "
+                "(source='user' OR rule_version=?) UNION ALL "
                 "SELECT 1 FROM job_items WHERE provider=? AND provider_item_id=? AND state IN "
-                "('ineligible','duplicate','low_quality','no_technique') LIMIT 1",
-                (candidate['provider'], candidate['provider_item_id']) * 3)
+                "('ineligible','duplicate','low_quality') LIMIT 1", (*pair, *pair, self._rule_version(), *pair))
             if known:
                 continue
             fresh.append({'kind': 'candidate', 'key': f"{candidate['provider']}:{candidate['provider_item_id']}",
@@ -524,12 +541,14 @@ class Worker:
             if wanted and stats[key] != wanted:
                 return self._item(item['id'], state='filtered', reason=f'{key.replace("_", " ")} is {stats[key]}')
         fingerprint = images.dhash(picture)
-        duplicate = self.store.one('SELECT id FROM images WHERE file_sha256=? UNION ALL '
-                                   'SELECT id FROM tombstones WHERE file_sha256=? LIMIT 1', (sha, sha))
+        version = self._rule_version()
+        duplicate = self.store.one("SELECT id FROM images WHERE file_sha256=? AND removed_at IS NULL UNION ALL "
+                                   "SELECT id FROM tombstone_kinds WHERE file_sha256=? AND "
+                                   "(source='user' OR rule_version=?) LIMIT 1", (sha, sha, version))
         if duplicate is None:
             # ponytail: linear dHash scan; a BK-tree is worth it only past ~20k images
-            for row in self.store.rows("SELECT dhash FROM images WHERE removed_at IS NULL UNION ALL "
-                                       "SELECT dhash FROM tombstones"):
+            for row in self.store.rows("SELECT dhash FROM images WHERE removed_at IS NULL UNION ALL SELECT dhash "
+                                       "FROM tombstone_kinds WHERE source='user' OR rule_version=?", (version,)):
                 if images.hamming(row['dhash'], fingerprint) <= 6:
                     duplicate = row
                     break
@@ -538,7 +557,7 @@ class Worker:
         files, blobs = images.prepare_files(data, picture, kind)
         decision = candidate['rights']
         stamp = now()
-        image_id = self.store.add_image(
+        record = (
             {'provider': item['provider'], 'provider_item_id': item['provider_item_id'],
              'title': candidate['title'] or 'Untitled', 'creator': candidate['creator'],
              'date_text': candidate['date_text'], 'medium': candidate['medium'],
@@ -556,7 +575,13 @@ class Worker:
                                            'retrieved_by': f'Visual Atlas {__version__}'})},
             {**{k: stats[k] for k in ('aspect', 'orientation', 'mean_luma', 'contrast', 'colorfulness', 'saturation',
                                       'color_family')}, 'palette_json': canonical(stats['palette'])},
-            fence=(self.job['id'], self.owner))
+        )
+        earlier = self.store.one('SELECT id FROM images WHERE removed_at IS NOT NULL AND (file_sha256=? OR '
+                                 '(provider=? AND provider_item_id=?))', (sha, item['provider'], item['provider_item_id']))
+        if earlier:  # rejected automatically under an older analysis version: look again with the current one
+            image_id = self.store.revive_image(earlier['id'], *record, fence=(self.job['id'], self.owner))
+        else:
+            image_id = self.store.add_image(*record, fence=(self.job['id'], self.owner))
         images.write_files(self.media, blobs)  # after the row commits, so clean-up never sees them as strays
         self._item(item['id'], state='downloaded', image_id=image_id)
 
@@ -597,6 +622,8 @@ class Worker:
     def _added_item(self, item: dict, check: str | None, **changes):
         """Mark an analysed image as added, recording whether its optional second-model check happened."""
         payload = {**json.loads(item['payload_json']), 'check': check}
+        if self.job['kind'] in ('find', 'grow') and item['image_id']:
+            payload['match'] = self._match(item['image_id'])
         note = '' if check in (None, 'checked', 'nothing') else CHECK_NOTES[check]
         self._item(item['id'], state='added', reason=note, payload_json=canonical(payload), **changes)
 
@@ -618,9 +645,17 @@ class Worker:
             return self._optional_check(image_id, verifier, item_id)
         return None
 
+    def _rule_version(self) -> str:
+        """The analysis version an automatic rejection was made under (prompt, taxonomy, backend, model)."""
+        backend = self.job['backend']
+        model = (self.spec.get('models') or {}).get('analyze') or tasks.DEFAULT_MODELS[backend]['analyze']
+        return hashlib.sha256('|'.join([self.taxonomy_sha, tasks.prompt_sha('analyze'), backend, model])
+                              .encode()).hexdigest()[:16]
+
     def _remove_unhelpful(self, image: dict, reason: str):
         try:
-            removed = self.store.remove_image(image['id'], f'not added: {reason}', fence=(self.job['id'], self.owner))
+            removed = self.store.remove_image(image['id'], f'not added: {reason}', fence=(self.job['id'], self.owner),
+                                              source='auto', rule_version=self._rule_version())
         except ValueError:
             return  # someone is already using this image; keep it
         images.delete_files(self.media, removed)
@@ -825,29 +860,85 @@ class Worker:
         if brief is None:
             return self._done_failed('That brief no longer exists.')
         self._set(stage='analyzing', message='Thinking through directions for your brief…')
-        library = self.store.rows(
-            "SELECT i.id AS image_id, i.title, i.creator, i.date_text AS date, "
-            "json_extract(a.result_json,'$.summary') AS summary, "
-            "(SELECT group_concat(technique_id) FROM annotations n WHERE n.image_id=i.id AND n.state!='rejected') AS techniques "
-            "FROM images i LEFT JOIN analyses a ON a.id=i.analysis_id WHERE i.removed_at IS NULL AND i.status='ready' "
-            "ORDER BY i.id DESC LIMIT 150")
-        for row in library:
-            row['techniques'] = (row['techniques'] or '').split(',') if row['techniques'] else []
-        image_ids = [row['image_id'] for row in library]
-        answer = self._call('directions', tasks.directions_prompt(brief, list(self.techniques.values()), library),
-                            tasks.directions_schema(sorted(self.techniques), image_ids), [])
+        reading = coding.code_request(f"{brief['title']}. {brief['text']}", self.taxonomy)
+        library = relevant_references(self.store, reading)
+        if not library:
+            return self._done('Your library has no analysed images yet, so there is nothing to ground directions in. '
+                              'Find some images first.')
+        image_techniques = {r['image_id']: {t['id'] for t in r['techniques']} for r in library}
         try:
-            result = tasks.validate_directions(answer['result'], set(self.techniques), set(image_ids))
+            answer = self._call('directions', tasks.directions_prompt(brief, list(self.techniques.values()), library),
+                                tasks.directions_schema(sorted(self.techniques), sorted(image_techniques)), [],
+                                validate=lambda raw: tasks.validate_directions(raw, set(self.techniques),
+                                                                               image_techniques))
         except tasks.InvalidResult as error:
             return self._done_failed(f'The suggestions did not pass checks ({error}).')
-        analysis_id = self._save_analysis('directions', answer, result,
+        result = answer['result']
+        analysis_id = self._save_analysis('directions', answer, {**result, 'reading': reading,
+                                                                 'supplied_ids': sorted(image_techniques)},
                                           input_sha=hashlib.sha256(brief['text'].encode()).hexdigest())
+        if not result['directions']:
+            missing = result['insufficient_evidence'] or 'no reference clearly carries the techniques this brief needs'
+            return self._done(f'Not enough matching evidence in your library: {missing}. '
+                              f'Try Find images for {self._find_hint(reading)}. Earlier suggestions were kept.')
         self.store.save_directions(brief['id'], analysis_id, result['directions'])
-        return self._done(f"Ready. {len(result['directions'])} directions saved.")
+        count = len(result['directions'])
+        message = f'Ready. {count} direction{"s" if count != 1 else ""} saved.'
+        if result['dropped']:
+            message += f" {result['dropped']} more were dropped because they did not cite images showing their techniques."
+        return self._done(message)
+
+    def _find_hint(self, reading: dict) -> str:
+        names = [self.techniques[t['id']]['name'] for t in reading['techniques']][:2]
+        words = reading['subject_terms'][:3]
+        return '“' + ', '.join(names + words) + '”' if names or words else 'images that show the qualities you described'
 
     def _done_failed(self, message: str):
         self._finish('failed', message, 'invalid')
         return False
+
+
+STATE_WEIGHT = {'human_reviewed': 3, 'model_reviewed': 2, 'proposed': 1}
+
+
+def relevant_references(store: Store, reading: dict, limit: int = 40, budget: int = 24000) -> list[dict]:
+    """The library references most relevant to a coded request, as complete records within a size budget.
+
+    Score: each coded technique the image carries, weighted by review state (halved for a non-exact tag); one point
+    per coded goal its techniques serve; one point per subject word found in its text. Ties (and an uncoded request)
+    fall back to the newest. Deterministic: no AI is involved."""
+    coded = {t['id']: (1 if t['exact'] else .5) for t in reading['techniques']}
+    goals = {g['id'] for g in reading['goals']}
+    serves = {}
+    for link in store.rows("SELECT technique_id, target_id FROM technique_links WHERE kind='goal'"):
+        serves.setdefault(link['technique_id'], set()).add(link['target_id'])
+    images = {row['id']: row for row in store.rows(
+        "SELECT i.id, i.title, i.creator, i.date_text, json_extract(a.result_json,'$.summary') AS summary FROM images i "
+        "LEFT JOIN analyses a ON a.id=i.analysis_id WHERE i.removed_at IS NULL AND i.status='ready'")}
+    labels, score = {}, dict.fromkeys(images, 0.0)
+    for row in store.rows("SELECT image_id, technique_id, state FROM annotations WHERE state!='rejected' "
+                          "ORDER BY role='primary' DESC, confidence DESC"):
+        if row['image_id'] in images:
+            labels.setdefault(row['image_id'], []).append({'id': row['technique_id'], 'state': row['state']})
+            score[row['image_id']] += coded.get(row['technique_id'], 0) * STATE_WEIGHT.get(row['state'], 0)
+    for image_id, carried in labels.items():
+        score[image_id] += len(goals & set().union(*(serves.get(t['id'], set()) for t in carried)))
+    for term in reading['subject_terms']:
+        for row in store.rows('SELECT rowid AS id FROM images_fts WHERE images_fts MATCH ?', (f'"{term}"*',)):
+            if row['id'] in score:
+                score[row['id']] += 1
+    records, size = [], 2
+    for image_id in sorted(images, key=lambda i: (-score[i], -i)):
+        image = images[image_id]
+        record = {'image_id': image_id, 'title': image['title'][:120], 'creator': image['creator'][:80],
+                  'date': image['date_text'][:40], 'summary': (image['summary'] or '')[:300],
+                  'techniques': labels.get(image_id, [])}
+        cost = len(json.dumps(record, ensure_ascii=False)) + 2
+        if len(records) >= limit or size + cost > budget:
+            break
+        records.append(record)
+        size += cost
+    return records
 
 
 def create_job(store: Store, kind: str, spec: dict) -> str:
@@ -878,6 +969,10 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
         scaled = {'max_searches': max(10, -(-target // 3) + 4), 'max_candidates': max(80, 4 * target),
                   'max_downloads': max(30, 2 * target), 'max_analyses': max(12, target + 4)}  # room for misses
         budgets = {k: max(1, min(int(asked.get(k, scaled[k])), 200)) for k in DEFAULT_BUDGETS}
+        reading = coding.code_request(goal, catalog.load()[0], technique_ids, subject=str(spec.get('subject') or ''))
+        # Targets: techniques asked for in the form, Grow's gap techniques, or ones named exactly in the request.
+        targets = list(dict.fromkeys(technique_ids + [t['id'] for t in reading['techniques'] if t['exact']]))
+        clean.update(reading=reading, targets=targets)
         clean.update(goal=goal[:1000], subject=str(spec.get('subject') or '')[:120],
                      intended_use=str(spec.get('intended_use') or '')[:200], technique_ids=technique_ids,
                      orientation=spec.get('orientation') if spec.get('orientation') in ('landscape', 'portrait', 'square') else None,

@@ -333,10 +333,13 @@ class Store:
         self.connection.execute('INSERT INTO images_fts(rowid,title,creator,body) VALUES(?,?,?,?)',
                                 (image_id, image['title'], image['creator'], ' '.join(filter(None, parts))))
 
-    def remove_image(self, image_id: int, reason: str, fence: tuple | None = None) -> dict:
+    def remove_image(self, image_id: int, reason: str, fence: tuple | None = None, *, source: str = 'user',
+                     rule_version: str = '') -> dict:
         """Forget an image: files are deleted by the caller after this commits; a tombstone stops it being re-added.
 
-        An automatic removal (fence given, from a job) never removes an image a person has already worked on."""
+        A person's removal (source 'user') is final. An automatic removal (source 'auto', from a job holding `fence`)
+        records the analysis version that judged it, never removes an image a person has already worked on, and
+        lets a later analysis version look at the picture again."""
         with self.transaction():
             if fence:
                 self._fence(*fence)
@@ -349,7 +352,8 @@ class Store:
                 raise ValueError('image is in use and was not removed automatically')
             self._insert('tombstones', {'provider': image['provider'], 'provider_item_id': image['provider_item_id'],
                                         'file_sha256': image['file_sha256'], 'dhash': image['dhash'],
-                                        'reason': reason[:200], 'created_at': now()})
+                                        'reason': reason[:200], 'source': source, 'rule_version': rule_version,
+                                        'created_at': now()})
             for table in ('annotations', 'collection_items', 'image_metrics'):
                 self.connection.execute(f'DELETE FROM {table} WHERE image_id=?', (image_id,))
             self._update('images', 'id', image_id, {'removed_at': now(), 'original_path': None,
@@ -357,6 +361,21 @@ class Store:
                                                     'description': '', 'favorite': 0})
             self.refresh_search(image_id)
             return image
+
+    def revive_image(self, image_id: int, image: dict, rights: dict, metrics: dict, fence: tuple | None = None) -> int:
+        """Bring back an image that an older analysis version rejected automatically, for a fresh look. The old row,
+        its rights history and its analyses stay; it gets a new rights record, metrics and files."""
+        with self.transaction():
+            if fence:
+                self._fence(*fence)
+            if not self.one('SELECT 1 FROM images WHERE id=? AND removed_at IS NOT NULL', (image_id,)):
+                raise ValueError('only a removed image can be revived')
+            self._update('images', 'id', image_id, {**image, 'removed_at': None, 'status': 'pending',
+                                                    'analysis_id': None, 'favorite': 0, 'created_at': now()})
+            self._insert('rights_records', {**rights, 'image_id': image_id})
+            self._insert('image_metrics', {**metrics, 'image_id': image_id})
+            self.refresh_search(image_id)
+            return image_id
 
     def import_reference(self, image: dict, rights: dict, metrics: dict, analyses: list[dict],
                          annotations: list[dict], current_analysis: int | None = None) -> int | None:

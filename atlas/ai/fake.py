@@ -3,6 +3,7 @@
 Used by tests and the offline demo. Every result it produces is labelled 'practice' in the app."""
 
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -50,15 +51,15 @@ def run(prompt: str, schema: dict, images: list[Path], *, model: str = 'practice
         result = {'queries': [{'provider': p, 'query': ' '.join(words[:2]), 'technique_id': _pick(techniques, seed, 1)[0]}
                               for p in providers]}
     elif 'directions' in properties:
-        item = properties['directions']['items']['properties']
-        techniques = item['technique_ids']['items']['enum']
-        images = [i for i in item['image_ids']['items']['enum'] if i]
+        library = json.loads(prompt.split('Library references (JSON): ', 1)[1].split('\n\nBrief (JSON data)', 1)[0])
+        carriers = [r for r in library if r['techniques']]
         result = {'directions': [{'title': f'Practice direction {n + 1}', 'idea': 'A practice idea from the offline demo.',
                                   'rationale': 'Practice rationale; no model was used.',
-                                  'technique_ids': _pick(techniques, seed + bytes([n]), 2),
-                                  'image_ids': _pick(images, seed + bytes([n]), 2),
+                                  'technique_ids': [reference['techniques'][0]['id']],
+                                  'image_ids': [reference['image_id']],
                                   'execution': ['Practice suggestion.'], 'tradeoffs': ['Practice tradeoff.']}
-                                 for n in range(3)]}
+                                 for n, reference in enumerate(carriers[:3])],
+                  'insufficient_evidence': None if carriers else 'Practice: the library has no analysed images.'}
     else:
         image_ids = properties['per_image']['items']['properties']['image_id']['enum']
         result = {'shared': ['Practice: both images use a clear focal area.'],
