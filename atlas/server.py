@@ -72,8 +72,16 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     worker = jobs.Worker(home)
     app.state.worker = worker
     app.state.stop = threading.Event()
-    if start_worker:
-        threading.Thread(target=worker.loop, args=(app.state.stop,), daemon=True, name='atlas-worker').start()
+    app.state.thread = None
+
+    def start():
+        if start_worker:
+            app.state.stop = threading.Event()
+            app.state.thread = threading.Thread(target=worker.loop, args=(app.state.stop,), daemon=True,
+                                                name='atlas-worker')
+            app.state.thread.start()
+
+    start()
 
     def db() -> Store:
         return Store(jobs.db_path(home))
@@ -582,14 +590,18 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
 
     @app.post('/api/backups/{name}/restore')
     def restore(name: str):
-        app.state.stop.set()  # pause the background worker while files are swapped
+        with db() as store:
+            if store.one("SELECT id FROM jobs WHERE state IN ('queued','running','cancelling')"):
+                raise ValueError('A job is still running. Pause or cancel it, then restore.')
+        app.state.stop.set()  # stop the background worker while files are swapped
+        if app.state.thread is not None:
+            app.state.thread.join(timeout=30)
+            if app.state.thread.is_alive():
+                raise ValueError('The background worker is still busy. Try again in a minute.')
         try:
-            result = transfer.restore(home, name)
+            return transfer.restore(home, name)
         finally:
-            app.state.stop = threading.Event()
-            if start_worker:
-                threading.Thread(target=worker.loop, args=(app.state.stop,), daemon=True).start()
-        return result
+            start()
 
     @app.get('/media/{path:path}', include_in_schema=False)
     def media(path: str):

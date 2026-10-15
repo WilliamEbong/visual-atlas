@@ -106,7 +106,7 @@ def _stop_tree(process, job):
 
 
 def run_process(argv, *, prompt, cwd, env, timeout_seconds=90,
-                max_output_bytes=MAX_OUTPUT_BYTES, output_path=None):
+                max_output_bytes=MAX_OUTPUT_BYTES, output_path=None, cancel=None):
     """Collect bounded bytes with a deadline, including non-reading stdin/descendants.
 
     Limits protect local processing; they do not imply a provider token/billing cap.

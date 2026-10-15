@@ -18,7 +18,7 @@ from atlas import catalog, images, providers, rights
 from atlas.ai import claude_cli, codex_cli, fake, tasks
 from atlas.ai.process import BackendError
 from atlas.fetch import Fetcher, FetchError
-from atlas.home import home_dir, media_dir
+from atlas.home import home_dir
 from atlas.store import LeaseLost, Store, canonical, now
 
 BACKENDS = {'codex': codex_cli, 'claude': claude_cli, 'fake': fake}
