@@ -19,7 +19,7 @@ COMMONS_LICENCES = ('haswbstatement:P275=Q6938433|P275=Q20007257|P275=Q14947546|
 
 def _clip(value, limit=500) -> str:
     # Commons templates leak Wikidata residue such as "1812 date QS:P571,+1812-00-00T00:00:00Z/9".
-    text = re.sub(r'\s*\b(?:date|title)\s+QS:P\d+,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
+    text = re.sub(r'\s*\b(?:date|title|label)\s+QS:[PL]\w*,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
     return text.strip()[:limit]
 
 
@@ -147,7 +147,7 @@ def _commons(fetcher, query, page, per_page):
         meta = info.get('extmetadata') or {}
         if info.get('mime') not in ('image/jpeg', 'image/png', 'image/webp'):
             continue
-        title = plain((meta.get('ObjectName') or {}).get('value')) or item.get('title', '').removeprefix('File:')
+        title = _clip((meta.get('ObjectName') or {}).get('value'), 300) or item.get('title', '').removeprefix('File:')
         results.append({
             'provider': 'commons', 'provider_item_id': str(item.get('pageid')), 'title': title[:300],
             'creator': _clip((meta.get('Artist') or {}).get('value'), 200),

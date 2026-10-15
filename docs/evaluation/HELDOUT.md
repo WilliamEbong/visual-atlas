@@ -18,7 +18,7 @@ numbers as a sanity check of behaviour, not as accuracy.
 | 9 | Corridor of Vizianagaram Hall, Universit (commons) | Frame within a frame, Leading lines, Rhythm and pattern — converging arcade, repeated arches and doors, arches frame the far door | Frame within a frame, Leading lines, Rhythm and pattern | Colour contrast, Leading lines, Rhythm and pattern, Symmetry and central balance | Leading lines, Rhythm and pattern |
 | 10 | Map/Print Case (cma) | — — catalogue photo of a furniture object on a plain ground; any isolation is incidental to museum photography, so no technique is expected | — | Limited palette harmony, Texture contrast | — |
 | 11 | [Female Portrait, Standing, Looking Left (met) | Gaze direction — sitter looks out of frame to the left; the oval mount and monochrome come from the medium, not a choice | Frame within a frame, Light–dark contrast (chiaroscuro) | Frame within a frame, Gaze direction | Light–dark contrast (chiaroscuro) |
-| 12 | A Market Place and Crowd title QS:P1476, (commons) | Proximity grouping — a crowd clustered under awnings against empty walls; ambiguous sketch | Layered depth (foreground, middle, background), Selective focus | Diagonal energy, Proximity grouping, Selective focus | Layered depth (foreground, middle, background) |
+| 12 | A Market Place and Crowd (commons) | Proximity grouping — a crowd clustered under awnings against empty walls; ambiguous sketch | Layered depth (foreground, middle, background), Selective focus | Diagonal energy, Proximity grouping, Selective focus | Layered depth (foreground, middle, background) |
 
 ## Summary
 
