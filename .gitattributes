@@ -4,3 +4,4 @@
 *.ico binary
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
+design-review/** export-ignore
