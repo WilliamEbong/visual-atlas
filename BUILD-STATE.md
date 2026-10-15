@@ -4,9 +4,9 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-v0.3 (package 0.3.0) is in progress: spec, plan and tasks in specs/006-v0-3-maturity; both evaluation gates are
-fixed in docs/evaluation/v0.3. Next: the visual system and shared states (T604–T606), then the screens to the
-design canvas, then sources, coding cues and the metadata filter. v0.3.0 is published only on the owner's go-ahead.
+v0.3 (package 0.3.0) is built, verified and committed locally on main (not pushed or tagged). Pending: fold in the
+independent Codex review (at most 2 rounds), rerun the gates, rebuild release/VisualAtlas-v0.3.0.zip from the final
+commit. Publishing v0.3.0 waits for the owner's go-ahead.
 
 ## v0.3 status (2026-10-15)
 - Owner choices (2026-10-15): polish and finish, plus the deferred features (new sources, better request coding,
@@ -25,6 +25,56 @@ design canvas, then sources, coding cues and the metadata filter. v0.3.0 is publ
   - **Published zip:** downloaded, extracted to a short scratch path and installed with -NoShortcuts -NoLaunch. The
     install reports 0.2.0, 85 images and schema 2, and doctor shows both assistants ready.
   - **Pages demo (Playwright):** 60 then 85 unique plates after "Show more", no broken images, no console errors.
+
+### v0.3 decisions (reversible, logged)
+- **Design system.** The canvas fixes the look. The horizon is one header band whose bottom rule sits at the same
+  height on every page. The library is a CSS-only justified grid: flex-grow is proportional to each picture's
+  aspect, and a filler stops the last row stretching. Arrow keys move by on-screen position.
+- **Phone image page.** Sections stack instead of becoming tabs (FR-11 reworded): simpler, and all content is
+  reachable by scrolling.
+- **Undo replays the inverse API call.** Removing from a collection is undone by adding back, then restoring the
+  order. Irreversible actions (removal from the library, deleting a brief or collection, restore) use an in-app
+  dialog. A vitest test forbids browser alert, confirm and prompt.
+- **Sources (docs/evaluation/v0.3/SOURCES.md).**
+  - Rijksmuseum is accepted on the VisualItem's rights URI (PDM 1.0, CC0, CC BY 4.0). Three requests per item;
+    title search; the first 100 ids are paged locally.
+  - The National Gallery is accepted through its CC0 open data. Its first search downloads about 190 MB into
+    <home>/sources/nga, which is turned into a gzip JSON index (open-access primary images only) before the CSVs
+    are deleted. The index refreshes after 30 days, and an old index survives a failed refresh. It is opt-in in
+    Find (default_on false) and left out of DEFAULT_PROVIDERS.
+  - The Library of Congress and NASA are disabled with evidence (free-text rights; Library of Congress API behind a
+    Cloudflare challenge).
+- **Request coding.** Cue phrases are taxonomy data (request_cues on techniques and goals), are non-exact, and
+  "against" and "flyer" are stopwords. Adopted on the development gate; the final holdout was reported, not tuned.
+- **Metadata filter: not integrated.** Both arms skipped 5 of 29 good pictures; the gate allows none. The rules
+  moved to docs/evaluation/v0.3/metadata-rules.json.
+- **Cache-Control: no-store on the app page.** Found while taking screenshots: a cached page kept an old build's
+  asset names. A user upgrading in place could hit the same.
+- **Release zip.** design-review/** is export-ignore, so the zip drops from 31 MB to 21.1 MB.
+
+### v0.3 evidence (2026-10-15)
+- **Tests:** 355 passed, 9 deselected (live). New tests cover sources, the coder's cue phrases, the reading
+  endpoint, image sizes, cache headers, the no-alert rule, nextByPosition, activeFilters and regions. Ruff, tsc,
+  vitest (14), build, taxonomy check, data guard and npm audit are clean.
+- **Live:** Rijksmuseum and National Gallery smoke tests pass; each found eligible images and downloaded one.
+  The National Gallery download of about 190 MB and the index build finished within the 41 s test.
+- **Browser (Playwright, scratch library):**
+  - axe-core 4.13.0 on 12 screens in light and dark: 0 serious or critical issues, after a contrast fix on cream.
+  - Library first-load CLS 0.015 to 0.029.
+  - No horizontal overflow at 375 px on 11 screens, after fixing the image-page grid and the collections header.
+  - 12 of 12 journeys pass (scripts/journeys-v03.js), including a live Rijksmuseum Find: 2 found, 2 free, 2 added.
+  - Real Codex directions on the redesigned project page: 4 grounded directions.
+  - The demo build renders every screen; compare was added to the demo.
+- **Evaluation:** docs/evaluation/v0.3/REPORT.md.
+  - Coding, development set: F1 0.31 to 0.84, retrieval@20 0.68 to 0.78.
+  - Coding, final holdout: F1 0.29 to 0.62.
+  - Metadata filter: rules 11/18 negatives and 5/29 positives skipped; Jev 10/18 and 5/29. Neither integrated.
+  - Jev spend about $0.002, using the Qualia key in the evaluation process only.
+- **Install and upgrade:**
+  - v0.3.0 zip (21.1 MB) installed over the library made by the published v0.2.0, after adding a collection, a
+    favourite and a rejected reading. Version 0.3.0; all three kept; seven sources; the coder reads "backlit" as
+    silhouette.
+  - A fresh v0.3.0 install has 85 starter references and doctor reports ready.
 
 ## v1.1 status (2026-10-15)
 - Baseline on 680b199 (scratch home): pytest 290 passed / 7 live deselected; ruff clean; taxonomy check OK;
