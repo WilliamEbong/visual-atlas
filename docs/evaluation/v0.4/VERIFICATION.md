@@ -85,4 +85,24 @@ no percentage-confidence claim, no horizontal overflow and no broken images.
 
 Spec Kit convergence: 10 functional requirements, 4 acceptance criteria, 5 plan steps and 6 constitutional
 principles assessed; no actionable implementation gaps remained. Documented coverage/model-access limitations
-are not claimed as completed targets. No remote release, push or deployment occurred.
+are not claimed as completed targets. No remote release, push or deployment occurred during that local build.
+
+## Documentation and authorized branch push (2026-10-16)
+
+The owner's follow-up authorized a commit and push. Commit `9aaafa1` on `visual-atlas-v0.4` includes the
+implementation, rewritten README and detailed user guide. Main was not updated because its push workflow
+deploys the public demo. No release tag or public release was created.
+
+[CI run 38871909266](https://github.com/WilliamEbong/visual-atlas/actions/runs/38871909266) passed on Linux
+and Windows: 372 backend tests on each platform, 15 frontend tests, TypeScript, Ruff, production builds,
+Windows scratch installation, dependency audits and secret scanning. Nine live tests were deselected.
+
+Independent source review corrected three documentation claims: collections contain reference images,
+the library button says “Show the next …”, and image removal retains audit history. All 49 local README
+and guide links, anchors and image references resolve. Playwright inspected the rendered GitHub pages,
+including loaded README screenshots, guide contents and a readable 375px layout without page overflow.
+GitHub's global-navigation payload returned 404; the documents and their images loaded successfully.
+
+The local zip includes the revised documents. All 473 archived source files match the working source;
+247 runtime files remain byte-identical to the previously installed and tested copy. The current receipt
+is `release/verification.json`. No live model checks were repeated for this documentation-only follow-up.

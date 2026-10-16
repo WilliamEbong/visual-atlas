@@ -7,7 +7,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 v0.4.0 local release implemented and verified. Launch with `uv run visual-atlas`, or extract
 `release/VisualAtlas-v0.4.0.zip` and run `Install Visual Atlas.cmd`. No pending core implementation task.
 Owner's latest instruction authorizes committing and pushing the implementation and documentation.
-Push branch `visual-atlas-v0.4`; main triggers Pages deployment, which remains outside this request.
+Implementation and documentation pushed on branch `visual-atlas-v0.4`; main triggers Pages deployment,
+which remains outside this request.
 No release tag, public release, deployment, global settings change or real-library write is authorized.
 The starting worktree was clean at v0.3.0; all current changes belong to this session.
 
@@ -21,6 +22,13 @@ The starting worktree was clean at v0.3.0; all current changes belong to this se
 - Independent source review corrected collection wording, the paging button label and deletion guarantees.
   Documentation-only follow-up requires link/render/package checks; prior full app tests remain the app evidence.
 - Local release zip is rebuilt with these documents. No version bump for documentation; remains 0.4.0.
+- Commit 9aaafa1 passed Linux and Windows CI (run 38871909266): 372 backend tests per platform,
+  15 frontend tests, TypeScript, Ruff, builds, installer, dependency audits and secret scan.
+- All 49 local README/guide links, image references and anchors resolve. Playwright inspected GitHub
+  rendering at desktop and 375px: loaded README images, guide contents/anchors and readable mobile text
+  without page overflow. GitHub's own global-navigation payload returned 404; document content loaded.
+- Rebuilt archive verified all 473 source files and 247 runtime files against the tested installation.
+  Current hash/size are in gitignored release/verification.json; user library remains untouched.
 
 ## v0.4 decisions and ownership (2026-10-15)
 - Existing constitution retained. Feature directory chosen autonomously under the owner's instruction.
