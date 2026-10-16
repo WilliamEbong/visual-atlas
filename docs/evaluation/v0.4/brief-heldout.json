@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "split": "heldout",
+  "judgments": {
+    "author": "Codex evaluation subagent",
+    "status": "Provisional model-authored judgments; not independent expert ground truth.",
+    "created": "2026-10-15",
+    "frozen_before_outputs": true,
+    "inputs_read": ["specs/007-visual-reasoning/spec.md", "atlas/data/taxonomy.json", "BUILD-STATE.md", "AGENTS.md", "CLAUDE.md"],
+    "separation": "The author did not read coder implementation, development cases, or old/new coder outputs. Case content and judgments were withheld from the implementation agent until tuning was declared frozen.",
+    "goals_policy": "Expected goals reflect communication outcomes requested in the brief, not every taxonomy goal associated with an expected technique.",
+    "subjects_policy": "subjects lists required useful subject words; not_subjects lists particular instruction, format, or mechanism words that should not become subject searches. Other sensible subject words are not penalized by these lists.",
+    "techniques_policy": "Expected techniques require a named mechanism or concrete descriptive evidence. A mood or generic style alone does not establish a mechanism. Explicitly negated techniques are excluded."
+  },
+  "cases": [
+    {
+      "id": "h01",
+      "category": "direct-name",
+      "text": "Find visual metaphor examples about patience.",
+      "techniques": ["visual-metaphor"],
+      "goals": [],
+      "subjects": ["patience"],
+      "not_subjects": ["find", "visual", "metaphor", "examples"],
+      "rationale": "The mechanism is explicitly named; patience is the concept to search for, without an additional stated communication goal."
+    },
+    {
+      "id": "h02",
+      "category": "direct-name",
+      "text": "Use figure-ground ambiguity with birds and trees to provoke a second look.",
+      "techniques": ["figure-ground-ambiguity"],
+      "goals": ["surprise"],
+      "subjects": ["birds", "trees"],
+      "not_subjects": ["use", "figure", "ground", "ambiguity", "provoke", "second", "look"],
+      "rationale": "A named mechanism and explicit second-look goal should survive punctuation normalization."
+    },
+    {
+      "id": "h03",
+      "category": "natural-paraphrase",
+      "text": "A solitary sailboat, surrounded on every side by a wide expanse of unoccupied water. The image should feel peaceful.",
+      "techniques": ["negative-space"],
+      "goals": ["create-calm"],
+      "subjects": ["sailboat", "water"],
+      "not_subjects": ["image", "should", "feel", "surrounded", "unoccupied"],
+      "rationale": "Extensive unoccupied surroundings isolate the boat; there is no second object establishing a size comparison. Peacefulness is an explicit calm goal."
+    },
+    {
+      "id": "h04",
+      "category": "natural-paraphrase",
+      "text": "Keep the butterfly crisp; everything behind it should dissolve into blur.",
+      "techniques": ["selective-focus"],
+      "goals": [],
+      "subjects": ["butterfly"],
+      "not_subjects": ["keep", "crisp", "everything", "behind", "should", "dissolve", "blur"],
+      "rationale": "Sharp subject against blurred surroundings is selective focus, not motion blur."
+    },
+    {
+      "id": "h05",
+      "category": "natural-paraphrase",
+      "text": "An orderly row of identical chairs, except one faces the wrong direction.",
+      "techniques": ["rhythm-pattern", "repetition-with-interruption"],
+      "goals": [],
+      "subjects": ["chairs"],
+      "not_subjects": ["orderly", "identical", "except", "wrong", "direction"],
+      "rationale": "A regular repeated series and a single directional exception are both concretely specified. No human face or gaze is requested."
+    },
+    {
+      "id": "h06",
+      "category": "natural-paraphrase",
+      "text": "A grand piano sitting in the middle of a supermarket aisle, as if it belongs there.",
+      "techniques": ["contextual-incongruity"],
+      "goals": [],
+      "subjects": ["piano", "supermarket"],
+      "not_subjects": ["sitting", "middle", "belongs"],
+      "rationale": "The piano's placement in an ordinary supermarket is a concrete contextual mismatch. This does not establish a metaphor or mirrored composition."
+    },
+    {
+      "id": "h07",
+      "category": "natural-paraphrase",
+      "text": "Express burnout by turning a human head into a candle burning down.",
+      "techniques": ["visual-metaphor"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["burnout", "head", "candle"],
+      "not_subjects": ["express", "turning"],
+      "rationale": "Substituting a burning candle for a head transfers depletion to burnout, explicitly expressing an abstract concept."
+    },
+    {
+      "id": "h08",
+      "category": "multiple-techniques-and-goals",
+      "text": "Guide the eye towards the cabin with leading lines, and use limited palette harmony to create calm.",
+      "techniques": ["leading-lines", "color-harmony"],
+      "goals": ["guide-the-eye", "create-calm"],
+      "subjects": ["cabin"],
+      "not_subjects": ["guide", "eye", "leading", "lines", "limited", "palette", "harmony", "create", "calm"],
+      "rationale": "Two explicitly named techniques serve two explicitly named goals; neither should erase the other."
+    },
+    {
+      "id": "h09",
+      "category": "multiple-natural-mechanisms",
+      "text": "Make the cliff look enormous beside a tiny climber. Leave almost all of the upper picture unoccupied.",
+      "techniques": ["scale-contrast", "negative-space"],
+      "goals": ["show-scale"],
+      "subjects": ["cliff", "climber"],
+      "not_subjects": ["make", "look", "leave", "almost", "upper", "picture", "unoccupied"],
+      "rationale": "Two differently sized objects establish scale, while extensive unoccupied space is separately specified."
+    },
+    {
+      "id": "h10",
+      "category": "ambiguous-style",
+      "text": "I want a bold portrait that feels modern.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["portrait"],
+      "not_subjects": ["want", "feels"],
+      "rationale": "Bold and modern do not specify whether colour, lighting, scale, framing, or any other particular mechanism should be used."
+    },
+    {
+      "id": "h11",
+      "category": "goal-without-technique",
+      "text": "Surprise viewers with a memorable bicycle image; I have not settled on a visual device.",
+      "techniques": [],
+      "goals": ["surprise"],
+      "subjects": ["bicycle"],
+      "not_subjects": ["viewers", "image", "settled", "visual", "device"],
+      "rationale": "A surprise goal is explicit but the mechanism is deliberately undecided; it must not become a committed incongruity classification."
+    },
+    {
+      "id": "h12",
+      "category": "negation",
+      "text": "Please avoid silhouette and motion blur. Show a horse in a field.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["horse", "field"],
+      "not_subjects": ["please", "avoid", "silhouette", "motion", "blur", "show"],
+      "rationale": "Both named mechanisms are rejected, including the second item in the coordinated negative phrase."
+    },
+    {
+      "id": "h13",
+      "category": "conflicting-instructions",
+      "text": "Use symmetry for the tree. Actually, avoid symmetry and use off-centre placement instead.",
+      "techniques": ["asymmetric-balance"],
+      "goals": [],
+      "subjects": ["tree"],
+      "not_subjects": ["use", "symmetry", "actually", "avoid", "off", "centre", "placement", "instead"],
+      "rationale": "The user explicitly retracts symmetry and names its replacement; preserving both would misread the correction."
+    },
+    {
+      "id": "h14",
+      "category": "subject-only",
+      "text": "Kingfishers and reeds.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["kingfishers", "reeds"],
+      "not_subjects": [],
+      "rationale": "Two subjects do not establish juxtaposition, grouping, framing, or any other particular composition."
+    },
+    {
+      "id": "h15",
+      "category": "subject-only",
+      "text": "Industrial cranes at a shipyard.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["cranes", "shipyard"],
+      "not_subjects": [],
+      "rationale": "Architecture and machinery can support many mechanisms, but these nouns alone justify none."
+    },
+    {
+      "id": "h16",
+      "category": "format-instructions-without-technique",
+      "text": "Find references for a square album cover with a headline and three lines of text.",
+      "techniques": [],
+      "goals": [],
+      "subjects": [],
+      "not_subjects": ["find", "references", "square", "album", "cover", "headline", "three", "lines", "text"],
+      "rationale": "These are deliverable and typography instructions, not depicted subjects or leading lines. No empty-area extent is specified, so negative-space isolation is not established."
+    }
+  ]
+}

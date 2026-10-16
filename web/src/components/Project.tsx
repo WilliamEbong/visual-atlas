@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { del, media, post, put, readOnly, request } from '../lib/client'
 import { date, useData } from '../lib/hooks'
 import { go, href } from '../lib/router'
-import type { Brief, Job, Settings } from '../lib/types'
+import type { Brief, Job, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
+import ReadingEditor from './ReadingEditor'
 import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
 
 const RULES = ['rule-rust', 'rule-blue', 'rule-green', 'rule-ochre', 'rule-ink']
@@ -65,12 +66,15 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
   const { notify, fail, confirm } = useNotice()
   const [jobId, setJobId] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
+  const [correction, setCorrection] = useState<ReadingCorrection | null>(null)
+  useEffect(() => { setCorrection(null) }, [id, data?.text, data?.title])
   if (error) return <><PageHead kicker={<a href="#/project">All briefs</a>} title="Brief" /><Failure message={error} busy={busy} retry={reload} /></>
   if (!data) return <><PageHead kicker={<a href="#/project">All briefs</a>} title="…" /><Loading plates={false} /></>
   async function suggest() {
     try {
       const settings = await request<Settings>('settings')
-      const job = await post<Job>('jobs', { kind: 'directions', spec: { brief_id: id, backend: settings.backend } })
+      const job = await post<Job>('jobs', { kind: 'directions', spec: { brief_id: id, backend: settings.backend,
+        reading_correction: correction } })
       setJobId(job.id)
     } catch (reason) { fail(reason) }
   }
@@ -100,13 +104,11 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
           {editing ? <BriefForm brief={data} onSaved={() => { setEditing(false); reload(); onChange(); notify('Brief saved.') }} onCancel={() => setEditing(false)} />
             : <div className="slip"><p className="mono" style={{ marginBottom: 8 }}>The brief</p><p className="slip-text">{data.text}</p></div>}
         </div>
-        {reading && <div className="side-col trays" style={{ flex: '2 1 560px', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 24 }} aria-label="How the brief was read">
-          <div className="tray-col rule-green"><p className="mono">Goals</p><p style={{ marginTop: 6 }}>{reading.goals.map((g) => g.name).join(', ') || '—'}</p></div>
-          <div className="tray-col rule-rust"><p className="mono">Techniques</p><p style={{ marginTop: 6 }}>{reading.techniques.map((t) => t.name.replace(/ \(.*\)$/, '') + (t.exact ? '' : ' (maybe)')).join(', ') || '—'}</p></div>
-          <div className="tray-col rule-blue"><p className="mono">Subject words</p><p style={{ marginTop: 6 }}>{reading.subject_terms.join(', ') || '—'}</p></div>
+        {reading && <div className="side-col" aria-label="How the brief was read">
+          <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />
         </div>}
       </div>
-      <p className="mono" style={{ marginTop: 14 }}>How the atlas read your brief. It ranks your references by these words and sends the most relevant with the brief. Wrong? Edit the brief.</p>
+      <p className="mono" style={{ marginTop: 14 }}>These suggestions rank references without requiring every image to match. Subject matches keep a place too. Suggest directions uses AI and sends your full original brief with the selected references. Corrections apply to this run; editing the brief resets them.</p>
       {jobId && <div className="slip" style={{ marginTop: 24 }}><JobProgress jobId={jobId} compact />
         <button type="button" style={{ marginTop: 12 }} onClick={() => { setJobId(null); reload() }}>Show the results</button></div>}
 

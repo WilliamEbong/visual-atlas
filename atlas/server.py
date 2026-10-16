@@ -340,59 +340,86 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         return {**row, 'techniques': [{**t, 'thumb': media_url(t.pop('thumb_path'))} for t in techniques]}
 
     @app.get('/api/graph')
-    def graph(focus: str):
+    def graph(focus: str, limit: int = 6):
         kind, _, key = focus.partition(':')
-        nodes, edges = {}, set()
+        limit = max(1, min(limit, 200))
+        nodes, edges, counts = {}, {}, {}
 
         def node(node_id, label, node_kind, thumb=None, ring=1):
             nodes.setdefault(node_id, {'id': node_id, 'label': label, 'kind': node_kind, 'thumb': thumb, 'ring': ring})
 
         with db() as store, store.reading():
             names = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM techniques')}
-            goals = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM goals')}
+            facets = {k: {r['id']: r for r in store.rows(f'SELECT id, name, description FROM {table}')}
+                      for k, table in (('goal', 'goals'), ('operation', 'operations'), ('domain', 'domains'))}
+
+            def edge(source, target, relation, explanation, **extra):
+                edges[(source, target, relation)] = {'source': source, 'target': target, 'kind': relation,
+                                                     'explanation': explanation, **extra}
+
+            def membership(tid, facet, target):
+                entry = facets[facet][target]
+                nid = f'{facet}:{target}'
+                node(nid, entry['name'], facet)
+                nodes[nid]['description'] = entry['description']
+                meaning = {'goal': 'can help with', 'operation': 'uses the operation', 'domain': 'works with'}[facet]
+                edge(nid, f'technique:{tid}', {'goal': 'serves', 'operation': 'operation', 'domain': 'domain'}[facet],
+                     f'{names[tid]} {meaning} {entry["name"]}. {entry["description"]}')
+
+            def technique_node(tid, context=False):
+                node(f'technique:{tid}', names[tid], 'technique')
+                if context:
+                    for link in store.rows('SELECT kind, target_id, note FROM technique_links WHERE technique_id=?', (tid,)):
+                        if link['kind'] in facets:
+                            membership(tid, link['kind'], link['target_id'])
+                        elif link['kind'] == 'related' and link['target_id'] in names:
+                            other = link['target_id']
+                            node(f'technique:{other}', names[other], 'technique', ring=2)
+                            edge(f'technique:{tid}', f'technique:{other}', 'related',
+                                 f'{names[tid]} / {names[other]}: {link["note"].replace("_", " ") or "related in the taxonomy"}.')
 
             def examples(technique_id, limit, ring):
-                for e in store.rows("SELECT i.id, i.title, i.thumb_path FROM annotations a JOIN images i ON i.id=a.image_id "
+                counts[technique_id] = store.one("SELECT COUNT(*) AS n FROM annotations a JOIN images i ON i.id=a.image_id "
+                                                "WHERE a.technique_id=? AND a.state!='rejected' AND i.removed_at IS NULL",
+                                                (technique_id,))['n']
+                for e in store.rows("SELECT i.id, i.title, i.thumb_path, a.role, a.state, a.effect, a.evidence_json "
+                                    "FROM annotations a JOIN images i ON i.id=a.image_id "
                                     "WHERE a.technique_id=? AND a.state!='rejected' AND i.removed_at IS NULL "
-                                    "ORDER BY a.confidence DESC LIMIT ?", (technique_id, limit)):
+                                    "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, "
+                                    "a.role='primary' DESC, i.id LIMIT ?", (technique_id, limit)):
                     node(f"image:{e['id']}", e['title'], 'image', media_url(e['thumb_path']), ring)
-                    edges.add((f'technique:{technique_id}', f"image:{e['id']}", 'example'))
+                    edge(f'technique:{technique_id}', f"image:{e['id']}", 'example', e['effect'],
+                         role=e['role'], state=e['state'], evidence=json.loads(e['evidence_json']))
 
             if kind == 'technique' and key in names:
                 node(focus, names[key], 'technique', ring=0)
-                for link in store.rows('SELECT kind, target_id FROM technique_links WHERE technique_id=?', (key,)):
-                    if link['kind'] == 'goal':
-                        node(f"goal:{link['target_id']}", goals[link['target_id']], 'goal')
-                        edges.add((f"goal:{link['target_id']}", focus, 'serves'))
-                    elif link['kind'] == 'related' and link['target_id'] in names:
-                        node(f"technique:{link['target_id']}", names[link['target_id']], 'technique')
-                        edges.add((focus, f"technique:{link['target_id']}", 'related'))
-                examples(key, 8, 2)
-            elif kind == 'goal' and key in goals:
-                node(focus, goals[key], 'goal', ring=0)
-                for link in store.rows("SELECT technique_id FROM technique_links WHERE kind='goal' AND target_id=?", (key,)):
-                    node(f"technique:{link['technique_id']}", names[link['technique_id']], 'technique')
-                    edges.add((focus, f"technique:{link['technique_id']}", 'serves'))
-                    examples(link['technique_id'], 2, 2)
+                technique_node(key, context=True)
+                examples(key, limit, 2)
+            elif kind in facets and key in facets[kind]:
+                node(focus, facets[kind][key]['name'], kind, ring=0)
+                for link in store.rows('SELECT technique_id FROM technique_links WHERE kind=? AND target_id=? '
+                                       'ORDER BY technique_id', (kind, key)):
+                    tid = link['technique_id']
+                    technique_node(tid)
+                    membership(tid, kind, key)
+                    examples(tid, min(limit, 2), 2)
             elif kind == 'image' and key.isdigit():
                 row = store.one('SELECT id, title, thumb_path FROM images WHERE id=? AND removed_at IS NULL', (int(key),))
                 if row is None:
                     raise HTTPException(404, 'That image is not in the library.')
                 node(focus, row['title'], 'image', media_url(row['thumb_path']), ring=0)
-                for a in store.rows("SELECT technique_id FROM annotations WHERE image_id=? AND state!='rejected'",
+                for a in store.rows("SELECT technique_id, role, state, effect, evidence_json FROM annotations "
+                                    "WHERE image_id=? AND state!='rejected'",
                                     (row['id'],)):
                     tid = a['technique_id']
-                    node(f'technique:{tid}', names[tid], 'technique')
-                    edges.add((f'technique:{tid}', focus, 'example'))
-                    for link in store.rows("SELECT target_id FROM technique_links WHERE technique_id=? AND kind='goal'",
-                                           (tid,)):
-                        node(f"goal:{link['target_id']}", goals[link['target_id']], 'goal', ring=2)
-                        edges.add((f"goal:{link['target_id']}", f'technique:{tid}', 'serves'))
-                    examples(tid, 3, 2)
+                    technique_node(tid, context=True)
+                    examples(tid, min(limit, 2), 2)
+                    edge(f'technique:{tid}', focus, 'example', a['effect'], role=a['role'], state=a['state'],
+                         evidence=json.loads(a['evidence_json']))
             else:
                 raise HTTPException(404, 'Unknown focus.')
-        return {'focus': focus, 'nodes': list(nodes.values()),
-                'edges': [{'source': s, 'target': t, 'kind': k} for s, t, k in sorted(edges)]}
+        return {'focus': focus, 'nodes': list(nodes.values()), 'edges': list(edges.values()),
+                'example_counts': counts, 'limit': limit}
 
     @app.get('/api/sources')
     def sources():
@@ -520,11 +547,12 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             out.append({**d, **data})
         return {**brief, 'directions': out, 'reading': read_request(f"{brief['title']}. {brief['text']}")}
 
-    def read_request(text: str, technique: str = '', goal: str = '') -> dict:
+    def read_request(text: str, technique: str = '', goal: str = '', subject: str = '') -> dict:
         taxonomy = catalog.load()[0]
         names = {t['id']: t['name'] for t in taxonomy['techniques']} | {g['id']: g['name'] for g in taxonomy['goals']}
-        reading = coding.code_request(text, taxonomy, [technique] if technique in names else (),
-                                      [goal] if goal in names else ())
+        reading = coding.code_request(text, taxonomy,
+                                      [technique] if technique in {t['id'] for t in taxonomy['techniques']} else (),
+                                      [goal] if goal in {g['id'] for g in taxonomy['goals']} else (), subject=subject)
         for tag in reading['techniques'] + reading['goals']:
             tag['name'] = names[tag['id']]
         return reading
@@ -532,7 +560,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     @app.get('/api/reading')
     def reading(text: str = '', technique: str = '', goal: str = '', subject: str = ''):
         """How a Find request reads (no AI): shown live under the request box."""
-        return read_request(f'{text[:4000]} {subject[:400]}', technique, goal)
+        return read_request(text[:4000], technique, goal, subject[:400])
 
     @app.put('/api/briefs/{brief_id}')
     def edit_brief(brief_id: int, body: BriefInput):

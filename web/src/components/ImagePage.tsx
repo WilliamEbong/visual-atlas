@@ -3,13 +3,13 @@ import { del, media, post, readOnly, request } from '../lib/client'
 import { date, useApp, useData } from '../lib/hooks'
 import { aspect } from '../lib/library'
 import { regionBox, regionLabel } from '../lib/regions'
-import { go, href } from '../lib/router'
+import { go, href, useRoute } from '../lib/router'
 import type { Annotation, Collection, ImageDetail, Settings } from '../lib/types'
 import { PROVIDERS, STATE_LABEL } from '../lib/types'
 import { Failure, Loading, useNotice } from './ui'
 
 function backendName(name: string) {
-  return { codex: 'Codex', claude: 'Claude Code', fake: 'Practice mode (no model)' }[name] ?? name
+  return { codex: 'Codex', 'codex-interactive': 'Codex curation agent', claude: 'Claude Code', fake: 'Practice mode (no model)' }[name] ?? name
 }
 
 function who(changedBy: string) {
@@ -30,6 +30,8 @@ function readTrail(): { query: string; ids: number[] } {
 }
 
 export default function ImagePage({ id }: { id: number }) {
+  const { query } = useRoute()
+  const from = query.get('from')?.startsWith('#/connections?') ? query.get('from') : null
   const { data, error, busy, reload, setData } = useData<ImageDetail>(`images/${id}`)
   const { taxonomy, compare, toggleCompare } = useApp()
   const { notify, fail, confirm } = useNotice()
@@ -48,15 +50,15 @@ export default function ImagePage({ id }: { id: number }) {
     function onKey(event: KeyboardEvent) {
       const target = event.target as HTMLElement
       if (event.altKey || event.ctrlKey || event.metaKey || target.closest('input, textarea, select, [contenteditable], dialog[open], .tabs')) return
-      if (event.key === 'ArrowLeft' && previous) go(`image/${previous}`)
-      if (event.key === 'ArrowRight' && next) go(`image/${next}`)
+      if (event.key === 'ArrowLeft' && previous) go(`image/${previous}`, { from })
+      if (event.key === 'ArrowRight' && next) go(`image/${next}`, { from })
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [previous, next])
+  }, [previous, next, from])
 
-  if (error) return <><Crumbs trail={trail} position={position} previous={previous} next={next} /><Failure message={error} busy={busy} retry={reload} /></>
-  if (!data || data.image.id !== id) return <><Crumbs trail={trail} position={position} previous={previous} next={next} /><Loading label="Loading the image…" plates={false} /></>
+  if (error) return <><Crumbs trail={trail} position={position} previous={previous} next={next} from={from} /><Failure message={error} busy={busy} retry={reload} /></>
+  if (!data || data.image.id !== id) return <><Crumbs trail={trail} position={position} previous={previous} next={next} from={from} /><Loading label="Loading the image…" plates={false} /></>
   const { image, rights, metrics, analysis } = data
   const picked = compare.some((p) => p.id === image.id)
   const ratio = image.width && image.height ? image.width / image.height : 1.4
@@ -90,12 +92,12 @@ export default function ImagePage({ id }: { id: number }) {
     const sure = await confirm({ title: 'Remove this image from the library?', danger: true, confirm: 'Remove',
       body: `Its files, readings${data!.collections.length ? ` and places in ${data!.collections.length} collection${data!.collections.length === 1 ? '' : 's'}` : ''} go. A note stays so later searches skip it. This cannot be undone.` })
     if (!sure) return
-    try { await del(`images/${id}`); notify(`Removed “${image.title}” from the library.`); go('') } catch (reason) { fail(reason) }
+    try { await del(`images/${id}`); notify(`Removed “${image.title}” from the library.`); go('', { from }) } catch (reason) { fail(reason) }
   }
 
   return (
     <>
-      <Crumbs trail={trail} position={position} previous={previous} next={next} />
+      <Crumbs trail={trail} position={position} previous={previous} next={next} from={from} />
       <section className="image-head" aria-labelledby="image-title">
         <figure className={`figure${allRegions ? ' regions-on' : ''}`} style={{ aspectRatio: ratio, flexBasis: `min(900px, calc(76vh * ${ratio.toFixed(3)}))` }}>
           <img src={media(image.display)} alt={`${image.title}${image.creator ? ` by ${image.creator}` : ''}`} />
@@ -146,20 +148,20 @@ export default function ImagePage({ id }: { id: number }) {
         <section className="why" aria-labelledby="why">
           <div className="ruled-title rule-rust section-title"><h2 id="why">Why it may work</h2>
             {!readOnly && <button type="button" className="quiet small" aria-expanded={adding} onClick={() => setAdding(!adding)}>{adding ? 'Close' : 'Add a technique'}</button>}</div>
-          {data.goals.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Serves: {data.goals.map((g, i) => <span key={g.id}>{i ? ', ' : ''}<a href={href(`explore/goal/${g.id}`)}>{g.name}</a></span>)}</p>}
+          {data.goals.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Serves: {data.goals.map((g, i) => <span key={g.id}>{i ? ', ' : ''}<a href={href(`explore/goal/${g.id}`, { from })}>{g.name}</a></span>)}</p>}
           {adding && <TechniqueForm title="Add a technique you can see" techniques={taxonomy?.techniques.filter((t) => !data.annotations.some((a) => a.technique_id === t.id)) ?? []}
             onSave={(techniqueId, evidence, effect) => decide({ technique_id: techniqueId }, 'human_reviewed', { evidence, effect })} />}
           {data.annotations.length === 0 && <p className="muted" style={{ marginTop: 14 }}>No technique recorded yet.</p>}
           {data.annotations.map((a) => (
             <article key={a.technique_id} className={`technique-card ${a.state}`}>
               <div className="card-top">
-                <h3><a href={href(`technique/${a.technique_id}`)}>{a.name}</a></h3>
+                <h3><a href={href(`technique/${a.technique_id}`, { from })}>{a.name}</a></h3>
                 <span className={`state ${a.state}`}>{STATE_LABEL[a.state]}</span>
               </div>
               <p style={{ fontSize: 15 }}>{a.effect || 'No effect recorded.'}</p>
               <p style={{ fontSize: 14 }} className="muted">{a.evidence.join(' ') || '—'}</p>
               <p className="mono">{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
-                ? `proposed by ${backendName(a.proposed_backend)} · confidence ${Math.round(a.confidence * 100)}%` : 'added by you'}
+                ? `proposed by ${backendName(a.proposed_backend)}` : 'added by you'}
                 {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ` · checked by ${who(a.changed_by)}` : ''}
                 {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}{a.note ? ` · ${a.note}` : ''}</p>
               {!readOnly && (editing === a.technique_id
@@ -209,14 +211,14 @@ export default function ImagePage({ id }: { id: number }) {
         </div>
         <div className="strip" style={{ marginTop: 20 }}>
           {related.map((r, index) => (
-            <a key={r.id} href={href(`image/${r.id}`)} className="specimen" style={{ height: [200, 150, 176, 220, 132, 190][index % 6], aspectRatio: aspect(r) }} aria-label={r.title}>
+            <a key={r.id} href={href(`image/${r.id}`, { from })} className="specimen" style={{ height: [200, 150, 176, 220, 132, 190][index % 6], aspectRatio: aspect(r) }} aria-label={r.title}>
               <img src={media(r.thumb)} alt="" /></a>))}
         </div>
         <p className="mono strip-caption">{related.slice(0, 6).map((r) => r.title).join(' · ')}</p>
       </section>}
 
       <section className="section" aria-label="See also" style={{ marginTop: 40 }}>
-        <div className="row"><a className="button small" href={href('connections', { focus: `image:${image.id}` })}>See connections</a></div>
+        <div className="row"><a className="button small" href={href('connections', { focus: `image:${image.id}`, from })}>See connections</a></div>
         {data.history.length > 0 && <details style={{ marginTop: 24, borderTop: '1px solid var(--hair)', paddingTop: 10 }}>
           <summary>History · {data.history.length} entr{data.history.length === 1 ? 'y' : 'ies'}</summary>
           <div className="scroll-x"><table className="plain"><thead><tr><th>When</th><th>Technique</th><th>State</th><th>By</th><th>Note</th></tr></thead>
@@ -228,14 +230,14 @@ export default function ImagePage({ id }: { id: number }) {
   )
 }
 
-function Crumbs({ trail, position, previous, next }: { trail: { query: string; ids: number[] }; position: number; previous: number | null; next: number | null }) {
+function Crumbs({ trail, position, previous, next, from }: { trail: { query: string; ids: number[] }; position: number; previous: number | null; next: number | null; from: string | null }) {
   return (
     <nav className="crumbs" aria-label="Results">
-      <a href={`#/${trail.query ? `?${trail.query}` : ''}`} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>
+      <a href={href('', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>
       {position >= 0 && <div className="row">
         <span className="mono">{position + 1} of {trail.ids.length} · ← → to move</span>
-        <a className="button small" aria-disabled={!previous} href={previous ? href(`image/${previous}`) : undefined}>← Previous</a>
-        <a className="button small" aria-disabled={!next} href={next ? href(`image/${next}`) : undefined}>Next →</a>
+        <a className="button small" aria-disabled={!previous} href={previous ? href(`image/${previous}`, { from }) : undefined}>← Previous</a>
+        <a className="button small" aria-disabled={!next} href={next ? href(`image/${next}`, { from }) : undefined}>Next →</a>
       </div>}
     </nav>
   )

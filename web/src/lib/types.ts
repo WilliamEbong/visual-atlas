@@ -68,13 +68,15 @@ export interface Direction {
 
 export interface Tag { id: string; name: string; exact: boolean; why: string }
 export interface Reading { techniques: Tag[]; goals: Tag[]; subject_terms: string[] }
+export interface ReadingCorrection { technique_ids: string[]; goal_ids: string[]; subject_terms: string[] }
 export interface Brief { id: number; title: string; text: string; created_at: string; updated_at: string; directions?: Direction[]; reading?: Reading }
 
 export interface Settings { backend: 'codex' | 'claude' | 'fake'; verify_with: 'codex' | 'claude' | 'none'; daily_ai_cap: number; welcomed: boolean
   jev_ranking: boolean; jev_key: boolean }
 
-export interface GraphData { focus: string; nodes: { id: string; label: string; kind: 'goal' | 'technique' | 'image'; thumb?: string | null; ring: number }[]
-  edges: { source: string; target: string; kind: string }[] }
+export interface GraphData { focus: string; nodes: { id: string; label: string; kind: 'goal' | 'operation' | 'domain' | 'technique' | 'image'; thumb?: string | null; description?: string; ring: number }[]
+  edges: { source: string; target: string; kind: string; explanation?: string; role?: string; state?: State; evidence?: string[] }[]
+  example_counts?: Record<string, number>; limit?: number }
 
 export const STATE_LABEL: Record<State, string> = {
   proposed: '○ proposed by a model', model_reviewed: '◐ agreed by a second model', human_reviewed: '● confirmed by you',

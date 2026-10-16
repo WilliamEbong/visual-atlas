@@ -26,6 +26,7 @@ function plateState(item: LibraryItem): string {
 
 export default function Library({ query }: { query: URLSearchParams }) {
   const filters = fromQuery(query)
+  const from = query.get('from')?.startsWith('#/connections?') ? query.get('from') : null
   const { taxonomy, compare, toggleCompare } = useApp()
   const { fail } = useNotice()
   const first = apiPath(filters, PAGE, 0)
@@ -63,7 +64,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
   const [panel, setPanel] = useState(false)
   const grid = useRef<HTMLDivElement>(null)
   useEffect(() => setText(filters.q), [filters.q])
-  const set = (change: Partial<Filters>) => go('', toQuery({ ...filters, ...change }))
+  const set = (change: Partial<Filters>) => go('', { ...toQuery({ ...filters, ...change }), from })
   const empty = data && data.total === 0 && activeCount(filters) === 0
   const names: Record<string, string> = { ...PROVIDERS, ...STATES,
     ...Object.fromEntries([...(taxonomy?.techniques ?? []), ...(taxonomy?.goals ?? [])].map((x) => [x.id, x.name])) }
@@ -179,7 +180,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
           <div className="active-filters">
             {active.length > 0 && <span className="mono">Filtered by</span>}
             {active.map((filter) => <button key={filter.label} type="button" aria-label={`Remove filter: ${filter.label}`} onClick={() => set(filter.clear)}>{filter.label} ×</button>)}
-            {active.length > 0 && <button type="button" className="clear" onClick={() => go('', toQuery({ ...EMPTY, sort: filters.sort }))}>Clear all</button>}
+            {active.length > 0 && <button type="button" className="clear" onClick={() => go('', { ...toQuery({ ...EMPTY, sort: filters.sort }), from })}>Clear all</button>}
             <span className="mono" style={{ marginLeft: 'auto' }} aria-live="polite">Showing {items.length} of {data.total}</span>
           </div>
           {!readOnly && !!data.waiting?.length && <p className="notice" role="status" style={{ marginTop: 16 }}>
@@ -187,7 +188,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
             {queued ? <a href={href(`jobs/${queued}`)}>Analysis started — see progress</a>
               : <button type="button" className="small" onClick={() => analyseWaiting(data.waiting!)}>Analyse them now</button>}</p>}
           {data.total === 0 ? <Empty title="Nothing matches these filters" actions={<>
-              <button type="button" onClick={() => go('', toQuery({ ...EMPTY, sort: filters.sort }))}>Clear filters</button>
+              <button type="button" onClick={() => go('', { ...toQuery({ ...EMPTY, sort: filters.sort }), from })}>Clear filters</button>
               {!readOnly && <a className="button" href={href('find', { goal: filters.q, technique: filters.technique })}>Find new images like this</a>}</>}>
               {active.length} filter{active.length === 1 ? ' is' : 's are'} on.
             </Empty>
@@ -196,7 +197,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
                 const picked = compare.some((p) => p.id === item.id)
                 return (
                   <article key={item.id} className="plate-item" style={{ '--a': aspect(item) } as React.CSSProperties}>
-                    <a className="plate" href={href(`image/${item.id}`)}>
+                    <a className="plate" href={href(`image/${item.id}`, { from })}>
                       <span className="plate-frame"><img src={media(item.thumb)} alt={`${item.title}${item.creator ? `, ${item.creator}` : ''}`} loading="lazy" decoding="async" /></span>
                       <span className="fig">Fig. {item.id}{plateState(item) ? `  ${plateState(item)}` : ''}</span>
                       <span className="plate-title">{item.title}</span>

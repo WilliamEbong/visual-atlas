@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { go, href } from '../lib/router'
+import { go, href, useRoute } from '../lib/router'
 import type { ImageDetail, Job, Settings, State } from '../lib/types'
 import JobProgress from './JobProgress'
 import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
@@ -12,13 +12,15 @@ interface Saved { shared: string[]; differences: string[]; per_image: { image_id
 const MARK: Record<State, string> = { model_reviewed: '■', human_reviewed: '●', proposed: '□', rejected: '×' }
 
 export default function Compare({ ids }: { ids: number[] }) {
+  const { query } = useRoute()
+  const from = query.get('from')?.startsWith('#/connections?') ? query.get('from') : null
   const { taxonomy, clearCompare, toggleCompare } = useApp()
   const { fail } = useNotice()
   const valid = ids.slice(0, 4)
   const { data, error, busy, reload } = useData<{ images: ImageDetail[]; comparison: Saved | null }>(valid.length ? `compare?ids=${valid.join(',')}` : null)
   const [jobId, setJobId] = useState<string | null>(null)
   if (valid.length < 2) return <><PageHead kicker="Compare · two to four images" title="Compare" />
-    <Empty title="Choose at least two images" actions={<a className="button primary" href="#/">Go to the library</a>}>Use “+ Compare” on any picture in the library, then come back here.</Empty></>
+    <Empty title="Choose at least two images" actions={<a className="button primary" href={href('', { from })}>Go to the library</a>}>Use “+ Compare” on any picture in the library, then come back here.</Empty></>
   if (error) return <><PageHead kicker="Compare" title="Compare" /><Failure message={error} busy={busy} retry={reload} /></>
   if (!data) return <><PageHead kicker="Compare" title="Compare" /><Loading /></>
   const used = taxonomy?.techniques.filter((t) => data.images.some((d) => d.annotations.some((a) => a.technique_id === t.id && a.state !== 'rejected'))) ?? []
@@ -32,13 +34,13 @@ export default function Compare({ ids }: { ids: number[] }) {
   }
   function drop(imageId: number, title: string) {
     toggleCompare({ id: imageId, title })
-    go('compare', { ids: valid.filter((x) => x !== imageId).join(',') })
+    go('compare', { ids: valid.filter((x) => x !== imageId).join(','), from })
   }
   const columns = { '--n': data.images.length } as React.CSSProperties
   return (
     <>
       <PageHead kicker={`Compare · ${data.images.length} of up to 4 images`} title="Compare" asideClass="actions"
-        aside={<><a className="button" href="#/">Add an image</a><button type="button" onClick={() => { clearCompare(); go('') }}>Clear</button></>} />
+        aside={<><a className="button" href={from ?? '#/'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/' }}>Clear</button></>} />
       <section className="baseline" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
         {data.images.map((d) => <figure key={d.image.id}><img src={media(d.image.display)} alt={d.image.title} /></figure>)}
       </section>
@@ -47,7 +49,7 @@ export default function Compare({ ids }: { ids: number[] }) {
           <div key={d.image.id} className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
             <div>
               <p className="mono">Fig. {d.image.id}</p>
-              <h2 style={{ fontSize: 24, lineHeight: 1.1, marginTop: 2 }}><a href={href(`image/${d.image.id}`)}>{d.image.title}</a></h2>
+              <h2 style={{ fontSize: 24, lineHeight: 1.1, marginTop: 2 }}><a href={href(`image/${d.image.id}`, { from })}>{d.image.title}</a></h2>
               <p className="muted" style={{ fontSize: 14, marginTop: 2 }}>{[d.image.creator, d.image.date_text].filter(Boolean).join(', ')}{d.rights ? ` · ${d.rights.license_code}` : ''}</p>
               {data.comparison?.per_image.find((n) => n.image_id === d.image.id) && <p style={{ fontSize: 14, marginTop: 8 }}>{data.comparison.per_image.find((n) => n.image_id === d.image.id)!.note}</p>}
             </div>
@@ -61,7 +63,7 @@ export default function Compare({ ids }: { ids: number[] }) {
         <div className="scroll-x"><table className="plain">
           <thead><tr><th scope="col" style={{ width: '34%' }}>Technique</th>{data.images.map((d) => <th key={d.image.id} scope="col">Fig. {d.image.id}</th>)}</tr></thead>
           <tbody>
-            {used.map((t) => <tr key={t.id}><th scope="row"><a href={href(`technique/${t.id}`)}>{t.name}</a></th>
+            {used.map((t) => <tr key={t.id}><th scope="row"><a href={href(`technique/${t.id}`, { from })}>{t.name}</a></th>
               {data.images.map((d) => {
                 const a = d.annotations.find((x) => x.technique_id === t.id && x.state !== 'rejected')
                 return <td key={d.image.id} className="mark" aria-label={a ? a.state.replace('_', ' ') : 'not seen'}>{a ? MARK[a.state] : '—'}</td>

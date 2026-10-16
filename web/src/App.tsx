@@ -82,13 +82,15 @@ export default function App() {
                 {(running.message || running.stage).slice(0, 48)}</a>}
           </div>
         </header>
-        <main id="content" tabIndex={-1}>{page}</main>
+        <main id="content" tabIndex={-1}>
+          {route.query.get('from')?.startsWith('#/connections?') && <a className="return-context" href={route.query.get('from')!}>← Return to your exploration</a>}
+          {page}</main>
         {!readOnly && <Welcome />}
         {compare.length > 0 && section !== 'compare' && (
           <div className="tray" role="region" aria-label="Images chosen for comparison">
             <span>Compare ({compare.length}/4)</span>
             <span className="row">{compare.map((p) => <img key={p.id} alt={p.title} src={media(p.thumb)} />)}</span>
-            {compare.length >= 2 ? <a className="button" href={href('compare', { ids: compare.map((p) => p.id).join(',') })}>Compare side by side</a>
+            {compare.length >= 2 ? <a className="button" href={href('compare', { ids: compare.map((p) => p.id).join(','), from: section === 'connections' ? window.location.hash : route.query.get('from') })}>Compare side by side</a>
               : <span>Pick at least one more image</span>}
             <button type="button" onClick={() => setCompare([])}>Clear</button>
           </div>

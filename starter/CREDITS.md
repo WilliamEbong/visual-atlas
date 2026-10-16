@@ -1,6 +1,6 @@
 # Visual Atlas credits
 
-Labels describe what was checked and are not legal advice. The images here are reduced-size copies (at most 1024 px on the long side) of the originals at each source; nothing else was changed.
+Labels describe what was checked and are not legal advice. The images here are reduced-size JPEG copies (at most 1024 px on the long side), resized and re-encoded from the originals at each source. Numbers below are from a clean starter import.
 
 ## Branch of the Seine near Giverny (Mist) (#1)
 
@@ -506,7 +506,7 @@ Unknown maker, Daoist Immortal on a Qilin and Two Attendants, late 1800s. Clevel
 Source URL: https://clevelandart.org/art/1915.221
 Restrictions: Copyrighted and 'Other' records are skipped.
 
-## William Howard Taft Presidential Inaugural Medal (#44)
+## William Howard Taft Presidential Inaugural Medal (#43)
 
 Creator: Joseph K. Davison's Sons
 Date: 1909
@@ -518,7 +518,7 @@ Joseph K. Davison's Sons, William Howard Taft Presidential Inaugural Medal, 1909
 Source URL: https://americanart.si.edu/collections/search/artwork/?id=79388
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Headrest (#45)
+## Headrest (#44)
 
 Creator: Tellem artist
 Date: 11th-14th century
@@ -530,7 +530,7 @@ Tellem artist, Headrest, 11th-14th century. Smithsonian Open Access. CC0.
 Source URL: https://collections.si.edu/search/detail/edanmdm:nmafa_73-7-19
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## World of Mammals Exhibition Hall, Museum of Natural History (#46)
+## World of Mammals Exhibition Hall, Museum of Natural History (#45)
 
 Creator: Smithsonian Institution Photographic Services Division
 Date: 1960
@@ -542,7 +542,7 @@ Smithsonian Institution Photographic Services Division, World of Mammals Exhibit
 Source URL: https://siarchives.si.edu/collections/siris_arc_402178
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## World of Mammals Exhibition Hall, Museum of Natural History (#47)
+## World of Mammals Exhibition Hall, Museum of Natural History (#46)
 
 Creator: Smithsonian Institution Photographic Services Division
 Date: 1960
@@ -554,7 +554,7 @@ Smithsonian Institution Photographic Services Division, World of Mammals Exhibit
 Source URL: https://siarchives.si.edu/collections/siris_arc_402177
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Portrait of John Brown (#48)
+## Portrait of John Brown (#47)
 
 Creator: Alexander Gardner, Scottish, 1821 - 1882
 Date: ca. 1859
@@ -566,7 +566,7 @@ Alexander Gardner, Scottish, 1821 - 1882, Portrait of John Brown, ca. 1859. Smit
 Source URL: https://nmaahc.si.edu/object/nmaahc_2010.77.4
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Podangis dactyloceras (#49)
+## Podangis dactyloceras (#48)
 
 Creator: 
 Date: 
@@ -578,7 +578,7 @@ Unknown maker, Podangis dactyloceras. Smithsonian Open Access. CC0.
 Source URL: https://collections.si.edu/search/detail/edanmdm:ofeo-sg_2015-1993A
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Podangis dactyloceras (#50)
+## Podangis dactyloceras (#49)
 
 Creator: 
 Date: 
@@ -590,7 +590,7 @@ Unknown maker, Podangis dactyloceras. Smithsonian Open Access. CC0.
 Source URL: https://collections.si.edu/search/detail/edanmdm:ofeo-sg_2014-0542A
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Architectural Fantasy with Figures Bathing (#51)
+## Architectural Fantasy with Figures Bathing (#50)
 
 Creator: Jean-Charles Delafosse, French, 1734 – 1789
 Date: 1770
@@ -602,7 +602,7 @@ Jean-Charles Delafosse, French, 1734 – 1789, Architectural Fantasy with Figure
 Source URL: https://collection.cooperhewitt.org/view/objects/asitem/id/18237
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Frame with Mascaron and Fantasy Crown (#52)
+## Frame with Mascaron and Fantasy Crown (#51)
 
 Creator: François de Cuvilliés the Elder, Belgian, 1695 - 1768
 Date: 1740–68
@@ -614,7 +614,7 @@ François de Cuvilliés the Elder, Belgian, 1695 - 1768, Frame with Mascaron and
 Source URL: https://collection.cooperhewitt.org/view/objects/asitem/id/29227
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Architectural Fantasy: Bridge and Monuments (#53)
+## Architectural Fantasy: Bridge and Monuments (#52)
 
 Creator: Charles Michel-Ange Challe, French, 1718 – 1778
 Date: 1745–50
@@ -626,7 +626,7 @@ Charles Michel-Ange Challe, French, 1718 – 1778, Architectural Fantasy: Bridge
 Source URL: https://collection.cooperhewitt.org/view/objects/asitem/id/18580
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Architectural Fantasy (#54)
+## Architectural Fantasy (#53)
 
 Creator: Wendel Dietterlinn the Elder, 1551 – 1599
 Date: late 16th century
@@ -638,7 +638,7 @@ Wendel Dietterlinn the Elder, 1551 – 1599, Architectural Fantasy, late 16th ce
 Source URL: https://collection.cooperhewitt.org/view/objects/asitem/id/186429
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Floral Fantasy, "Fleurs Idealisées" (#55)
+## Floral Fantasy, "Fleurs Idealisées" (#54)
 
 Creator: Jean-Baptiste Pillement, French, 1728–1808
 Date: 18th century
@@ -650,7 +650,7 @@ Jean-Baptiste Pillement, French, 1728–1808, Floral Fantasy, "Fleurs Idealisée
 Source URL: https://collection.cooperhewitt.org/view/objects/asitem/id/52226
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Floral Fantasy, "Fleurs de Gout" (#56)
+## Floral Fantasy, "Fleurs de Gout" (#55)
 
 Creator: Jean-Baptiste Pillement, French, 1728–1808
 Date: 18th century
@@ -662,7 +662,7 @@ Jean-Baptiste Pillement, French, 1728–1808, Floral Fantasy, "Fleurs de Gout", 
 Source URL: https://collection.cooperhewitt.org/view/objects/asitem/id/52225
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Dendrobium Frandy's Fantasy 'Carmela' (#57)
+## Dendrobium Frandy's Fantasy 'Carmela' (#56)
 
 Creator: 
 Date: 
@@ -674,7 +674,7 @@ Unknown maker, Dendrobium Frandy's Fantasy 'Carmela'. Smithsonian Open Access. C
 Source URL: https://collections.si.edu/search/detail/edanmdm:ofeo-sg_2008-1716A
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## × Aliceara Star Gazer 'Hilo Fantasy' (#58)
+## × Aliceara Star Gazer 'Hilo Fantasy' (#57)
 
 Creator: 
 Date: 
@@ -686,7 +686,7 @@ Unknown maker, × Aliceara Star Gazer 'Hilo Fantasy'. Smithsonian Open Access. C
 Source URL: https://collections.si.edu/search/detail/edanmdm:ofeo-sg_2013-0233A
 Restrictions: Media not marked CC0 is skipped (Smithsonian allows only non-commercial use of those).
 
-## Surrealism in photography 06 (#59)
+## Surrealism in photography 06 (#58)
 
 Creator: Mostafameraji
 Date: 2020-05-28 05:42:32
@@ -698,7 +698,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Surrealism_in_photography_06.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Profile Portrait of Degas (#60)
+## Profile Portrait of Degas (#59)
 
 Creator: Marcellin Gilbert Desboutin
 Date: n.d.
@@ -710,7 +710,7 @@ Marcellin Gilbert Desboutin, Profile Portrait of Degas, n.d.. Art Institute of C
 Source URL: https://www.artic.edu/artworks/56109
 Restrictions: Public-domain status covers the artwork image only; AIC's text 'description' field is CC BY 4.0 and is attributed if shown.
 
-## Profile Portrait of Charles Meryon (#61)
+## Profile Portrait of Charles Meryon (#60)
 
 Creator: Félix Henri Bracquemond
 Date: 1854
@@ -722,7 +722,7 @@ Félix Henri Bracquemond, Profile Portrait of Charles Meryon, 1854. Art Institut
 Source URL: https://www.artic.edu/artworks/63640
 Restrictions: Public-domain status covers the artwork image only; AIC's text 'description' field is CC BY 4.0 and is attributed if shown.
 
-## Profile Portrait of Monsieur de Sommariva (#62)
+## Profile Portrait of Monsieur de Sommariva (#61)
 
 Creator: Dominique-Vivant Denon
 Date: c. 1820
@@ -734,7 +734,7 @@ Dominique-Vivant Denon, Profile Portrait of Monsieur de Sommariva, c. 1820. Art 
 Source URL: https://www.artic.edu/artworks/39903
 Restrictions: Public-domain status covers the artwork image only; AIC's text 'description' field is CC BY 4.0 and is attributed if shown.
 
-## Profile Portrait of the Printers Brunet and Lasteyrie (#63)
+## Profile Portrait of the Printers Brunet and Lasteyrie (#62)
 
 Creator: Dominique-Vivant Denon
 Date: 1816
@@ -746,7 +746,7 @@ Dominique-Vivant Denon, Profile Portrait of the Printers Brunet and Lasteyrie, 1
 Source URL: https://www.artic.edu/artworks/39609
 Restrictions: Public-domain status covers the artwork image only; AIC's text 'description' field is CC BY 4.0 and is attributed if shown.
 
-## Sunset over Trommekilen from Norrkila 6 (#64)
+## Sunset over Trommekilen from Norrkila 6 (#63)
 
 Creator: W.carter
 Date: Taken on 8 September 2019, 19:30:01 (according to Exif data)
@@ -758,7 +758,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Sunset_over_Trommekilen_from_Norrkila_6.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Slovenian Sunset (7027587519) (#65)
+## Slovenian Sunset (7027587519) (#64)
 
 Creator: whatleydude from London, United Kingdom
 Date: 2012-03-28 19:45
@@ -770,7 +770,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Slovenian_Sunset_(7027587519).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Frigate Bird Silhouette Against St Lucia Sunset 5738 (#67)
+## Frigate Bird Silhouette Against St Lucia Sunset 5738 (#65)
 
 Creator: ImagePerson
 Date: 2014-02-25 05:59:32
@@ -782,7 +782,7 @@ Licence: Free with attribution — credit included — [CC BY 4.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Frigate_Bird_Silhouette_Against_St_Lucia_Sunset_5738.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Frigate Bird Silhouette Against St Lucia Sunset 5746 (#68)
+## Frigate Bird Silhouette Against St Lucia Sunset 5746 (#66)
 
 Creator: ImagePerson
 Date: 2014-02-25 05:59:32
@@ -794,7 +794,7 @@ Licence: Free with attribution — credit included — [CC BY 4.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Frigate_Bird_Silhouette_Against_St_Lucia_Sunset_5746.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Silhouette eines Steinwälzers (#69)
+## Silhouette eines Steinwälzers (#67)
 
 Creator: Stephan Sprinz
 Date: 2022-11-04 17:40:07
@@ -806,7 +806,7 @@ Licence: Free with attribution — credit included — [CC BY 4.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Silhouette_eines_Steinw%C3%A4lzers.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Backlit Margarita Island Sunset in Las Guevaras, Venezuela CaptureNX2 (#70)
+## Backlit Margarita Island Sunset in Las Guevaras, Venezuela CaptureNX2 (#68)
 
 Creator: Wilfredor
 Date: 2013-12-19 18:06:59
@@ -818,7 +818,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Backlit_Margarita_Island_Sunset_in_Las_Guevaras,_Venezuela_CaptureNX2.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Backlit Laptop Keyboard (#71)
+## Backlit Laptop Keyboard (#69)
 
 Creator: Gre123gr
 Date: 2023-04-06
@@ -830,7 +830,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Backlit_Laptop_Keyboard.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Backlit laptop keyboard (Unsplash) (#72)
+## Backlit laptop keyboard (Unsplash) (#70)
 
 Creator: Markus Petritz petritzdesigns
 Date: 2016-09-10
@@ -842,7 +842,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Backlit_laptop_keyboard_(Unsplash).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Sidney Ken Backlit Sunset (#73)
+## Sidney Ken Backlit Sunset (#71)
 
 Creator: Sidney Ken
 Date: 2025-01-17 18:16:01
@@ -854,7 +854,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Sidney_Ken_Backlit_Sunset.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Spot the odd one out (5322927182) (#74)
+## Spot the odd one out (5322927182) (#72)
 
 Creator: AlyZen Moonshadow
 Date: 2011-01-04 13:13
@@ -866,7 +866,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Spot_the_odd_one_out_(5322927182).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Odd one out (29633471507) (#75)
+## Odd one out (29633471507) (#73)
 
 Creator: Kandukuru Nagarjun from Bangalore, India
 Date: 2018-09-01 12:16
@@ -878,7 +878,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Odd_one_out_(29633471507).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Odd One Out (2875941109) (#76)
+## Odd One Out (2875941109) (#74)
 
 Creator: Ian Parkes from Buxton, United Kingdom
 Date: 2008-09-21 12:59
@@ -890,7 +890,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Odd_One_Out_(2875941109).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Odd one out (15828284123) (#77)
+## Odd one out (15828284123) (#75)
 
 Creator: Phil Gayton from Totnes, UK
 Date: 2015-02-05 07:36
@@ -902,7 +902,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Odd_one_out_(15828284123).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Odd one out (6097084986) (#78)
+## Odd one out (6097084986) (#76)
 
 Creator: ^ Missi ^ from Mississauga, Canada
 Date: 2011-08-29 11:05
@@ -914,7 +914,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Odd_one_out_(6097084986).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Spot the odd one out (49622539126) (#79)
+## Spot the odd one out (49622539126) (#77)
 
 Creator: chris lovelock
 Date: 2020-02-27 13:42
@@ -926,7 +926,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Spot_the_odd_one_out_(49622539126).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## MA9 Mashup Camp Maker Hackathon Odaiba Mono (9333975564) (#80)
+## MA9 Mashup Camp Maker Hackathon Odaiba Mono (9333975564) (#78)
 
 Creator: Yusuke Kawasaki
 Date: 2013-07-19 17:44
@@ -938,7 +938,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:MA9_Mashup_Camp_Maker_Hackathon_Odaiba_Mono_(9333975564).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Elegant preventive of the cholera. (#81)
+## Elegant preventive of the cholera. (#79)
 
 Creator: Print made by: Robert Seymour Published by: Thomas McLean
 Date: 1832
@@ -950,7 +950,7 @@ Licence: Public domain — source checked — [PD](https://creativecommons.org/p
 Source URL: https://commons.wikimedia.org/wiki/File:Elegant_preventive_of_the_cholera._(BM_1868,0808.12313).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## The Lancaster Caleb Quotem, i.e. Jack of all trades. (#82)
+## The Lancaster Caleb Quotem, i.e. Jack of all trades. (#80)
 
 Creator: Print made by: Charles Williams Published by: Thomas Tegg
 Date: 1812
@@ -962,7 +962,7 @@ Licence: Public domain — source checked — [PD](https://creativecommons.org/p
 Source URL: https://commons.wikimedia.org/wiki/File:The_Lancaster_Caleb_Quotem,_i.e._Jack_of_all_trades._(BM_1872,1012.5012).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## French Generals retiring, on account of their health:-with Lepaux presiding in the Directory Dispensary. (#83)
+## French Generals retiring, on account of their health:-with Lepaux presiding in the Directory Dispensary. (#81)
 
 Creator: Print made by: James Gillray Published by: Hannah Humphrey
 Date: 1799
@@ -974,7 +974,7 @@ Licence: Public domain — source checked — [PD](https://creativecommons.org/p
 Source URL: https://commons.wikimedia.org/wiki/File:French_Generals_retiring,_on_account_of_their_health-with_Lepaux_presiding_in_the_Directory_Dispensary._(BM_1851,0901.984).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Figure-ground illusion text (#84)
+## Figure-ground illusion text (#82)
 
 Creator: Belbury
 Date: 2023-11-06
@@ -986,7 +986,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:Figure-ground_illusion_text.png
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## David standing, sword in lowered right hand, sack in the left, the head of Goliath on the ground beneath him (#85)
+## David standing, sword in lowered right hand, sack in the left, the head of Goliath on the ground beneath him (#83)
 
 Creator: Marcantonio Raimondi / Francesco Francia
 Date: circa 1506
@@ -998,7 +998,7 @@ Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/public
 Source URL: https://commons.wikimedia.org/wiki/File:David_standing,_sword_in_lowered_right_hand,_sack_in_the_left,_the_head_of_Goliath_on_the_ground_beneath_him_MET_DP852704.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Ronchamp17f.jpg - Flickr - scarletgreen (#87)
+## Ronchamp17f.jpg - Flickr - scarletgreen (#84)
 
 Creator: scarletgreen from Japan
 Date: Taken on 19 February 2003, 20:37
@@ -1010,7 +1010,7 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 Source URL: https://commons.wikimedia.org/wiki/File:Ronchamp17f.jpg_-_Flickr_-_scarletgreen.jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
 
-## Composition (1939) - Auguste Herbin (1882-1960) (25176351757) (#89)
+## Composition (1939) - Auguste Herbin (1882-1960) (25176351757) (#85)
 
 Creator: Pedro Ribeiro Simões from Lisboa, Portugal
 Date: 2015-11-22 14:29
@@ -1021,3 +1021,99 @@ Licence: Free with attribution — credit included — [CC BY 2.0](https://creat
 
 Source URL: https://commons.wikimedia.org/wiki/File:Composition_(1939)_-_Auguste_Herbin_(1882-1960)_(25176351757).jpg
 Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Celestial Jellyfish - photomotage (#86)
+
+Creator: W.carter
+Date: 2019-09-05 20:10:00
+Source: commons
+Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+"Celestial Jellyfish - photomotage" by W.carter, CC0, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Celestial_Jellyfish_-_photomotage.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Celestial_Jellyfish_-_photomotage.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Alan Warburton - Quantified Human (#87)
+
+Creator: Alan Warburton for BBC
+Date: 2021
+Source: commons
+Licence: Free with attribution — credit included — [CC BY 4.0](https://creativecommons.org/licenses/by/4.0)
+
+"Alan Warburton - Quantified Human" by Alan Warburton for BBC, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0), via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Alan_Warburton_-_Quantified_Human.jpg). Alan Warburton / BBC / Better Images of AI / Quantified Human / CC-BY 4.0.
+
+Source URL: https://commons.wikimedia.org/wiki/File:Alan_Warburton_-_Quantified_Human.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## 01 Irrational behavior, surreal absurd street scene in Budapest, Hungary (#88)
+
+Creator: Marek Ślusarczyk ( Tupungato ) Photo portfolio
+Date: Taken on 21 June 2014
+Source: commons
+Licence: Free with attribution — credit included — [CC BY 3.0](https://creativecommons.org/licenses/by/3.0)
+
+"01 Irrational behavior, surreal absurd street scene in Budapest, Hungary" by Marek Ślusarczyk ( Tupungato ) Photo portfolio, CC BY 3.0 (https://creativecommons.org/licenses/by/3.0), via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:01_Irrational_behavior,_surreal_absurd_street_scene_in_Budapest,_Hungary.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:01_Irrational_behavior,_surreal_absurd_street_scene_in_Budapest,_Hungary.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Civil War optical illusion card-The Eagle of the Republic (#89)
+
+Creator: Unknown author Unknown author
+Date: 1865
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Civil War optical illusion card-The Eagle of the Republic" by Unknown author Unknown author, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Civil_War_optical_illusion_card-The_Eagle_of_the_Republic.png).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Civil_War_optical_illusion_card-The_Eagle_of_the_Republic.png
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## All is Vanity (#90)
+
+Creator: Charles Allan Gilbert
+Date:
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"All is Vanity" by Charles Allan Gilbert, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Charles_Allan_Gilbert_-_All_is_Vanity.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Charles_Allan_Gilbert_-_All_is_Vanity.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Alice 05a-1116x1492 (#91)
+
+Creator: Sir John Tenniel
+Date: 1865
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Alice 05a-1116x1492" by Sir John Tenniel, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Alice_05a-1116x1492.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Alice_05a-1116x1492.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Temple of Time (1846) Emma Willard (#92)
+
+Creator: Emma Hart Willard (February 23, 1787 – April 15, 1870) First published in the USA in 1846
+Date: 1846
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Temple of Time (1846) Emma Willard" by Emma Hart Willard (February 23, 1787 – April 15, 1870) First published in the USA in 1846, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Temple_of_Time_(1846)_Emma_Willard.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Temple_of_Time_(1846)_Emma_Willard.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## The Titan's Goblet (#93)
+
+Creator: Thomas Cole
+Date: 1833
+Source: met
+Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+Thomas Cole, The Titan's Goblet, 1833. The Metropolitan Museum of Art. CC0 (Gift of Samuel P. Avery Jr., 1904).
+
+Source URL: https://www.metmuseum.org/art/collection/search/10499
+Restrictions: Only objects The Met marks public domain; other objects are skipped.

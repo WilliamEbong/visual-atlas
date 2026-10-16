@@ -1,6 +1,6 @@
 [project]
 name = "visual-atlas"
-version = "0.3.0"
+version = "0.4.0"
 description = "Find free-to-use images, learn the visual techniques that make them work, and apply them to your projects"
 requires-python = ">=3.14"
 license = "MIT"

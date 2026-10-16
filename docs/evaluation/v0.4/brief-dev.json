@@ -1,0 +1,21 @@
+{
+  "judgments": "Builder/model judgments, recorded before outputs; not independent expert ground truth. Expected labels are useful warranted inferences, not all conceivable visual treatments.",
+  "cases": [
+    {"id":"d01","text":"A calm poster about solitude, with one small person in a large empty landscape. Leave space for a title.","techniques":["negative-space","scale-contrast"],"goals":["create-calm"],"subjects":["solitude"],"not_subjects":["leave","space","title","poster","empty"]},
+    {"id":"d02","text":"Use silhouette and juxtaposition for birds beside factories.","techniques":["silhouette","juxtaposition"],"goals":[],"subjects":["bird","factory"]},
+    {"id":"d03","text":"A lighthouse surrounded by empty sky, with room above for the headline.","techniques":["negative-space"],"goals":[],"subjects":["lighthouse","sky"],"not_subjects":["room","above","headline"]},
+    {"id":"d04","text":"A bicycle dwarfed by an enormous building.","techniques":["scale-contrast"],"goals":["show-scale"],"subjects":["bicycle","building"]},
+    {"id":"d05","text":"Make one thing stand out. A red apple among green apples.","techniques":[],"goals":["draw-attention"],"subjects":["apple"]},
+    {"id":"d06","text":"No silhouette or deep shadow. A calm harbour scene.","techniques":[],"goals":["create-calm"],"subjects":["harbour"],"not_subjects":["silhouette","shadow"]},
+    {"id":"d07","text":"Not symmetrical, but use a limited palette of earth tones.","techniques":["color-harmony"],"goals":[]},
+    {"id":"d08","text":"Use symmetry. Avoid symmetry.","techniques":[],"goals":[]},
+    {"id":"d09","text":"Photographs of otters and river reeds.","techniques":[],"goals":[],"subjects":["otter","river","reed"]},
+    {"id":"d10","text":"Something interesting for a presentation, please.","techniques":[],"goals":[],"not_subjects":["something","interesting","presentation","please"]},
+    {"id":"d11","text":"A little mysterious, perhaps nostalgic.","techniques":[],"goals":[]},
+    {"id":"d12","text":"A doorway frames a quiet garden, with a blurred background.","techniques":["framing","selective-focus"],"goals":["create-calm"],"subjects":["garden"]},
+    {"id":"d13","text":"A teacup where it does not belong, sitting on the moon.","techniques":["contextual-incongruity"],"goals":[],"subjects":["teacup","moon"]},
+    {"id":"d14","text":"A key stands for freedom. Keep space beside it for text.","techniques":["visual-metaphor","negative-space"],"goals":["make-an-idea-visible"],"subjects":["key","freedom"]},
+    {"id":"d15","text":"A small bird with a large empty area around it; avoid dramatic lighting.","techniques":["negative-space"],"goals":[],"subjects":["bird"],"not_subjects":["avoid","area","around","lighting"]},
+    {"id":"d16","text":"A figure-ground ambiguity in black and white, and a diagonal composition.","techniques":["figure-ground-ambiguity","diagonal-energy"],"goals":[]}
+  ]
+}

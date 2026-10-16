@@ -1,0 +1,481 @@
+{
+ "split": "dev",
+ "briefs": 16,
+ "v1.1": {
+  "precision": {
+   "k": 6,
+   "n": 11,
+   "rate": 0.55,
+   "ci95": [
+    0.28,
+    0.79
+   ]
+  },
+  "recall": {
+   "k": 6,
+   "n": 28,
+   "rate": 0.21,
+   "ci95": [
+    0.1,
+    0.4
+   ]
+  },
+  "micro_f1": 0.31,
+  "coded": 11,
+  "expected": 28,
+  "hits": 6,
+  "retrieval_recall@20": {
+   "k": 56,
+   "n": 80,
+   "rate": 0.7,
+   "ci95": [
+    0.59,
+    0.79
+   ]
+  }
+ },
+ "v1.1_rows": [
+  {
+   "id": 1,
+   "coded": [
+    "create-calm"
+   ],
+   "expected": [
+    "create-calm"
+   ],
+   "why": {
+    "create-calm": "“calm”"
+   }
+  },
+  {
+   "id": 2,
+   "coded": [
+    "negative-space"
+   ],
+   "expected": [
+    "negative-space",
+    "scale-contrast",
+    "show-scale"
+   ],
+   "why": {
+    "negative-space": "“empty space”"
+   }
+  },
+  {
+   "id": 3,
+   "coded": [
+    "silhouette"
+   ],
+   "expected": [
+    "silhouette"
+   ],
+   "why": {
+    "silhouette": "“silhouette”"
+   }
+  },
+  {
+   "id": 4,
+   "coded": [
+    "repetition-with-interruption"
+   ],
+   "expected": [
+    "repetition-with-interruption",
+    "draw-attention"
+   ],
+   "why": {
+    "repetition-with-interruption": "“odd one out”"
+   }
+  },
+  {
+   "id": 5,
+   "coded": [
+    "build-depth",
+    "draw-attention"
+   ],
+   "expected": [
+    "value-contrast",
+    "create-tension"
+   ],
+   "why": {
+    "build-depth": "“deep”",
+    "draw-attention": "“single”"
+   }
+  },
+  {
+   "id": 6,
+   "coded": [
+    "create-calm"
+   ],
+   "expected": [
+    "symmetry",
+    "create-calm"
+   ],
+   "why": {
+    "create-calm": "“calm”"
+   }
+  },
+  {
+   "id": 7,
+   "coded": [],
+   "expected": [
+    "contextual-incongruity",
+    "visual-metaphor",
+    "surprise"
+   ],
+   "why": {}
+  },
+  {
+   "id": 8,
+   "coded": [],
+   "expected": [
+    "negative-space"
+   ],
+   "why": {}
+  },
+  {
+   "id": 9,
+   "coded": [],
+   "expected": [
+    "layered-depth",
+    "atmospheric-perspective",
+    "build-depth"
+   ],
+   "why": {}
+  },
+  {
+   "id": 10,
+   "coded": [
+    "rhythm-pattern"
+   ],
+   "expected": [
+    "gaze-direction"
+   ],
+   "why": {
+    "rhythm-pattern": "“sery”"
+   }
+  },
+  {
+   "id": 11,
+   "coded": [
+    "make-an-idea-visible"
+   ],
+   "expected": [
+    "color-contrast"
+   ],
+   "why": {
+    "make-an-idea-visible": "“abstract”"
+   }
+  },
+  {
+   "id": 12,
+   "coded": [],
+   "expected": [],
+   "why": {}
+  },
+  {
+   "id": 13,
+   "coded": [
+    "create-tension"
+   ],
+   "expected": [
+    "tell-a-story"
+   ],
+   "why": {
+    "create-tension": "“crowded”"
+   }
+  },
+  {
+   "id": 14,
+   "coded": [],
+   "expected": [
+    "selective-focus",
+    "tight-cropping"
+   ],
+   "why": {}
+  },
+  {
+   "id": 15,
+   "coded": [],
+   "expected": [
+    "value-contrast",
+    "create-tension"
+   ],
+   "why": {}
+  },
+  {
+   "id": 16,
+   "coded": [
+    "create-calm"
+   ],
+   "expected": [
+    "atmospheric-perspective",
+    "color-harmony",
+    "create-calm"
+   ],
+   "why": {
+    "create-calm": "“calm”"
+   }
+  }
+ ],
+ "v0.3": {
+  "precision": {
+   "k": 24,
+   "n": 25,
+   "rate": 0.96,
+   "ci95": [
+    0.8,
+    0.99
+   ]
+  },
+  "recall": {
+   "k": 24,
+   "n": 28,
+   "rate": 0.86,
+   "ci95": [
+    0.69,
+    0.94
+   ]
+  },
+  "micro_f1": 0.91,
+  "coded": 25,
+  "expected": 28,
+  "hits": 24,
+  "retrieval_recall@20": {
+   "k": 62,
+   "n": 80,
+   "rate": 0.78,
+   "ci95": [
+    0.67,
+    0.85
+   ]
+  }
+ },
+ "v0.3_rows": [
+  {
+   "id": 1,
+   "coded": [
+    "create-calm"
+   ],
+   "expected": [
+    "create-calm"
+   ],
+   "why": {
+    "create-calm": "“calm”"
+   }
+  },
+  {
+   "id": 2,
+   "coded": [
+    "negative-space",
+    "scale-contrast",
+    "show-scale"
+   ],
+   "expected": [
+    "negative-space",
+    "scale-contrast",
+    "show-scale"
+   ],
+   "why": {
+    "negative-space": "“empty space”",
+    "scale-contrast": "“small figure”",
+    "show-scale": "“huge”"
+   }
+  },
+  {
+   "id": 3,
+   "coded": [
+    "silhouette"
+   ],
+   "expected": [
+    "silhouette"
+   ],
+   "why": {
+    "silhouette": "“silhouette”"
+   }
+  },
+  {
+   "id": 4,
+   "coded": [
+    "repetition-with-interruption",
+    "draw-attention"
+   ],
+   "expected": [
+    "repetition-with-interruption",
+    "draw-attention"
+   ],
+   "why": {
+    "repetition-with-interruption": "“odd one out”",
+    "draw-attention": "“stand out”"
+   }
+  },
+  {
+   "id": 5,
+   "coded": [
+    "value-contrast",
+    "create-tension"
+   ],
+   "expected": [
+    "value-contrast",
+    "create-tension"
+   ],
+   "why": {
+    "value-contrast": "“deep shadow”",
+    "create-tension": "“dramatic”"
+   }
+  },
+  {
+   "id": 6,
+   "coded": [
+    "symmetry",
+    "create-calm"
+   ],
+   "expected": [
+    "symmetry",
+    "create-calm"
+   ],
+   "why": {
+    "symmetry": "“symmetrical”",
+    "create-calm": "“calm”"
+   }
+  },
+  {
+   "id": 7,
+   "coded": [
+    "contextual-incongruity",
+    "surprise"
+   ],
+   "expected": [
+    "contextual-incongruity",
+    "visual-metaphor",
+    "surprise"
+   ],
+   "why": {
+    "contextual-incongruity": "“strangeness”",
+    "surprise": "“strangeness”"
+   }
+  },
+  {
+   "id": 8,
+   "coded": [
+    "negative-space"
+   ],
+   "expected": [
+    "negative-space"
+   ],
+   "why": {
+    "negative-space": "“lots of blank”"
+   }
+  },
+  {
+   "id": 9,
+   "coded": [
+    "layered-depth",
+    "build-depth"
+   ],
+   "expected": [
+    "layered-depth",
+    "atmospheric-perspective",
+    "build-depth"
+   ],
+   "why": {
+    "layered-depth": "“middle ground”",
+    "build-depth": "“sense of depth”"
+   }
+  },
+  {
+   "id": 10,
+   "coded": [
+    "gaze-direction",
+    "rhythm-pattern"
+   ],
+   "expected": [
+    "gaze-direction"
+   ],
+   "why": {
+    "rhythm-pattern": "“sery”",
+    "gaze-direction": "“looks out”"
+   }
+  },
+  {
+   "id": 11,
+   "coded": [
+    "color-contrast"
+   ],
+   "expected": [
+    "color-contrast"
+   ],
+   "why": {
+    "color-contrast": "“clashing”"
+   }
+  },
+  {
+   "id": 12,
+   "coded": [],
+   "expected": [],
+   "why": {}
+  },
+  {
+   "id": 13,
+   "coded": [
+    "tell-a-story"
+   ],
+   "expected": [
+    "tell-a-story"
+   ],
+   "why": {
+    "tell-a-story": "“satirical”"
+   }
+  },
+  {
+   "id": 14,
+   "coded": [
+    "tight-cropping"
+   ],
+   "expected": [
+    "selective-focus",
+    "tight-cropping"
+   ],
+   "why": {
+    "tight-cropping": "“close up”"
+   }
+  },
+  {
+   "id": 15,
+   "coded": [
+    "create-tension"
+   ],
+   "expected": [
+    "value-contrast",
+    "create-tension"
+   ],
+   "why": {
+    "create-tension": "“unsettling”"
+   }
+  },
+  {
+   "id": 16,
+   "coded": [
+    "atmospheric-perspective",
+    "color-harmony",
+    "create-calm"
+   ],
+   "expected": [
+    "atmospheric-perspective",
+    "color-harmony",
+    "create-calm"
+   ],
+   "why": {
+    "atmospheric-perspective": "“misty”",
+    "color-harmony": "“pastel”",
+    "create-calm": "“calm”"
+   }
+  }
+ ],
+ "decision": {
+  "f1_gain": 0.6,
+  "f1_gain_at_least_0.10": true,
+  "precision_at_least_0.60": true,
+  "retrieval_not_lower": true,
+  "adopt": true
+ }
+}

@@ -90,6 +90,34 @@ def test_graph_focus_paths_and_unknown_focus(library):
     assert library.get('/api/graph', params={'focus': 'goal:nope'}).status_code == 404
 
 
+def test_graph_memberships_counts_and_annotation_states(library):
+    taxonomy = library.get('/api/taxonomy').json()
+    for facet in ('operation', 'domain'):
+        entry = taxonomy[facet + 's'][0]
+        graph = library.get('/api/graph', params={'focus': f'{facet}:{entry["id"]}'}).json()
+        expected = {t['id'] for t in taxonomy['techniques'] if entry['id'] in t[facet + 's']}
+        assert {n['id'].split(':')[1] for n in graph['nodes'] if n['kind'] == 'technique'} == expected
+        assert all(e['explanation'] for e in graph['edges'] if e['kind'] != 'example')
+        assert library.get('/api/graph', params={'focus': f'{facet}:unknown'}).status_code == 404
+    image_id = library.get('/api/library').json()['items'][0]['id']
+    annotation = library.get(f'/api/images/{image_id}').json()['annotations'][0]
+    tid = annotation['technique_id']
+    graph = library.get('/api/graph', params={'focus': f'technique:{tid}', 'limit': 1}).json()
+    edges = [e for e in graph['edges'] if e['kind'] == 'example']
+    assert len(edges) == 1 and graph['example_counts'][tid] >= 1
+    expanded = library.get('/api/graph', params={'focus': f'technique:{tid}', 'limit': 200}).json()
+    assert len([e for e in expanded['edges'] if e['kind'] == 'example']) == graph['example_counts'][tid]
+    assert {'goal', 'operation', 'domain'} <= {n['kind'] for n in graph['nodes']}
+    edge = next(e for e in expanded['edges'] if e['target'] == f'image:{image_id}' and e['kind'] == 'example')
+    assert (edge['state'], edge['role'], edge['evidence']) == (annotation['state'], annotation['role'], annotation['evidence'])
+    library.post(f'/api/images/{image_id}/annotations', json={'technique_id': tid, 'state': 'human_reviewed'})
+    checked = library.get('/api/graph', params={'focus': f'image:{image_id}'}).json()
+    assert next(e for e in checked['edges'] if e['source'] == f'technique:{tid}' and e['target'] == f'image:{image_id}')['state'] == 'human_reviewed'
+    library.post(f'/api/images/{image_id}/annotations', json={'technique_id': tid, 'state': 'rejected'})
+    rejected = library.get('/api/graph', params={'focus': f'technique:{tid}'}).json()
+    assert not any(e['target'] == f'image:{image_id}' for e in rejected['edges'])
+
+
 def test_jobs_api_validates_and_controls(client):
     assert client.post('/api/jobs', json={'kind': 'find', 'spec': {}}).status_code == 400
     job = client.post('/api/jobs', json={'kind': 'find', 'spec': {'goal': 'fog', 'backend': 'fake'}}).json()
@@ -137,6 +165,13 @@ def test_reading_shows_how_a_request_is_coded_without_ai(client):
     ids = [t['id'] for t in reading['techniques']]
     assert ids[0] == 'silhouette' and 'negative-space' in ids and reading['goals'] == []
     assert all(t['name'] for t in reading['techniques'])
+
+
+def test_reading_keeps_subject_separate_and_checks_choice_kind(client):
+    reading = client.get('/api/reading', params={'subject': 'silhouette', 'goal': 'negative-space',
+                                                 'technique': 'create-calm'}).json()
+    assert reading['techniques'] == [] and reading['goals'] == []
+    assert reading['subject_terms'] == ['silhouette']
 
 
 def test_page_data_carries_image_sizes_for_layout(library):

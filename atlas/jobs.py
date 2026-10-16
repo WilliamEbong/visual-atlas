@@ -455,7 +455,10 @@ class Worker:
 
     def _goal_text(self) -> str:
         spec = self.spec
-        parts = [spec.get('goal', '')]
+        parts = []
+        if spec.get('reading_correction') is not None:
+            parts.append('Corrected interpretation: ' + json.dumps(spec['reading_correction'], ensure_ascii=False))
+        parts.append(spec.get('goal', ''))
         for key, label in (('subject', 'Subject'), ('intended_use', 'Intended use'), ('orientation', 'Orientation'),
                            ('color', 'Colour')):
             if spec.get(key):
@@ -463,7 +466,7 @@ class Worker:
         if spec.get('technique_ids'):
             parts.append('Techniques: ' + ', '.join(self.techniques[t]['name'] for t in spec['technique_ids']
                                                     if t in self.techniques))
-        return '. '.join(p for p in parts if p)[:1000]
+        return '. '.join(p for p in parts if p)[:4000]
 
     def _fallback_queries(self, goal: str, enabled: list[str]) -> list[dict]:
         """No AI: the request's coded techniques (exact tags first) give curated search hints; its subject words
@@ -471,14 +474,12 @@ class Worker:
         reading = self.spec.get('reading') or coding.code_request(goal, self.taxonomy,
                                                                   self.spec.get('technique_ids') or [])
         chosen = [t['id'] for t in sorted(reading['techniques'], key=lambda t: not t['exact'])][:3]
-        queries = []
+        keywords = ' '.join(reading['subject_terms'][:3])
+        queries = [{'provider': provider, 'query': keywords[:40], 'technique_id': None} for provider in enabled] if keywords else []
         for technique_id in chosen:
             for provider in enabled:
                 for hint in (self.techniques[technique_id]['search_hints'].get(provider) or [])[:1]:
                     queries.append({'provider': provider, 'query': hint, 'technique_id': technique_id})
-        keywords = (self.spec.get('subject') or '').strip() or ' '.join(reading['subject_terms'][:3])
-        if keywords:
-            queries += [{'provider': provider, 'query': keywords[:40], 'technique_id': None} for provider in enabled]
         return queries[:12]
 
     def _search(self, query: dict):
@@ -886,7 +887,9 @@ class Worker:
         if brief is None:
             return self._done_failed('That brief no longer exists.')
         self._set(stage='analyzing', message='Thinking through directions for your brief…')
-        reading = coding.code_request(f"{brief['title']}. {brief['text']}", self.taxonomy)
+        reading = coding.correct_reading(coding.code_request(f"{brief['title']}. {brief['text']}", self.taxonomy),
+                                         self.spec.get('reading_correction'), self.taxonomy)
+        brief['reading'] = reading
         library, ranking = self._references_for(brief, reading)
         if not library:
             return self._done('Your library has no analysed images yet, so there is nothing to ground directions in. '
@@ -968,6 +971,7 @@ def relevant_references(store: Store, reading: dict, limit: int = 40, budget: in
         "SELECT i.id, i.title, i.creator, i.date_text, json_extract(a.result_json,'$.summary') AS summary FROM images i "
         "LEFT JOIN analyses a ON a.id=i.analysis_id WHERE i.removed_at IS NULL AND i.status='ready'")}
     labels, score = {}, dict.fromkeys(images, 0.0)
+    subject_score = dict.fromkeys(images, 0)
     for row in store.rows("SELECT image_id, technique_id, state FROM annotations WHERE state!='rejected' "
                           "ORDER BY role='primary' DESC, confidence DESC"):
         if row['image_id'] in images:
@@ -979,10 +983,21 @@ def relevant_references(store: Store, reading: dict, limit: int = 40, budget: in
         for row in store.rows('SELECT rowid AS id FROM images_fts WHERE images_fts MATCH ?', (f'"{term}"*',)):
             if row['id'] in score:
                 score[row['id']] += 1
+                subject_score[row['id']] += 1
+    ranked = sorted(images, key=lambda i: (-score[i], -i))
+    subject_ranked = sorted((i for i in images if subject_score[i]), key=lambda i: (-subject_score[i], -i))
+    ordered = []
+    # Reserve every fourth place for subject evidence so an inferred technique cannot crowd it all out.
+    while ranked and len(ordered) < limit:
+        image_id = subject_ranked[0] if len(ordered) % 4 == 3 and subject_ranked else ranked[0]
+        ordered.append(image_id)
+        ranked.remove(image_id)
+        if image_id in subject_ranked:
+            subject_ranked.remove(image_id)
     return fit_records([{'image_id': image_id, 'title': images[image_id]['title'][:120],
                          'creator': images[image_id]['creator'][:80], 'date': images[image_id]['date_text'][:40],
                          'summary': (images[image_id]['summary'] or '')[:300], 'techniques': labels.get(image_id, [])}
-                        for image_id in sorted(images, key=lambda i: (-score[i], -i))], limit, budget)
+                        for image_id in ordered], limit, budget)
 
 
 def fit_records(records: list[dict], limit: int = 40, budget: int = 24000) -> list[dict]:
@@ -1019,13 +1034,27 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
         if not 1 <= target <= 40:
             raise ValueError('ask for between 1 and 40 images per job')
         goal = str(spec.get('goal') or '').strip()
-        if kind == 'find' and not (goal or spec.get('subject') or technique_ids):
-            raise ValueError('describe what you are looking for, or pick a technique')
         asked = spec.get('budgets') or {}
         scaled = {'max_searches': max(10, -(-target // 3) + 4), 'max_candidates': max(80, 4 * target),
                   'max_downloads': max(30, 2 * target), 'max_analyses': max(12, target + 4)}  # room for misses
         budgets = {k: max(1, min(int(asked.get(k, scaled[k])), 200)) for k in DEFAULT_BUDGETS}
-        reading = coding.code_request(goal, catalog.load()[0], technique_ids, subject=str(spec.get('subject') or ''))
+        taxonomy = catalog.load()[0]
+        goal_ids = spec.get('goal_ids') or []
+        if not isinstance(goal_ids, list) or any(not isinstance(g, str) or g not in {g['id'] for g in taxonomy['goals']}
+                                               for g in goal_ids):
+            raise ValueError('unknown goal')
+        reading = coding.code_request(goal, taxonomy, technique_ids, goal_ids, subject=str(spec.get('subject') or ''))
+        reading = coding.correct_reading(reading, spec.get('reading_correction'), taxonomy)
+        if kind == 'find' and not (goal or spec.get('subject') or technique_ids or any(reading.values())):
+            raise ValueError('describe what you are looking for, or pick a technique')
+        for reading_kind, ids in (('techniques', technique_ids), ('goals', goal_ids)):
+            present = {tag['id'] for tag in reading[reading_kind]}
+            reading[reading_kind].extend({'id': key, 'exact': True, 'why': 'chosen in the form'} for key in ids if key not in present)
+        if spec.get('reading_correction') is not None:
+            clean['reading_correction'] = {'technique_ids': [t['id'] for t in reading['techniques']],
+                                           'goal_ids': [g['id'] for g in reading['goals']],
+                                           'subject_terms': reading['subject_terms']}
+        clean['goal_ids'] = goal_ids
         # Targets: techniques asked for in the form, Grow's gap techniques, or ones named exactly in the request.
         targets = list(dict.fromkeys(technique_ids + [t['id'] for t in reading['techniques'] if t['exact']]))
         clean.update(reading=reading, targets=targets)
@@ -1050,6 +1079,11 @@ def create_job(store: Store, kind: str, spec: dict) -> str:
         clean['brief_id'] = int(spec.get('brief_id') or 0)
         if not store.one('SELECT id FROM briefs WHERE id=?', (clean['brief_id'],)):
             raise ValueError('brief not found')
+        if spec.get('reading_correction') is not None:
+            corrected = coding.correct_reading({}, spec['reading_correction'], catalog.load()[0])
+            clean['reading_correction'] = {'technique_ids': [t['id'] for t in corrected['techniques']],
+                                           'goal_ids': [g['id'] for g in corrected['goals']],
+                                           'subject_terms': corrected['subject_terms']}
     if isinstance(spec.get('models'), dict):
         clean['models'] = {k: str(v)[:120] for k, v in spec['models'].items() if k in tasks.DEFAULT_MODELS[backend]}
     model = (clean.get('models') or {}).get('analyze') or tasks.DEFAULT_MODELS[backend]['analyze']

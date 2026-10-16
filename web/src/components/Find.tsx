@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
 import { useRoute } from '../lib/router'
-import type { Job, Reading, Settings } from '../lib/types'
+import type { Job, Reading, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
+import ReadingEditor from './ReadingEditor'
 import { PageHead, useNotice } from './ui'
 
 const COLORS = ['', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink', 'brown', 'neutral', 'monochrome']
@@ -11,16 +12,6 @@ const ASSISTANTS: [string, string][] = [['codex:claude', 'Codex analyses, Claude
   ['claude:codex', 'Claude Code analyses, Codex checks'], ['claude:none', 'Claude Code only'], ['fake:none', 'Practice mode (offline, no real analysis)']]
 export interface Source { id: string; name: string; status: string; rule?: string; reason?: string; label?: string; attribution?: string
   evidence_urls: string[]; checked_on: string; notes?: string; default_on?: boolean; setup?: string }
-
-function readingText(reading: Reading | null): string {
-  if (!reading) return ''
-  const parts = [
-    reading.goals.length ? `goal: ${reading.goals.map((g) => g.name).join(', ')}` : '',
-    reading.techniques.length ? `technique: ${reading.techniques.map((t) => t.name.replace(/ \(.*\)$/, '') + (t.exact ? '' : ' (maybe)')).join(', ')}` : '',
-    reading.subject_terms.length ? `subject: ${reading.subject_terms.join(', ')}` : '',
-  ].filter(Boolean)
-  return parts.length ? `Read as — ${parts.join(' · ')}` : 'Read as — nothing yet: name a subject, a mood or a technique.'
-}
 
 export default function Find() {
   const route = useRoute()
@@ -43,6 +34,8 @@ export default function Find() {
   const [jobId, setJobId] = useState<string | null>(null)
   const [growTechniques, setGrowTechniques] = useState<string[]>([])
   const [reading, setReading] = useState<Reading | null>(null)
+  const [correction, setCorrection] = useState<ReadingCorrection | null>(null)
+  const [readingFailed, setReadingFailed] = useState(false)
   const enabled = sources.data?.filter((s) => s.status === 'enabled') ?? []
   const chosen = providers ?? enabled.filter((s) => s.default_on !== false).map((s) => s.id)
   useEffect(() => { if (settings.data) setAssistant(`${settings.data.backend}:${settings.data.verify_with}`) }, [settings.data])
@@ -51,10 +44,13 @@ export default function Find() {
   }, [coverage.data, growTechniques.length])
   useEffect(() => {  // how the request reads, refreshed as you type (ordinary code, no AI)
     if (readOnly || mode !== 'find') return
+    setReading(null)
+    setCorrection(null)
+    setReadingFailed(false)
     let live = true  // an answer for words already changed is ignored, whichever order the answers arrive in
     const timer = window.setTimeout(() => {
       const query = new URLSearchParams({ text: `${goal} ${use}`.trim(), subject, technique, goal: goalId })
-      request<Reading>(`reading?${query}`).then((value) => { if (live) setReading(value) }).catch(() => { if (live) setReading(null) })
+      request<Reading>(`reading?${query}`).then((value) => { if (live) setReading(value) }).catch(() => { if (live) setReadingFailed(true) })
     }, 300)
     return () => { live = false; window.clearTimeout(timer) }
   }, [goal, subject, use, technique, goalId, mode])
@@ -67,7 +63,9 @@ export default function Find() {
     const goalName = taxonomy?.goals.find((g) => g.id === goalId)?.name
     const spec = mode === 'find'
       ? { goal: [goal, goalName ? `Goal: ${goalName}` : ''].filter(Boolean).join('. '), subject, intended_use: use, orientation: orientation || null,
-          color: color || null, technique_ids: technique ? [technique] : [], target_new_images: count, providers: chosen, backend,
+          color: color || null, technique_ids: correction?.technique_ids ?? (technique ? [technique] : []),
+          goal_ids: correction?.goal_ids ?? (goalId ? [goalId] : []), reading_correction: correction,
+          target_new_images: count, providers: chosen, backend,
           verify_with: verifier === 'none' ? null : verifier }
       : { technique_ids: growTechniques, target_new_images: count, providers: chosen, backend, verify_with: verifier === 'none' ? null : verifier }
     try {
@@ -93,7 +91,8 @@ export default function Find() {
             <label className="field"><span className="label" style={{ fontSize: 17, color: 'var(--ink)' }}>Describe what you need</span>
               <textarea rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} style={{ fontFamily: 'var(--mono)', fontSize: 16 }}
                 placeholder="a quiet image where one small figure stands alone in a big empty landscape" /></label>
-            <p className="mono" aria-live="polite" style={{ color: 'var(--graphite)', marginTop: -8 }}>{readingText(reading)}</p>
+            {readingFailed && <p role="status" className="mono">The automatic reading is unavailable. Choose goals, techniques and subject words below, or continue with your original request.</p>}
+            <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />
             <div className="filters">
               <label className="field">Goal<select value={goalId} onChange={(event) => setGoalId(event.target.value)}><option value="">Any</option>
                 {taxonomy?.goals.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>

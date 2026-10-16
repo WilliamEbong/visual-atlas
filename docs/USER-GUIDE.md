@@ -1,80 +1,72 @@
 # Visual Atlas user guide
 
-Visual Atlas finds free-to-use images, files them by the visual techniques that make them work, explains
-from visible evidence why they may work, and helps you use those ideas in your own projects. Everything
-runs on your computer.
+Visual Atlas helps you find reference images, examine the techniques they use, and apply those ideas to a design brief. Your library includes the pictures, their recorded usage terms, and explanations you can question or correct.
 
-- [1. Basic ideas](#1-basic-ideas)
-- [2. Install and open](#2-install-and-open)
-- [3. Set up AI (optional)](#3-set-up-ai-optional)
-- [4. Find images](#4-find-images)
-- [5. Grow my library](#5-grow-my-library)
-- [6. The library](#6-the-library)
-- [7. An image, its evidence and its credits](#7-an-image-its-evidence-and-its-credits)
-- [8. Correct a reading](#8-correct-a-reading)
-- [9. Explore goals and techniques](#9-explore-goals-and-techniques)
-- [10. See connections](#10-see-connections)
-- [11. Help with my project](#11-help-with-my-project)
-- [12. Collections](#12-collections)
-- [13. Compare](#13-compare)
-- [14. Jobs: progress, pause, cancel, resume](#14-jobs-progress-pause-cancel-resume)
-- [15. Where images come from, and how permission is checked](#15-where-images-come-from-and-how-permission-is-checked)
-- [16. Credits and exports](#16-credits-and-exports)
-- [17. Back up and restore](#17-back-up-and-restore)
-- [18. Using Visual Atlas from Claude Code or Codex](#18-using-visual-atlas-from-claude-code-or-codex)
-- [19. Editing the taxonomy](#19-editing-the-taxonomy)
-- [20. Troubleshooting](#20-troubleshooting)
+This guide covers v0.4.0. The online demo is for browsing; searches for new images, editing and AI requests need the installed app. A public release or demo may be older than the source version described here.
 
-## 1. Basic ideas
+If you've just installed the app, start with [Your first session](#your-first-session). You can do that walkthrough without an assistant account.
 
-| Word | Meaning |
-|---|---|
-| **Goal** | What you want an image to do: make one thing stand out, show scale, create calm… |
-| **Operation** | What a technique does: contrast, isolate, repeat, frame, juxtapose… |
-| **Domain** | The visual variable it works on: colour, light and value, scale, position, gaze… |
-| **Technique** | A concrete, nameable move, such as *negative space isolation* or *leading lines*. One technique can serve several goals; one image can use several techniques. |
-| **Reference** | An image in your library, with its source and licence record. |
-| **Reading** (annotation) | A technique proposed for one image, with the visible **evidence**, a hedged **possible effect** and a **review state**. |
+## Contents
 
-Review states are always honest:
+- [Install and update](#install-and-update)
+- [Your first session](#your-first-session)
+- [Set up an assistant](#set-up-an-assistant)
+- [Find new images](#find-new-images)
+- [Correct the interpretation of a request](#correct-the-interpretation-of-a-request)
+- [Fill gaps in your library](#fill-gaps-in-your-library)
+- [Search and organise the library](#search-and-organise-the-library)
+- [Read an image page](#read-an-image-page)
+- [Confirm or correct an image reading](#confirm-or-correct-an-image-reading)
+- [Explore visual techniques](#explore-visual-techniques)
+- [Follow connections](#follow-connections)
+- [Compare images](#compare-images)
+- [Get directions for a project](#get-directions-for-a-project)
+- [Make a collection and export it](#make-a-collection-and-export-it)
+- [Manage jobs and usage limits](#manage-jobs-and-usage-limits)
+- [Understand sources and usage terms](#understand-sources-and-usage-terms)
+- [Back up and restore](#back-up-and-restore)
+- [Use the command line](#use-the-command-line)
+- [Edit the taxonomy](#edit-the-taxonomy)
+- [Troubleshooting](#troubleshooting)
 
-| State | Meaning |
-|---|---|
-| ○ proposed by a model | One assistant suggested it after looking at the picture. |
-| ◐ agreed by a second model | A different assistant looked at the picture and agreed. This is not a human review. |
-| ● confirmed by you | You confirmed or wrote it. Later analysis never changes it. |
-| ✕ rejected | You (or the evidence) ruled it out. It stays rejected. |
+## Install and update
 
-Style, medium, subject and period describe an image; they are kept apart from the techniques, which
-describe how it works.
+### Windows installation
 
-## 2. Install and open
+1. Download `VisualAtlas-<version>.zip` from the [Releases page](https://github.com/WilliamEbong/visual-atlas/releases/latest), or use a local release zip you have built.
+2. Right-click the zip and open **Properties**. If **Unblock** appears, tick it and choose **OK**.
+3. Extract the zip to a short, permanent folder, such as `C:\VisualAtlas`. Open the extracted folder; don't run the installer from inside the zip.
+4. Double-click **Install Visual Atlas.cmd**. The installer sets up uv and Python if needed, installs the app, imports the starter library, and creates Desktop and Start menu shortcuts. The first installation needs an internet connection.
+5. When the app opens, choose **Look around first** to browse the starter images. Use the **Visual Atlas** shortcut for later sessions.
 
-**Windows, no terminal:**
+The app normally opens in an Edge or Chrome app window. If neither is available, it opens in your default browser. After you close the window, the local server stops after roughly three minutes without activity. A running job keeps it active; use **Pause** or **Cancel** in Jobs if you want that work to stop.
 
-1. Download `VisualAtlas-<version>.zip` from the [Releases page](https://github.com/WilliamEbong/visual-atlas/releases/latest).
-2. Right-click the zip → **Properties** → tick **Unblock** → **OK**. Extract it to a folder you keep
-   (for example `Documents\VisualAtlas`).
-3. Double-click **Install Visual Atlas**. It installs what it needs (uv and Python), adds the starter
-   library and puts a **Visual Atlas** icon on your Desktop and Start menu. It takes a few minutes the
-   first time.
-4. Double-click the icon whenever you want to work. Visual Atlas opens in its own window. Closing the
-   window stops it a few minutes later (a running job finishes first).
+### Where your work is saved
 
-To update, download the newer zip, extract it over the old folder and run **Install Visual Atlas** again.
-Your library is upgraded in place; a copy of the old database is kept first (for example `atlas.db.v1.bak`).
+The application folder contains the software. Your library is a separate folder:
 
-Use a short folder such as `C:\VisualAtlas` or your Downloads folder: a very deep folder can exceed Windows's path-length limit and stop the installer.
-Your library is not touched. To remove Visual Atlas, delete its folder and the two shortcuts; your
-library stays in `%USERPROFILE%\VisualAtlas` until you delete that too.
-
-**Where your library lives:** `%USERPROFILE%\VisualAtlas` (database, images, backups, exports). It is
-kept out of OneDrive on purpose: cloud sync can damage a database that is in use. To use another
-folder, set the `VISUAL_ATLAS_HOME` environment variable.
-
-**From source (any platform, developers):** Python 3.14, Node 24, [uv](https://docs.astral.sh/uv/):
-
+```text
+%USERPROFILE%\VisualAtlas
 ```
+
+Paste that path into File Explorer's address bar to open it. It contains the database, images, backups and exports. Keep this folder outside OneDrive, Dropbox and other sync services, because a live database should not be synced between machines.
+
+The `VISUAL_ATLAS_HOME` environment variable selects a different library folder. Set it before launching the app. A different folder opens a different library; it does not move your existing work.
+
+### Update an existing installation
+
+1. In **Settings**, choose **Back up now**.
+2. Let active jobs finish, or pause them. Close Visual Atlas and allow its server to stop.
+3. Extract the newer release over the application folder and run **Install Visual Atlas.cmd** again.
+4. Open the app and check your library. The installer adds any missing starter references without duplicating existing ones or replacing your personal corrections.
+
+When an upgrade changes the database structure, the app saves a copy of the old database before applying it. Version 0.4 uses the same database structure as 0.3. Removing the application folder and shortcuts does not remove the separate library folder.
+
+### Run from source
+
+Install Git, Node.js 24 and [uv](https://docs.astral.sh/uv/), then run these commands in a terminal:
+
+```sh
 git clone https://github.com/WilliamEbong/visual-atlas.git
 cd visual-atlas
 uv sync
@@ -84,287 +76,320 @@ uv run atlas starter-import
 uv run visual-atlas
 ```
 
-## 3. Set up AI (optional)
+uv supplies the project's Python 3.14 environment. To use a regular browser, run `uv run atlas serve` instead of the last command and open the address it prints. Keep that terminal open; Ctrl+C stops the server.
 
-Browsing, searching, filtering, collections, comparison, credits and backups work with no AI at all.
-AI is used only to **look** at pictures (describe what is visible and name techniques), to turn your
-words into searches, to compare images and to suggest project directions.
+After updating a source checkout, run `uv sync`, the two npm commands, and `uv run atlas starter-import` again. Merely launching the app does not import additions to the starter pack.
 
-Visual Atlas uses the assistants already installed on your computer, signed in with your own
-subscription. It never reads, stores or sends your passwords or tokens.
+## Your first session
 
-**What leaves your computer.** The library itself (database, images, notes, collections) stays in your library
-folder. Searches go to the collections you tick. When an AI step runs, the assistant app sends what that step
-needs to its service (OpenAI for Codex, Anthropic for Claude Code), under that service's terms for your account:
-the picture and its catalogue text for an analysis or a check, your request for a search plan, the pictures you
-compare, or your brief plus short summaries of up to about forty relevant library images for project directions.
-Browsing, filtering, collections, comparison you have already saved, credits and backups never call an AI.
+Try this with the starter library. It takes you from an intention to a pair of examples without making an AI call.
 
-**Optional Jev ranking.** If you have your own TypeSafe account, you can put `TYPESAFE_API_KEY=your-key` in the
-`.env` file in your library folder and switch on **Settings → Use Jev to rank references for project help**. Jev
-then reorders which library images are offered to the assistant for a brief. Your brief and the titles, makers,
-dates, summaries and technique names of up to 120 library images are sent to TypeSafe and billed to your account
-(no picture is sent). It is off by default, it is never used for anything else, and if it fails the built-in
-ranking is used.
+1. Open **Explore**, then **See connections**.
+2. In **Start or focus on**, choose **Make one thing stand out**.
+3. In the context panel, follow **Isolate**, then **Space and depth**.
+4. Follow **Negative space isolation** in the map or List. Its explanation describes a subject surrounded by a large, quiet area.
+5. Scroll to **Examples in this exploration**. Read the count and select **Show more examples** to reveal more of the library.
+6. Open an image. Read **What you can see**, **Why it may work**, and **Usage and credits**. Use **Return to your exploration** to go back.
+7. Choose **+ Compare** on two examples, then **Compare side by side**. Look at the amount of space around each subject and the technique table below the pictures.
+8. Select **Return to your exploration**. Your focus, Map/List view, expanded examples and trail are restored.
 
-| Assistant | Install | Sign in once |
+You are following related techniques, not a strict family tree. One technique can use several operations and domains. You can take another route through the same collection.
+
+## Set up an assistant
+
+You can browse, search your existing library, compare pictures side by side, edit readings, manage collections and export credits without AI. An assistant is needed to analyse newly found images, write a comparison, or suggest project directions.
+
+Visual Atlas uses an installed **Codex CLI** or **Claude Code**, signed in with your own account. A ChatGPT browser session alone does not establish a Codex CLI sign-in.
+
+1. Install the assistant using its official instructions: [Codex CLI](https://developers.openai.com/codex/cli/) or [Claude Code](https://claude.com/claude-code).
+2. In a terminal, run `codex login` for Codex, or `claude` for Claude Code, and complete the sign-in.
+3. Open **Settings → Assistants** in Visual Atlas and choose **Check again**.
+4. Select the assistant that will analyse images. If both are ready, you can choose the other for the second-model check. If you have only one, use the corresponding single-assistant option in **Who analyses** on Find images.
+5. Set **Daily AI limit (calls)** to a limit you are comfortable with. This counts calls, not money, and does not replace your account's own usage limits.
+
+The readiness check confirms that the assistant can be found and has the expected setup. A real request can still fail because of authentication, connectivity or account limits. Jobs shows the reason when that happens.
+
+**Practice mode** makes no model calls and produces demonstration answers. Use it to learn the workflow, not to assess an image. Source searches can still require a network connection.
+
+### What is sent outside your computer
+
+The library is stored locally. These actions send specific information to outside services:
+
+| Action | Information sent |
+|---|---|
+| Search a source | Search terms go to the selected museum or archive service; eligible files are downloaded from it. |
+| Plan a Find request with AI | The request and search context go to the selected assistant. |
+| Analyse or check an image | The image copy and catalogue details go to OpenAI or Anthropic through the selected assistant. |
+| Ask for a written comparison | The selected image copies and their reference information go to the assistant. |
+| Suggest project directions | Your original brief, corrected interpretation and summaries of selected library references go to the assistant. |
+
+Those services process requests under the terms of your account. Browsing stored results and correcting a brief's interpretation do not make model calls. You can reopen a saved comparison or project direction without requesting it again.
+
+Each assistant call runs with its tools disabled and a restricted answer format. This limits what the assistant can do during an Atlas task; it does not make the model's interpretation infallible.
+
+### Optional TypeSafe Jev ranking
+
+Jev is off by default. Under **Settings → Project help**, **Rank references with TypeSafe Jev** can reorder the references offered for a project brief. It requires your own `TYPESAFE_API_KEY` in the library folder's `.env` file and is billed to that account.
+
+When enabled, it sends the brief and text about up to 120 references, including titles, creators, dates, summaries and technique names. It does not receive picture files for this ranking step. Jev does not interpret images, decide permissions or check annotations. If it fails, the built-in ranking is used. You do not need it to use project help.
+
+## Find new images
+
+**Library search** searches what you already have. **Find images** searches outside collections and adds new references.
+
+1. Open **Find images** and leave **Find images for a request** selected.
+2. In **Describe what you need**, write the subject and the effect you want. For example: "A calm poster about solitude, with one small person in a large empty landscape. Leave space for a title."
+3. Read the suggested goals, techniques and subject words below the text. Correct them if needed, following the next section.
+4. Use **Goal**, **Technique to look for**, **Subject** and **Intended use** if you want to be more specific. Shape and main-colour filters narrow the results further.
+5. Choose **How many new images**. Start with a small request, such as four or six, while you learn which searches work.
+6. Check **Who analyses** and the selected **Sources**. The National Gallery of Art is off by default because its first search downloads about 190 MB of catalogue data.
+7. Choose **Start finding**. You can keep browsing while the job runs.
+
+The progress panel shows search, permission checks, analysis and the result. The app skips unclear licences, duplicates, near-duplicates, unsuitable files and images outside your chosen filters. The assistant then proposes techniques for usable pictures. A second assistant can check those proposals if you selected one.
+
+The requested count is a target, not a guarantee. When you ask for a technique, an image only counts toward that target if its analysis supports the requested technique. Other useful images may still enter the library. The result explains how many match and how many show other techniques.
+
+Open **Not added** to inspect skipped results. **Stopped short** can mean the job reached its analysis limit; it does not prove the sources have no suitable images. If a second-model check fails, an image may still be added with a proposed reading. It is not marked as checked unless a check completed and was saved.
+
+## Correct the interpretation of a request
+
+The interpretation is a local word-matching suggestion. It can recognise a technique you describe without naming, but it can also miss a phrase or mistake an instruction for a subject.
+
+For the solitude example, look for **Create calm and order**, **Negative space isolation** and **Scale contrast**. The useful subject word is **solitude**. If you specifically need a person rather than any image about solitude, add **person** in the correction editor.
+
+1. Open **Correct this reading**.
+2. Tick the goals and techniques you want. Untick suggestions that do not fit. Choosing none is allowed.
+3. Edit **Subject words**, separated by commas. Use concrete search words such as `person, coast, boat`, rather than layout instructions such as `leave room for title`.
+4. Check the summary above the editor, then start the search or ask for project directions.
+
+Corrections apply to the next submitted request. They do not rewrite your original text or the readings attached to library images. Changing the request fields recalculates the automatic reading and clears the correction; in My project, editing the saved brief clears it too. Use **Use automatic reading** to discard your corrections deliberately.
+
+If the automatic reading is unavailable in Find, the page says so and leaves the correction controls available. You can also continue with your original request. Unfamiliar descriptions, conflicting instructions and phrases such as "avoid X and use Y" still need care. A mistaken suggestion affects reference ranking, but does not remove all other candidates from consideration.
+
+## Fill gaps in your library
+
+On **Find images**, select **Fill gaps in technique coverage**. The app lists techniques with few examples first and preselects some of the thinnest categories.
+
+Choose the techniques you want, the number of new images, sources and assistant, then select **Grow my library**. This uses the techniques' stored search hints, so planning needs no AI call. Analysing the downloaded images still uses the selected assistant.
+
+Coverage counts include proposals. Five labels do not necessarily mean five strong examples; inspect the new images before relying on a category for teaching or project work.
+
+## Search and organise the library
+
+Library search looks through titles, creators, saved observations, and technique names and aliases. It does not make an AI call.
+
+Technique, goal and sort controls sit above the pictures. **More filters** adds shape, source, review state, main colour and favourites. Remove an individual active filter or choose **Clear all** to broaden the results. Sorting changes their order; it does not change the saved images or readings. Filters are recorded in the page address, so Back and reload retain them.
+
+Use **Show the next …** when more results are available. Images keep their proportions in the grid. The arrow keys move between pictures, and Enter opens the focused image. On narrow screens, use the menu to reach the other sections.
+
+You can mark an image as a favourite, save it to a collection, or add it to the comparison tray. If a job downloaded images but stopped before analysis, the library offers **Analyse them now**. That action uses the selected assistant.
+
+## Read an image page
+
+An image page separates what was observed from what was inferred.
+
+**What you can see** contains numbered observations. Hover over an observation or focus it with the keyboard to outline the relevant area on the image. **Show every marked area** displays all of them. Some regions are approximate bands, such as foreground or background. Check that the description matches the picture.
+
+**Why it may work** lists techniques, the evidence for each, a possible effect, and its review state. "Main technique" and "supporting technique" describe the saved reading's roles, not certainty. A picture can support several techniques.
+
+**Left open** records ambiguities. **Documented intent**, when present, comes from the source record; it is separate from the assistant's interpretation. The source's catalogue text is also shown separately.
+
+**Usage and credits** contains the credit line, licence link, source link, restrictions and the date and evidence of the check. Use **Copy credit** to copy the attribution. If you need a production file, follow **Open at the source** and check the available size and usage terms there.
+
+Previous and Next, or the arrow keys when not editing a field, move through the library results you opened. When you arrived through Connections, **Return to your exploration** takes you back to that context.
+
+## Confirm or correct an image reading
+
+Review labels tell you who has assessed a technique claim:
+
+| Label | What it means |
+|---|---|
+| Proposed by a model | An assistant suggested the technique. It has not been personally confirmed. |
+| Agreed by a second model | A different model checked the image and agreed. This is still model review. |
+| Confirmed by you | You confirmed or wrote the reading. Later model analysis preserves it. |
+| Rejected | The reading was ruled out. A personal rejection is preserved during later analysis. |
+
+On the image page, choose **Confirm** if the evidence supports the technique, or **Reject** if it does not. **Edit evidence** lets you correct the observations and possible effect. Put one observation per line. Use **Add a technique** when a relevant technique is missing.
+
+For example, "the person occupies a small part of the frame, with empty sky around them" describes evidence. "This makes the person feel isolated" is a possible effect. Keep those separate so another reader can assess the claim.
+
+History records changes. If a later analysis drops an earlier model proposal, that proposal becomes superseded and stays in history rather than appearing as a current reading. Your saved decisions are not overwritten by that analysis.
+
+**Remove from library…** removes an image from the active library, deletes its stored image files and active readings, and removes it from collections. Audit history and a removal record remain; that record prevents automatic collection of the image again. The app asks before removal. Use rejection when you want to keep the picture but disagree with its classification.
+
+## Explore visual techniques
+
+Use **Explore** when you know what you want an image to do but do not yet have a reference in mind.
+
+| Term | Example | Meaning |
 |---|---|---|
-| **Codex** (ChatGPT plan) | `npm install -g @openai/codex` | run `codex login` in a terminal |
-| **Claude Code** (Claude plan) | see [claude.com/claude-code](https://claude.com/claude-code) | run `claude` in a terminal and sign in |
+| Goal | Make one thing stand out | The communication effect you want. |
+| Operation | Isolate | What the technique does to the arrangement. |
+| Domain | Space and depth | The aspect of the image it works with. |
+| Technique | Negative space isolation | A specific visual mechanism you can look for and use. |
 
-Open **Settings → Assistants** to see whether each one is ready. Choose which one **analyses images** and
-which one does the **second-model check**. The recommended split is Codex analysing and Claude Code
-checking, so the work is spread over both plans. A **daily AI limit** (number of calls) protects your
-plan; jobs pause politely when it is reached.
+A technique page gives its definition, where to look, when it may help, common confusions, limitations and related techniques. It also shows examples from your library. These are Visual Atlas's working definitions; background links let you read further.
 
-**Practice mode** answers instantly without any model. Its readings are clearly marked as practice and
-are only for trying the workflow.
+Subject, medium and style answer different questions. A painting of a boat can use the same spatial technique as a photograph of a person. Compare the mechanism, rather than assuming the subject or period explains the effect.
 
-How the assistants are run: each call uses a fixed command with every tool switched off (no file,
-shell, web or browser access), an empty temporary folder, and a strict answer format. Picture titles,
-museum descriptions and any text inside images are passed as untrusted data, never as instructions.
-Answers that break the format — unknown technique names, evidence that cites nothing, links, a claim
-of the artist's intention that the museum record does not support — are discarded, never saved.
+## Follow connections
 
-## 4. Find images
+**See connections** focuses on one goal, operation, domain, technique or image at a time. Choose a focus from the dropdown, follow links in the context panel, or select a map node. The trail above the view records the route you took.
 
-**Find images** turns a request into searches across the open collections.
+Operations and domains are shared memberships. A technique can belong to several of each, so the map does not assign every node a single parent. The context panel helps you read the current focus without tracing every line.
 
-1. Describe what you want to see, in plain words. Optionally pick a **goal**, a **technique**, a
-   **subject**, an **intended use**, a **shape** (landscape, portrait, square), a **main colour** and how
-   many new images you want.
-   Under the box, **Read as** shows how Visual Atlas understood your words (goal, technique, subject words) as
-   you type. It is ordinary matching against the taxonomy, not AI, and it understands many descriptions
-   ("backlit figures" reads as silhouette, "misty hills" as atmospheric perspective).
-2. Choose which collections to search and who analyses. The National Gallery of Art is off until you tick it,
-   because its first search downloads its open data (about 190 MB).
-3. Select **Start finding**. The job runs in the background; you can keep browsing.
+Select a line to read its explanation above the canvas. The legend distinguishes goal links, operation links, domain links, related techniques and saved image readings. Thick example lines indicate a main technique in that reading; proposed readings use dotted lines. Neither thickness nor a model-reviewed state means you personally confirmed it.
 
-What happens, in order:
+The canvas scrolls to keep labels and thumbnails readable. **List** presents the same connections as text and links and works with keyboard navigation and screen readers. It opens by default on a phone.
 
-1. **Searching** — your request becomes a few short keyword searches (planned by the assistant; if it is
-   unavailable, Visual Atlas uses the search hints stored with each technique).
-2. **Checking permissions** — every result's licence is checked in code against the museum's own record.
-   Unclear means skipped.
-3. Duplicates and near-duplicates, very small or blank images, and images outside your shape or colour
-   filter are skipped **before** any AI is used.
-4. **Analyzing** — the assistant describes what it sees and proposes techniques; the second assistant can
-   check each reading.
-5. **Ready** — only images with at least one clear technique are added.
+### See more examples without losing your place
 
-The panel shows the four steps as a timeline, then counts (found, free to use, analysed, added) and the
-latest results one by one, each with what happened to it. **Not added — see why** lists every skipped item and
-its reason.
+Under **Examples in this exploration**, each technique shows a displayed count and a total. Follow **Explore examples** to focus on that technique. **Show more examples** expands the displayed set; **View all in library** opens the complete matching library result.
 
-**Did it find what you asked for?** When you pick a technique, or name one in your words (for example
-"negative space"), each added image is marked by whether its own analysis shows that technique; it is never
-forced onto a picture. Only those count toward your number, and the summary says how many show what you asked
-for and how many show other techniques (those are kept as references too). If a job runs out of its budget,
-it says so ("Stopped at this job's analysis limit"), which is different from the collections having nothing
-more to offer; the heading then reads **Stopped short** rather than **Ready**. A larger request gets
-proportionally larger limits. If a collection asks Visual Atlas to slow down, the job says which one and how
-long it is waiting.
+Open **Visible evidence** on an example card to see what supports the reading. Select two to four examples with **+ Compare**, then choose **Compare side by side**. The return link restores the focus, view, expansion and trail, including after visits to image, technique and library pages.
 
-**Second-model checks are reported honestly.** Only a check that was really carried out and saved counts as
-checked. If the checking assistant is over its limit, signed out, slow or gives an unusable answer, the image
-is still added, marked "not checked", and the summary says how many were checked. The checker first forms its
-own reading of the picture and then judges the proposals; it never marks anything as reviewed by you.
+## Compare images
 
-## 5. Grow my library
+Choose **+ Compare** on at least two images. The tray accepts up to four; remove one or use **Clear** if you want to change the group. Choose **Compare side by side** to open it.
 
-**Find images → Fill gaps in technique coverage** looks for examples of the techniques that have the
-fewest examples in your library. It uses each technique's curated search hints, so no AI is needed for
-planning. Run it a few times to build a balanced library.
+The pictures and technique table use saved library information. They do not call an assistant. The table distinguishes proposals, second-model agreement and your confirmations. A dash means that technique is not recorded for that image, not that it is impossible to see it there. Palette and contrast measurements offer another way to compare the pictures; they are not quality scores.
 
-## 6. The library
+If you want a written explanation, select **Ask an assistant to compare them**. This makes an AI request. When it finishes, choose **Show the comparison**. The result is saved so reopening it needs no additional call.
 
-- **Search** finds words in titles, makers, what the assistant saw, and technique names and aliases.
-- Pictures keep their own proportions: each row is filled edge to edge and every picture in it has the same
-  height.
-- **Filters**: technique, goal and sort are always visible; **More filters** opens shape, source, review state,
-  main colour and favourites. The filters in use are listed above the pictures; select one to remove it, or
-  **Clear all**. **Sort** by newest, oldest, title, maker, most techniques, most colourful, lightest or darkest.
-  Filters live in the address, so Back and reload keep them.
-- Use the arrow keys to move between images (up and down go to the nearest picture in the row above or below);
-  Enter opens one.
-- **+ Compare** adds an image to the comparison tray (up to four).
-- If a job stopped before analysing some downloaded images, a notice offers **Analyse them now**.
+When you started from Connections, use **Return to your exploration** to resume that exact route.
 
-## 7. An image, its evidence and its credits
+## Get directions for a project
 
-- **What you can see** — numbered observations of the picture. Point at one, or move to it with the keyboard,
-  and its area is outlined on the picture (foreground, middle ground and background are approximate bands).
-  **Show every marked area** outlines them all. Open questions are listed as *Left open*. These are a model's
-  description of the pixels, not a catalogue record.
-- **← Previous / Next →** (or the arrow keys) move through the results you came from.
-- **Why it may work** — each technique with its **evidence** (the observations it rests on), a hedged
-  **possible effect**, its review state, who proposed it and who checked it.
-- **Documented intent** appears only when the museum's own record states the maker's intention.
-- **Related images** share techniques with this one.
-- **Usage and credits** — the licence label (for example *CC0 — source checked* or *Free with attribution
-  — credit included*), the exact credit line, the licence link, what was checked and when, restrictions,
-  and a link to the source page. Labels describe what was checked; they are not legal advice. Check the
-  source before publishing.
-- **Remove from library…** asks first, inside the app, naming what will go. It deletes the image, its copies,
-  readings and places in collections; it will not be collected again.
-- **☆ Favourite** and saving to or removing from a collection show a short notice with **Undo**.
+1. Open **My project** and enter a project name.
+2. Write the brief with its audience, message, format, mood and constraints. For example: "An A2 poster for a public talk about solitude. Calm, with a small person in a wide landscape. Keep the top third quiet enough for a title."
+3. Choose **Save and continue**. Saving the brief does not request AI advice.
+4. Read and, if necessary, correct its goals, techniques and subject words.
+5. Choose **Suggest directions**. This uses the assistant selected in Settings.
+6. Once the job finishes, select **Show the results**.
 
-## 8. Correct a reading
+The adviser receives your full original brief as well as the structured interpretation. It is offered a limited set of library references ranked for the request, with room for subject matches as well as technique matches.
 
-On any reading:
+A direction includes an idea, why it might fit, reference images, techniques, and **How to do it, and tradeoffs**. Open the images and judge the proposal against your brief. Advice may be useful without being the direction you ultimately choose.
 
-- **✓ Confirm** — mark it confirmed by you.
-- **✕ Reject** — rule it out. It stays rejected even if the image is analysed again.
-- **Edit** — rewrite the evidence (one point per line) and the possible effect.
-- **Add a technique** — record one the assistants missed, with the evidence you see.
+Choose **Keep** to retain a direction when asking for new ones. **Dismiss** removes it from the current view and offers Undo. Asking again replaces unkept suggestions; kept directions remain. Briefs and suggestions are saved under **Your briefs**.
 
-Every change is kept in the **annotation history** (who, what, when). Your decisions always win over
-later model output.
+If the library cannot support a direction, the app may return no suggestion. Use **Find images for this brief** to gather more evidence, or correct a mistaken interpretation. Adding more images only helps if they illustrate the mechanisms your project needs.
 
-When an image is analysed again, its model readings become exactly the new analysis's readings: an earlier
-model reading that the new analysis does not name is **superseded**. It disappears from the image page but
-stays in the history, marked "superseded (no longer current)". Your confirmations, rejections and edits are
-never touched.
+**Delete this brief…** removes the brief and its directions after confirmation. Reference images remain in the library.
 
-## 9. Explore goals and techniques
+## Make a collection and export it
 
-**Explore** starts from goals. A goal page lists the techniques that can serve it. A technique page
-explains it: definition, how it works, where to look, when it may help, what it is often confused with
-and how to tell, its limits and a counterexample, related techniques, and the examples in your library.
-Definitions are Visual Atlas's own working definitions; the source links are background reading.
+Save images to a collection from an image page. Open **Collections** to return to it. You can rename the collection, move images with the left and right controls, or remove an image from the collection. Removing it here leaves the image in the library and offers Undo.
 
-## 10. See connections
+Use **Credits** for the collection's attribution list, or **Export zip** for a package containing image files, `CREDITS.md` and `annotations.json`.
 
-**See connections** draws one focus at a time (a goal, a technique or an image) and what it connects to.
-Select a node to make it the new focus; select the centre to open it. Use **Zoom in**, **Zoom out** and
-**Fit**, or drag to pan. **List** shows the same connections as text (it opens by default on a phone).
+For references found by the app, the export uses the downloaded original. For starter references, it uses the bundled reduced copy, up to 1024 pixels on the long side. The annotation export identifies those reduced copies. Check the source if you need a larger file.
 
-## 11. Help with my project
+In **Settings**, **All credits (Markdown)** and **Credits as CSV** export credits for the whole library. Keep credits with the images when sharing or publishing, and follow each image's licence conditions.
 
-Describe a project — audience, message, format, mood, constraints — and select **Suggest directions**.
+Deleting a collection removes its grouping, not the images. Deleting an image from the library removes it from collections too.
 
-- **How the brief is read.** The page shows how Visual Atlas read the brief: the goals, techniques and subject
-  words it recognised, using the taxonomy as a codebook (no AI is involved in this step).
-- **Which references are offered.** The assistant is offered the most relevant images in your library, up to
-  about forty, ranked by those goals, techniques and subject words. Older images count as much as new ones.
-- **What you get back.** Up to five directions, each with the idea, why it suits the brief, the techniques it
-  uses, reference images **from your library**, how to execute it and the tradeoffs.
-- **Every direction is checked.** It must cite at least one image, and each cited image must really carry one
-  of the direction's techniques; a direction that fails this is dropped. If your library has no good evidence
-  for the brief, you get an honest "not enough matching evidence" message with a suggestion of what to find,
-  and earlier suggestions are kept.
-- **Keeping directions.** **Keep** the ones you like; asking again replaces only the unkept ones. **Dismiss**
-  shows a notice with **Undo**. Briefs and suggestions are saved; **Delete this brief…** asks first.
+## Manage jobs and usage limits
 
-## 12. Collections
+Find, Grow, analysis, model checks, written comparisons and project directions run as background jobs. Open **Jobs** to see their state and any failure message. A worker handles one job at a time.
 
-Save images to collections from any image page. A collection page lets you rename it, reorder images
-(← →), remove images (with **Undo**), download its **credits**, or **Export zip**: the original files,
-`CREDITS.md` and `annotations.json`. **Delete this collection…** asks first; the images stay in your library.
+- **Pause** requests a stop after the current step. It may not interrupt a model call already running.
+- **Resume** continues the unfinished work.
+- **Cancel** stops further work on the job. Images already added stay in the library.
 
-## 13. Compare
+The queue records progress so a restart can continue unfinished steps. If you want work to stay stopped when reopening the app, pause or cancel it explicitly.
 
-Pick two to four images with **+ Compare**, then **Compare side by side**. The pictures stand on one
-baseline; below them a table marks each technique per image (■ agreed by a second model, ● confirmed by you,
-□ proposed, — not seen), with palettes and contrast. **Ask an assistant to compare them** writes a saved comparison (what they share, how they
-differ, one note per image).
+A daily call cap and the assistant account's limits are separate. When an account limit pauses a job, wait until the account is available and resume it. Changing the default assistant in Settings affects new jobs; an existing job retains the assistant chosen when it was created. Start a new request with another assistant if you need to switch immediately.
 
-## 14. Jobs: progress, pause, cancel, resume
+Failures do not all mean the same thing. A source can be temporarily unavailable, a download can be rejected, an assistant can be signed out, or a job can exhaust its own search or analysis budget. Read the job's message before repeating the request. [Troubleshooting](#troubleshooting) gives the common next steps.
 
-Searches and analyses run one job at a time in the background. **Jobs** lists them. **Pause** stops after
-the current step; **Resume** continues where it stopped; **Cancel** stops (images already added stay).
-Jobs survive closing the app or a crash: unfinished work continues the next time Visual Atlas (or the
-`atlas worker` command) runs, without repeating finished steps. If an assistant reaches its usage limit
-the job pauses with a plain message; resume later or switch assistant in Settings.
+## Understand sources and usage terms
 
-## 15. Where images come from, and how permission is checked
+Visual Atlas collects images through these supported sources:
 
-| Source | Rule checked on every item |
+| Source | What the app accepts |
 |---|---|
-| Art Institute of Chicago | `is_public_domain` is true and an image exists (CC0) |
-| The Met | `isPublicDomain` is true and an image exists (CC0) |
-| Cleveland Museum of Art | `share_license_status` is `CC0` |
-| Smithsonian Open Access | the image media itself is marked `CC0` (metadata alone is not enough) |
-| Wikimedia Commons | the file's licence is CC0, public domain or CC BY (with author and licence link); share-alike, non-commercial and no-derivatives licences are excluded |
-| Rijksmuseum | the image's own rights statement is the Public Domain Mark, CC0 or CC BY 4.0; the catalogue record's CC0 covers only its text and is not read as an image licence |
-| National Gallery of Art | its open data marks the image `openaccess = 1` with no size cap, and it is the object's main view (CC0) |
+| Art Institute of Chicago | Images marked public domain under its CC0 policy. |
+| The Met | Images the item record marks public domain under its CC0 policy. |
+| Cleveland Museum of Art | Images marked CC0. |
+| Smithsonian Open Access | Image media marked CC0, not merely open catalogue metadata. |
+| Wikimedia Commons | CC0, public domain or CC BY files with the required author and licence evidence. |
+| Rijksmuseum | The image's own Public Domain Mark, CC0 or CC BY 4.0 rights statement. |
+| National Gallery of Art | Open-access primary images without a size cap, under its CC0 policy. |
 
-Unsplash, Pexels and Pixabay are **not used**: their terms either require hotlinking or restrict AI and
-machine-learning use in ways that are unclear for this app. The Library of Congress and NASA are **not used**
-either: their rights are free text that differs from item to item, so no rule can read them reliably.
+The app decides eligibility from recorded source fields and its source policy. Models do not decide whether an image can be used. Missing or unclear evidence means the item is skipped. Commons share-alike, non-commercial and no-derivatives licences are outside the automatic collection policy.
 
-**The National Gallery of Art** has no search service. The first search that includes it downloads its open
-data (about 190 MB), keeps only the open-access pictures in a small index in your library folder (`sources\nga`)
-and deletes the download. Later searches use the index; it refreshes after 30 days, and if a refresh fails the
-old index keeps working. Settings → *Sources*
-shows every source, its rule, its evidence links and when it was last checked. The policies live in
-`atlas/data/source_policies.json`.
+**Settings → Sources** shows each source's rule, supporting links and checking date. An image page keeps the item-specific evidence and the date it was checked. Review **Usage and credits** for the exact attribution and restrictions before using an image outside the app. Copyright permission may not cover a person's likeness, a trademark or every intended use.
 
-Smithsonian works with a shared demonstration key that allows only a few searches per hour. For more,
-get a free key at [api.data.gov](https://api.data.gov/signup/) and put `SMITHSONIAN_API_KEY=your-key` in
-a `.env` file in your library folder.
+The starter pack's distribution rights were checked separately from the app's permission to store, display and analyse an image. Its files retain their own licences. The [curation report](evaluation/v0.4/CURATION.md) records the accepted additions and remaining gaps; the [credits file](../starter/CREDITS.md) carries their attribution.
 
-For a researched list of free-to-use inspiration sites (and popular sites that are *not* free to use),
-see [FREE-IMAGE-SOURCES.md](FREE-IMAGE-SOURCES.md).
+### Source-specific setup
 
-## 16. Credits and exports
+The **National Gallery of Art** is opt-in. Its first search downloads about 190 MB of open catalogue data, builds a smaller index in the library's `sources\nga` folder, and deletes the downloaded CSV files. Later searches reuse that index. It refreshes after 30 days; a failed refresh leaves the old index available.
 
-- **Settings → Download all credits** (Markdown or CSV), or a collection's **Credits** button.
-- Every credit carries the licence name and link, the exact attribution text and the source URL.
-- **Export zip** on a collection includes credits automatically.
+**Smithsonian** can use a shared demonstration key with limited capacity. If you hit that limit, get your own key at [api.data.gov](https://api.data.gov/signup/) and add `SMITHSONIAN_API_KEY=your-key` to the library folder's `.env` file. Do not put credentials in a brief or commit them to the project repository.
 
-## 17. Back up and restore
+Sources such as Unsplash, Pexels, Pixabay, the Library of Congress and NASA are not enabled in the shipped policy. See [source research](evaluation/v0.3/SOURCES.md) for the recorded reasons and [other image sources](FREE-IMAGE-SOURCES.md) for further reading. Their absence does not imply that every image on those sites has the same rights.
 
-**Settings → Back up now** saves the whole library (database, images, readings) into
-`%USERPROFILE%\VisualAtlas\backups`, with a manifest of checksums. **Restore…** checks the whole backup first
-(a backup from an older Visual Atlas is upgraded in a temporary copy), makes a safety backup of what you have
-now, adds the backup's images and then replaces the library's contents in one step. From a terminal:
-`uv run atlas backup` and `uv run atlas restore <file name>`; the app can stay open.
+## Back up and restore
 
-- **Nothing you save is lost.** While a restore (or the start-up tidy-up of leftover files) runs, any change
-  from the app, a terminal or another window is refused with "Visual Atlas is restoring a backup…" and you can
-  simply try again; nothing is accepted and then thrown away. Restoring waits until no job is running.
-- **If a restore is interrupted** (power cut, crash), you keep either the previous library or the restored one,
-  never a half of each. Leftover image files are cleaned up the next time Visual Atlas starts, and the library
-  unlocks itself automatically.
-- **Ways back:** the safety backup made before every restore is listed with your backups; and before a new
-  version changes the database it keeps a copy next to it (`atlas.db.v1.bak` and so on).
+In **Settings**, choose **Back up now**. The backup contains the database, images and saved readings and is stored in the library's `backups` folder. Copy completed backup files to another drive if you need protection against loss of the computer or its disk.
 
-## 18. Using Visual Atlas from Claude Code or Codex
+To return to a backup, select **Restore…** beside it and read the confirmation before proceeding. Restore replaces the current library with the backup's state; it does not merge your latest edits into that older version.
 
-The project folder has identical `CLAUDE.md` and `AGENTS.md` files, so either assistant can maintain it.
-Useful commands (run in the project folder):
+The app checks the archive, makes a safety backup of the current library, and restores the selected copy. If a job is active, stop it and try again. While maintenance is in progress, other writes are refused with a message; retry them when it finishes.
 
-| Command | What it does |
+If restore is interrupted, restart the app and inspect the library. Recovery is designed to leave the previous or restored database intact, and the safety backup provides a route back. Keep a separate backup of important work rather than relying on recovery alone.
+
+From a source checkout, the equivalent commands are `uv run atlas backup` and `uv run atlas restore <backup-file-name>`. The restore argument is a filename in the library's backups folder.
+
+## Use the command line
+
+Run these commands from the project or extracted application folder. They use the same library as the app, unless you set a different `VISUAL_ATLAS_HOME`.
+
+| Command | Purpose |
 |---|---|
-| `uv run atlas find "foggy harbours, silhouettes" --count 6` | queue and run a Find job |
-| `uv run atlas grow --count 8` | fill technique gaps |
-| `uv run atlas analyze` | analyse images waiting for analysis |
-| `uv run atlas jobs` / `uv run atlas job <id> pause|resume|cancel` | see and control jobs |
-| `uv run atlas worker` | continue unfinished jobs (safe alongside the app: a lease stops two workers sharing a job) |
-| `uv run atlas library` / `uv run atlas coverage` | list images / technique coverage |
-| `uv run atlas credits --format csv` | print credits |
-| `uv run atlas backup` / `uv run atlas restore <name>` | back up / restore |
-| `uv run atlas doctor` | check the library folder, knowledge files and both assistants |
+| `uv run atlas find "foggy harbours, silhouettes" --count 6` | Find and analyse references; uses the configured assistant. |
+| `uv run atlas grow --count 8` | Search for examples of techniques with low coverage. |
+| `uv run atlas analyze` | Analyse downloaded images that are still waiting. |
+| `uv run atlas jobs` | List recent jobs. |
+| `uv run atlas job <id> pause` | Pause a job; use `resume` or `cancel` for the other actions. |
+| `uv run atlas worker` | Work the next unfinished job. |
+| `uv run atlas worker --forever` | Keep processing the queue until stopped with Ctrl+C. |
+| `uv run atlas library` | List library images and readings. |
+| `uv run atlas coverage` | Show examples per technique. |
+| `uv run atlas credits --format csv` | Print the library's credits as CSV. |
+| `uv run atlas starter-import` | Add missing bundled references without duplicating existing ones. |
+| `uv run atlas doctor` | Check the library, knowledge files and assistant setup. |
+| `uv run atlas --help` | List available commands and options. |
 
-Jobs and their results use one shared JSON format (`schemas/job.schema.json`,
-`schemas/analysis.schema.json`), so a job started in the app can be finished by either agent.
+Use `--backend codex` or `--backend claude` on a Find request to choose an assistant explicitly. `--verify-with none` turns off its second-model check. These commands can make real model calls and use your account allowance.
 
-## 19. Editing the taxonomy
+Claude Code and Codex can both work with this project. [`AGENTS.md`](../AGENTS.md) and [`CLAUDE.md`](../CLAUDE.md) give them the same instructions. Jobs use shared JSON contracts in [`schemas/`](../schemas/); the app and a command-line worker coordinate through job leases to avoid processing the same job together.
 
-Goals, operations, domains and techniques live in `atlas/data/taxonomy.json`; source rules in
-`atlas/data/source_policies.json`. Edit them, then run `uv run atlas taxonomy check` (it reports any
-broken reference) and restart the app. A technique still used by readings in your library cannot be
-removed until those readings are rejected or removed.
+## Edit the taxonomy
 
-## 20. Troubleshooting
+For maintainers, goals, operations, domains and techniques live in [`atlas/data/taxonomy.json`](../atlas/data/taxonomy.json). Source eligibility rules and evidence links live in [`atlas/data/source_policies.json`](../atlas/data/source_policies.json).
 
-| Problem | What to do |
+After editing the knowledge files, run `uv run atlas taxonomy check` and restart the app. Keep existing technique IDs stable while saved readings refer to them. Changes to source rules affect what the app may collect, so test them against the rights-policy tests before use.
+
+## Troubleshooting
+
+| What you see | What to try |
 |---|---|
-| Windows says the installer is from the internet | You skipped **Unblock**: right-click the zip → Properties → Unblock, extract again. |
-| “Port 8775 is used by another program” | Close that program, or add `VISUAL_ATLAS_PORT=8776` to a `.env` file in your library folder. |
-| Settings → Assistants shows “Not ready” | Sign in once in a terminal (`codex login` or `claude`), then **Check again**. |
-| A job paused with a usage-limit message | Wait for your plan to reset, or switch assistant in Settings, then **Resume**. |
-| A source keeps failing | Museums occasionally go offline; the job records the failure and moves on. Try again later. |
-| Smithsonian searches fail | The shared demo key is limited; add your own free key (section 15). |
-| Something else | See `%USERPROFILE%\VisualAtlas\visual-atlas-app.log`, or run `uv run atlas doctor`. |
+| Windows blocks the downloaded installer | Check the zip's Properties for **Unblock**, then extract it again. Confirm you are using the release you intended to download. |
+| Installation fails with a long-path error | Extract into a shorter application path, such as `C:\VisualAtlas`, and rerun the installer. Leave your library folder where it is. |
+| The app opens with no starter images | Run the installer again, or run `uv run atlas starter-import` from the application folder. Check whether `VISUAL_ATLAS_HOME` points to a different library. |
+| An assistant is not ready | Run `codex login` or `claude` in a terminal, complete sign-in, then use **Settings → Assistants → Check again**. |
+| A second-model check is unavailable | Keep the reading as proposed, or retry the check when that assistant is ready. Agreement is not required to browse or personally review an image. |
+| A request has the wrong goals or subjects | Use **Correct this reading** before submitting it. Editing the brief clears previous corrections. |
+| Find returns fewer images than requested | Read **Not added** and the job message. Broaden shape, colour or subject constraints, or run a new request if the job reached its limit. |
+| Project help returns no directions | Check the brief's interpretation and whether the library has relevant examples. Use **Find images for this brief** if it needs more references. |
+| A job pauses at a usage limit | Wait for the account limit to reset, then resume. To use another assistant immediately, choose it for a new job. |
+| A source reports a temporary error | Retry later or use other sources. For Smithsonian limits, consider your own key. The first National Gallery search can take longer because it builds an index. |
+| “Port 8775 is used by another program” | Close the conflicting program, or add `VISUAL_ATLAS_PORT=8776` to the library folder's `.env` file and relaunch. |
+| A restore refuses to start | Pause or cancel active jobs, allow the current step to finish, then retry. |
+| Changes are refused during maintenance | Wait for restore or recovery to finish, then repeat the action. |
+| A starter image is too small for print | Follow **Open at the source** for a larger file and check its terms. The bundled copies are for reference use. |
+
+For a window launched from the Windows shortcut, check `%USERPROFILE%\VisualAtlas\visual-atlas-app.log`. If you use a custom library folder, look there instead. A terminal launch prints errors in that terminal. Run `uv run atlas doctor` for a setup check, and include the specific error message when reporting a problem. Remove credentials and private brief text before sharing logs.

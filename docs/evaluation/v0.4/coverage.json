@@ -1,0 +1,615 @@
+{
+  "checked_dates": [
+    "2026-10-15",
+    "2026-10-16"
+  ],
+  "baseline_references": 85,
+  "final_references": 93,
+  "before": {
+    "asymmetric-balance": 18,
+    "atmospheric-perspective": 8,
+    "color-contrast": 10,
+    "color-harmony": 8,
+    "contextual-incongruity": 1,
+    "diagonal-energy": 4,
+    "figure-ground-ambiguity": 1,
+    "framing": 13,
+    "gaze-direction": 6,
+    "implied-motion": 7,
+    "juxtaposition": 6,
+    "layered-depth": 17,
+    "leading-lines": 4,
+    "negative-space": 19,
+    "proximity-grouping": 2,
+    "repetition-with-interruption": 6,
+    "rhythm-pattern": 14,
+    "scale-contrast": 5,
+    "selective-focus": 3,
+    "silhouette": 7,
+    "symmetry": 2,
+    "texture-contrast": 7,
+    "tight-cropping": 5,
+    "value-contrast": 35,
+    "vantage-point": 2,
+    "visual-metaphor": 3
+  },
+  "after": {
+    "asymmetric-balance": 18,
+    "atmospheric-perspective": 8,
+    "color-contrast": 10,
+    "color-harmony": 8,
+    "contextual-incongruity": 5,
+    "diagonal-energy": 4,
+    "figure-ground-ambiguity": 2,
+    "framing": 13,
+    "gaze-direction": 6,
+    "implied-motion": 7,
+    "juxtaposition": 6,
+    "layered-depth": 17,
+    "leading-lines": 4,
+    "negative-space": 19,
+    "proximity-grouping": 2,
+    "repetition-with-interruption": 6,
+    "rhythm-pattern": 14,
+    "scale-contrast": 5,
+    "selective-focus": 3,
+    "silhouette": 7,
+    "symmetry": 2,
+    "texture-contrast": 7,
+    "tight-cropping": 5,
+    "value-contrast": 35,
+    "vantage-point": 2,
+    "visual-metaphor": 6
+  },
+  "before_review_states": {
+    "model_reviewed": 167,
+    "proposed": 46
+  },
+  "after_review_states": {
+    "model_reviewed": 167,
+    "proposed": 54
+  },
+  "new_media_bytes": 2178274,
+  "searches": {
+    "commons: Rubin vase": [
+      {
+        "id": "145901804",
+        "title": "Rubin vase",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "166454048",
+        "title": "Planetary Nebula NGC 6818 (1998-11-622)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"figure ground\"": [
+      {
+        "id": "95146237",
+        "title": "Composition (1939) - Auguste Herbin (1882-1960) (25176351757)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "60883955",
+        "title": "David standing, sword in lowered right hand, sack in the left, the head of Goliath on the ground beneath him",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "92159104",
+        "title": "Ronchamp17f.jpg - Flickr - scarletgreen",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "140206665",
+        "title": "Figure-ground illusion text",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"optical illusion\"": [
+      {
+        "id": "120238416",
+        "title": "底なしドラム缶",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "152825393",
+        "title": "Moona lisa opart",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "168421446",
+        "title": "Variation on Z N spin model",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "178768263",
+        "title": "Fragata fantasma",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "177361901",
+        "title": "Optical Illusion in Desmos",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "7373382",
+        "title": "Civil War optical illusion card-The Eagle of the Republic",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "142715979",
+        "title": "Iluzja optyczna",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "101959693",
+        "title": "Menschliche Hand umgrenzt menschliche Silhouette 20200911 DSC3711",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "97774823",
+        "title": "5C9F7~1 (2551537303)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "152159750",
+        "title": "Cracks in wall form mountainscape",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: surreal photomontage": [
+      {
+        "id": "88194558",
+        "title": "Celestial Jellyfish - photomotage",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "73900080",
+        "title": "Grete Stern, Self-portrait 1956",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "48418763",
+        "title": "Escaping the dome (13799295904)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"photomontage\"": [
+      {
+        "id": "163111970",
+        "title": "Vincent Tinto Montagem",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130333508",
+        "title": "Collage with photos and coins, Rostov-on-Don, Russia",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130333510",
+        "title": "Collage with photos and silver coins, Rostov-on-Don, Russia",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "167896768",
+        "title": "NOAA photo collage of typical climate and weather-related events 14 April 2022",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "127956743",
+        "title": "Photomontage Listenbourg passport - derivative work",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "133901935",
+        "title": "Platão e os diálogos socráticos",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "134543403",
+        "title": "A few of Moose Jaws business houses",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "141769505",
+        "title": "Variação de espaços entre as letras da marca Google",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "139102900",
+        "title": "Jornal do Bairro",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "2460828",
+        "title": "Ceres Earth Moon Comparison",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "139206277",
+        "title": "Teoria dos recursos organizacionais no contexto de trabalho",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "163337472",
+        "title": "Exemplo de texto em linguagem simples",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"visual metaphor\"": [
+      {
+        "id": "95582753",
+        "title": "Visual Metaphor",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "113625810",
+        "title": "Alan Warburton - Quantified Human",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130960009",
+        "title": "Car reversed by Rens Dimmendaal & Jesse Donoghoe",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130959994",
+        "title": "Data flock (faces) by Philipp Schmitt & AT&T Laboratories Cambridge",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130960017",
+        "title": "Letter Word Text Taxonomy by Teresa Berndtsson",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "179989100",
+        "title": "A Window of Knowledge",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130960011",
+        "title": "Decision Tree reversed by Rens Dimmendaal & Johann Siemens",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "180317833",
+        "title": "A small strip of stores dwarfed by asphalt (11012480604)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130960004",
+        "title": "Fish by Rens Dimmendaal & David Clode",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "97526752",
+        "title": "Windows (37469754)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "130959979",
+        "title": "Plant by Alan Warburton",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: surreal": [
+      {
+        "id": "108924712",
+        "title": "01 Irrational behavior, surreal absurd street scene in Budapest, Hungary",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "59409940",
+        "title": "Woman in a surreal pose",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "64665565",
+        "title": "Surreal Sky",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "88124947",
+        "title": "Alte Bleichertwerke Surreal (Copyrightfree)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "55844532",
+        "title": "Surrealista - Surreal (22701405204)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "69583468",
+        "title": "Kamchatka Surreal Tolbachik (21088285003)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "198163509",
+        "title": "Illusionize Playing at Surreal in Sinop MT",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "52190122",
+        "title": "Surreal - panoramio",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "24817791",
+        "title": "Surreal (3308517647)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "97614889",
+        "title": "Surreal (8426466944)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "42075273",
+        "title": "Surreal (6294453542)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "40321473",
+        "title": "Surreal swamp",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"ambiguous\"": [
+      {
+        "id": "109231364",
+        "title": "AZV \"Wir entsorgen Ihre Alte!\" Hof 20210824 095658cens",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "109231359",
+        "title": "AZV \"Wir entsorgen Ihre Alte!\" Hof 20210824 095654",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "182504926",
+        "title": "NadiaPiet -ArchivalImages of AI + AIxDESIGNLimitsof Classification -2560x1404",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "821174",
+        "title": "Alice 05a-1116x1492",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "36050084",
+        "title": "Phall-O-meter', Intersex Society of North",
+        "eligible": false,
+        "rejection": "CC BY 4.0 requires an author credit, but no author is recorded",
+        "downloaded": false
+      },
+      {
+        "id": "80467854",
+        "title": "Phall-O-meter', Intersex Society of North",
+        "eligible": false,
+        "rejection": "CC BY 4.0 requires an author credit, but no author is recorded",
+        "downloaded": false
+      },
+      {
+        "id": "85962393",
+        "title": "Vers op de dood van de gebroeders De Witt, 1672 Dubbelsinnigh Rijm (titel op object), RP-P-OB-77.139",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "141930809",
+        "title": "PSM V54 D328 Optical illusion of a duck or a rabbit head (cropped)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "667017",
+        "title": "Duck-Rabbit illusion",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "1043070",
+        "title": "All is Vanity",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "117276703",
+        "title": "Fallersleben Kreuz 2022",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "74033911",
+        "title": "IMG-20181025-WA0003u",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"figure-ground\"": [
+      {
+        "id": "95146237",
+        "title": "Composition (1939) - Auguste Herbin (1882-1960) (25176351757)",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "60883955",
+        "title": "David standing, sword in lowered right hand, sack in the left, the head of Goliath on the ground beneath him",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "92159104",
+        "title": "Ronchamp17f.jpg - Flickr - scarletgreen",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "140206665",
+        "title": "Figure-ground illusion text",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "commons: \"Temple of Time\"": [
+      {
+        "id": "97798889",
+        "title": "Temple of Time (1846) Emma Willard",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      },
+      {
+        "id": "97799553",
+        "title": "American Temple of Time",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ],
+    "met: Titans Goblet": [
+      {
+        "id": "788887",
+        "title": "Titan's Goblet at the Approach of the Third Millennium",
+        "eligible": false,
+        "rejection": "not marked public domain by the museum",
+        "downloaded": false
+      },
+      {
+        "id": "10499",
+        "title": "The Titan's Goblet",
+        "eligible": true,
+        "rejection": null,
+        "downloaded": true
+      }
+    ]
+  }
+}

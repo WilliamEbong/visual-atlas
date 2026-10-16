@@ -1,0 +1,139 @@
+[
+  {
+    "provider": "commons",
+    "item_id": "88194558",
+    "technique": "contextual-incongruity",
+    "observations": [
+      "A luminous orange jellyfish-shaped body with long trailing filaments floats in the blue sky above a dark coastal inlet.",
+      "The rocky shoreline, small buildings and water below form an otherwise recognisable nighttime landscape."
+    ],
+    "effect": "Moving a marine form into the sky may make an ordinary coastal view feel strange and invite a second look.",
+    "teaching_value": "Contemporary photomontage makes a clear change of setting while leaving the environment recognisable.",
+    "ambiguity": "The luminous body can also resemble a comet; the reading does not establish a message or creator intent.",
+    "subjects": [
+      "jellyfish",
+      "sky",
+      "coast"
+    ]
+  },
+  {
+    "provider": "commons",
+    "item_id": "113625810",
+    "technique": "visual-metaphor",
+    "observations": [
+      "A human portrait is divided by a square grid, with some tiles showing sky or dark equipment instead of uninterrupted skin and clothing.",
+      "Fine polygon meshes and a network of connected circles overlap the face, neck, coat and background."
+    ],
+    "effect": "Treating a person as tiles, meshes and connections may suggest that human identity is being translated into measurable data.",
+    "teaching_value": "A contemporary editorial composite fuses portraiture with the visual vocabulary of quantification.",
+    "ambiguity": "The visual reading is a proposal; source metadata separately describes the image as a metaphor for AI quantification.",
+    "subjects": [
+      "portrait",
+      "data",
+      "grid"
+    ]
+  },
+  {
+    "provider": "commons",
+    "item_id": "108924712",
+    "technique": "contextual-incongruity",
+    "observations": [
+      "A tall stack of black top hats rests on a red fire hydrant beside a parked car.",
+      "A standing man reaches up toward the stack in an ordinary street setting."
+    ],
+    "effect": "Using a fire hydrant as a stand for an excessive tower of hats may interrupt expectations of an ordinary street scene.",
+    "teaching_value": "Observational street photography shows contextual mismatch without requiring a digital composite.",
+    "ambiguity": "The photograph does not establish whether this was storage, performance or promotion; visible branding is not an endorsement.",
+    "subjects": [
+      "hats",
+      "fire hydrant",
+      "street"
+    ]
+  },
+  {
+    "provider": "commons",
+    "item_id": "7373382",
+    "technique": "figure-ground-ambiguity",
+    "observations": [
+      "A dark eagle spreads its wings across a pale printed field.",
+      "The pale spaces beside the wings have forehead, nose and chin-like profiles sharing the eagle's contours.",
+      "Small printed words below ask the viewer what they see in the picture."
+    ],
+    "effect": "Switching attention from the dark bird to the pale face profiles may make the same contours support alternating subjects.",
+    "teaching_value": "A historical printed card shows how the gap beside a positive silhouette can become a second recognisable figure.",
+    "ambiguity": "Recognising the historical identities requires source context; the observed mechanism is the shared eagle/profile contour.",
+    "subjects": [
+      "eagle",
+      "faces",
+      "printed card"
+    ]
+  },
+  {
+    "provider": "commons",
+    "item_id": "1043070",
+    "technique": "visual-metaphor",
+    "observations": [
+      "A woman sits at a dressing table facing her reflection in a large rounded mirror.",
+      "The two dark hair masses resemble eye sockets; the mirror outline and pale tabletop combine into a large skull-like face."
+    ],
+    "effect": "Combining a grooming scene with a skull-like form may connect appearance and self-regard with mortality.",
+    "teaching_value": "A graphic double image links two concepts through an overall shape assembled from ordinary scene details.",
+    "ambiguity": "This is a compound image, not a clean positive/negative contour reversal, so it is not counted toward figure-ground ambiguity.",
+    "subjects": [
+      "mirror",
+      "woman",
+      "skull"
+    ]
+  },
+  {
+    "provider": "commons",
+    "item_id": "821174",
+    "technique": "contextual-incongruity",
+    "observations": [
+      "A large caterpillar sits upright on a mushroom and holds a smoking pipe connected to a hookah.",
+      "A small girl stands beside the mushroom looking toward the caterpillar."
+    ],
+    "effect": "Giving an insect a seated human activity and an elaborate smoking device may make the garden setting feel fantastical.",
+    "teaching_value": "Narrative illustration creates mismatch by assigning a familiar human activity to an animal.",
+    "ambiguity": "Within the fictional world this can be normal; incongruity depends on comparison with everyday expectations.",
+    "subjects": [
+      "caterpillar",
+      "mushroom",
+      "girl"
+    ]
+  },
+  {
+    "provider": "commons",
+    "item_id": "97798889",
+    "technique": "visual-metaphor",
+    "observations": [
+      "A historical chart depicts a temple interior whose columns, ceiling and floor recede toward a distant point.",
+      "Names, dates and labelled categories occupy the architectural surfaces and repeated columns."
+    ],
+    "effect": "Mapping historical time onto a walk through architectural space may turn an abstract chronology into a place the viewer can mentally explore.",
+    "teaching_value": "An information graphic uses architecture as a spatial metaphor, broadening the collection beyond pictorial allegory.",
+    "ambiguity": "The chart's historical selection is culturally partial; small text is not fully readable in the reduced starter copy.",
+    "subjects": [
+      "history",
+      "temple",
+      "chart"
+    ]
+  },
+  {
+    "provider": "met",
+    "item_id": "10499",
+    "technique": "contextual-incongruity",
+    "observations": [
+      "An enormous stemmed goblet stands in a rocky mountain landscape.",
+      "Its bowl contains water, tiny sailing boats and a tree-lined rim; water spills from the rim into the terrain below."
+    ],
+    "effect": "Making a drinking vessel large enough to contain a landscape may disrupt familiar scale and turn the object into an imagined world.",
+    "teaching_value": "A painted object/environment mismatch offers a distinct mechanism from animal personification, street anomalies and sky photomontage.",
+    "ambiguity": "Possible allegorical meanings are not established by these visible details.",
+    "subjects": [
+      "goblet",
+      "landscape",
+      "boats"
+    ]
+  }
+]

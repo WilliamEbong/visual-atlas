@@ -129,3 +129,104 @@ def test_descriptive_cue_phrases_tag_a_technique_without_its_name():
     calm = coding.code_request('A serene, misty morning by the lake', TAXONOMY)
     assert {'create-calm'} <= {g['id'] for g in calm['goals']}
     assert 'atmospheric-perspective' in {t['id'] for t in calm['techniques']}
+
+
+def test_ordinary_isolation_brief_excludes_layout_words():
+    techniques, goals, reading = tags('A calm poster about solitude, with one small person in a large empty landscape. '
+                                      'Leave space for a title.')
+    assert set(techniques) == {'negative-space', 'scale-contrast'} and goals == {'create-calm'}
+    assert reading['subject_terms'] == ['solitude']
+
+
+def test_negation_conflict_and_explicit_choices():
+    techniques, goals, reading = tags('Use silhouette. No silhouette or deep shadow, but keep it calm.')
+    assert techniques == {} and goals == {'create-calm'}
+    assert not {'silhouette', 'shadow', 'no'} & set(reading['subject_terms'])
+    techniques, _, _ = tags('Avoid symmetry.', technique_ids=['symmetry'])
+    assert techniques == {'symmetry': True}
+    techniques, _, _ = tags('A cup where it does not belong.')
+    assert techniques == {'contextual-incongruity': False}
+    techniques, _, _ = tags('The picture does not use silhouette.')
+    assert techniques == {}
+
+
+def test_explicit_subject_is_not_a_technique_instruction():
+    techniques, _, reading = tags('Find a photograph', subject='symmetry exhibition')
+    assert techniques == {} and reading['subject_terms'] == ['symmetry', 'exhibition']
+
+
+def test_corrected_reading_can_remove_every_inference_and_validates_input():
+    original = coding.code_request('silhouette and calm', TAXONOMY)
+    correction = {'technique_ids': [], 'goal_ids': [], 'subject_terms': ['otters', 'river reeds']}
+    assert coding.correct_reading(original, correction, TAXONOMY) == {
+        'techniques': [], 'goals': [], 'subject_terms': ['otter', 'river', 'reed']}
+    for invalid in [False, {}, {**correction, 'technique_ids': ['invented']},
+                    {**correction, 'goal_ids': [['create-calm']]}, {**correction, 'subject_terms': [4]}]:
+        with pytest.raises(ValueError):
+            coding.correct_reading(original, invalid, TAXONOMY)
+
+
+def test_subject_candidate_survives_a_mistaken_technique(library):
+    home, oldest = library
+    reading = coding.code_request('', TAXONOMY, technique_ids=['framing'], subject='evening')
+    with jobs.open_store(home) as store:
+        ranked = jobs.relevant_references(store, reading, limit=4)
+    assert ranked[3]['image_id'] == oldest
+
+
+def test_find_correction_preserves_choices_and_can_clear_inferred_subjects(home):
+    with jobs.open_store(home) as store:
+        job = jobs.create_job(store, 'find', {'goal': 'silhouette', 'technique_ids': ['framing'],
+                              'goal_ids': ['create-calm'], 'backend': 'fake', 'reading_correction': {
+                              'technique_ids': [], 'goal_ids': [], 'subject_terms': []}})
+        spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (job,))['spec_json'])
+        assert store.one('SELECT kind FROM jobs WHERE id=?', (job,))['kind'] == 'find'
+        grow = jobs.create_job(store, 'grow', {'technique_ids': ['framing'], 'backend': 'fake'})
+        assert store.one('SELECT kind FROM jobs WHERE id=?', (grow,))['kind'] == 'grow'
+    assert [t['id'] for t in spec['reading']['techniques']] == ['framing']
+    assert [g['id'] for g in spec['reading']['goals']] == ['create-calm']
+    assert spec['reading']['subject_terms'] == [] and spec['targets'] == ['framing']
+
+
+def test_fallback_search_keeps_subject_queries_with_many_providers():
+    worker = jobs.Worker.__new__(jobs.Worker)
+    worker.taxonomy = TAXONOMY
+    worker.techniques = {t['id']: t for t in TAXONOMY['techniques']}
+    worker.spec = {'reading': coding.code_request('silhouette, symmetry, negative space', TAXONOMY, subject='heron')}
+    providers = ['commons', 'aic', 'met', 'cma', 'smithsonian', 'rijksmuseum', 'nga']
+    queries = worker._fallback_queries('', providers)
+    assert {q['provider'] for q in queries if q['query'] == 'heron'} == set(providers)
+    assert len(queries) <= 12
+
+
+def test_corrected_subject_alone_is_valid_and_long_find_preserves_correction(home):
+    from atlas.ai import tasks
+
+    correction = {'technique_ids': [], 'goal_ids': [], 'subject_terms': ['otters']}
+    with jobs.open_store(home) as store:
+        job = jobs.create_job(store, 'find', {'backend': 'fake', 'reading_correction': correction})
+        spec = json.loads(store.one('SELECT spec_json FROM jobs WHERE id=?', (job,))['spec_json'])
+    worker = jobs.Worker.__new__(jobs.Worker)
+    worker.spec = {**spec, 'goal': 'Detailed brief. ' * 65}
+    worker.techniques = {t['id']: t for t in TAXONOMY['techniques']}
+    prompt = tasks.plan_prompt(worker._goal_text(), TAXONOMY['techniques'], ['aic'])
+    assert 'otter' in prompt and worker.spec['goal'] in prompt
+
+
+def test_directions_use_corrections_and_keep_original_brief(library):
+    from atlas.ai import tasks
+
+    home, _ = library
+    text = 'Silhouette, no cropping. ' + 'Original detail. ' * 150
+    correction = {'technique_ids': ['framing'], 'goal_ids': [], 'subject_terms': ['evening']}
+    with jobs.open_store(home) as store:
+        brief = store.save_brief('Test', text)
+        job = jobs.create_job(store, 'directions', {'brief_id': brief, 'backend': 'fake', 'reading_correction': correction})
+    worker = jobs.Worker(home, owner='corrected', backends={'fake': fake})
+    worker.run_once(job)
+    with jobs.open_store(home) as store:
+        analysis = json.loads(store.one("SELECT result_json FROM analyses WHERE task='directions'")['result_json'])
+        assert analysis['reading']['techniques'] == [{'id': 'framing', 'exact': True, 'why': 'corrected by you'}]
+        assert store.one('SELECT text FROM briefs WHERE id=?', (brief,))['text'] == text.strip()
+    prompt = tasks.directions_prompt({'title': 'Test', 'text': text, 'reading': analysis['reading']}, TAXONOMY['techniques'], [])
+    assert text in prompt and 'corrected by you' in prompt

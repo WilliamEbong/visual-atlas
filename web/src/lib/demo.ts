@@ -21,6 +21,20 @@ export async function demoRequest<T>(path: string, init?: RequestInit): Promise<
   const key = decodeURIComponent(path)
   if (key in data.responses) return data.responses[key] as T
   const [route, search = ''] = key.split('?')
+  if (route === 'graph') {
+    const query = new URLSearchParams(search)
+    const focus = query.get('focus') ?? ''
+    const base = `graph?focus=${focus}`
+    const full = data.responses[`${base}&limit=200`] as import('./types').GraphData | undefined
+    const graph = full ?? data.responses[base] as import('./types').GraphData | undefined
+    if (!graph) throw new Error('This connection is not in the demo.')
+    if (!full) return graph as T
+    const limit = Math.min(200, Math.max(1, Number(query.get('limit')) || 6))
+    const examples = graph.edges.filter((e) => e.kind === 'example').slice(0, limit)
+    const ids = new Set(examples.map((e) => e.target))
+    return { ...graph, limit, nodes: graph.nodes.filter((n) => n.kind !== 'image' || ids.has(n.id)),
+      edges: graph.edges.filter((e) => e.kind !== 'example').concat(examples) } as T
+  }
   if (route === 'library') {
     const query = new URLSearchParams(search)
     const q = (query.get('q') ?? '').toLowerCase()

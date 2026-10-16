@@ -4,10 +4,82 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Next concrete action
-v0.3 (package 0.3.0) is complete and committed locally on main; it is not pushed or tagged. Both review rounds are
-folded in and the gates pass. release/VisualAtlas-v0.3.0.zip is built from the commit that carries this file. Next,
-only on the owner's go-ahead: push main and tag v0.3.0 (the release workflow runs Checks on Linux and Windows, then
-packages), then check that Pages rebuilt the demo.
+v0.4.0 local release implemented and verified. Launch with `uv run visual-atlas`, or extract
+`release/VisualAtlas-v0.4.0.zip` and run `Install Visual Atlas.cmd`. No pending core implementation task.
+Owner's latest instruction authorizes committing and pushing the implementation and documentation.
+Push branch `visual-atlas-v0.4`; main triggers Pages deployment, which remains outside this request.
+No release tag, public release, deployment, global settings change or real-library write is authorized.
+The starting worktree was clean at v0.3.0; all current changes belong to this session.
+
+## Documentation follow-up (2026-10-16)
+- README now leads with the product's practical use, a concrete example, screenshots and installation.
+  Internals follow the user journey. Public demo/download version limits and model-review limits remain explicit.
+- User guide covers setup, a no-AI first session, exploration, interpretation correction, comparison,
+  project advice, exports, usage limits, source terms, backup/restore and concrete failure recovery.
+- Humanizer guidance and the owner's linked Wikipedia writing guidance informed the prose pass.
+  No fabricated experience, independent endorsement or unsupported capability claims added.
+- Independent source review corrected collection wording, the paging button label and deletion guarantees.
+  Documentation-only follow-up requires link/render/package checks; prior full app tests remain the app evidence.
+- Local release zip is rebuilt with these documents. No version bump for documentation; remains 0.4.0.
+
+## v0.4 decisions and ownership (2026-10-15)
+- Existing constitution retained. Feature directory chosen autonomously under the owner's instruction.
+- Goal/operation/domain relationships remain technique memberships; no invented direct hierarchy links.
+  Focused map plus context/list/examples will expose these facets, keep roles/review states, and carry context in URLs.
+- Root owns graph/server/shared types/App/styles/build/docs. Brief agent owns coding/jobs/Find/Project and evaluation;
+  curation agent owns starter and coverage; heldout author owns frozen heldout cases. No overlapping writers.
+- Data and development/destructive tests use temporary homes outside OneDrive. Default user library is off limits.
+- Built-in fetch could not access either inspiration URL; the supplied demonstration description is the baseline,
+  not evidence of watching the video or accessing the private Iris product.
+- No new dependencies, graph editing, decorative animation or AI interpretation service planned.
+- Four local design systems were found under Claude skills: archive-of-looking, garden-of-lingering,
+  citadel-of-watching and harbour-of-drifting. Their catalogs supplied discovery leads; catalog approval was
+  not treated as proof of bundled redistribution rights. No local generated assets were relabelled CC0.
+- Existing deterministic interpretation retained after the predeclared development gate passed. Held-out
+  precision improved but recall fell; no held-out miss tuning. Manual corrections and subject candidate slots
+  are intentional recovery mechanisms, not a claim of broad language understanding.
+- Spec Kit remains the only planning workflow. No database migration, source-policy relaxation, new provider,
+  Jev expansion, global assistant configuration change or real-library write.
+
+### v0.4 implementation and evidence
+- Focused graph now exposes operations/domains, typed explanations, saved roles and review states; readable
+  columns, example counts/expansion, accessible list and URL-carried context through compare/detail/library.
+- Find and My project offer deterministic readings and direct goal/technique/subject corrections. Jobs retain
+  corrections and original brief; subject references retain candidate places despite mistaken inferred tags.
+- Before final curation: backend 370 passed, 9 live deselected; frontend 15 passed; TypeScript, Ruff, taxonomy,
+  production and read-only demo builds passed. See docs/evaluation/v0.4/VERIFICATION.md for final evidence.
+- Real Playwright desktop/375px checks passed goal/operation/domain/technique/image paths, expansion, two/four
+  image comparison, exact context return, keyboard list, Find/Project correction submission, and mocked reading
+  outage recovery. Final runs had no console errors or broken images. Jobs were cancelled before model work.
+- Separate source review found and fixed context propagation, reciprocal edge keys, job-kind shadowing,
+  correction-only validation, long planner correction truncation and an overly broad negation exception.
+- Frozen development TP/FP/FN: 17/7/4 → 21/0/0. Held-out: 14/5/6 → 12/1/8; precision 14/19 → 12/13,
+  recall 14/20 → 12/20; held-out candidate technique coverage@20 unchanged 12/13. Model/builder judgments,
+  not expert ground truth. Full protocol and limits: docs/evaluation/v0.4/BRIEF-REPORT.md.
+
+### v0.4 final handoff (2026-10-16)
+- Final starter: 93 references, 8 additions, 26 techniques. Contextual incongruity 1→5, metaphor 3→6,
+  figure–ground 1→2; juxtaposition stays 6. Added media 2,178,274 bytes. New annotations are proposed;
+  existing 167 model-reviewed readings retained. All accepted pixels inspected; weak candle excluded by review.
+- Live Commons/Met searches, downloads and deterministic item rights succeeded. Sandbox CLI checks reported
+  missing authentication; host Codex availability was detected, but its image-analysis authorization never
+  executed. No successful independent CLI review is claimed. Details: docs/evaluation/v0.4/CURATION.md.
+- Final full offline suite: 372 passed, 9 live deselected. Final affected curation/import checks: 10 passed.
+  Frontend: 15 passed; tsc, Ruff, taxonomy, data guard, production/demo builds and npm audit passed.
+- Fresh import93, repeat0, upgrade85→93 preserving a personal correction, schema2/integrity passed. Credits
+  agree with stored attribution/source/license/restrictions. No migration or real-library access required.
+- Windows release built from working source; every archived file checked byte-for-byte against source/assets.
+  Fresh extracted install succeeded with NoShortcuts/NoLaunch, version0.4.0, 93 images, repeat import0.
+  Playwright on that installed copy opened all5 incongruity examples and Titan's Goblet with proposed evidence;
+  final console errors0/broken images0. Demo93 and mobile new-example evidence also verified.
+- Packaging review caught PowerShell5 stdin carriage returns defeating export-ignore; fixed with argument
+  batches and verified screenshot exclusion. No secrets/libraries/global settings entered the archive.
+- Spec Kit convergence assessed10 requirements,4 acceptance criteria,5 plan steps and6 constitution principles;
+  no remaining actionable implementation findings. Existing documented external/coverage limits remain.
+- Remaining limits: figure–ground three examples below aim; typography/contemporary graphics thin; new readings
+  lack independent CLI checks; held-out interpretation recall fell70%→60% and instruction leakage remains.
+  No added interpretation AI or generated images, no paid dependency, and no publication/push.
+- Details and launch journey: docs/RELEASE-v0.4.0.md. Local artifact receipt: release/verification.json.
 
 ## v0.3 status (2026-10-15)
 - Owner choices (2026-10-15): polish and finish, plus the deferred features (new sources, better request coding,

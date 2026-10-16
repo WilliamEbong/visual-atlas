@@ -49,6 +49,11 @@ def main(base: str = './'):
         for goal in taxonomy['goals']:
             grab(f"goals/{goal['id']}")
             grab(f"graph?focus=goal:{goal['id']}")
+        for kind in ('operation', 'domain'):
+            for entry in taxonomy[kind + 's']:
+                grab(f"graph?focus={kind}:{entry['id']}")
+        for technique in taxonomy['techniques']:
+            grab(f"graph?focus=technique:{technique['id']}&limit=200")
         if STAGE.exists():
             shutil.rmtree(STAGE)
         shutil.copytree(ROOT / 'web' / 'public', STAGE)

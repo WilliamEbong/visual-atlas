@@ -283,6 +283,29 @@ table.plain thead th { font: 12px var(--mono); color: var(--caption); }
 .tray button:hover, .tray a:hover { color: #F3EFE4; border-color: #F3EFE4; background: rgba(243, 239, 228, .12); }
 .tray img { width: 44px; height: 44px; object-fit: cover; }
 .graph-box { height: min(68vh, 620px); border: 1px solid var(--keyline); background: var(--paper); }
+.connections .horizon-head { min-height: 150px; }
+.connections h1 { font-size: clamp(36px, 5vw, 64px); }
+.reasoning-trail { overflow-wrap: anywhere; }
+.connection-controls { display: grid; grid-template-columns: minmax(200px, 360px) minmax(0, 1fr); gap: 24px; align-items: center; }
+.connection-workbench { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 24px; border-top: 1px solid var(--rule); padding-top: 16px; }
+.reasoning-context { display: flex; flex-direction: column; gap: 24px; font-size: 14px; }
+.reasoning-context h2 { margin-bottom: 8px; }
+.reasoning-context p { max-width: 65ch; }
+.graph-scroll { max-height: 570px; overflow: auto; border: 1px solid var(--keyline); background: var(--paper); }
+.connections .graph-box { width: 840px; min-width: 100%; border: 0; }
+.graph-legend { font: 12px/1.5 var(--mono); }
+.connection-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; }
+.connection-list ul { padding-left: 20px; margin-top: 10px; }
+.connection-list li { margin-bottom: 8px; }
+.connection-examples { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 32px 24px; }
+.connection-examples img { width: 100%; height: 220px; object-fit: contain; background: var(--paper); margin-bottom: 12px; }
+.example-reading { margin: 12px 0; font-size: 14px; }
+.example-reading .mono { margin: 4px 0; }
+.return-context { display: inline-block; margin-top: 16px; }
+@media (max-width: 640px) {
+  .connection-controls, .connection-workbench { grid-template-columns: 1fr; gap: 16px; }
+  .connections .horizon-head { min-height: 120px; }
+}
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; }
 .legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: middle; }
 .legend .g::before { background: #A2573B; } .legend .t::before { background: #236292; border-radius: 50%; } .legend .i::before { background: #8B867B; }

@@ -311,7 +311,7 @@ class Plan(Strict):
 
 def plan_prompt(goal: str, techniques: list[dict], providers: list[str]) -> str:
     names = '; '.join(f"{t['id']}: {t['name']}" for t in techniques)
-    return PLAN.format(providers=', '.join(providers), techniques=names, goal=untrusted(goal[:1000]))
+    return PLAN.format(providers=', '.join(providers), techniques=names, goal=untrusted(goal[:4000]))
 
 
 def validate_plan(raw: dict, technique_ids: set[str], providers: set[str]) -> dict:
@@ -380,7 +380,7 @@ def directions_prompt(brief: dict, techniques: list[dict], library: list[dict]) 
     return DIRECTIONS.format(techniques=json.dumps(technique_brief(techniques, ('id', 'name', 'definition')),
                                                    ensure_ascii=False),
                              library=json.dumps(library, ensure_ascii=False),
-                             brief=untrusted({'title': brief['title'], 'text': brief['text']}))
+                             brief=untrusted({'title': brief['title'], 'text': brief['text'], 'reading': brief.get('reading')}))
 
 
 def validate_directions(raw: dict, technique_ids: set[str], image_techniques: dict[int, set[str]]) -> dict:
