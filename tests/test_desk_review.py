@@ -407,3 +407,16 @@ def test_serve_says_when_the_port_is_taken():
         port = holder.getsockname()[1]
         result = CliRunner().invoke(app, ['serve', '--port', str(port)])
     assert result.exit_code == 1 and 'already in use' in result.output and 'Visual Atlas on' not in result.output
+
+
+def test_more_confident_readings_rank_first(starter_home, monkeypatch, tmp_path):
+    """Scorers saw the same two pictures lead every negative-space answer: ties fell back to ref order."""
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    connection = sqlite3.connect(starter_home / 'atlas.db')
+    rows = connection.execute("SELECT a.image_id, a.confidence FROM annotations a WHERE a.technique_id='negative-space' "
+                              "AND a.state='model_reviewed' AND a.role='primary' ORDER BY a.confidence DESC").fetchall()
+    connection.close()
+    best = rows[0][0]
+    first = desk.search(techniques=['negative-space'], limit=3, layers_wanted=['library'], home=starter_home)['results'][0]
+    assert first['image_id'] == best

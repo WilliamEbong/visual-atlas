@@ -90,11 +90,12 @@ def _library(home: Path) -> list[dict]:
             "LEFT JOIN analyses a ON a.id=i.analysis_id LEFT JOIN image_metrics m ON m.image_id=i.id "
             "WHERE i.removed_at IS NULL AND i.status='ready'")
         notes = {}
-        for row in _rows(connection, "SELECT image_id, technique_id, state, role, evidence_json, effect FROM annotations "
+        for row in _rows(connection, "SELECT image_id, technique_id, state, role, evidence_json, effect, confidence FROM annotations "
                               "WHERE state!='rejected' ORDER BY role='primary' DESC, confidence DESC"):
             notes.setdefault(row['image_id'], []).append(
                 {'id': row['technique_id'], 'state': row['state'], 'role': row['role'],
-                 'evidence': json.loads(row['evidence_json'])[:2], 'effect': row['effect']})
+                 'evidence': json.loads(row['evidence_json'])[:2], 'effect': row['effect'],
+                 'confidence': row['confidence'] or 0.0})
     media = home / 'media'
     out = []
     for row in images:
@@ -259,7 +260,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
         for tid in want_t:
             if tid in shown:
                 note = shown[tid]
-                score += STATE_WEIGHT.get(note['state'], 1) + (1 if note.get('role') == 'primary' else 0)
+                # A more confident reading of the same state and role ranks higher (otherwise ties fell to ref order).
+                score += STATE_WEIGHT.get(note['state'], 1) + (1 if note.get('role') == 'primary' else 0)                     + 0.5 * note.get('confidence', 0.8)
                 evidence = f": {note['evidence'][0]}" if note.get('evidence') else ''
                 reasons.append(f"Shows {names[tid]} ({STATE_WORDS.get(note['state'], note['state'])}){evidence}")
         for gid in want_g:
