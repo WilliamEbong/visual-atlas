@@ -350,7 +350,7 @@ table.plain thead th { font: 12px var(--mono); color: var(--caption); }
 /* ── ask the atlas ─────────────────────────────────────────────────────── */
 .ask-form { display: flex; flex-direction: column; gap: 16px; max-width: 880px; }
 .ask-brief textarea { font: 20px/1.45 var(--text); min-height: 112px; }
-.ask-controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; justify-content: space-between; }
+.ask-controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; justify-content: flex-start; }
 .ask-controls button.primary { min-width: 140px; }
 .examples { display: flex; flex-wrap: wrap; gap: 2px 18px; align-items: baseline; }
 .examples button.quiet { font: 15px var(--text); min-height: 36px; color: var(--graphite); text-align: left; }
@@ -366,4 +366,9 @@ table.plain thead th { font: 12px var(--mono); color: var(--caption); }
 .licence-line { font: 12px/1.4 var(--mono); color: var(--graphite); margin-top: 6px; }
 .layer-tag.generated { color: var(--accent); }
 .layer-tag.design-system { color: var(--green-strong); }
-.desk-results { --row: 220px; gap: 44px 22px; }
+.desk-results { --row: 260px; gap: 44px 24px; }
+.desk-results .plate-item { min-width: min(190px, 100%); }
+.reason { font-size: 13px; line-height: 1.4; color: var(--graphite); margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.welcome-step { --rule-color: var(--hair); border-top-width: 1px; }
+.ask-form .segments .choice { min-height: 44px; }
+h1 { text-wrap: balance; }

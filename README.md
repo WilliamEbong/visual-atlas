@@ -20,6 +20,24 @@ The connections view gives you several ways in. Start with a communication goal,
 
 ![Connections for negative space isolation, showing its goals, domains, related techniques and examples](docs/media/connections-v04.png)
 
+## Ask what a picture should do
+
+Open **Ask** and write what you need: "a calm opening slide: one small figure in a lot of empty space". The atlas shows how it read the brief, the techniques that could do the job and what to look for in each, and references that use them. Each reference says why it was chosen and what its licence is. Choose **In published work** to see only images you may publish with a credit. Asking uses readings already saved in your library. It makes no AI call and sends nothing anywhere.
+
+## Give your AI agent a reference desk
+
+Claude Code, Codex and other agents can use the same answers through a read-only MCP server or the command line. They get references with reasons, licences and credits, and can view the pictures, before they choose an image for a slide or a page.
+
+```powershell
+claude mcp add visual-atlas -s user -- uv run --directory C:\VisualAtlas atlas mcp
+```
+
+```sh
+uv run atlas advise "make one product stand out on a dark poster" --text
+```
+
+A small set of generated examples, labelled as generated and never offered for publication, fills techniques where open collections had few examples. On its author's computer, the atlas can also read four private design-system libraries in place; that layer does not exist anywhere else. See [Use Visual Atlas from an AI agent](docs/USER-GUIDE.md#use-visual-atlas-from-an-ai-agent). The product reasoning is in [docs/research](docs/research/05-thesis.md).
+
 ## Find references worth keeping
 
 Describe what you need in ordinary language. Visual Atlas searches supported museum and archive collections, checks each image's recorded licence, and keeps eligible references with their credits. You can narrow the search by subject, technique, shape or colour, or ask it to fill gaps in your library.

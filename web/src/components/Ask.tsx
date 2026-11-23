@@ -12,6 +12,16 @@ const EXAMPLES = ['A calm opening slide: one small figure in a lot of empty spac
   'A surprising image for an essay about cities']
 const LAYER_NAMES: Record<string, string> = { library: 'Your library', generated: 'Generated examples', 'design-system': 'Design systems' }
 
+/** Licence in plain words for the grid; the exact licence stays on the reference page. */
+export function plainLicence(ref: DeskRef): string {
+  switch (ref.licence.code) {
+    case 'cc0': case 'pd': return 'Free to use; credit appreciated'
+    case 'cc-by': return 'Free to use with credit'
+    case 'generated': return 'Generated: no licence asserted'
+    default: return 'Licence unclear: check the source'
+  }
+}
+
 export function layerLabel(ref: DeskRef): string {
   if (ref.layer === 'design-system') return `Design system · ${ref.system}`
   return ref.layer === 'generated' ? 'Generated example' : 'Library'
@@ -32,11 +42,12 @@ export default function Ask() {
   const off = (route.query.get('off') ?? '').split(',').filter(Boolean)
   const [text, setText] = useState(asked)
   useEffect(() => setText(asked), [asked])
-  const query = new URLSearchParams({ brief: asked, use, limit: '12' })
+  const limit = Math.min(40, Math.max(12, Number(route.query.get('limit')) || 12))
+  const query = new URLSearchParams({ brief: asked, use, limit: String(limit) })
   const wanted = Object.keys(LAYER_NAMES).filter((layer) => !off.includes(layer))
   if (off.length) query.set('layers', wanted.join(','))
   const answer = useData<DeskAnswer>(!readOnly && asked.trim() ? `desk?${query}` : null)
-  const set = (changes: Record<string, string>) => go('ask', { q: asked, use, off: off.join(','), ...changes })
+  const set = (changes: Record<string, string>) => go('ask', { q: asked, use, off: off.join(','), limit: '', ...changes })
   const from = window.location.hash
 
   if (readOnly) return <><PageHead kicker="Ask the atlas" title="What should the picture do?" />
@@ -63,29 +74,34 @@ export default function Ask() {
           </fieldset>
           <button type="submit" className="primary" disabled={!text.trim()}>Ask</button>
         </div>
-        {!asked && <div className="examples" aria-label="Examples">
+        {!asked && <div className="examples" role="group" aria-label="Examples">
           <span className="mono">Try</span>
           {EXAMPLES.map((example) => <button key={example} type="button" className="quiet" onClick={() => set({ q: example })}>{example}</button>)}
         </div>}
       </form>
       {asked && answer.error && <Failure message={answer.error} busy={answer.busy} retry={answer.reload} />}
       {asked && !answer.data && !answer.error && <Loading label="Reading your brief…" />}
-      {answer.data && <Answer data={answer.data} use={use} off={off} from={from} toggle={(layer) =>
+      {answer.data && <Answer data={answer.data} use={use} off={off} from={from} more={limit < 40 && answer.data.total_matches > limit
+        ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
       {!asked && <p className="lede" style={{ marginTop: 40 }}>The atlas reads your brief, names the techniques that could serve it,
-        and shows pictures that use them, each with the reason it was chosen and its licence. Nothing is sent to an AI service.</p>}
+        and shows pictures that use them, each with the reason it was chosen and its licence. It works from readings already saved in your library and sends nothing to an AI service.</p>}
     </>
   )
 }
 
-function Answer({ data, use, off, from, toggle }: { data: DeskAnswer; use: string; off: string[]; from: string; toggle: (layer: string) => void }) {
-  const reading = [...data.reading.goals, ...data.reading.techniques].map((t) => t.name)
+function Answer({ data, use, off, from, toggle, more }: { data: DeskAnswer; use: string; off: string[]; from: string
+  toggle: (layer: string) => void; more?: () => void }) {
+  const goals = data.reading.goals.map((g) => g.name)
+  const techniques = data.reading.techniques.map((t) => t.name)
   const available = ['library', ...(data.layers.generated ? ['generated'] : []), ...(data.layers['design-system'].length ? ['design-system'] : [])]
   return (
     <>
       <section className="reading-line" aria-label="How the atlas read your brief">
-        <p><span className="mono">Read as </span>{reading.length ? reading.join(' · ') : 'no goal or technique the atlas knows yet'}
-          {data.reading.subject_terms.length > 0 && <span className="muted">, about {data.reading.subject_terms.join(', ')}</span>}</p>
+        <p>{goals.length || techniques.length ? <>{goals.length > 0 && <><span className="mono">Goal </span>{goals.join(' · ')} </>}
+          {techniques.length > 0 && <><span className="mono">{goals.length ? ' Techniques ' : 'Techniques '}</span>{techniques.join(' · ')}</>}</>
+          : 'The atlas did not recognise a goal or technique in this brief yet.'}</p>
+        {data.reading.subject_terms.length > 0 && <p className="mono">Subject words: {data.reading.subject_terms.join(', ')}</p>}
         {data.route.system && data.layers['design-system'].length > 0 && <p className="mono">Design system: {data.route.system.name}. {data.route.system.why}.</p>}
         {available.length > 1 && <div className="row layer-toggles" role="group" aria-label="Where to look">
           {available.map((layer) => <label key={layer} className="choice plain"><input type="checkbox" checked={!off.includes(layer)}
@@ -121,12 +137,13 @@ function Answer({ data, use, off, from, toggle }: { data: DeskAnswer; use: strin
                 <span className="plate-title">{ref.title}</span>
                 {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${ref.date}` : ''}</span>}
               </a>
-              <ul className="reasons">{ref.reasons.slice(0, 2).map((reason) => <li key={reason}>{reason}</li>)}</ul>
-              <p className="licence-line">{ref.licence.label}</p>
+              <p className="reason">{ref.reasons[0]}</p>
+              <p className="licence-line">{plainLicence(ref)}</p>
             </article>)}
           </div>}
+        {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
       </section>
-      <p className="mono" style={{ marginTop: 40, maxWidth: 760 }}>{data.note}</p>
+      <p className="muted" style={{ marginTop: 40, maxWidth: 760, fontSize: 14, lineHeight: 1.5 }}>{data.note}</p>
     </>
   )
 }

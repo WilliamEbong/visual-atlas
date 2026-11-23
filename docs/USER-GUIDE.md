@@ -20,6 +20,8 @@ If you've just installed the app, start with [Your first session](#your-first-se
 - [Explore visual techniques](#explore-visual-techniques)
 - [Follow connections](#follow-connections)
 - [Compare images](#compare-images)
+- [Ask the atlas](#ask-the-atlas)
+- [Use Visual Atlas from an AI agent](#use-visual-atlas-from-an-ai-agent)
 - [Get directions for a project](#get-directions-for-a-project)
 - [Make a collection and export it](#make-a-collection-and-export-it)
 - [Manage jobs and usage limits](#manage-jobs-and-usage-limits)
@@ -257,6 +259,66 @@ The pictures and technique table use saved library information. They do not call
 If you want a written explanation, select **Ask an assistant to compare them**. This makes an AI request. When it finishes, choose **Show the comparison**. The result is saved so reopening it needs no additional call.
 
 When you started from Connections, use **Return to your exploration** to resume that exact route.
+
+## Ask the atlas
+
+Open **Ask** and describe the picture you need and what it is for, for example "a calm opening slide: one small figure in a lot of empty space". The atlas shows:
+
+- how it read the brief: the goals, techniques and subject words it recognised;
+- the techniques that could do the job, with what to look for and what not to confuse them with;
+- references that use those techniques. Each one gives the reasons it was chosen and its licence.
+
+Choose **In published work** to see only CC0, public-domain and CC BY pictures. Their credits are included. Asking uses no AI and sends nothing anywhere: it reads the readings, words and licences already in your library. If the atlas does not recognise your words, say what the picture should do (stand out, feel calm, show scale, surprise) or open a technique from **Explore**.
+
+Pictures come from up to three places, and each is labelled:
+
+| Label | What it is |
+|---|---|
+| Library | Your library. Each licence is checked by Visual Atlas against the source's record. |
+| Generated example | Original images made for Visual Atlas with Codex image generation to show techniques with few examples. Each one keeps its prompt, the works studied for craft, and its review. No licence is asserted, and they never appear under **In published work**. |
+| Design system | Private style libraries on the computer they belong to. See below. |
+
+### Private design-system libraries (the owner's computer only)
+
+Visual Atlas can read the four design-system libraries that exist on its author's computer (archive-of-looking, garden-of-lingering, citadel-of-watching and harbour-of-drifting). It reads them in place and never copies them. They are not part of Visual Atlas, and on any other computer this layer is empty. To turn it on, add `VISUAL_ATLAS_DESIGN_SYSTEMS=auto` to the `.env` file in your library folder, or set it for the MCP server as shown below. `auto` means the four folders under `%USERPROFILE%\.claude\skills`; you can also give folders separated by `;`. The atlas then also suggests which design system suits a brief. Their licences come from each system's own catalogue, not from Visual Atlas's checks.
+
+## Use Visual Atlas from an AI agent
+
+Agents such as Claude Code and Codex can ask the atlas for references while they design a slide, a page or a poster. The MCP server runs on your computer, reads your library and changes nothing. It never calls an AI model and never downloads anything.
+
+Add it to Claude Code (replace the folder with your Visual Atlas folder):
+
+```powershell
+claude mcp add visual-atlas -s user -- uv run --directory C:\VisualAtlas atlas mcp
+```
+
+Add it to Codex:
+
+```powershell
+codex mcp add visual-atlas -- uv run --directory C:\VisualAtlas atlas mcp
+```
+
+On the owner's computer, add `-e VISUAL_ATLAS_DESIGN_SYSTEMS=auto` (Claude Code, before `--`) or `--env VISUAL_ATLAS_DESIGN_SYSTEMS=auto` (Codex) to include the design-system libraries.
+
+| Tool | What the agent gets |
+|---|---|
+| `advise` | How a brief reads, techniques that fit and how to apply them, and ranked references with reasons, licence and credit. `use: "publish"` keeps only CC0, public-domain and CC BY images. |
+| `search_references` | References by brief or by technique and goal ids, subjects, orientation, colour, medium, era or design system. |
+| `get_reference` | One reference in full: evidence and effect for each technique, review state, licence, restrictions and credit. |
+| `view_reference` | The picture itself, at most 1024 pixels, with its credit. |
+| `list_techniques`, `get_technique` | The goals and techniques, with guidance and the best examples. |
+| `route_brief` | Which design system and which of your collections suit a brief. |
+
+The same answers are available on the command line, as JSON by default or as text with `--text`:
+
+| Command | Purpose |
+|---|---|
+| `uv run atlas advise "calm opener, one small figure" --text` | Advice for a visual decision. Add `--publish` for publishable images only. |
+| `uv run atlas refs --technique silhouette --orientation portrait` | References by technique, goal (`--goal`), subject, shape, colour, medium, era or layer. |
+| `uv run atlas ref library:12` | One reference in full. |
+| `uv run atlas mcp` | Run the MCP server on stdio (agents start this themselves). |
+
+References are named by an id such as `library:12`, `generated:symmetry-01` or `system:harbour-of-drifting:gen-canal-dusk`, never by a file path.
 
 ## Get directions for a project
 

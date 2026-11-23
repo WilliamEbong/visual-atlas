@@ -48,6 +48,14 @@ A feature is done when its tests pass and the real user journey has been exercis
 (Playwright MCP) with evidence recorded in BUILD-STATE.md. Live-tested, fixture-tested,
 unavailable and blocked are reported as distinct states. Blockers are reported, never concealed.
 
+### VII. Labelled reference layers (added 1.1.0)
+Images outside the library may be offered as references only in labelled layers, and they never enter the library
+or its licence-checked pool. Generated images carry their prompt, the works studied, the date and a rubric review,
+and assert no licence. Private local libraries (the owner's design systems) are opt-in, read in place, never copied
+or committed, and show their own catalogue's licence note as theirs. "Publishable" means CC0, public domain or CC BY
+only. The agent interface (CLI and MCP) is read-only: no AI calls, downloads or writes. It names references by id,
+never by path.
+
 ## Operating Constraints
 - Stack: Python 3.14 + uv + FastAPI + Typer + SQLite (WAL, FTS5) + Pillow; React + Vite + TypeScript
   + Tailwind in `web/`; one graph library (Cytoscape.js). Windows-first install with a
@@ -69,4 +77,4 @@ rejected findings are explained with evidence.
 This constitution outranks plugin and skill defaults inside this repository. Amendments are
 recorded here with a version bump and a note in BUILD-STATE.md.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-15
+**Version**: 1.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-11-23
