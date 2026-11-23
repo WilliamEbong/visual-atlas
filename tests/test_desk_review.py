@@ -193,3 +193,18 @@ def test_mcp_discards_an_oversized_frame_and_answers_the_next(monkeypatch):
     replies = [json.loads(line) for line in out.getvalue().splitlines()]
     assert replies == [{'jsonrpc': '2.0', 'id': None, 'error': {'code': -32700, 'message': 'Parse error'}},
                        {'jsonrpc': '2.0', 'id': 8, 'result': {}}]
+
+
+# ---- round 3 (overnight round 2) -----------------------------------------------------------------------------
+
+
+def test_two_folders_with_the_same_slug_keep_separate_refs(starter_home, tmp_path, monkeypatch):
+    first = _system(tmp_path / 'a', ['tea-1,window,tea;garden,light,muted,painting,First tea,A,1800,CC0,A,https://x,,'
+                                     'tea,300x200'])
+    second = _system(tmp_path / 'b', ['tea-1,window,tea;garden,light,muted,painting,Second tea,A,1800,CC0,A,https://x,,'
+                                      'tea,300x200'])
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', f'{first};{second}')
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    refs = [r['ref'] for r in desk.search(brief='tea garden', home=starter_home)['results'] if r['layer'] == 'design-system']
+    assert len(refs) == len(set(refs)) == 2
+    assert {desk.get(ref, home=starter_home)['title'] for ref in refs} == {'First tea', 'Second tea'}

@@ -5,6 +5,7 @@ import re
 import secrets
 import sqlite3
 import threading
+from contextlib import suppress
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -87,6 +88,11 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             app.state.thread.start()
 
     start()
+    if start_worker:  # warm the desk's caches (catalogues, tokenised references) so the first Ask is quick
+        def warm():
+            with suppress(Exception):  # only a speed-up: a failure here shows up properly on the first real Ask
+                desk.advise('warm up', home=home)
+        threading.Thread(target=warm, daemon=True, name='atlas-warm').start()
 
     def db() -> Store:
         return Store(jobs.db_path(home))

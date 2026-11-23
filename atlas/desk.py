@@ -12,6 +12,7 @@ import json
 import re
 import sqlite3
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 
 from atlas import catalog, coding, jobs, layers
@@ -187,6 +188,12 @@ def guidance(technique_ids: list[str], taxonomy: dict | None = None) -> list[dic
             for tid in technique_ids if tid in by_id]
 
 
+@lru_cache(maxsize=4096)
+def _text(text: str) -> str:
+    """A reference's searchable words, tokenised once: most of a search's time went here."""
+    return ' '.join(coding.words(text))
+
+
 def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orientation: str = '', colour: str = '',
            medium: str = '', era_from: int | None = None, era_to: int | None = None, layers_wanted=None,
            system: str = '', publishable_only: bool = False, limit: int = 8, home: Path | None = None) -> dict:
@@ -257,9 +264,9 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
                 reasons.append(f"Serves “{names[gid]}” through {names[via[0]]} "
                                f"({STATE_WORDS.get(best['state'], best['state'])})"
                                + (f": {best['evidence'][0]}" if best.get('evidence') else ''))
-        strong = ' '.join(coding.words(' '.join([ref['title'], *ref.get('subjects', [])])))
-        weak = ' '.join(coding.words(' '.join([ref.get('summary', ''), ref.get('notes', ''), ref.get('medium', ''),
-                                               ref.get('description', '')])))
+        strong = _text(' '.join([ref['title'], *ref.get('subjects', [])]))
+        weak = _text(' '.join([ref.get('summary', ''), ref.get('notes', ''), ref.get('medium', ''),
+                               ref.get('description', '')]))
         hits_strong = [t for t in terms if f' {t} ' in f' {strong} ']
         hits_weak = [t for t in terms if t not in hits_strong and f' {t} ' in f' {weak} ']
         if hits_strong or hits_weak:
