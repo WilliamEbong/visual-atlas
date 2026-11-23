@@ -130,6 +130,82 @@ The most-named next step is to restore pass C with a balanced last row, then mov
 onto it. After that comes content curation (point 1), which matters more than any layout change.
 
 
+## Content round (23 November, after the structural cycle)
+
+The scorers' reasons pointed at content, not layout, so this round worked on content. One commit per item.
+
+- **Curated starter** (`b1a99fb`, record `docs/evaluation/r5/STARTER-CURATION.md`). Sixteen stock snapshots were
+  removed: sunsets, laptop keyboards, "odd one out" photos and a hackathon photo. Fourteen museum and archive works
+  replaced them: Edouart silhouettes, Rackham, Runge, Hodler, Haeckel, Moronobu, Degas, Hiroshige and Julia Margaret
+  Cameron. The pack is now 102 references. 23 display titles were cleaned, and each original is kept in its rights
+  record (`source_title`). Licences and licence evidence are unchanged.
+- **Leads by strength** (`47ddecd`, `1b9171d`, `docs/evaluation/r5/LEADS.md`). A fresh reviewer ranked every
+  technique's starter examples from the pixels. Each technique page and the Techniques index now open on the
+  strongest one; a picture you confirmed still comes first. Four techniques have no strong example in the pack:
+  symmetry, selective focus, leading lines and figure–ground ambiguity.
+- **Mood goals** (`1b4de9a`, `docs/evaluation/r2/MOOD-GOALS.md`). Five were added: warm and welcoming, serious and
+  credible, playful, luxurious, and lonely or wistful. Calm and energetic were already covered by existing goals.
+  - On 13 new mood briefs, the intended goal was read 2 times out of 13 before and 13 out of 13 after. These briefs
+    were written with the cues, so the result is optimistic.
+  - On the held-out set, recall is unchanged. Goal precision falls from 0.87 to 0.73 because those labels predate
+    mood goals; scored on the original 11 goals, the numbers are identical.
+- **Moods belong to pictures** (`a39a9ab`, `docs/evaluation/r5/MOODS.md`). A fresh reviewer tagged the moods each
+  starter picture itself conveys (42 of 102).
+  - A brief that asks for a mood is now answered only with pictures that carry it. "Warm and communal" no longer
+    offers a cholera caricature.
+  - Warm is thin (two pictures), and the answer now says so plainly. Finding more becomes the next step.
+- **What you get back.** Find shows the pictures it recently added. Projects shows a saved real answer before the
+  first brief: one Codex run, four directions for a choir poster, from `scripts/make_example_brief.py`.
+- **Long tail.**
+  - Compare labels its measures, and the image page separates the figure number from the image size.
+  - Phone tabs scroll instead of wrapping, and the Find switch stacks.
+  - A missed brief keeps the same button order as a normal answer.
+  - A picture teaches one way only.
+  - Generated examples never lead.
+- **Codex reviews.**
+  - Structural pass, 4 findings fixed: the read-only demo's front page, return links from the sample, "Show more"
+    collapsing its own list, and phone Compare overlapping.
+  - Content round, 4 findings fixed: false mood claims, the Library mood filter, uniqueness applied after the limit,
+    and a stale "Recently added".
+
+| Build | Product designer | Editorial designer | Mean |
+|---|---|---|---|
+| after pass B (structural) | 7.0 | 7.1 | 7.05 |
+| curated starter, leads, Find, Projects, long tail | 6.8 | 7.3 | 7.05 |
+| moods gated by picture | 6.8 | 7.0 | 6.9 |
+| final (thin answers said plainly, Codex fixes) | 7.25 | 7.8 | **7.5** |
+
+Final per-screen means (product, editorial):
+
+| Screen | Score |
+|---|---|
+| Technique | 8.5 (one scorer gave 9) |
+| Ask front page | 8 |
+| Image page | 8 |
+| Library | 7.75 |
+| Ask answer | 7.75 |
+| Find | 7.75 |
+| Techniques index | 7.5 |
+| Compare | 6.75 |
+| Projects | 6.75 |
+| Mood brief | 6.5 |
+
+Content moved the score where three layout passes did not.
+
+**Still between this and 9, per the final scorers:**
+1. **Fit of picks.**
+   - The front-page example pairs "one small figure in empty space" with a floral print.
+   - Reasons describe pixels rather than why the picture suits the brief.
+   - Warm has only two pictures, and "communal" could also reach proximity grouping and rhythm.
+2. **One picture-row system.**
+   - Phone rows switch patterns within a strip.
+   - Short last rows are orphaned.
+   - Projects' direction pictures are small and uneven.
+3. **Compare.** The empty key column, and a matrix of dashes.
+4. **Explore.** Goals are text-only boxed cards, and some techniques share a thumbnail.
+5. **Content still thin.** Four techniques have no strong starter example. Two Podangis orchids and two Mammals Hall
+   photographs sit side by side.
+
 ## Round 4: acceptance, merge rehearsal, scored design (23 November)
 
 **Independent acceptance.** Two fresh Opus testers, each given only the README and the user guide.

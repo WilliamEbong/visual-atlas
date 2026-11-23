@@ -13,6 +13,9 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
   three places and the answer is in picture bands, and pass B, one picture system and one job per screen. Both
   were kept (flat). Pass C, rows measured in code, scored lower and was reverted at fb5bae3. Stopped after three
   approaches. What blocks a 9 is in OVERNIGHT-CHANGES.md "Structural design", mostly content curation.
+- Content round: curated starter (102 refs, museum works for stock), leads by strength, mood goals plus per-picture
+  moods, Find and Projects show results, long tail, two Codex reviews fixed. Fresh-scorer mean 7.05 -> 7.5. What
+  still blocks a 9 is in OVERNIGHT-CHANGES.md "Content round".
 - Next concrete action: owner's blind test (docs/evaluation/v0.5/BLIND-TEST.md), then the merge.
 
 ## 008 Reference desk, design pass and round 3 (2026-11-23, same branch)
