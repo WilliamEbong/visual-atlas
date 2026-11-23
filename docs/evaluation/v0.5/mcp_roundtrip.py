@@ -3,10 +3,13 @@ r"""Real MCP round trip: official MCP Python SDK client -> `uv run atlas mcp` ov
 Needs the SDK in a separate venv (pip install mcp; uv could not install its pywin32 dependency on this machine):
     <venv>\Scripts\python docs/evaluation/v0.5/mcp_roundtrip.py <repo> <scratch VISUAL_ATLAS_HOME> [brief] [off|auto]
 The committed output (mcp-roundtrip.json) was made with design systems off, so no private catalogue data is in it."""
-import json, os, sys
+import json
+import os
+import sys
+
 import anyio
-from mcp import Client, StdioServerParameters
 import mcp.types as types
+from mcp import Client, StdioServerParameters
 
 REPO = sys.argv[1]
 HOME = sys.argv[2]
