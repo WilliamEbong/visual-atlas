@@ -1,7 +1,12 @@
 # Overnight changes, 22–23 November 2026
 
-Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4` at `f9e400c`. Nothing has been pushed, merged,
-tagged or released, and the version number is unchanged (0.4.0). Your real library at `C:\Users\Owner\VisualAtlas`
+## Landed 2026-11-23
+
+The branch was merged into `visual-atlas-v0.4` as `9f2c85b` and pushed, followed by the dependency security patch `42ead4b` (pillow 13.0.0, certifi and opentelemetry-api; the audit is clean), and CI is green. The MCP server `visual-atlas` is registered for Claude Code. `main` and the public demo were deliberately left alone until your blind test. The merge also added about 413 MB of design-review screenshots to this public branch's history; a spot check found only the public starter library in them, and removing them would need a history rewrite that only you can approve.
+
+Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4` at `f9e400c`. It was merged into
+`visual-atlas-v0.4` (`9f2c85b`) and pushed on 2026-11-23; nothing was merged to `main`, tagged or released, and the
+version number is unchanged (0.4.0). Your real library at `C:\Users\Owner\VisualAtlas`
 was never touched.
 
 ## What changed for you, in plain words
@@ -445,7 +450,8 @@ Then ask Claude Code: "Use visual-atlas to find two references for a calm openin
 app, start it with `uv run visual-atlas` and open **Ask**.
 
 ## How to merge
-`visual-atlas-v0.4` still points at `f9e400c`, where this branch was cut, so the merge has no conflicts (85 commits).
+Done on 2026-11-23 (merge `9f2c85b` on `visual-atlas-v0.4`, pushed); the steps are kept for the record.
+`visual-atlas-v0.4` then still pointed at `f9e400c`, where this branch was cut, so the merge had no conflicts (85 commits).
 A full merge rehearsal passed every check in round 4; the final checks on this branch passed again: 477 backend
 tests, 18 web tests, Ruff, TypeScript, the taxonomy check and the data guard.
 
@@ -463,9 +469,9 @@ No database migration is involved; an existing library keeps working. To bring t
 existing library, run `uv run atlas starter-import`. It adds the 14 new works and skips those already present. The
 16 retired stock snapshots stay in a library that already has them; remove them in the app if you like.
 
-**Rollback** (before pushing): `git reset --hard ORIG_HEAD` on `visual-atlas-v0.4` undoes the merge. After pushing,
-use `git revert -m 1 <merge commit>` instead.
+**Rollback:** the merge is pushed, so use `git revert -m 1 9f2c85b` (the reset that worked before pushing no
+longer applies).
 
 **Warning about `main`:** a push to `main` triggers the GitHub Pages workflow and republishes the public demo.
-Merge into `visual-atlas-v0.4` first, and only bring it to `main` when you want the demo updated. Nothing here
-has been pushed.
+Merge into `visual-atlas-v0.4` first, and only bring it to `main` when you want the demo updated. The merge into
+`visual-atlas-v0.4` is pushed; `main` has not been touched.

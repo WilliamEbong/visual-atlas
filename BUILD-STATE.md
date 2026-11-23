@@ -3,6 +3,14 @@
 Durable checkpoint for the autonomous build. Newest status first. Plan of record:
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
+## Landed 2026-11-23
+- 008 Reference desk merged into `visual-atlas-v0.4` as `9f2c85b` and pushed, then dependency security patch `42ead4b`
+  (pillow 13.0.0, certifi, opentelemetry-api; audit clean). CI green. MCP server `visual-atlas` registered for Claude Code.
+- `main` and the public demo deliberately left alone until the owner's blind test.
+- The merge added about 413 MB of design-review screenshots to this public branch's history, spot-checked to show only
+  the public starter library. Removing them would need a history rewrite the owner must approve.
+- Next concrete action: the owner runs docs/evaluation/v0.5/BLIND-TEST.md, then decides whether to bring it to `main`.
+
 ## 008 Reference desk, round 4 (2026-11-23, same branch)
 - Acceptance: an Opus "designer" installed the release zip in temp and an Opus "agent" used MCP and the CLI. Everything
   worked; what they hit is fixed with tests (layout and mood words, evidence first, credits, serve port, zip contents).
@@ -18,7 +26,7 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
   still blocks a 9 is in OVERNIGHT-CHANGES.md "Content round".
 - Final Codex review of the whole branch: 3 findings, all fixed with tests (MCP file containment, MCP UTF-8 input,
   credits in readable CLI output). 477 backend and 18 web tests pass.
-- Next concrete action: owner's blind test (docs/evaluation/v0.5/BLIND-TEST.md), then the merge.
+- Next concrete action: owner's blind test (docs/evaluation/v0.5/BLIND-TEST.md). The merge into visual-atlas-v0.4 is done (see "Landed").
 
 ## 008 Reference desk, design pass and round 3 (2026-11-23, same branch)
 - Design pass: seven lens reviewers, six fix batches, four review rounds; screenshots design-review/r3
@@ -51,7 +59,7 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
   generated/ layer, commit guard for design-system files, constitution 1.1.0.
 - Invariants kept: rights.py is still the only gate into the library; no new dependency; no migration; the
   owner's real library was untouched (all runs used %TEMP%\va-home); design systems were read in place.
-- Next concrete action: the owner runs docs/evaluation/v0.5/BLIND-TEST.md, then decides whether to merge.
+- Next concrete action: the owner runs docs/evaluation/v0.5/BLIND-TEST.md (merged into visual-atlas-v0.4 on 2026-11-23; see "Landed").
 
 ## Next concrete action (v0.4, superseded by 008 above)
 v0.4.0 local release implemented and verified. Launch with `uv run visual-atlas`, or extract
