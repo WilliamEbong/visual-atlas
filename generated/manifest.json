@@ -1,0 +1,419 @@
+{
+  "version": 1,
+  "licence_note": "Generated with Codex image generation for Visual Atlas. Not a photograph or artwork by a person. US copyright protection for AI-generated images is unsettled; no licence is asserted. Use as a reference for the technique.",
+  "images": [
+    {
+      "id": "symmetry-01",
+      "file": "symmetry-01.jpg",
+      "title": "Boathouse on a still lake",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "boathouse",
+        "lake",
+        "reflection",
+        "mountains"
+      ],
+      "techniques": [
+        "symmetry"
+      ],
+      "colour": "muted",
+      "notes": "A small timber boathouse sits on the vertical centre line, its gable apex on the axis; the dead-calm water mirrors it, giving a second, horizontal axis at the waterline.",
+      "width": 1024,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art photograph on medium-format colour film, soft overcast dawn light, quiet muted colours. A small old timber boathouse with a steep pitched roof stands on short stilts at the edge of a mountain lake, seen dead-on from the front from water level. The apex of the gable sits exactly on the vertical centre line of the frame, the open boat door is centred beneath it, and two identical small square windows sit either side. Behind it, dark conifer slopes rise evenly on both sides to a pale sky. The water is perfectly still and mirrors the boathouse and slopes exactly, so the waterline is a second, horizontal axis across the middle of the frame. Left and right halves balance in shape, mass and tone. Square format. No people, no boats.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Marriage of the Virgin (Lo Sposalizio)",
+          "creator": "Raphael",
+          "date": "1504",
+          "source_url": "https://pinacotecabrera.org/en/collezioni/collezione-on-line/the-marriage-of-the-virgin/",
+          "lesson": "One structure on the vertical axis with the paving running to it; halves balanced in mass and tone."
+        },
+        {
+          "title": "The Ideal City (Urbino panel)",
+          "creator": "Formerly attributed to Piero della Francesca",
+          "date": "c. 1480",
+          "source_url": "https://en.wikipedia.org/wiki/The_Ideal_City_(painting)",
+          "lesson": "Even frontal light and architecture mirrored about the centre make order and stillness read at once."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Gable apex, door and paired windows sit on the vertical axis; the calm reflection adds a horizontal axis. Reflection geometry checked at full size: windows and door mirror at the right height."
+      }
+    },
+    {
+      "id": "symmetry-02",
+      "file": "symmetry-02.jpg",
+      "title": "Glasshouse aisle",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (black-and-white film look)",
+      "subjects": [
+        "glasshouse",
+        "palms",
+        "iron architecture",
+        "aisle"
+      ],
+      "techniques": [
+        "symmetry"
+      ],
+      "colour": "muted",
+      "notes": "One-point view down the centre aisle of an iron glasshouse; arched ribs, palms and benches mirror left and right about the central path.",
+      "width": 819,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art black-and-white film photograph, fine grain, soft diffuse daylight through glass. An imaginary Victorian iron-and-glass palm house, seen from the exact centre of its main aisle at standing height, looking straight down the aisle. The tiled path runs from the bottom centre to a round arched doorway at the far end, exactly on the vertical centre line. Curved white iron ribs arch overhead in matching pairs; tall palms in identical large pots stand in mirrored pairs on both sides, with low planting beds either side of the path. The left and right halves mirror each other closely in shape and tone. Slight natural variation in the leaves only. Portrait format 4:5. No people.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Marriage of the Virgin (Lo Sposalizio)",
+          "creator": "Raphael",
+          "date": "1504",
+          "source_url": "https://pinacotecabrera.org/en/collezioni/collezione-on-line/the-marriage-of-the-virgin/",
+          "lesson": "One structure on the vertical axis with the paving running to it; halves balanced in mass and tone."
+        },
+        {
+          "title": "The Ideal City (Urbino panel)",
+          "creator": "Formerly attributed to Piero della Francesca",
+          "date": "c. 1480",
+          "source_url": "https://en.wikipedia.org/wiki/The_Ideal_City_(painting)",
+          "lesson": "Even frontal light and architecture mirrored about the centre make order and stillness read at once."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. One-point view; arched door on the centre line, palms, pots and iron ribs mirrored. Ironwork and tiles straight at full size; leaf variation only."
+      }
+    },
+    {
+      "id": "vantage-point-01",
+      "file": "vantage-point-01.jpg",
+      "title": "Looking straight up through pines",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (black-and-white film look)",
+      "subjects": [
+        "pine trees",
+        "forest",
+        "sky"
+      ],
+      "techniques": [
+        "vantage-point"
+      ],
+      "colour": "mono",
+      "notes": "A worm's-eye view: tall pine trunks rise from every edge of the frame and converge toward a small patch of sky in the centre; no horizon.",
+      "width": 1024,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art black-and-white film photograph with fine grain, taken lying on the forest floor with a wide lens pointing straight up. Tall straight pine trunks rise from all four edges of the frame and converge steeply toward the centre, where their crowns leave an irregular patch of pale overcast sky. The trunks are strongly foreshortened: wide and textured with bark at the edges, thin and small near the centre. There is no horizon and no ground visible. Bright sky against dark trunks, rich mid-greys in the bark. Square format. No people, no animals.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "Berlin Radio Tower",
+          "creator": "László Moholy-Nagy",
+          "date": "1928",
+          "source_url": "https://www.artic.edu/artworks/55476/berlin-radio-tower",
+          "lesson": "Pointing straight down removes the horizon and turns the ground into a graphic map; low light makes it legible."
+        },
+        {
+          "title": "The Boulevard Seen from Above",
+          "creator": "Gustave Caillebotte",
+          "date": "1880",
+          "source_url": "https://nga.gov/features/slideshows/gustave-caillebotte.html",
+          "lesson": "Foreshortened tree, bench and passers-by seen from the top tell the viewer how high they stand."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Worm's-eye view: trunks converge from every edge to a patch of sky, strongly foreshortened, no horizon. Bark texture slightly crisp but no artefacts."
+      }
+    },
+    {
+      "id": "vantage-point-02",
+      "file": "vantage-point-02.jpg",
+      "title": "Harbour quay from above",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (colour film look)",
+      "subjects": [
+        "harbour",
+        "boats",
+        "quay",
+        "water"
+      ],
+      "techniques": [
+        "vantage-point"
+      ],
+      "colour": "muted",
+      "notes": "Bird's-eye view looking nearly straight down on a small harbour: boats seen as hull outlines, a figure foreshortened to a head and shoulders, long early shadows; no horizon.",
+      "width": 819,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art colour film photograph, muted palette, low early-morning sun from the left casting long shadows. Seen from very high above, looking almost straight down onto a small stone quay in a fishing harbour. No horizon and no sky. The quay edge runs diagonally across the frame; half a dozen small wooden rowing and fishing boats are moored in the dark green water below it, seen from directly above as clean hull outlines with their oars and coiled ropes. On the quay, a single small figure in a dark coat is seen from the top as a head and shoulders with a long shadow stretching across the paving stones; a few stacked crates and a bollard also cast long shadows. The ground plane reads as a flat graphic pattern. Portrait format 4:5. No text or numbers on the boats.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "Berlin Radio Tower",
+          "creator": "László Moholy-Nagy",
+          "date": "1928",
+          "source_url": "https://www.artic.edu/artworks/55476/berlin-radio-tower",
+          "lesson": "Pointing straight down removes the horizon and turns the ground into a graphic map; low light makes it legible."
+        },
+        {
+          "title": "The Boulevard Seen from Above",
+          "creator": "Gustave Caillebotte",
+          "date": "1880",
+          "source_url": "https://nga.gov/features/slideshows/gustave-caillebotte.html",
+          "lesson": "Foreshortened tree, bench and passers-by seen from the top tell the viewer how high they stand."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Near-vertical view; no horizon, boats as hull outlines, the one figure foreshortened to head and shoulders; shadows of figure, crates and bollard all fall the same way. Some mooring lines drop straight into the water (read as stern lines to underwater moorings)."
+      }
+    },
+    {
+      "id": "proximity-grouping-01",
+      "file": "proximity-grouping-01.jpg",
+      "title": "Swallows on a wire",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (black-and-white film look)",
+      "subjects": [
+        "birds",
+        "swallows",
+        "wire",
+        "sky"
+      ],
+      "techniques": [
+        "proximity-grouping"
+      ],
+      "colour": "mono",
+      "notes": "Identical swallows on one wire, grouped only by spacing: a tight cluster of five at left, three at centre-right, and one bird alone near the right edge.",
+      "width": 1024,
+      "height": 683,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art black-and-white film photograph, fine grain, soft overcast light. A single thin wire crosses the frame horizontally, slightly below the middle, against a plain pale-grey sky. Nine swallows of the same size and pose sit on the wire, all facing the same way, seen in profile as dark silhouettes with forked tails. Spacing does all the work: five birds sit almost touching in a tight cluster in the left third; a wide empty stretch of wire; three birds sit close together just right of centre; another wide gap; one single bird sits alone near the right edge. All birds look alike so only distance separates the groups. Exactly nine birds. Landscape 3:2. Nothing else in the frame.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Harvesters",
+          "creator": "Pieter Bruegel the Elder",
+          "date": "1565",
+          "source_url": "https://www.metmuseum.org/art/collection/search/435809",
+          "lesson": "Reapers clustered under one tree with single workers apart: the gaps say who belongs together."
+        },
+        {
+          "title": "A Sunday on La Grande Jatte — 1884",
+          "creator": "Georges Seurat",
+          "date": "1884–86",
+          "source_url": "https://www.artic.edu/artworks/27992/a-sunday-on-la-grande-jatte-1884",
+          "lesson": "Groups set on an even, open ground so the empty intervals read as clearly as the figures."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Nine identical swallows grouped 5 / 3 / 1 by spacing alone; birds correctly formed at full size."
+      }
+    },
+    {
+      "id": "proximity-grouping-02",
+      "file": "proximity-grouping-02.jpg",
+      "title": "Figures on a winter beach",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated painterly illustration (gouache look)",
+      "subjects": [
+        "beach",
+        "figures",
+        "sea",
+        "winter"
+      ],
+      "techniques": [
+        "proximity-grouping"
+      ],
+      "colour": "muted",
+      "notes": "Small, similar figures on an even stretch of sand form a group of four, a pair, and one figure standing apart at the water’s edge; spacing alone sets the groups.",
+      "width": 1024,
+      "height": 683,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA painterly gouache illustration with flat, matte colour and visible paper texture, muted winter palette of sand, slate blue and off-white, soft overcast light. Seen from a high dune looking down at a wide, empty, even beach with the sea along the top of the picture. On the sand stand small figures in similar dark winter coats, all roughly the same size, seen from behind or in simple silhouette with no facial detail: four figures stand close together in a huddle in the lower left; two stand side by side in the middle distance at centre; one single figure stands alone at the far right by the water’s edge. Wide empty sand separates the groups. Each figure casts a short soft shadow. Landscape 3:2. Exactly seven figures, no animals.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Harvesters",
+          "creator": "Pieter Bruegel the Elder",
+          "date": "1565",
+          "source_url": "https://www.metmuseum.org/art/collection/search/435809",
+          "lesson": "Reapers clustered under one tree with single workers apart: the gaps say who belongs together."
+        },
+        {
+          "title": "A Sunday on La Grande Jatte — 1884",
+          "creator": "Georges Seurat",
+          "date": "1884–86",
+          "source_url": "https://www.artic.edu/artworks/27992/a-sunday-on-la-grande-jatte-1884",
+          "lesson": "Groups set on an even, open ground so the empty intervals read as clearly as the figures."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Seven similar figures grouped 4 / 2 / 1 on even sand; figures seen from behind with no facial detail, limbs and boots correct at full size. Shadows consistent."
+      }
+    },
+    {
+      "id": "fg-ambiguity-01",
+      "file": "fg-ambiguity-01.jpg",
+      "title": "Tree or two deer",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated cut-paper style illustration",
+      "subjects": [
+        "tree",
+        "deer",
+        "positive and negative shape"
+      ],
+      "techniques": [
+        "figure-ground-ambiguity"
+      ],
+      "colour": "mono",
+      "notes": "A cream tree on black: the black spaces either side of the trunk, under the canopy, are two deer heads in profile facing each other, sharing the trunk’s contour.",
+      "width": 1024,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA flat two-tone cut-paper illustration: only cream paper and solid black, no shading, gradients or texture beyond a faint paper grain. A single cream tree stands in the centre: a broad rounded canopy across the top and a trunk down the middle to a cream ground strip at the bottom. The two black spaces either side of the trunk, between the canopy and the ground, are shaped precisely as two deer heads in profile facing each other across the trunk: the trunk’s left and right edges are the deer’s foreheads, noses and chins; small ears and short antlers rise into the underside of the canopy; their necks run down to the outer edges. One small cream dot marks each deer eye. Cream and black occupy roughly equal areas, so the eye flips between reading a cream tree and two black deer. Symmetrical, centred, square format.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "Sky and Water I",
+          "creator": "M. C. Escher",
+          "date": "1938",
+          "source_url": "https://www.nga.gov/artworks/54215-sky-and-water-i",
+          "lesson": "Two flat tones of equal weight; the flip happens where shapes share every contour."
+        },
+        {
+          "title": "Rubin's vase demonstrations",
+          "creator": "Edgar Rubin",
+          "date": "1915",
+          "source_url": "https://en.wikipedia.org/wiki/Rubin_vase",
+          "lesson": "A centred shape whose outer contour is recognisable from the other side flips most reliably; no shading."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Two flat tones; the trunk contour is shared by the cream tree and the two black deer profiles, whose antlers are the branches. Reads both ways at a glance. Small cream ear shapes sit inside the black but do not break the reading."
+      }
+    },
+    {
+      "id": "selective-focus-01",
+      "file": "selective-focus-01.jpg",
+      "title": "Seed head in a meadow",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (colour film look)",
+      "subjects": [
+        "seed head",
+        "meadow",
+        "grasses"
+      ],
+      "techniques": [
+        "selective-focus"
+      ],
+      "colour": "muted",
+      "notes": "Only the dry seed head is sharp; grass stems in front of it and the meadow behind dissolve into smooth blur with soft discs of light.",
+      "width": 819,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art colour film photograph, muted greens and straw, low warm evening side light. A macro lens at its widest aperture. A single dry, spherical seed head on a thin stem stands just right of centre, in razor-sharp focus: every fine filament and seed is crisp. Out-of-focus grass stems cross the foreground as soft translucent streaks, and the meadow behind dissolves into smooth, creamy blur with a few soft round discs of light. The seed head has the same light and colour as everything around it; only sharpness separates it. Natural optical blur, no cut-out edges around the subject. Portrait 4:5.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Lacemaker",
+          "creator": "Johannes Vermeer",
+          "date": "c. 1669–70",
+          "source_url": "https://en.wikipedia.org/wiki/The_Lacemaker_(Vermeer)",
+          "lesson": "Soft foreground threads and crisp hands place the plane of focus exactly; blur in front as well as behind."
+        },
+        {
+          "title": "Kate Keown",
+          "creator": "Julia Margaret Cameron",
+          "date": "1866",
+          "source_url": "https://www.metmuseum.org/art/collection/search/286404",
+          "lesson": "Shallow focus and gentle side light: only sharpness, not colour or brightness, separates the subject."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Seed head sharp to the filaments; foreground stems and background meadow smoothly blurred with soft light discs; no cut-out edge."
+      }
+    },
+    {
+      "id": "selective-focus-02",
+      "file": "selective-focus-02.jpg",
+      "title": "Teapot on a table",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated painterly illustration (oil painting look)",
+      "subjects": [
+        "teapot",
+        "table",
+        "still life",
+        "interior"
+      ],
+      "techniques": [
+        "selective-focus"
+      ],
+      "colour": "muted",
+      "notes": "The teapot is painted with tight, precise strokes; the cups in front and the room behind are broad, loose and blurred, so handling alone draws the eye.",
+      "width": 1024,
+      "height": 768,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nAn oil painting of a quiet interior still life in soft north window light from the left, muted ochres, greys and blue-white. A blue-and-white glazed ceramic teapot on a plain wooden table, slightly left of centre, is painted with tight, precise, crisp detail: the glaze highlight, the lid knob, the curve of the spout, a fine crack line in the glaze. Everything else is painted loosely: two teacups in the near foreground are soft smudged shapes of colour, and the room behind (a window, a chair, a dresser) dissolves into broad, blurry, sketchy strokes with lost edges. The teapot is not brighter or more saturated than its surroundings; only the sharpness of the handling sets it apart. Landscape 4:3. No people.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Lacemaker",
+          "creator": "Johannes Vermeer",
+          "date": "c. 1669–70",
+          "source_url": "https://en.wikipedia.org/wiki/The_Lacemaker_(Vermeer)",
+          "lesson": "Soft foreground threads and crisp hands place the plane of focus exactly; blur in front as well as behind."
+        },
+        {
+          "title": "Kate Keown",
+          "creator": "Julia Margaret Cameron",
+          "date": "1866",
+          "source_url": "https://www.metmuseum.org/art/collection/search/286404",
+          "lesson": "Shallow focus and gentle side light: only sharpness, not colour or brightness, separates the subject."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight rubric checks pass. Teapot crisp (glaze highlight, knob, crack line); foreground cups and room loose and blurred; teapot not brighter than its surroundings."
+      }
+    }
+  ],
+  "dropped": [
+    {
+      "id": "fg-ambiguity-02-v1",
+      "technique": "figure-ground-ambiguity",
+      "reason": "Check 1 (technique reads) and check 3 (artefacts): the cream upper area reads as sky with indigo windows floating in it, not as a second town, so there is no flip; areas are unequal.",
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA flat two-colour screenprint illustration in deep indigo and warm cream only, no shading, gradients or outlines, faint paper grain. A row of small-town rooftops in indigo rises from the bottom edge: gables, chimneys, a small dome and a bell tower, with a few cream rectangular windows. From the top edge hangs an upside-down row of cream rooftops, with indigo windows, whose outline is formed by exactly the same contour: every gable of one town is the gap between two gables of the other, so the single shared jagged line belongs to both. Indigo and cream take up equal areas, and neither reads clearly as sky, so the picture flips between a dark town under a pale sky and a pale town under a dark sky. Landscape 3:2. Imaginary buildings only.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n"
+    },
+    {
+      "id": "fg-ambiguity-02-v2",
+      "technique": "figure-ground-ambiguity",
+      "reason": "Check 1 (technique reads) and check 7 (craft): the houses merged into one zigzag band with loose door rectangles; it reads as a border pattern, not as interlocking houses.",
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA flat two-colour screenprint illustration in deep indigo and warm cream only, no shading, gradients or outlines, faint paper grain. The whole frame is one interlocking row of simple house shapes, like two combs pushed together. Five identical indigo houses stand upright on the bottom edge, each a tall rectangle with a steep triangular roof pointing up. Between and above them, the cream space forms five identical cream houses of exactly the same shape and size, hanging upside down from the top edge with their roofs pointing down into the gaps between the indigo houses. Every edge is shared: each roof fits exactly into the gap between two houses of the other colour. Each house of both colours has one small plain door of the opposite colour at its base (for the cream houses, at the top edge). Indigo and cream cover exactly equal areas, so the picture flips between indigo houses on a cream ground and cream houses on an indigo ground. No windows, chimneys, sky, ground line or anything else. Landscape 3:2.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n"
+    },
+    {
+      "id": "fg-ambiguity-02-v3",
+      "technique": "figure-ground-ambiguity",
+      "reason": "Check 1 (technique reads) and check 3 (artefacts): a counterchanged pear reads as a clear figure on both halves (counterchange or silhouette, not a flip), and the stem halves are misregistered at the split.",
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA flat two-colour screenprint illustration in deep indigo and warm cream only, no shading, gradients or outlines, faint paper grain. The frame is divided exactly down the vertical centre: the left half is cream, the right half is indigo. One large upright pear with a short stem and a single leaf sits exactly on the dividing line, so half the pear lies on each side. The colours are counterchanged: on the cream left half, the left half of the pear is solid indigo; on the indigo right half, the right half of the pear is solid cream. The pear outline is one continuous, symmetrical contour, so on the left the pear is the figure and on the right the pear is the ground, and the eye flips between reading a pear and reading two pear-shaped holes. The leaf follows the same rule. Nothing else in the picture. Square format.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n"
+    }
+  ]
+}
