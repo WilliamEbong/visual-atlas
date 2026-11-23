@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react'
 import { del, media, post, put, readOnly, request } from '../lib/client'
 import { date, useData } from '../lib/hooks'
 import { go, href } from '../lib/router'
-import type { Brief, Job, ReadingCorrection, Settings } from '../lib/types'
+import type { Brief, Direction, Job, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
 import ReadingEditor from './ReadingEditor'
 import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
-import { SampleAnswer } from './Ask'
 
 const RULES = ['rule-rust', 'rule-blue', 'rule-green', 'rule-ochre', 'rule-ink']
 const THUMB_HEIGHTS = [70, 58, 86, 64, 100]
@@ -36,8 +35,7 @@ export default function Project({ id }: { id?: number }) {
             </nav>}
         </aside>
       </div>
-      {list.data?.length === 0 && !readOnly && <SampleAnswer brief="A calm opening slide: one small figure in a lot of empty space" use="reference"
-        from={href('ask', { q: 'A calm opening slide: one small figure in a lot of empty space' })} open={() => go('ask', { q: 'A calm opening slide: one small figure in a lot of empty space' })} />}
+      {list.data?.length === 0 && !readOnly && <ExampleBrief />}
     </>
   )
 }
@@ -151,5 +149,37 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
       </section>
       {!readOnly && <p style={{ marginTop: 48 }}><button type="button" className="quiet small" style={{ color: 'var(--danger)' }} onClick={remove}>Delete this brief…</button></p>}
     </>
+  )
+}
+
+/** A saved real run of Suggest directions: what a brief gives back, before you write your own. */
+function ExampleBrief() {
+  const example = useData<{ title: string; text: string; backend: string; model: string; made: string
+    directions: Pick<Direction, 'title' | 'idea' | 'rationale' | 'execution' | 'tradeoffs' | 'images' | 'techniques'>[] }>('briefs/example')
+  if (!example.data?.directions.length) return null
+  const e = example.data
+  return (
+    <section className="section" aria-labelledby="example-title">
+      <div className="section-title"><h2 id="example-title">For example: {e.title}</h2>
+        <p className="mono">A real answer, suggested by {backendName(e.backend)} on {e.made}</p></div>
+      <p className="slip-text" style={{ maxWidth: 760, marginTop: 8 }}>{e.text}</p>
+      <div className="trays" style={{ marginTop: 22, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+        {e.directions.map((d, index) => (
+          <article key={d.title} className={`tray-col ${RULES[index % RULES.length]}`} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <p className="mono">Direction {index + 1}</p>
+            <h3 className="direction-title">{d.title}</h3>
+            {d.images.length > 0 && <div className="contact" style={{ height: 120, gap: 8 }}>
+              {d.images.slice(0, 3).map((img, i) => <a key={img.id} href={href(`image/${img.id}`)} aria-label={img.title}>
+                <img src={media(img.thumb)} alt="" style={{ height: THUMB_HEIGHTS[i] }} /></a>)}</div>}
+            <p style={{ fontSize: 15 }}>{d.idea}</p>
+            <p className="mono">{d.techniques.map((t, i) => <span key={t.id}>{i ? ' · ' : ''}<a href={href(`technique/${t.id}`)}>{t.name.replace(/ \(.*\)$/, '')}</a></span>)}</p>
+            <details><summary>How to do it, and tradeoffs</summary>
+              <ul style={{ fontSize: 14, paddingLeft: 18 }}>{d.execution.map((x) => <li key={x}>{x}</li>)}</ul>
+              <p className="mono" style={{ marginTop: 8 }}>Tradeoffs</p>
+              <ul style={{ fontSize: 14, paddingLeft: 18 }}>{d.tradeoffs.map((x) => <li key={x}>{x}</li>)}</ul>
+            </details>
+          </article>))}
+      </div>
+    </section>
   )
 }

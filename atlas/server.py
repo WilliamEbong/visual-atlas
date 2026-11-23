@@ -19,6 +19,7 @@ from atlas.home import REPO, home_dir, local_setting
 from atlas.store import LibraryBusy, Store
 
 LEADS = REPO / 'atlas' / 'data' / 'leads.json'
+EXAMPLE = REPO / 'atlas' / 'data' / 'example_brief.json'
 
 
 def lead_rank(technique_id: str):
@@ -555,6 +556,24 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     def briefs():
         with db() as store:
             return store.rows('SELECT * FROM briefs ORDER BY updated_at DESC')
+
+    @app.get('/api/briefs/example')
+    def example_brief():
+        """A saved real run of Suggest directions, shown on Projects before you write a brief. Its pictures are the
+        starter references in this library; any you removed are left out."""
+        if not EXAMPLE.exists():
+            raise HTTPException(404, 'No example brief.')
+        example = json.loads(EXAMPLE.read_text(encoding='utf-8'))
+        with db() as store, store.reading():
+            local = {f"{r['provider']}:{r['provider_item_id']}": r for r in store.rows(
+                'SELECT id, title, thumb_path, provider, provider_item_id FROM images WHERE removed_at IS NULL')}
+            names = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM techniques')}
+        directions = [{**{k: d[k] for k in ('title', 'idea', 'rationale', 'execution', 'tradeoffs')},
+                       'images': [{'id': local[ref]['id'], 'title': local[ref]['title'], 'thumb': media_url(local[ref]['thumb_path'])}
+                                  for ref in d['images'] if ref in local],
+                       'techniques': [{'id': t, 'name': names.get(t, t)} for t in d['techniques']]}
+                      for d in example['directions']]
+        return {**{k: example[k] for k in ('title', 'text', 'backend', 'model', 'made')}, 'directions': directions}
 
     @app.post('/api/briefs', status_code=201)
     def create_brief(body: BriefInput):
