@@ -562,7 +562,7 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .image-head { align-items: flex-start; }
 @media (min-width: 761px) {
   .compare-grid { grid-template-columns: 160px repeat(var(--n), minmax(0, 1fr)); }
-  .compare-table th[scope="col"]:first-child { width: 160px !important; }
+  .compare-table th[scope="col"]:first-child { width: 192px !important; }  /* the 160 px key column plus its 32 px gap */
 }
 .drawers.goals { gap: 0 32px; }
 .drawers.goals .drawer { border: 0; border-top: 1px solid var(--keyline); padding: 16px 0 18px; min-height: 0; background: none; }
