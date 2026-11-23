@@ -11,3 +11,9 @@
 - 2026-11-23 Design review (william-web-design reviewer, Opus) on Ask/Welcome: 12 findings; applied 1–7, 9–12; skipped 8 (header specimens on Ask; nice-to-have). Welcome "Check the assistants" button dropped (Settings is in the nav).
 - 2026-11-23 CLI on 8 real briefs: 6/8 read a goal/technique; 2 misses left untuned on purpose (docs/evaluation/v0.5/CLI-BRIEFS.md).
 - 2026-11-23 Library drawers minmax 240->200 so five ways in fit one row at 1440.
+- 2026-11-23 Generated layer (Opus subagent via Codex companion): 12 generated, 9 kept, 3 dropped (all figure-ground; rubric checks 1/3/7). I independently viewed all 9 (contact sheet) and fg-ambiguity-01 full size: pass. Fixed its script's E731 lint. 1.4 MB.
+- 2026-11-23 Observed 1.5–8.5 s /api/desk responses in the browser while the generator and the test suite were running; once the machine was idle: 70–315 ms in the browser, 0.07–0.6 s over HTTP, 0.1–0.3 s in-process. Recorded as load, not a defect.
+- 2026-11-23 Full offline suite: 422 passed / 9 live deselected (baseline 372). Codex adversarial review started on f9e400c..HEAD.
+- 2026-11-23 Codex adversarial review round 1 (base f9e400c): 7 findings, all confirmed and fixed (e9bbd1f); regression tests fail on old code (9 cases). Round 2: fixes confirmed, 4 new findings, all fixed (round-2 commit); 4 tests fail on old code. Review rounds stop at 2 (project convention).
+- 2026-11-23 Design-system plates now say "Private design system: reference only" (0c07d87). Browser check with design systems on: garden-of-lingering routing, 12/12 token-protected images, 0 console errors; screenshot kept outside the repo.
+- 2026-11-23 Decision: no separate HANDOFF.md; OVERNIGHT-CHANGES.md + BUILD-STATE.md serve as the handoff (owner asked for OVERNIGHT-CHANGES). Dev servers stopped; Playwright browser closed.

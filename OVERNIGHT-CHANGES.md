@@ -1,0 +1,127 @@
+# Overnight changes, 22–23 November 2026
+
+Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. 13 commits on top of `f9e400c`. Nothing has been pushed, merged, tagged or
+released, and the version number is unchanged (0.4.0).
+
+## Product thesis, in five lines
+1. **For** designers, and the AI agents that now pick images for their slides, pages and posters.
+2. **Job:** turn a brief into a few references worth borrowing from. Each says which technique it shows, the
+   visible evidence, how sure the reading is, its licence and credit, and how to apply the idea.
+3. **Different:** reference tools keep pictures, not reasons. Agent image tools return links with no licence and no
+   reason. Visual Atlas already has evidence, review states and licence records for every image.
+4. **Smallest proof:** one engine without AI behind three doors: the **Ask** page, the CLI (`atlas advise`) and a
+   read-only MCP server (`atlas mcp`).
+5. **Test that decides it:** you rate agent output with and without the desk on 12–20 of your own briefs
+   (`docs/evaluation/v0.5/BLIND-TEST.md`). It is prepared but not run, because the ratings must be yours.
+
+Research with sources is in `docs/research/01–04`, and the decision and its reasoning in `docs/research/05-thesis.md`.
+
+## What was built
+- **Reference desk** (`atlas/desk.py`). A brief goes in. Out come the goals, techniques and subject words it read
+  as, guidance for each technique (what it is, when it helps, what to look for, what not to confuse it with), and
+  ranked references. Each reference carries its reasons, licence, credit and layer. It ranks by stored readings,
+  taxonomy links and words, with no AI. It writes nothing.
+- **CLI**: `atlas advise`, `atlas refs`, `atlas ref`, `atlas mcp`.
+- **MCP server** (`atlas/mcp_server.py`), read-only, over stdio. Seven tools: `advise`, `search_references`,
+  `get_reference`, `view_reference` (returns the picture itself), `list_techniques`, `get_technique` and
+  `route_brief`. References are named by id, never by path. Every input is validated.
+- **Ask page** in the app, plus a reference page for generated and design-system images. Ask is first in the
+  navigation, first on the Library home, and first in the welcome dialog.
+- **Generated layer** (`generated/`): original images made with Codex image generation for techniques with only
+  two or three starter examples. Each keeps its prompt, the works studied, the date and a rubric review
+  (`generated/RUBRIC.md`, `generated/STUDY.md`). They are labelled generated everywhere, assert no licence, and are
+  never offered as publishable. **12 generated, 9 kept, 3 dropped.** Two each were kept for symmetry, vantage point, proximity grouping and selective focus. Figure–ground ambiguity kept one of four; three attempts failed the rubric because the picture did not flip both ways. I checked the kept images myself as well. Total size is 1.4 MB. To regenerate: `uv run python scripts/generate_images.py`.
+- **Your four design systems** as an opt-in local layer (`atlas/layers.py`). They are read in place from
+  `%USERPROFILE%\.claude\skills\<system>\` (850 images), never copied, and never in the repo. The layer is off unless
+  `VISUAL_ATLAS_DESIGN_SYSTEMS=auto` is set, so it exists only on your machine. The router suggests a system for a
+  brief: "cyberpunk night city for a game pitch" goes to harbour-of-drifting, and a brief that matches none goes to
+  archive-of-looking.
+- **Guards**: `.gitignore` patterns, plus `scripts/check_no_data.py` (already run in CI). It now refuses
+  design-system paths and any tracked image whose bytes match one of your design-system files, even renamed.
+- **Design**: the Ask page, a welcome without jargon or decorative rules, plain licence wording on result plates,
+  balanced headings, and the Library's five ways in fitting one row. A design reviewer subagent (the
+  william-web-design reviewer) critiqued the page. Its must-fix findings were applied.
+- **Docs**: README sections, user guide sections "Ask the atlas" and "Use Visual Atlas from an AI agent" (MCP setup
+  for Claude Code and Codex), and constitution 1.1.0 (principle VII, labelled reference layers).
+
+## Decisions, and how to undo each
+| Decision | Why | Undo |
+|---|---|---|
+| MCP implemented with the standard library, not the official SDK | The SDK needs pywin32 on Windows; `uv` failed to install it 4 times (file lock, invalid wheel entry), and the installer uses `uv` | Replace `atlas/mcp_server.py` with an SDK `MCPServer`; tools map one-to-one |
+| Desk uses no AI and the MCP server is read-only | Fast, free, checkable; agents never trigger spending | Add an opt-in `suggest_directions` tool later |
+| Design systems are read in place, not imported into the library | Keeps the rights invariant (only `atlas/rights.py` admits images) and keeps private files out of exports and the public repo | Remove `VISUAL_ATLAS_DESIGN_SYSTEMS` from `.env` (off), or delete `atlas/layers.py`'s systems part |
+| Generated images assert no licence and never count as publishable | US protection for AI output is unsettled; only you can dedicate work | Change `licence_note` in `generated/manifest.json` if you decide otherwise |
+| Brief coding left untuned | The two misses in the CLI run are new test briefs; tuning on them would hide the known recall limit | Add `request_cues` in `atlas/data/taxonomy.json` |
+| Ties in design-system routing go to archive-of-looking | Your default system | `atlas/desk.py` `route()` sort key |
+| Other layers keep up to half the result places | Otherwise 93 library images bury them | `search()` in `atlas/desk.py` |
+| Committed evidence made with design systems off | No private catalogue titles in the public repo | n/a; the design-system run is in the session notes folder |
+
+## Evidence (all gathered in this run, against a scratch library in `%TEMP%\va-home`; your real library was not touched)
+| Check | Result |
+|---|---|
+| Backend tests (`uv run pytest`, offline) | **437 passed**, 1 skipped, 9 live deselected (baseline before the work: 372 passed). One symlink test is skipped because Windows does not let this account create links; the same check is also covered by a deleted-file case that runs. |
+| New tests | Engine and layers (`tests/test_desk.py`), CLI and MCP (`tests/test_mcp.py`, including a stdio round trip in a subprocess), web API (`tests/test_desk_api.py`), and Codex review regressions (`tests/test_desk_review.py`). Network and model calls: none are made. |
+| Ruff, taxonomy check, data guard | Clean |
+| Frontend: TypeScript, vitest, production build, npm audit | TypeScript clean; 15 tests passed; build OK; npm audit 0 vulnerabilities |
+| Real MCP round trip from a client | The official MCP Python SDK 2.3.0 `Client` launched `uv run atlas mcp`. It negotiated protocol 2025-11-25, listed 7 tools, called `advise`, received a JPEG from `view_reference`, and got a path traversal refused. Output: `docs/evaluation/v0.5/mcp-roundtrip.json`. A second run with design systems on (it routed to harbour-of-drifting) is kept outside the repo. |
+| CLI on real briefs | 8 briefs. 6 read as a known goal or technique and returned credited references with reasons. 2 did not (see below). Output: `docs/evaluation/v0.5/CLI-BRIEFS.md`. |
+| Playwright, 1440 px and 375 px | Ask, Library, image page, Explore, Find, and the generated reference page. No horizontal overflow, no broken images, 0 console errors. With design systems on, a tea-garden brief routed to garden-of-lingering, and 12/12 of its images loaded through the token-protected endpoint. Screenshots: `design-review/v0.5/`. Private-image screenshots stay outside the repo. |
+| Design review | The william-web-design reviewer (Opus) returned 12 findings. 11 were applied; the header specimens on Ask were skipped. |
+| Codex review (codex plugin, adversarial, 2 rounds) | **Round 1:** 7 findings, all confirmed and fixed. **Round 2:** confirmed those fixes and found 4 more, all confirmed and fixed. Every fix has a test that fails on the old code (checked by swapping the old files back in). Details are under "Codex review" below. |
+| Generated images | 12 generated, **9 kept, 3 dropped** (all figure–ground ambiguity attempts). I reviewed the kept set myself as well. |
+
+### Codex review
+- **Round 1:**
+  - Publication is decided by `atlas/rights.py` only. Other layers are reference only, and NC, SA and ND notes read as unclear.
+  - Private layer pictures sit behind the launch token.
+  - The desk reads through a read-only SQLite connection, so it can never create or migrate a library.
+  - Layer files are re-checked on disk when they are served.
+  - The commit guard reads Git index blobs, not working files.
+  - The MCP server survives hostile frames.
+  - Goal reasons quote one technique with its own review state.
+- **Round 2:**
+  - Library licence codes are matched exactly, so `CC-BY-NC` is never publishable.
+  - Design-system ids are slugs.
+  - The guard also covers folders set in the library's `.env`.
+  - MCP frames are read in bounded pieces.
+
+## Not done
+- **The blind test that decides the thesis** (`docs/evaluation/v0.5/BLIND-TEST.md`) needs your own briefs and ratings.
+- **Brief reading recall.** "Show how big the mountains are" and "Group three related services" were not
+  recognised. Word matching is the known weak point (v0.4 held-out recall was 60%). It was not tuned on these new
+  briefs. Agents can pass technique or goal ids directly.
+- **A second figure–ground generated image.** Three attempts failed the rubric. The image model finds
+  shared-contour designs hard.
+- **Later** (thesis): an opt-in MCP `suggest_directions`; visual-similarity search; UI and typography
+  references, since the corpus is mostly pre-20th-century art; C2PA manifests on generated files; an HTTP MCP
+  transport; header specimens on the Ask page; design-system slug collisions (two folders whose names slug the
+  same would share ids).
+- **Not tested:** the Windows installer and the release zip were not rebuilt. `generated/` is included in
+  `git archive` (no export-ignore). The live provider tests (`-m live`) were not run, because nothing touching
+  them changed.
+- **Timing:** during the parallel image generation, a few Ask requests took 1.5–8.5 s. Once the machine was
+  idle they took 70–315 ms.
+
+## Try it
+```powershell
+uv run atlas advise "a calm opening slide: one small figure in a lot of empty space" --text
+```
+```powershell
+uv run atlas refs --technique figure-ground-ambiguity --text
+```
+```powershell
+$env:VISUAL_ATLAS_DESIGN_SYSTEMS="auto"; uv run atlas advise "cyberpunk night city in the rain for a game pitch" --text
+```
+```powershell
+claude mcp add visual-atlas -s user -e VISUAL_ATLAS_DESIGN_SYSTEMS=auto -- uv run --directory C:\Users\Owner\OneDrive\Documents\VisualAtlas atlas mcp
+```
+Then ask Claude Code: "Use visual-atlas to find two references for a calm opening slide and show me them." In the
+app, start it with `uv run visual-atlas` and open **Ask**.
+
+## How to merge
+Review the branch, then from the main checkout:
+```powershell
+git merge --no-ff claude/product-direction-d8e569
+```
+It merges into `visual-atlas-v0.4` (its base) without conflicts at the time of writing. Rebuild the web app
+(`npm --prefix web run build`) after merging. No database migration is involved.
