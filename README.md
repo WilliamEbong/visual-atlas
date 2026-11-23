@@ -22,11 +22,11 @@ The connections view gives you several ways in. Start with a communication goal,
 
 ## Ask what a picture should do
 
-Open **Ask** and write what you need: "a calm opening slide: one small figure in a lot of empty space". The atlas shows how it read the brief, the techniques that could do the job and what to look for in each, and references that use them. Each reference says why it was chosen and what its licence is. Choose **In published work** to see only images you may publish with a credit. Asking uses readings already saved in your library. It makes no AI call and sends nothing anywhere.
+Open **Ask** and write what you need: "a calm opening slide: one small figure in a lot of empty space". The atlas shows how it read the brief, up to three ways to do it (one technique each, with what to make sure of and pictures that show it), and every reference that fits. If it misreads you, choose what the picture should do with one click. **More like this** finds pictures with a similar composition. Each reference says why it was chosen and what its licence is. Choose **In published work** to see only images you may publish with a credit. Asking uses readings already saved in your library. It makes no AI call and sends nothing anywhere.
 
 ## Give your AI agent a reference desk
 
-Claude Code, Codex and other agents can use the same answers through a read-only MCP server or the command line. They get references with reasons, licences and credits, and can view the pictures, before they choose an image for a slide or a page.
+Claude Code, Codex and other agents can use the same answers through a read-only MCP server or the command line. They get distinct directions for a brief, references with reasons, licences and credits, and can view the pictures, before they choose an image for a slide or a page. When nothing local fits, they can search public museum collections live and get back only pictures whose licence Visual Atlas has checked.
 
 ```powershell
 claude mcp add visual-atlas -s user -- uv run --directory C:\VisualAtlas atlas mcp
@@ -44,7 +44,7 @@ Describe what you need in ordinary language. Visual Atlas searches supported mus
 
 Before you start, the app shows the goals, techniques and subject words it recognised. Change them directly if it has misunderstood you. For example, you can keep "solitude" as the subject while removing an unwanted technique suggestion.
 
-The v0.4 starter pack contains **93 references across 26 techniques**, including paintings, photography, illustration, photomontage and an information graphic. You can explore these immediately, without an AI account. The pack includes CC0, public-domain and CC BY images; [credits](starter/CREDITS.md) record the terms for each one.
+The starter pack contains **104 references across 26 techniques**, including paintings, photography, illustration, photomontage, posters, type specimens and information graphics (Minard, Playfair, Du Bois). You can explore these immediately, without an AI account. The pack includes CC0, public-domain and CC BY images; [credits](starter/CREDITS.md) record the terms for each one.
 
 ## Develop a direction for your project
 

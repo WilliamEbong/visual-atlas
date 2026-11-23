@@ -265,10 +265,12 @@ When you started from Connections, use **Return to your exploration** to resume 
 Open **Ask** and describe the picture you need and what it is for, for example "a calm opening slide: one small figure in a lot of empty space". The atlas shows:
 
 - how it read the brief: the goals, techniques and subject words it recognised;
-- the techniques that could do the job, with what to look for and what not to confuse them with;
-- references that use those techniques. Each one gives the reasons it was chosen and its licence.
+- **Ways to do it**: up to three techniques that could do the job, one each, with what to make sure of, what not to confuse it with, and pictures that show it;
+- **All references**: every match, with the reasons it was chosen and its licence. Pictures chosen only because a word matched (no technique evidence yet) are kept apart under **Matched on words only**.
 
-Choose **In published work** to see only CC0, public-domain and CC BY pictures. Their credits are included. Asking uses no AI and sends nothing anywhere: it reads the readings, words and licences already in your library. If the atlas does not recognise your words, say what the picture should do (stand out, feel calm, show scale, surprise) or open a technique from **Explore**.
+The atlas reads briefs by matching words, so it misses some ways of saying things. Under the reading, choose what the picture should do (**Make one thing stand out**, **Create calm and order**, **Show size or scale** and so on): the answer changes at once. Choose **In published work** to see only CC0, public-domain and CC BY pictures. Their credits are included. Asking uses no AI and sends nothing anywhere: it reads the readings, words and licences already in your library.
+
+On a reference or image page, **More like this** shows pictures whose light, dark and colour sit in similar places, from every layer. It compares small thumbnails on your computer; it finds compositions that look alike, not the same subject.
 
 Pictures come from up to three places, and each is labelled:
 
@@ -284,7 +286,7 @@ Visual Atlas can read the four design-system libraries that exist on its author'
 
 ## Use Visual Atlas from an AI agent
 
-Agents such as Claude Code and Codex can ask the atlas for references while they design a slide, a page or a poster. The MCP server runs on your computer, reads your library and changes nothing. It never calls an AI model and never downloads anything.
+Agents such as Claude Code and Codex can ask the atlas for references while they design a slide, a page or a poster. The MCP server runs on your computer, reads your library and changes nothing. It never calls an AI model and never downloads anything. One tool, `search_open_collections`, goes online: it sends one search to each public collection it asks (Wikimedia Commons, the Met, the Art Institute of Chicago, the Cleveland Museum of Art, the Rijksmuseum) and returns only the results whose licence Visual Atlas can confirm.
 
 Add it to Claude Code (replace the folder with your Visual Atlas folder):
 
@@ -302,7 +304,10 @@ On the owner's computer, add `-e VISUAL_ATLAS_DESIGN_SYSTEMS=auto` (Claude Code,
 
 | Tool | What the agent gets |
 |---|---|
-| `advise` | How a brief reads, techniques that fit and how to apply them, and ranked references with reasons, licence and credit. `use: "publish"` keeps only CC0, public-domain and CC BY images. |
+| `advise` | How a brief reads, techniques that fit and how to apply them, and ranked references with reasons, licence and credit. `use: "publish"` keeps only CC0, public-domain and CC BY images. An agent can add the technique and goal ids it reads in the brief; when the words match nothing, the answer includes the list of ids. |
+| `suggest_directions` | One to five distinct ways to answer a brief, one technique each: the idea, why it works, what to make sure of, what to watch out for, and the pictures that show it. |
+| `search_open_collections` | Live search of public collections for a subject, licence-checked from each record, with credit. Downloads and stores nothing. |
+| `similar_references` | Pictures whose composition (light, dark and colour) looks like a given reference. |
 | `search_references` | References by brief or by technique and goal ids, subjects, orientation, colour, medium, era or design system. |
 | `get_reference` | One reference in full: evidence and effect for each technique, review state, licence, restrictions and credit. |
 | `view_reference` | The picture itself, at most 1024 pixels, with its credit. |
@@ -316,6 +321,9 @@ The same answers are available on the command line, as JSON by default or as tex
 | `uv run atlas advise "calm opener, one small figure" --text` | Advice for a visual decision. Add `--publish` for publishable images only. |
 | `uv run atlas refs --technique silhouette --orientation portrait` | References by technique, goal (`--goal`), subject, shape, colour, medium, era or layer. |
 | `uv run atlas ref library:12` | One reference in full. |
+| `uv run atlas directions "calm opener" --goal create-calm --text` | Distinct ways to answer a brief, with pictures for each. |
+| `uv run atlas similar library:12 --text` | Pictures with a similar composition. |
+| `uv run atlas search-open "lighthouse at night" --text` | Live, licence-checked search of public collections (goes online; downloads nothing). |
 | `uv run atlas mcp` | Run the MCP server on stdio (agents start this themselves). |
 
 References are named by an id such as `library:12`, `generated:symmetry-01` or `system:harbour-of-drifting:gen-canal-dusk`, never by a file path.

@@ -81,6 +81,32 @@ STUDIED = {
          'source_url': 'https://www.metmuseum.org/art/collection/search/286404',
          'lesson': 'Shallow focus and gentle side light: only sharpness, not colour or brightness, separates the subject.'},
     ],
+    'leading-lines': [
+        {'title': 'The Avenue at Middelharnis', 'creator': 'Meindert Hobbema', 'date': '1689',
+         'source_url': 'https://en.wikipedia.org/wiki/The_Avenue_at_Middelharnis',
+         'lesson': 'A road and two rows of trees run from the bottom edge to one point on the horizon; the eye travels the whole depth.'},
+        {'title': 'Paris Street; Rainy Day', 'creator': 'Gustave Caillebotte', 'date': '1877',
+         'source_url': 'https://en.wikipedia.org/wiki/Paris_Street;_Rainy_Day',
+         'lesson': 'Kerb lines and building edges converge on a distant point, pulling the eye past the foreground figures.'},
+    ],
+    'tight-cropping': [
+        {'title': "The Child's Bath", 'creator': 'Mary Cassatt', 'date': '1893',
+         'source_url': 'https://en.wikipedia.org/wiki/The_Child%27s_Bath',
+         'lesson': 'A high, close view cut at the frame edges puts the viewer inside the moment; nothing outside it competes.'},
+    ],
+    'gaze-direction': [
+        {'title': 'Young Man at His Window', 'creator': 'Gustave Caillebotte', 'date': '1876',
+         'source_url': 'https://en.wikipedia.org/wiki/Young_Man_at_His_Window',
+         'lesson': 'A figure seen from behind looks out to the street, so the viewer looks where he looks.'},
+        {'title': 'Girl with a Pearl Earring', 'creator': 'Johannes Vermeer', 'date': 'c. 1665',
+         'source_url': 'https://en.wikipedia.org/wiki/Girl_with_a_Pearl_Earring',
+         'lesson': 'A turned head and sideways eyes make a direction and a question; the gaze is the subject.'},
+    ],
+    'contextual-incongruity': [
+        {'title': 'The Song of Love', 'creator': 'Giorgio de Chirico', 'date': '1914',
+         'source_url': 'https://en.wikipedia.org/wiki/The_Song_of_Love',
+         'lesson': 'Ordinary objects, each painted plainly, placed where they do not belong; the mismatch alone makes the second look.'},
+    ],
 }
 
 # id: technique, title, medium, colour, subjects, notes, brief
@@ -191,6 +217,91 @@ IMAGES = {
               'the lid knob, the curve of the spout, a fine crack line in the glaze. Everything else is painted loosely: two teacups in the near foreground are soft '
               'smudged shapes of colour, and the room behind (a window, a chair, a dresser) dissolves into broad, blurry, sketchy strokes with lost edges. '
               'The teapot is not brighter or more saturated than its surroundings; only the sharpness of the handling sets it apart. Landscape 4:3. No people.'),
+    'leading-lines-01': dict(
+        technique='leading-lines', title='Boardwalk across a salt marsh', colour='muted',
+        medium='generated photograph-style image (medium-format colour film look)',
+        subjects=['boardwalk', 'salt marsh', 'hut', 'dusk'],
+        notes='The plank boardwalk starts wide at the bottom edge and narrows straight to a small hut on the horizon, so both rails and the plank lines carry the eye to it.',
+        brief='A fine-art photograph on medium-format colour film, calm dusk light, muted greens and soft violet sky. '
+              'A straight timber boardwalk with a simple rail on each side starts wide across the whole bottom edge of the frame '
+              'and runs dead straight away from the viewer across a flat salt marsh, narrowing to a single point on the horizon. '
+              'Exactly at that point sits one small weathered wooden hut, the only built thing in view. The plank lines, both rails '
+              'and the edges of the walk all converge on the hut. Viewpoint low and centred, a little above the planks. '
+              'Wide empty marsh grass on both sides, a low horizon about a third of the way down the frame, a quiet pale sky.'),
+    'leading-lines-02': dict(
+        technique='leading-lines', title='Vine rows to a farmhouse', colour='muted',
+        medium='generated gouache-style illustration',
+        subjects=['vineyard', 'rows', 'farmhouse', 'hills'],
+        notes='Curved vine rows sweep from the lower left foreground up the slope and all end at a small white farmhouse high on the right.',
+        brief='A gouache illustration with flat matte colour and visible brush texture, late-summer afternoon light, ochre, olive and dusty blue. '
+              'A rolling hillside vineyard: long parallel rows of vines start large in the lower left foreground and sweep in gentle curves '
+              'up and across the slope, narrowing with distance, so every row ends at one small white farmhouse with a terracotta roof '
+              'set high on the right third of the picture. Nothing else competes: no people, no vehicles, a plain pale sky. '
+              'The rows are clear stripes of green vine and ochre earth so their direction reads at once.'),
+    'tight-cropping-01': dict(
+        technique='tight-cropping', title='Bow of a fishing boat', colour='muted',
+        medium='generated photograph-style image (medium-format colour film look)',
+        subjects=['fishing boat', 'peeling paint', 'rope', 'texture'],
+        notes='The weathered bow fills the frame and is cut by all four edges; only painted planks, a rope and rivets remain, so the boat is felt rather than shown.',
+        brief='A fine-art close-up photograph on medium-format colour film, soft overcast light. An extremely tight crop of the bow of an old '
+              'wooden fishing boat: the curved painted planks fill the entire frame and run out past all four edges, so the whole boat is never seen. '
+              'Faded blue paint peels to show red undercoat and grey wood; a thick coil of rope crosses the lower right corner and is cut off by the frame; '
+              'a short row of rust-streaked iron rivets runs diagonally. No sky, no water, no background at all. Rich but muted colour, fine detail in the paint.'),
+    'tight-cropping-02': dict(
+        technique='tight-cropping', title='Figs in a bowl, cropped close', colour='vivid',
+        medium='generated photograph-style image (medium-format colour film look)',
+        subjects=['figs', 'bowl', 'fruit', 'table'],
+        notes='Seen from directly above, the bowl rim runs out of the frame on three sides and the figs press to the edges; one split fig sits just off centre.',
+        brief='A fine-art food photograph on medium-format colour film, seen from directly above, soft window light from the left. '
+              'A shallow glazed ceramic bowl heaped with ripe purple figs, cropped so tightly that the bowl rim leaves the frame on the top, left and bottom edges '
+              'and the figs press right up against the frame. One fig, cut in half to show its pink seeded inside, sits just right of centre. '
+              'No table, cloth or background visible beyond a sliver at the right edge. Deep purples, green stems, pink flesh, a cream glaze.'),
+    'gaze-direction-01': dict(
+        technique='gaze-direction', title='Fox looking out of frame', colour='muted',
+        medium='generated photograph-style image (medium-format colour film look)',
+        subjects=['fox', 'snow', 'winter', 'field'],
+        notes='A red fox sits in the left third with its head turned sharply to the right, ears forward; the open snow to the right and the frame edge are where the eye goes.',
+        brief='A fine-art wildlife photograph on medium-format colour film, soft grey winter light. A red fox sits upright in a smooth snowfield, '
+              'placed in the left third of a wide landscape frame. Its body faces the viewer but its head is turned sharply to the right, '
+              'ears pricked forward, eyes fixed on something beyond the right edge of the picture that is not shown. The right two thirds are empty, '
+              'even snow with a faint line of bare birch trunks far behind. The fox is sharp and correctly formed: four legs, one tail, natural fur.'),
+    'gaze-direction-02': dict(
+        technique='gaze-direction', title='Two climbers looking up', colour='muted',
+        medium='generated gouache-style illustration',
+        subjects=['climbers', 'cliff', 'mountain', 'rope'],
+        notes='Two small climbers at the foot of the frame both look up and to the left; their raised heads and a pointing arm send the eye up the rock face to a pale ledge.',
+        brief='A gouache illustration with flat matte colour and simple shapes, cool morning light, slate blue, grey and a single warm orange. '
+              'Two small climbers in orange jackets stand at the bottom right of the picture at the foot of a tall grey rock face that fills the frame. '
+              'Both tilt their heads back and look up and to the left; one points up with an outstretched arm. High on the upper left, a small pale ledge '
+              'catches the light where they are looking. Figures are simple and clear (no faces needed): their posture and head direction carry the look.'),
+    'incongruity-01': dict(
+        technique='contextual-incongruity', title='Dinner table in the surf', colour='muted',
+        medium='generated photograph-style image (medium-format colour film look)',
+        subjects=['dinner table', 'sea', 'beach', 'dawn'],
+        notes='A formally laid table with white linen, silver and candles stands in shallow surf on an empty beach; each object is ordinary, the place is wrong.',
+        brief='A fine-art photograph on medium-format colour film, pale dawn light, muted blues and cream. On an empty sandy beach, a long dining table '
+              'laid formally for eight (white linen cloth, white plates, polished cutlery, stemmed glasses and two unlit silver candlesticks, with plain wooden chairs) '
+              'stands in shallow surf: a thin sheet of sea water runs around the table and chair legs. Everything on the table is neat and dry, as if waiting for guests. '
+              'No people. Calm sea to the horizon, an even sky. Shot straight on from the side of the table at seated eye level.'),
+    'incongruity-02': dict(
+        technique='contextual-incongruity', title='Reading chair in a wheat field', colour='muted',
+        medium='generated photograph-style image (medium-format colour film look)',
+        subjects=['armchair', 'lamp', 'wheat field', 'summer'],
+        notes='A worn velvet armchair, a side table with a book and a lit standard lamp stand in the middle of a ripe wheat field at noon.',
+        brief='A fine-art photograph on medium-format colour film, bright high summer noon light, golden wheat and deep blue sky. '
+              'In the middle of a wide ripe wheat field stands a worn green velvet armchair, a small wooden side table with an open book and a cup, '
+              'and a tall standard lamp with a fabric shade that is switched on and glowing weakly in daylight, its flex trailing into the wheat. '
+              'The wheat reaches the seat of the chair. No people, no house in sight, a flat horizon. Everything else is ordinary and real.'),
+    'fg-ambiguity-03': dict(
+        technique='figure-ground-ambiguity', title='Pawn or two faces', colour='muted',
+        medium='generated screenprint-style illustration',
+        subjects=['chess pawn', 'faces', 'positive and negative shape'],
+        notes='A cream chess pawn stands in the centre of a dark green field; the green spaces either side are two human profiles facing each other, sharing the pawn\'s contours.',
+        brief='A flat two-colour screenprint illustration in dark bottle green and warm cream only, no shading, gradients or outlines, faint paper grain. '
+              'A single tall cream chess pawn stands upright in the exact centre, filling the full height of the frame, on a dark green ground. '
+              'Its left and right contours are drawn so that the two green spaces beside it read equally as two human faces in profile facing each other: '
+              'the pawn\'s round head forms the space between two foreheads, its neck collar the noses, its narrow waist the lips and chins, its wide base the necks and shoulders. '
+              'Both readings must be equally strong: a pawn, or two faces nearly touching. Perfectly symmetrical, nothing else in the picture.'),
 }
 
 
@@ -243,7 +354,11 @@ def build(review_path: str):
                        'checked_by': 'Claude (Opus) by eye, full size', 'notes': rv['notes']},
         })
         print(image_id, im.size, (OUT / f'{image_id}.jpg').stat().st_size, 'bytes')
-    manifest = {'version': 1, 'licence_note': LICENCE, 'images': images, 'dropped': review['dropped']}
+    old = json.loads((OUT / 'manifest.json').read_text(encoding='utf-8')) if (OUT / 'manifest.json').exists() else {}
+    kept = {image['id'] for image in images}  # a later batch adds to the manifest; re-kept ids are replaced
+    images = [i for i in old.get('images', []) if i['id'] not in kept] + images
+    dropped = old.get('dropped', []) + [d for d in review['dropped'] if d not in old.get('dropped', [])]
+    manifest = {'version': 1, 'licence_note': LICENCE, 'images': images, 'dropped': dropped}
     (OUT / 'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 
 
