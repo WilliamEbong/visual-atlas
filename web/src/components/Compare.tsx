@@ -58,7 +58,7 @@ export default function Compare({ ids }: { ids: number[] }) {
 
       <section className="section" aria-labelledby="matrix" style={{ marginTop: 48 }}>
         <h2 id="matrix">Techniques</h2>
-        <p className="mono" style={{ margin: '8px 0 12px' }}>◐ agreed by a second model · ● confirmed by you · ○ proposed by a model · — not seen{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
+        <p className="mono" style={{ margin: '8px 0 12px' }}><span className="phone-legend">◐ agreed by a second model · ● confirmed by you · ○ proposed by a model · — not seen</span>{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
         <div className="scroll-x"><table className="plain compare-table">
           <thead><tr><th scope="col" style={{ width: '34%' }}>Technique</th>{data.images.map((d) => <th key={d.image.id} scope="col">Fig. {d.image.id}</th>)}</tr></thead>
           <tbody>

@@ -569,3 +569,8 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .drawers.goals .drawer .letter { font-size: 28px; }
 .direction-lead { display: block; background: var(--card); }
 .direction-lead img { display: block; width: 100%; height: 220px; object-fit: contain; }
+.phone-legend { display: none; }
+@media (max-width: 760px) { .phone-legend { display: inline; } }
+.direction-lead { background: none; }
+.direction-lead img { width: auto; max-width: 100%; height: 220px; }
+.tray-col .direction-title { min-height: 2.2em; }

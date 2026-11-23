@@ -90,6 +90,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
   const index = taxonomy?.techniques.findIndex((t) => t.id === id) ?? -1
   const lens = data.examples.find((e) => e.state === 'human_reviewed') ?? data.examples[0]
   const confirmed = data.examples.filter((e) => e.state === 'human_reviewed').length
+  const taught = data.examples.some((e) => e.chosen) ? data.examples.filter((e) => e.chosen).length : data.examples.length
   return (
     <>
       <section className="horizon-head" aria-labelledby="technique-title">
@@ -121,7 +122,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
 
       <section className="section" aria-labelledby="examples">
         <div className="section-title">
-          <h2 id="examples">In your library <span className="mono" style={{ fontSize: 14 }}>{data.examples.length} example{data.examples.length === 1 ? '' : 's'}{confirmed ? ` · ${confirmed} confirmed by you` : ''}</span></h2>
+          <h2 id="examples">In your library <span className="mono" style={{ fontSize: 14 }}>{taught} example{taught === 1 ? '' : 's'}{confirmed ? ` · ${confirmed} confirmed by you` : ''}</span></h2>
           <div className="row">
             {!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find more examples</a>}
             <a className="button" href={href('library', { technique: data.id, from })}>Show in the library</a>
