@@ -148,3 +148,24 @@ def test_commons_template_residue_is_stripped_from_catalogue_text():
     assert _clip('A Market Place and Crowd title QS:P1476,en:"A Market Place and Crowd" '
                  'label QS:Len,"A Market Place and Crowd"') == 'A Market Place and Crowd'
     assert _clip('An ordinary title with dates 1890–1900') == 'An ordinary title with dates 1890–1900'
+
+
+def test_rijksmuseum_survives_list_shaped_dates_and_productions():
+    """Linked Art allows lists where one object is usual (found while curating, 23 Nov 2026: AttributeError)."""
+    base = 'https://id.rijksmuseum.nl/'
+    records = {
+        base + '1': {'identified_by': [{'type': 'Name', 'content': 'Poster'}], 'shows': [{'id': base + '2'}],
+                     'produced_by': [{'timespan': [{'identified_by': [{'type': 'Name', 'content': '1910'}]}]}]},
+        base + '2': {'digitally_shown_by': [{'id': base + '3'}]},
+        base + '3': {'access_point': [{'id': 'https://iiif.micr.io/abc/full/max/0/default.jpg'}]},
+        base + '4': {'identified_by': [{'type': 'Name', 'content': 'Print'}], 'shows': [{'id': base + '2'}],
+                     'produced_by': {'timespan': [{'identified_by': [{'type': 'Name', 'content': '1890'}]}]}}}
+
+    class Stub:
+        def get_json(self, provider, url, **kwargs):
+            if url.startswith('https://data.rijksmuseum.nl/search'):
+                return {'orderedItems': [{'id': base + '1'}, {'id': base + '4'}]}
+            return records[url]
+
+    found = providers.search(Stub(), 'rijksmuseum', 'poster', 0, 5)
+    assert [(r['title'], r['date_text']) for r in found] == [('Poster', '1910'), ('Print', '1890')]

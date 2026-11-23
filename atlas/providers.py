@@ -182,6 +182,12 @@ def _english(entries, classified: str | None = None) -> str:
     return (english or matches or [{'content': ''}])[0]['content']
 
 
+def _one(value) -> dict:
+    """Linked Art allows a list where one object is usual: take the first object, or nothing."""
+    value = value[0] if isinstance(value, list) and value else value
+    return value if isinstance(value, dict) else {}
+
+
 def _first_id(entries) -> str:
     entry = (entries or [{}])[0] if isinstance(entries, list) else {}
     return entry.get('id', '') if isinstance(entry, dict) else ''
@@ -212,7 +218,7 @@ def _rijksmuseum(fetcher, query, page, per_page):
             if error.code == 'http_404':
                 continue
             raise
-        produced = item.get('produced_by') or {}
+        produced = _one(item.get('produced_by'))
         makers = [_english(part.get('referred_to_by'), CREATOR_NOTE)
                   for part in produced.get('part') or [] if isinstance(part, dict)]
         pages = [_first_id(carrier.get('access_point')) for s in item.get('subject_of') or [] if isinstance(s, dict)
@@ -228,7 +234,7 @@ def _rijksmuseum(fetcher, query, page, per_page):
             'provider': 'rijksmuseum', 'provider_item_id': object_url.rsplit('/', 1)[-1],
             'title': _clip(_english(item.get('identified_by')), 300),
             'creator': _clip(re.sub(r'\s*\([^)]*\)\s*$', '', next((m for m in makers if m), '')), 200),
-            'date_text': _clip(_english((produced.get('timespan') or {}).get('identified_by')), 80),
+            'date_text': _clip(_english(_one(produced.get('timespan')).get('identified_by')), 80),
             'medium': _clip(_english(item.get('referred_to_by'), MATERIAL_NOTE), 200),
             'description': _clip(_english(item.get('referred_to_by'), DESCRIPTION_NOTE), 400),
             'source_url': page_url or (f'https://www.rijksmuseum.nl/en/collection/{number}' if number else ''),
