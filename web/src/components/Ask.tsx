@@ -185,7 +185,7 @@ function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; l
       {refs.map((ref) => <li key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
         <a href={refLink(ref, from, use)} className="plate">
           <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
-          <span className="plate-title">{cleanTitle(ref.title)}</span></a>
+          <span className="plate-title">{cleanTitle(ref.title)}</span>{ref.creator && <span className="sr-only">, {ref.creator}</span>}</a>
         {ref.reasons[0] && !ref.reasons[0].startsWith('Similar placement') && <span className="strip-reason"><Reason text={ref.reasons[0]} /></span>}
         <span className="mono strip-meta">{ref.layer !== 'library' ? `${layerLabel(ref)} · ` : ''}{plainLicence(ref)}</span>
       </li>)}

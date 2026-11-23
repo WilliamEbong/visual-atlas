@@ -490,4 +490,5 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .way .refs-row { margin-top: 0; }
 @media (max-width: 600px) { .refs-row { --row: 220px; } .refs-row .plate-item { max-width: calc(var(--a) * 320px); } }
 .refs-row .plate-title { margin-top: 8px; }
+.refs-row .plate-frame img { object-fit: contain; }  /* the whole composition is the evidence */
 .refs-row .strip-reason, .refs-row .strip-meta { min-width: 0; }

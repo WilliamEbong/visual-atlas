@@ -134,7 +134,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
               <li key={e.id} className="plate-item" style={{ '--a': aspect(e) } as React.CSSProperties}>
                 <a href={href(`image/${e.id}`, { from })} className="plate">
                   <span className="plate-frame"><img src={media(e.thumb)} alt="" loading="lazy" /></span>
-                  <span className="plate-title">{cleanTitle(e.title)}</span></a>
+                  <span className="plate-title">{cleanTitle(e.title)}</span>{e.creator && <span className="sr-only">, {e.creator}</span>}</a>
                 {e.state !== 'model_reviewed' && <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span>}
               </li>))}
           </ul>

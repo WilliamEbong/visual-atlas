@@ -87,7 +87,7 @@ Left from the last scoring (both scorers, about 6 to 7 out of 10 on these screen
 
 **Codex review of round 4:** four findings, then two more on the fix, all confirmed and fixed with tests (word-only
 results outranking evidence, mood words crowding out a subject, phone Compare losing its controls, unreachable word
-matches, a routed word match counted as evidence, phone strips wrapping).
+matches, a routed word match counted as evidence, phone strips wrapping). A final review of the last changes found two more, both fixed: strip pictures were cropped (now shown whole), and two works with the same title had the same link name (the maker is now read out).
 
 ## Round 3: tidy, simplify, graphify (23 November)
 
