@@ -10,7 +10,7 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
   suggest_directions, similar_references and search_open_collections MCP tools (+ atlas directions, similar,
   search-open); agent-supplied ids and codebook fallback in advise; Ask "Ways to do it", goal chips, word-only
   matches apart, More like this; 11 typography/poster/infographic starter references (93 to 104); 9 more
-  generated references (18 kept, 3 dropped) with IPTC provenance labels; design-system id numbering; warm
+  generated references (18 kept, 3 dropped) with IPTC provenance labels; warm
   caches; Rijksmuseum and Commons title fixes.
 - Proxy blind test (docs/evaluation/r2/proxy/PROXY-REPORT.md): the desk lost both rounds to an Opus agent with
   web search (8-1-1 twice; then 6-1-3 and 7-2-1 with open search). Honest finding, recorded as a proxy.

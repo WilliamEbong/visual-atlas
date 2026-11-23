@@ -198,18 +198,6 @@ def test_mcp_discards_an_oversized_frame_and_answers_the_next(monkeypatch):
 # ---- round 3 (overnight round 2) -----------------------------------------------------------------------------
 
 
-def test_two_folders_with_the_same_slug_keep_separate_refs(starter_home, tmp_path, monkeypatch):
-    first = _system(tmp_path / 'a', ['tea-1,window,tea;garden,light,muted,painting,First tea,A,1800,CC0,A,https://x,,'
-                                     'tea,300x200'])
-    second = _system(tmp_path / 'b', ['tea-1,window,tea;garden,light,muted,painting,Second tea,A,1800,CC0,A,https://x,,'
-                                      'tea,300x200'])
-    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', f'{first};{second}')
-    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
-    refs = [r['ref'] for r in desk.search(brief='tea garden', home=starter_home)['results'] if r['layer'] == 'design-system']
-    assert len(refs) == len(set(refs)) == 2
-    assert {desk.get(ref, home=starter_home)['title'] for ref in refs} == {'First tea', 'Second tea'}
-
-
 def test_every_generated_file_carries_its_provenance_label():
     manifest = json.loads((REPO / 'generated' / 'manifest.json').read_text(encoding='utf-8'))
     for item in manifest['images']:
@@ -231,17 +219,11 @@ def test_more_like_this_ranks_the_closest_composition_first(tmp_path, monkeypatc
         items.append({'id': name, 'file': f'{name}.jpg', 'title': name, 'tool': 'x', 'date': 'd', 'prompt': 'p'})
     (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
     monkeypatch.setattr(layers, 'GENERATED', folder)
-    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache')
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     found = desk.similar('generated:red-left', layers_wanted=['generated'], home=tmp_path / 'home')
     assert [r['ref'] for r in found['results']] == ['generated:red-left-copy', 'generated:blue-right']
     assert found['results'][0]['score'] > 0.9 > found['results'][1]['score']
-    cache = list((tmp_path / 'cache').glob('signatures-*.json'))
-    assert len(cache) == 1 and not (tmp_path / 'home').exists()
-    assert 'red-left' not in cache[0].read_text(encoding='utf-8')  # opaque keys: no file names or paths
-    (folder / 'blue-right.jpg').unlink()  # a full pass forgets pictures that are gone
-    desk.similar('generated:red-left', home=tmp_path / 'home')
-    assert len(json.loads(cache[0].read_text(encoding='utf-8'))) == 2
+    assert not (tmp_path / 'home').exists()  # reads only: nothing written
 
 
 def test_open_search_returns_only_rights_checked_candidates(monkeypatch):
@@ -292,18 +274,6 @@ def test_open_searches_share_one_fetcher_so_cooldowns_carry_over(monkeypatch):
     assert len(seen) == 2 and seen[0] is seen[1]
 
 
-def test_long_colliding_system_names_still_give_refs_that_open(starter_home, tmp_path, monkeypatch):
-    long = 'x' * 70
-    first = _system(tmp_path / 'a', ['tea-1,window,tea,light,muted,painting,First,A,1800,CC0,A,https://x,,tea,300x200'])
-    second = _system(tmp_path / 'b', ['tea-1,window,tea,light,muted,painting,Second,A,1800,CC0,A,https://x,,tea,300x200'])
-    first, second = first.rename(first.with_name(long)), second.rename(second.with_name(long))
-    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', f'{first};{second}')
-    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
-    refs = [r['ref'] for r in desk.search(brief='tea', home=starter_home)['results'] if r['layer'] == 'design-system']
-    assert len(set(refs)) == 2
-    assert {desk.get(ref, home=starter_home)['title'] for ref in refs} == {'First', 'Second'}
-
-
 def test_library_only_directions_do_not_route_to_private_systems(starter_home, tmp_path, monkeypatch):
     root = _system(tmp_path, ['tea-1,window,tea;garden,light,muted,painting,Tea,A,1800,CC0,A,https://x,,tea,300x200'])
     monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', str(root))
@@ -315,25 +285,6 @@ def test_library_only_directions_do_not_route_to_private_systems(starter_home, t
 
 
 # ---- Codex review, overnight round 3 ------------------------------------------------------------------------------
-
-
-def test_the_old_shared_signature_file_is_retired(tmp_path, monkeypatch):
-    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache')
-    (tmp_path / 'cache').mkdir()
-    old = tmp_path / 'cache' / 'signatures-v1.json'
-    old.write_text(json.dumps({'C:/private/picture.jpg|1|2': '00'}), encoding='utf-8')
-    desk._load_signatures(tmp_path / 'home')
-    assert not old.exists()
-
-
-def test_a_filtered_comparison_keeps_what_a_full_pass_saved(tmp_path, monkeypatch):
-    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache')
-    home = tmp_path / 'home'
-    desk._save_signatures(home, {'a': '01', 'b': '02'}, prune=True)
-    desk._save_signatures(home, {'c': '03'}, prune=False)
-    assert desk._load_signatures(home) == {'a': '01', 'b': '02', 'c': '03'}
-    desk._save_signatures(home, {'c': '03'}, prune=True)
-    assert desk._load_signatures(home) == {'c': '03'}
 
 
 def test_directions_find_technique_examples_behind_many_word_matches(tmp_path, monkeypatch):

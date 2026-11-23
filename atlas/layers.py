@@ -104,17 +104,9 @@ def systems(home: Path | None = None) -> list[dict]:
     out = []
     for folder in enabled_systems(home):
         try:
-            system = _read_system(folder, os.path.getmtime(folder / 'references' / 'images.csv'))
+            out.append(_read_system(folder, os.path.getmtime(folder / 'references' / 'images.csv')))
         except (OSError, csv.Error, UnicodeDecodeError):
             continue  # an unreadable catalogue leaves that system out; the rest still answer
-        taken = {s['name'] for s in out}
-        if system['name'] in taken:  # two folders whose names slug alike: number the later one, in setting order
-            name = next(f"{system['name'][:56]}-{n}" for n in range(2, 1000)
-                        if f"{system['name'][:56]}-{n}" not in taken)  # stays within the 60-character ref grammar
-            refs = [{**r, 'system': name, 'ref': f"system:{name}:{r['ref'].rsplit(':', 1)[1]}"}
-                    for r in system['references']]
-            system = {**system, 'name': name, 'references': refs}
-        out.append(system)
     return out
 
 

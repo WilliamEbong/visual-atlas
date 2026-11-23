@@ -8,14 +8,10 @@ web app (/api/desk). It reads three layers and labels each result with the layer
 Every reason is built from stored data (an annotation, a subject word, a metric), so it can be checked.
 """
 
-import hashlib
 import json
-import os
 import re
 import sqlite3
-import tempfile
-import threading
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from functools import lru_cache
 from pathlib import Path
 
@@ -463,66 +459,26 @@ def _picture(record: dict, home: Path) -> Path | None:
     return path if path.is_relative_to((home / 'media').resolve()) and path.is_file() else None
 
 
-# Signatures of pictures already seen. Large design-system files take about 0.1 s each to decode, so a first
-# comparison across hundreds of them would take a minute. They are kept in the user's own temp folder (never in the
-# library), one file per library, under opaque keys, and pruned to what the last full comparison still used.
-SIGNATURES = Path(tempfile.gettempdir()) / 'visual-atlas'
-
-
-def _cache_file(home: Path) -> Path:
-    return SIGNATURES / f"signatures-{hashlib.sha256(str(home.resolve()).encode()).hexdigest()[:16]}.json"
-
-
-_cache_lock = threading.Lock()
-
-
-def _load_signatures(home: Path) -> dict:
-    with suppress(OSError):  # the first overnight build kept one shared file with paths in it: retire it
-        (SIGNATURES / 'signatures-v1.json').unlink(missing_ok=True)
+@lru_cache(maxsize=8192)
+def _signature(path: str, mtime_ns: int, size: int) -> Image.Image | None:
+    """An 8 x 8 luma-chroma thumbnail: where the light, dark and colour sit. Local, no model. Kept in memory for the
+    process; the app computes them in the background at start."""
+    del mtime_ns, size  # part of the cache key: a changed file is read again
     try:
-        data = json.loads(_cache_file(home).read_text(encoding='utf-8'))
-        return data if isinstance(data, dict) else {}
-    except (OSError, ValueError):
-        return {}
+        with Image.open(path) as picture:
+            picture.draft('RGB', (64, 64))
+            return picture.convert('RGB').resize((8, 8), Image.Resampling.BOX).convert('YCbCr')
+    except (OSError, ValueError, Image.DecompressionBombError):
+        return None
 
 
-def _save_signatures(home: Path, cache: dict, prune: bool):
-    """A full pass replaces the file (pruning); a filtered pass only adds to what is there now."""
-    with _cache_lock, suppress(OSError):  # only a cache: losing it costs time, never results
-        SIGNATURES.mkdir(parents=True, exist_ok=True)
-        target = _cache_file(home)
-        merged = cache if prune else {**_load_signatures(home), **cache}
-        with tempfile.NamedTemporaryFile('w', encoding='utf-8', dir=SIGNATURES, suffix='.tmp', delete=False) as part:
-            json.dump(merged, part)
-        os.replace(part.name, target)
-
-
-def _signature(path: Path, cache: dict, seen: set) -> Image.Image | None:
-    """An 8 x 8 luma-chroma thumbnail: where the light, dark and colour sit. Local, no model."""
+def _signature_of(record: dict, home: Path) -> Image.Image | None:
+    path = _picture(record, home)
     try:
-        stat = path.stat()
+        stat = path.stat() if path else None
     except OSError:
         return None
-    key = hashlib.sha256(f'{path}|{stat.st_mtime_ns}|{stat.st_size}'.encode()).hexdigest()[:32]
-    seen.add(key)
-    if key not in cache:
-        try:
-            with Image.open(path) as picture:
-                picture.draft('RGB', (64, 64))
-                small = picture.convert('RGB').resize((8, 8), Image.Resampling.BOX).convert('YCbCr')
-        except (OSError, ValueError, Image.DecompressionBombError):
-            return None
-        cache[key] = small.tobytes().hex()
-    try:
-        return Image.frombytes('YCbCr', (8, 8), bytes.fromhex(cache[key]))
-    except (ValueError, TypeError):  # a damaged cache entry: forget it
-        cache.pop(key, None)
-        return None
-
-
-def _signature_of(record: dict, home: Path, cache: dict, seen: set) -> Image.Image | None:
-    path = _picture(record, home)
-    return _signature(path, cache, seen) if path else None
+    return _signature(str(path), stat.st_mtime_ns, stat.st_size) if stat else None
 
 
 def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_wanted=None,
@@ -536,8 +492,7 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
         raise ValueError(f"layers are {', '.join(LAYERS)}")
     home = home_dir(home)
     target = _record(ref, home)
-    cache, seen = _load_signatures(home), set()
-    mine = _signature_of(target, home, cache, seen)
+    mine = _signature_of(target, home)
     if mine is None:
         raise LookupError(f'the picture for {ref} cannot be read')
     names = {t['id']: t['name'] for t in catalog.load()[0]['techniques']}
@@ -549,16 +504,12 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
             continue
         if publishable_only and (candidate['layer'] != 'library' or candidate['licence']['code'] not in PUBLISHABLE):
             continue
-        theirs = _signature_of(candidate, home, cache, seen)
+        theirs = _signature_of(candidate, home)
         if theirs is None:
             continue
         # ponytail: brute force over every reference; fine to tens of thousands, index it if libraries grow past that
         distance = sum(ImageStat.Stat(ImageChops.difference(mine, theirs)).mean) / 3  # mean difference, 0-255
         scored.append((distance, candidate))
-    full = set(wanted) == set(LAYERS) and not publishable_only
-    if full:  # a full pass: drop pictures no longer there
-        cache = {key: value for key, value in cache.items() if key in seen}
-    _save_signatures(home, cache, prune=full)
     scored.sort(key=lambda item: (item[0], item[1]['ref']))
     results = []
     for distance, candidate in scored[:limit]:

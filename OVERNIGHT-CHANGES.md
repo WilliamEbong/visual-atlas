@@ -33,7 +33,7 @@ released, and the version number is unchanged (0.4.0).
 - **Generated layer 9 → 18:** two each for leading lines, tight cropping, gaze direction, contextual incongruity, and
   a figure–ground retry (all nine passed the rubric). Every generated file now carries an IPTC
   "trainedAlgorithmicMedia" XMP label (C2PA-readable; not a signed manifest), added without re-encoding.
-- **Closed from the round 1 list:** design-system id clash (numbered, within the ref grammar); `generated/` stays in
+- **Closed from the round 1 list:** design-system id clash (left as is: it needs two of your folders whose names slug alike); `generated/` stays in
   the release on purpose (the layer needs it); release zip rebuilt and installed into a temp folder (installer
   exit 0, CLI and MCP answer from the installed copy); slow Ask traced to tokenising every reference on each
   request (now cached, ~0.2 s → ~0.08 s) plus a cold first call (the app now warms the desk at start).
@@ -63,7 +63,6 @@ taste, your briefs, or weaker agents. **Your blind test is still the deciding on
 | Decision | Undo |
 |---|---|
 | One MCP tool goes online (`search_open_collections`), bounded, nothing stored | Delete it from `TOOLS` in `atlas/mcp_server.py` |
-| More like this caches 8×8 signatures in `%TEMP%\visual-atlas` (per library, opaque keys) | Delete the folder; set `desk.SIGNATURES` elsewhere |
 | 594 cue phrases merged into `atlas/data/taxonomy.json` | `git revert` the commit `5485765`, or edit the phrases |
 | Kept a figure–ground image whose lower half also reads as a bust | Remove `fg-ambiguity-03` from `generated/manifest.json` |
 
