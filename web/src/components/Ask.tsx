@@ -289,7 +289,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
               <div><p className="guide-def">{way.idea}</p>
                 {way.serves.length > 0 && <p className="mono">Serves: {way.serves.join(' · ')}</p>}</div>
             </div>
-            <RefStrip refs={way.references} from={from} use={use} label={`Pictures that show ${way.technique.name}`} />
+            <RefStrip refs={[...way.references].sort((a, b) => Number(a.layer !== 'library') - Number(b.layer !== 'library'))} from={from} use={use} label={`Pictures that show ${way.technique.name}`} />
             {way.make_sure[0] && <p className="way-first"><span className="mono">Make sure </span>{way.make_sure[0]}</p>}
             <details className="way-how"><summary className="mono">How to carry it out</summary>
               <ul>{way.make_sure.slice(1, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
