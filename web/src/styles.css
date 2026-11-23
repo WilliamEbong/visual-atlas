@@ -560,8 +560,10 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 /* root cause C: screen leftovers */
 .justified:not(.refs-row) .plate .techs { display: block; }  /* filed by technique: say so on every tile */
 .image-head { align-items: flex-start; }
-.compare-grid { grid-template-columns: 160px repeat(var(--n), minmax(0, 1fr)); }
-.compare-table th[scope="col"]:first-child { width: 160px !important; }
+@media (min-width: 761px) {
+  .compare-grid { grid-template-columns: 160px repeat(var(--n), minmax(0, 1fr)); }
+  .compare-table th[scope="col"]:first-child { width: 160px !important; }
+}
 .drawers.goals { gap: 0 32px; }
 .drawers.goals .drawer { border: 0; border-top: 1px solid var(--keyline); padding: 16px 0 18px; min-height: 0; background: none; }
 .drawers.goals .drawer .letter { font-size: 28px; }
