@@ -206,7 +206,8 @@ export default function Library({ query }: { query: URLSearchParams }) {
                       <span className="maker">{[item.creator, item.date_text].filter(Boolean).join(', ') || 'Unknown maker'}</span>
                       <span className="techs">{item.techniques.slice(0, 3).map((t) => t.name.replace(/ \(.*\)$/, '')).join(' · ') || (item.status === 'pending' ? 'Waiting for analysis' : 'No technique yet')}</span>
                     </a>
-                    <button type="button" className="pick" aria-pressed={picked} aria-label={`${picked ? 'Remove from' : 'Add to'} comparison: ${item.title}`}
+                    <button type="button" className="pick" aria-pressed={picked} aria-label={`Compare: ${item.title}`} disabled={!picked && compare.length >= 4}
+                      title={!picked && compare.length >= 4 ? 'Compare holds four images: remove one first' : undefined}
                       onClick={() => toggleCompare({ id: item.id, title: item.title, thumb: item.thumb })}>{picked ? '✓ Comparing' : '+ Compare'}</button>
                   </article>
                 )

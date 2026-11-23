@@ -427,3 +427,4 @@ button.primary:disabled { opacity: 1; background: transparent; color: var(--capt
 }
 #content:focus, #content:focus-visible { outline: none; }  /* focused by script on each new page; not a control */
 .use-line { margin-top: 14px; font: 500 16px/1.4 var(--label); color: var(--ink); }
+.sample h2 { font-size: 22px; }

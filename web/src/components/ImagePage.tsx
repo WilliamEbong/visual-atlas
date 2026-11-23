@@ -1,17 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { del, media, post, readOnly, request } from '../lib/client'
 import { date, useApp, useData } from '../lib/hooks'
-import { aspect, cleanTitle } from '../lib/library'
+import { aspect, backendName, cleanTitle } from '../lib/library'
 import { regionBox, regionLabel } from '../lib/regions'
 import { go, href, useRoute } from '../lib/router'
 import type { Annotation, Collection, ImageDetail, Settings } from '../lib/types'
 import { PROVIDERS, STATE_LABEL } from '../lib/types'
 import { MoreLikeThis } from './Ask'
 import { Failure, Loading, useNotice } from './ui'
-
-function backendName(name: string) {
-  return { codex: 'Codex', 'codex-interactive': 'Codex curation agent', claude: 'Claude Code', fake: 'Practice mode (no model)' }[name] ?? name
-}
 
 function who(changedBy: string) {
   if (changedBy === 'human') return 'you'
@@ -118,7 +114,8 @@ export default function ImagePage({ id }: { id: number }) {
           {rights && <p className="mono" style={{ color: 'var(--green)' }}>{rights.label} · {date(rights.verified_at)}</p>}
           <div className="row" style={{ marginTop: 6 }}>
             {!readOnly && <SaveToCollection imageId={image.id} member={data.collections} onDone={reload} />}
-            <button type="button" aria-pressed={picked} onClick={() => toggleCompare({ id: image.id, title: image.title, thumb: image.thumb })}>{picked ? '✓ Comparing' : 'Compare'}</button>
+            <button type="button" aria-pressed={picked} disabled={!picked && compare.length >= 4} title={!picked && compare.length >= 4 ? 'Compare holds four images: remove one first' : undefined}
+              onClick={() => toggleCompare({ id: image.id, title: image.title, thumb: image.thumb })}>{!picked && compare.length >= 4 ? 'Compare is full' : 'Compare'}</button>
             {!readOnly && <button type="button" aria-pressed={!!image.favorite} onClick={() => favourite(!image.favorite)}>{image.favorite ? '★ Favourite' : '☆ Favourite'}</button>}
             <a className="button" href={image.source_url} target="_blank" rel="noreferrer">Open at the source ↗</a>
           </div>

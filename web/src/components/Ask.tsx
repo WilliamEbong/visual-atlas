@@ -37,7 +37,7 @@ export function plainLicence(ref: DeskRef): string {
   switch (ref.licence.code) {
     case 'cc0': case 'pd': return 'Free to use; credit appreciated'
     case 'cc-by': return 'Free to use with credit'
-    case 'generated': return 'Generated: no licence asserted'
+    case 'generated': return 'No licence asserted'
     default: return 'Licence unclear: check the source'
   }
 }
@@ -128,8 +128,24 @@ export default function Ask() {
         choose={(goal) => set({ goals: (goals.includes(goal) ? goals.filter((g) => g !== goal) : [...goals, goal]).join(',') })} more={limit < 40 && answer.data.total_matches > limit
         ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
+      {!asked && <SampleAnswer brief={EXAMPLES[0]} open={() => set({ q: EXAMPLES[0], goals: '' })} />}
       {!asked && <p className="lede" style={{ marginTop: 40 }}>Describe what the picture should do. You get ways to do it and pictures that show them, each with its reason and licence. Nothing is sent to an AI service.</p>}
     </>
+  )
+}
+
+/** The empty page shows what an answer looks like, with pictures, before anyone types. */
+function SampleAnswer({ brief, open }: { brief: string; open: () => void }) {
+  const sample = useData<DeskAnswer>(`desk?${new URLSearchParams({ brief, limit: '5' })}`)
+  if (!sample.data?.results.length) return null
+  return (
+    <section className="section sample" aria-labelledby="sample-title" style={{ marginTop: 40 }}>
+      <div className="section-title">
+        <h2 id="sample-title">For example: “{brief}”</h2>
+        <button type="button" className="quiet" onClick={open}>See the whole answer</button>
+      </div>
+      <RefStrip refs={sample.data.results} from="#/ask" use="reference" label="Pictures from a sample answer" />
+    </section>
   )
 }
 

@@ -40,10 +40,16 @@ export default function App() {
   }, [pageKey])
   const toggleCompare = useCallback((pick: Pick) => setCompare((picks) => picks.some((p) => p.id === pick.id)
     ? picks.filter((p) => p.id !== pick.id) : picks.length >= 4 ? picks : [...picks, pick]), [])
+  const [finished, setFinished] = useState<Job | null>(null)
   const checkJobs = useCallback(() => {
     if (readOnly) return
-    request<Job[]>('jobs?limit=5').then((jobs) => setRunning(jobs.find((job) => ['queued', 'running', 'cancelling'].includes(job.state)) ?? null))
-      .catch(() => setRunning(null))
+    request<Job[]>('jobs?limit=5').then((jobs) => {
+      const active = jobs.find((job) => ['queued', 'running', 'cancelling'].includes(job.state)) ?? null
+      setRunning((previous) => {
+        if (previous && !active) setFinished(jobs.find((job) => job.id === previous.id) ?? null)  // it just ended
+        return active
+      })
+    }).catch(() => setRunning(null))
   }, [])
   useEffect(checkJobs, [checkJobs, section])
   usePoll(checkJobs, true, running ? 3000 : 30000)  // the 30 s ping also tells the launcher the window is open
@@ -87,6 +93,8 @@ export default function App() {
               {TOOLS.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
             </nav>
             {readOnly ? <span className="status-line">Read-only online demo</span>
+              : !running && finished ? <a className="status-line" role="status" href={href(`jobs/${finished.id}`)} onClick={() => setFinished(null)}>
+                {finished.state === 'done' ? 'Finished' : 'Stopped'}: {finished.message.slice(0, 60)} · see results</a>
               : running && <a className="status-line" href={href(`jobs/${running.id}`)}><span className="pulse" aria-hidden="true" />
                 {(running.message || running.stage).slice(0, 48)}</a>}
           </div>

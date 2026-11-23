@@ -116,3 +116,10 @@ export function activeFilters(filters: Filters, names: Record<string, string>): 
 export function cleanTitle(title: string): string {
   return title.replace(/\s*\(\d{6,}\)$/, '').replace(/[-_ ]\d{2,5}x\d{2,5}(-\d+)?$/, '').replace(/\.(jpe?g|png|tiff?)$/i, '').trim() || title
 }
+
+/** Assistant and job-state names as people say them. */
+export function backendName(name: string): string {
+  return ({ codex: 'Codex', 'codex-interactive': 'Codex curation agent', claude: 'Claude Code', fake: 'Practice mode (no model)' } as Record<string, string>)[name] ?? name
+}
+export const JOB_STATE: Record<string, string> = { queued: 'Waiting', running: 'Working', cancelling: 'Stopping', paused: 'Paused',
+  done: 'Finished', failed: 'Stopped', cancelled: 'Cancelled' }
