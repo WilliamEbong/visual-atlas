@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { activeCount, activeFilters, apiPath, appendPage, aspect, cleanMaker, cleanTitle, EMPTY, fromQuery, nextByPosition, nextPages, PAGE, toQuery, type Filters, type Pages } from '../lib/library'
+import { activeCount, activeFilters, apiPath, appendPage, aspect, cleanMaker, cleanTitle, EMPTY, shortDate, fromQuery, nextByPosition, nextPages, PAGE, toQuery, type Filters, type Pages } from '../lib/library'
 import { go, href } from '../lib/router'
 import type { LibraryItem, Settings } from '../lib/types'
 import { PROVIDERS } from '../lib/types'
@@ -19,7 +19,6 @@ interface LibraryPage { items: LibraryItem[]; total: number; waiting?: number[] 
 function plateState(item: LibraryItem): string {
   const states = item.techniques.map((t) => t.state)
   if (states.includes('human_reviewed')) return 'Confirmed by you'
-  if (states.includes('model_reviewed')) return 'Agreed by a second model'
   return item.status === 'pending' ? 'Waiting for analysis' : ''
 }
 
@@ -91,7 +90,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
             <img src={media(item.thumb)} alt="" /></span>)}</div>} />
       <div className="under row" style={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
         <p className="lede">Free-to-use pictures from open museum and archive collections, filed by the visual techniques that make them work. Every image keeps its source, its licence and the evidence behind each reading.</p>
-        {hero.length > 0 && <p className="mono hero-caption">Fig. 1–{hero.length}  From your library: {hero.slice(0, 3).map((item) => (cleanMaker(item.creator) || cleanTitle(item.title))
+        {hero.length > 0 && <p className="mono hero-caption">Fig. 1–{hero.length}  From your library: {hero.slice(0, 3).map((item) => (cleanMaker(item.creator) || cleanTitle(item.title).replace(/^(.{0,30})\b.*$/, '$1').replace(/[-–\s]+$/, ''))
           .replace(/^Print made by:\s*/i, '').split(/[,;(]| Published| from /)[0].trim().slice(0, 32)).join(' · ')}</p>}
       </div>
       {(data?.total ?? 0) < 12 && <nav className="drawers" aria-label="Ways in">
@@ -202,7 +201,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
                       <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" decoding="async" /></span>
                       <span className="fig">Fig. {item.id}{plateState(item) ? `  ${plateState(item)}` : ''}</span>
                       <span className="plate-title">{cleanTitle(item.title)}</span>
-                      <span className="maker">{[cleanMaker(item.creator), item.date_text].filter(Boolean).join(', ') || 'Unknown maker'}</span>
+                      <span className="maker">{[cleanMaker(item.creator), shortDate(item.date_text)].filter(Boolean).join(', ') || 'Unknown maker'}</span>
                       <span className="techs">{item.techniques.slice(0, 3).map((t) => t.name.replace(/ \(.*\)$/, '')).join(' · ') || (item.status === 'pending' ? 'Waiting for analysis' : 'No technique yet')}</span>
                     </a>
                     <button type="button" className="pick" aria-pressed={picked} aria-label={`Compare: ${item.title}`} disabled={!picked && compare.length >= 4}

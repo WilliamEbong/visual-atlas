@@ -388,7 +388,7 @@ h1 { text-wrap: balance; }
 .way-number { color: var(--graphite); }
 .way-text ul { padding-left: 18px; margin: 6px 0 0; font-size: 15px; display: flex; flex-direction: column; gap: 6px; }
 .ref-strip { list-style: none; padding: 6px 4px; margin: 0; display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; }
-.ref-strip li { flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px; max-width: 240px; }
+.ref-strip li { flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px; width: min-content; }
 .ref-strip .specimen { height: 180px; }
 .strip-label { font-size: 13px; line-height: 1.3; color: var(--graphite); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 @media (max-width: 760px) {
@@ -432,13 +432,19 @@ details[open] > summary::before { content: '\2212'; }
 details > summary:hover { text-decoration: underline; text-underline-offset: 3px; }
 details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); }
 .technique-card.disputed { opacity: .8; }
-.strip.captioned { align-items: flex-start; }
+.strip.captioned { align-items: flex-end; }
 .strip.captioned figure { margin: 0; flex: none; display: flex; flex-direction: column; gap: 6px; max-width: 220px; }
 .strip.captioned figcaption { font-size: 13px; line-height: 1.3; color: var(--graphite); }
-.way { grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr); }
+@media (min-width: 761px) { .way { grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr); } }
 .way .ref-strip .specimen { height: 240px; }
 .marks-key { margin: 4px 0 -8px; }
 @media (max-width: 600px) {
   .way .ref-strip .specimen { height: 160px; }
   .horizon-head .specimens, .hero-caption { display: none; }
 }
+.ref-strip .strip-label, .ref-strip .strip-meta { min-width: 140px; }
+.lens { border-radius: 0; width: 360px; height: auto; max-height: 360px; aspect-ratio: var(--a, 1); background: var(--card); }
+.lens::after { display: none; }
+.lens img { object-fit: contain; }
+@media (max-width: 900px) { .lens { width: 240px; max-height: 240px; } }
+@media (max-width: 600px) { .lens { width: 160px; max-height: 160px; margin-bottom: -40px; } }

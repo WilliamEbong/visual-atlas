@@ -122,7 +122,7 @@ export default function ImagePage({ id }: { id: number }) {
           </div>
         </div>
       </section>
-      <p className="mono under">Fig. {image.id}  {image.width} × {image.height} px{metrics ? ` · ${metrics.orientation} · mostly ${metrics.color_family}` : ''}
+      <p className="mono under">Fig. {image.id}  {image.width} × {image.height} px{metrics ? ` · ${metrics.orientation}` : ''}
         {analysis?.observations.some((o) => regionBox(o.region)) && <> · <button type="button" className="quiet small" aria-pressed={allRegions}
           onClick={() => setAllRegions(!allRegions)}>{allRegions ? 'Hide the marked areas' : 'Show every marked area'}</button></>}
         {image.original && !readOnly && <> · <a href={media(image.original)} target="_blank" rel="noreferrer">open the original file</a></>}</p>

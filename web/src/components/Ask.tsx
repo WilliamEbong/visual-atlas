@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { protectedImage, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { cleanMaker, cleanTitle } from '../lib/library'
+import { cleanMaker, cleanTitle, shortDate } from '../lib/library'
 import { go, href, useRoute } from '../lib/router'
 import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
@@ -64,11 +64,6 @@ export function Reason({ text }: { text: string }) {
   const [, shows, goal, via, state, evidence] = match
   return <><strong>{shows ?? `${via}, for “${goal}”`}</strong>{' '}
     <span className="state-mark" title={state} aria-label={state}>{STATE_MARK[state] ?? '○'}</span>{evidence ? ` ${evidence}` : ''}</>
-}
-
-/** Dates as people write them: camera timestamps lose their time of day. */
-export function shortDate(date?: string): string {
-  return (date ?? '').replace(/^(\d{4}-\d{2}-\d{2})[ T]\d{2}:\d{2}(:\d{2})?.*$/, '$1').replace(/, \d{1,2}:\d{2}(:\d{2})? \(according to Exif data\)$/, '')
 }
 
 function aspect(ref: DeskRef): number {
@@ -138,9 +133,9 @@ export default function Ask() {
 
 /** The empty page shows what an answer looks like, with pictures, before anyone types. */
 function SampleAnswer({ brief, open }: { brief: string; open: () => void }) {
-  const sample = useData<DeskAnswer>(`desk?${new URLSearchParams({ brief, limit: '20' })}`)
-  // Only pictures whose reading a second model or a person checked: the first screen must judge well.
-  const checked = (sample.data?.results ?? []).filter((ref) => /agreed by a second model|confirmed by you/.test(ref.reasons[0] ?? '')).slice(0, 5)
+  const sample = useData<DeskDirections>(`desk/directions?${new URLSearchParams({ brief })}`)
+  // The pictures chosen for the example's ways to do it: the first screen must show judgment, not every match.
+  const checked = (sample.data?.directions ?? []).flatMap((way) => way.references).slice(0, 5)
   if (!checked.length) return null
   return (
     <section className="section sample" aria-labelledby="sample-title" style={{ marginTop: 40 }}>

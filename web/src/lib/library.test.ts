@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextIndex, nextPages, toQuery } from './library'
-import { briefName, cleanMaker, cleanTitle } from './library'
+import { briefName, cleanMaker, cleanTitle, shortDate } from './library'
 
 describe('justified grid keyboard movement', () => {
   // two rows of different lengths: [0 wide][1][2] / [3][4 wide]
@@ -88,5 +88,14 @@ describe('cleanMaker and briefName', () => {
     expect(cleanMaker('Wilfredor')).toBe('Wilfredor')
     expect(briefName('Poster for a choir concert in a church, warm and communal')).toBe('Poster for a choir concert in a church')
     expect(briefName('A calm opening slide for a talk about burnout and rest at work')).toBe('A calm opening slide for a talk')
+  })
+})
+
+describe('shortDate', () => {
+  it('drops the time of day from camera timestamps', () => {
+    expect(shortDate('2019-09-05 20:10:00')).toBe('2019-09-05')
+    expect(shortDate('Taken on 19 February 2003, 20:37')).toBe('Taken on 19 February 2003')
+    expect(shortDate('c. 1861')).toBe('c. 1861')
+    expect(cleanTitle('Ronchamp17f.jpg - Flickr - scarletgreen')).toBe('Ronchamp17f')
   })
 })

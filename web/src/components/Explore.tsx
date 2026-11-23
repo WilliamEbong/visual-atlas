@@ -9,7 +9,6 @@ import { Empty, Failure, Loading, PageHead } from './ui'
 
 const RELATION: Record<string, string> = { often_combined: 'Often with', opposite_strategy: 'Opposite strategy',
   similar_purpose: 'Similar purpose', builds_on: 'Builds on', can_create: 'Can create', related: 'Related' }
-const STRIP = [150, 176, 210, 160, 236, 190]
 const short = (name: string) => name.replace(/ \(.*\)$/, '')
 
 export default function Explore({ route }: { route: Route }) {
@@ -96,7 +95,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
             {index >= 0 && taxonomy && <> / technique {index + 1} of {taxonomy.techniques.length}</>}</p>
           <h1 id="technique-title" style={{ fontSize: 'clamp(44px, 6vw, 84px)', lineHeight: .98 }}>{data.name}</h1>
         </div>
-        {lens && <a className="lens" href={href(`image/${lens.id}`, { from })} aria-label={`Example: ${lens.title}`}>
+        {lens && <a className="lens" href={href(`image/${lens.id}`, { from })} aria-label={`Example: ${lens.title}`} style={{ '--a': aspect(lens) } as React.CSSProperties}>
           <img src={media(lens.display ?? lens.thumb)} alt="" /></a>}
       </section>
       <div className={lens ? 'beside-lens under' : 'under'}>
@@ -129,9 +128,9 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         {data.examples.length === 0 ? <Empty title="No examples yet" actions={!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find examples</a>}>
           Find a few, and they will appear here with the evidence for each reading.</Empty> : <>
           <div className="strip captioned" style={{ marginTop: 22 }}>
-            {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e, i) => (
+            {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e) => (
               <figure key={e.id}>
-                <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: STRIP[i % STRIP.length], aspectRatio: aspect(e) }}>
+                <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: 200, aspectRatio: aspect(e) }}>
                   <img src={media(e.thumb)} alt="" loading="lazy" /></a>
                 <figcaption>{cleanTitle(e.title)}{e.state !== 'model_reviewed' && <> <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span></>}</figcaption>
               </figure>))}
