@@ -28,7 +28,7 @@ function readTrail(): { query: string; ids: number[] } {
 
 export default function ImagePage({ id }: { id: number }) {
   const { query } = useRoute()
-  const from = /^#\/(connections|ask)\?/.test(query.get('from') ?? '') ? query.get('from') : null
+  const from = /^#\/(connections\?|ask($|\?))/.test(query.get('from') ?? '') ? query.get('from') : null
   const { data, error, busy, reload, setData } = useData<ImageDetail>(`images/${id}`)
   const { taxonomy, compare, toggleCompare } = useApp()
   const { notify, fail, confirm } = useNotice()
@@ -47,7 +47,7 @@ export default function ImagePage({ id }: { id: number }) {
     function onKey(event: KeyboardEvent) {
       const target = event.target as HTMLElement
       if (event.altKey || event.ctrlKey || event.metaKey || target.closest('input, textarea, select, [contenteditable], dialog[open], .tabs')) return
-      if (from?.startsWith('#/ask?')) return  // from an answer: there is no library trail to step through
+      if (from?.startsWith('#/ask')) return  // from an answer: there is no library trail to step through
       if (event.key === 'ArrowLeft' && previous) go(`image/${previous}`, { from })
       if (event.key === 'ArrowRight' && next) go(`image/${next}`, { from })
     }
@@ -245,9 +245,9 @@ export default function ImagePage({ id }: { id: number }) {
 function Crumbs({ trail, position, previous, next, from }: { trail: { query: string; ids: number[] }; position: number; previous: number | null; next: number | null; from: string | null }) {
   return (
     <nav className="crumbs" aria-label="Results">
-      {from?.startsWith('#/ask?') ? <a href={from} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Back to your answer</a>
+      {from?.startsWith('#/ask') ? <a href={from} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Back to your answer</a>
         : <a href={href('', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>}
-      {position >= 0 && !from?.startsWith('#/ask?') && <div className="row">
+      {position >= 0 && !from?.startsWith('#/ask') && <div className="row">
         <span className="mono">{position + 1} of {trail.ids.length} · ← → to move</span>
         <a className="button small" aria-disabled={!previous} href={previous ? href(`image/${previous}`, { from }) : undefined}>← Previous</a>
         <a className="button small" aria-disabled={!next} href={next ? href(`image/${next}`, { from }) : undefined}>Next →</a>

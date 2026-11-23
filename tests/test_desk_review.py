@@ -371,3 +371,19 @@ def test_credit_lines_have_one_full_stop():
     from atlas import rights
     line = rights.credit_line({'creator': 'Martin Desjardins', 'title': 'Bust', 'date_text': 'n.d.'}, 'Art Institute of Chicago', 'CC0')
     assert '..' not in line and line == 'Martin Desjardins, Bust, n.d. Art Institute of Chicago. CC0.'
+
+
+def test_catalogue_years_are_not_shot_numbers(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = []
+    for rid, title in (('y1', 'Igeha Schokolade, 1926'), ('y2', 'Igeha Schokolade, 1928'),
+                       ('s1', 'Frigate Bird Sunset 5746'), ('s2', 'Frigate Bird Sunset 5738')):
+        Image.new('RGB', (40, 30)).save(folder / f'{rid}.jpg', 'JPEG')
+        items.append({'id': rid, 'file': f'{rid}.jpg', 'title': title, 'tool': 'Hohlwein', 'date': 'd', 'prompt': 'p',
+                      'techniques': ['silhouette']})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    refs = {r['ref'] for r in desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']}
+    assert {'generated:y1', 'generated:y2'} <= refs and len(refs) == 3  # two dated works stay; one bird shot

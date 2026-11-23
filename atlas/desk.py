@@ -297,7 +297,10 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
         # Numbered shots of one subject by one known maker ("Frigate Bird ... Sunset 5746" and "... 5738") are one
         # series; same-titled works without a shot number, or by an unknown maker, stay separate.
         title, maker = (item[1].get('title') or '').lower(), (item[1].get('creator') or '').lower().strip()
-        stem = SHOT_NUMBER.sub('', title)
+        shot = SHOT_NUMBER.search(title)
+        number = int(re.sub(r'\D', '', shot.group())) if shot else 0
+        is_year = 1400 <= number <= 2099 and len(str(number)) == 4  # "Igeha Schokolade, 1926" is a date, not a shot
+        stem = SHOT_NUMBER.sub('', title) if shot and not is_year else title
         series = (stem, maker) if stem != title and maker and not maker.startswith('unknown') else None
         if family not in seen and (series is None or series not in seen):
             seen.update({family, series} - {None})
