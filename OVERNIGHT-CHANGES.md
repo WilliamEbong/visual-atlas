@@ -3,6 +3,42 @@
 Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. Round 1: 13 commits on top of `f9e400c`; round 2 added more (see `git log d6117cf..HEAD`). Nothing has been pushed, merged, tagged or
 released, and the version number is unchanged (0.4.0).
 
+## Round 3: tidy, simplify, graphify (23 November)
+
+**Bar used:** only changes someone notices (a designer, an agent, a maintainer) or that remove code. Two read-only Opus
+audits (`ponytail-audit` style) covered the Python and the web app; every cut was checked by grep before it was made.
+
+| Change | Who notices | Measured |
+|---|---|---|
+| Reverted two round-2 pieces that served only contrived cases: the on-disk picture-signature cache (owner-only cold start; the app already warms at start) and design-system id numbering (two folders whose names slug alike) | maintainers | −107 lines, 4 tests for removed code removed |
+| The desk no longer imports the job runner (httpx, providers) | an agent starting the MCP server | `import atlas.mcp_server` ~2.7 s → ~1.5 s (median of 6) |
+| Dead code: `Store.fix_metadata`, two unused constants, a one-line CLI wrapper, `scripts/heldout.py` (superseded, unreferenced) | maintainers | −176 lines |
+| Dead frontend code: unused CSS, `techniqueName`, `nextIndex` (+ its test), `refreshTaxonomy`, never-passed props | maintainers | −27 lines |
+| Five unused screenshots in `docs/media` | anyone downloading the release | −1.3 MB per zip |
+
+**Measured and left alone:** Ask is already fast (advise ~73 ms, directions ~110 ms on the starter library), so caching
+the library read was not worth its code. Deferring pydantic model builds saved ~150 ms of import and nothing visible on
+the CLI, so it was reverted. Lazy-loading the job runner in the CLI would save ~0.4 s per `atlas` call but touches ~15
+commands and only helps agents that use the CLI instead of MCP: listed, not done.
+
+**Audit findings not applied:** `scripts/curate_v04.py` has a test; `eval_v03/v04/r2` are cited as reproduction commands;
+`atlas analyze --verify-with none` was reported as a bug but the job layer already turns "none" into no verifier;
+replacing cytoscape on the Connections map with plain SVG needs a visual redraw (listed).
+
+**graphify:** `graphify-out/` holds the knowledge graph of the code and docs: 1,498 nodes, 3,884 edges, 84 labelled
+communities (`GRAPH_REPORT.md`, interactive `graph.html`, `graph.json`). Code was read structurally (no model); the 44
+docs were read by two Opus extraction passes (~358k tokens, no paid service). `.graphifyignore` keeps pictures,
+screenshots, evaluation data and builds out; the extraction cache and the local interpreter path are gitignored;
+`graphify-out/` is export-ignored, so the release zip is unchanged. Ask it questions from the repo root:
+```powershell
+graphify query "how does a brief become ranked references"
+```
+Rebuild after big changes with `/graphify . --update` in Claude Code.
+
+**Codex review of the design pass and clean-up:** 5 findings, all confirmed and fixed (publish mode lost on the sample
+strip and on related links, the series rule merging same-titled works, two unnamed thumbnail links, generated examples
+showing the second-model mark).
+
 ## Design pass (23 November, after your note on UI/UX for the apps)
 
 **How it was run.** Every journey was captured at 1440 px and 375 px (`design-review/r3/before-*`). Seven
@@ -10,8 +46,10 @@ fresh-context Opus reviewers each took one lens: first impression and identity (
 hierarchy and type (with `impeccable` and `frontend-design`), pictures and credits (`taste-skill`), words
 (`design:ux-copy`, `humanizer`), flow and states (`design:design-critique`), accessibility
 (`design:accessibility-review`, contrast computed from the tokens), and a designer on a two-hour deadline. Fixes went
-in four batches, each checked in the browser; then a second round of three fresh reviewers
-(`design-review/r3/after-*`) and a third round of two (`design-review/r3/final-*`).
+in six batches, each checked in the browser at both widths with no overflow and no console errors. Fresh reviewers
+looked again after batches 3, 4 and 5 (three, two and two reviewers). By the fourth round both said most pages had
+nothing a user would notice; their remaining real items (a phone layout I had broken, cropped landscape pictures, the
+sample strip's choice, raw dates) were fixed in batch 6.
 
 **What changed, and who notices**
 | Change | Who notices |
@@ -31,12 +69,17 @@ in four batches, each checked in the browser; then a second round of three fresh
 | Field borders, caption grey and dark-mode region tags meet WCAG AA | low-vision users |
 | Finished jobs say so in the top bar; plain job states and assistant names; Compare says when it is full | anyone running Find or Grow |
 | One vocabulary for review states: proposed by a model / agreed by a second model / confirmed by you | everyone |
+| Pictures shown at their true shape: strips no longer crop landscapes; the technique example is a plate, not a circle | anyone reading a composition |
+| Library cards label only checked readings; camera timestamps, file names and "Unknown author Unknown author" cleaned | every Library visit |
+| A reading's state said once, the second model's note on its own line; projects from Ask named sensibly | anyone opening an image or starting a project |
 
 Screenshots: before `design-review/r3/before-*`, after the first passes `after-*`, current `final-*`.
 
-**Left on purpose** (fringe, or needs a decision): a spacing and type scale token refactor (many small inline values;
-no single screen is wrong enough to notice); Explore goal cards without pictures; Find's two sets of goal controls
-(changing it touches how Find reads a request); the Settings source table's exact rules; Connections map
+**Left on purpose** (minor, or needs a decision): a spacing and type scale token refactor (many small inline values;
+no single screen is wrong enough to notice); Explore's technique table without thumbnails; Find's goal selects beside
+its reading correction, and assistant names in its "Who analyses" choice (it is a real choice between your two
+sign-ins); the Settings source table's exact rules; Compare's contrast and colour numbers without words; the sample
+answer's pictures come from the desk's own ranking, so their fit depends on the readings; the Connections map
 (cytoscape) redrawn as SVG.
 
 ## Round 2 (23 November, after your approval to keep going)
