@@ -3,6 +3,14 @@
 Durable checkpoint for the autonomous build. Newest status first. Plan of record:
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
+## Design root-cause pass (2026-11-23, branch claude/design-root-cause, from df54a15)
+- Causes table, tactics and verification: docs/evaluation/r6/CAUSES.md and TACTICS.md; record: OVERNIGHT-CHANGES.md
+  "Design root-cause pass". Curated leads now rank answers; technique pages teach with chosen examples; screen
+  leftovers fixed; Codex review of the branch fixed (3). 482 backend and 18 web tests, Ruff, build, data guard and
+  pip-audit clean. Review screenshots stay on disk, untracked.
+- Final fresh scores 7.1 / 6.8 (front page hit by a sample-brief regression fixed after scoring). Next: picture-row
+  layout in code, then content (calm and warm works), then mood answers that lead with the thin note.
+
 ## Landed 2026-11-23
 - 008 Reference desk merged into `visual-atlas-v0.4` as `a30add4` (was `9f2c85b`) and pushed, then dependency security
   patch `e3c8d23` (was `42ead4b`; pillow 13.0.0, certifi, opentelemetry-api; audit clean). CI green. MCP server

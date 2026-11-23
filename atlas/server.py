@@ -24,7 +24,7 @@ EXAMPLE = REPO / 'atlas' / 'data' / 'example_brief.json'
 
 def lead_rank(technique_id: str):
     """Sort key: a technique's chosen lead examples first, strongest first; the rest keep their order."""
-    order = json.loads(LEADS.read_text(encoding='utf-8'))['leads'].get(technique_id, [])
+    order = (json.loads(LEADS.read_text(encoding='utf-8'))['leads'] if LEADS.exists() else {}).get(technique_id, [])
     return lambda row: order.index(f"{row['provider']}:{row['provider_item_id']}") \
         if f"{row['provider']}:{row['provider_item_id']}" in order else len(order)
 
@@ -312,9 +312,13 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
                                   "WHERE a.state!='rejected' AND i.removed_at IS NULL AND i.thumb_path IS NOT NULL "
                                   "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC"):
                 candidates.setdefault(row['technique_id'], []).append(row)
-            for technique_id, rows in candidates.items():
+            taken = set()
+            for technique_id, rows in sorted(candidates.items()):
                 rank = lead_rank(technique_id)
-                best[technique_id] = min(rows, key=lambda r: (r['state'] != 'human_reviewed', rank(r)))['thumb_path']
+                ordered = sorted(rows, key=lambda r: (r['state'] != 'human_reviewed', rank(r)))
+                pick = next((r for r in ordered if r['thumb_path'] not in taken), ordered[0])
+                taken.add(pick['thumb_path'])
+                best[technique_id] = pick['thumb_path']
             techniques = []
             for row in store.rows('SELECT id, data_json FROM techniques ORDER BY name'):
                 data = json.loads(row['data_json'])
@@ -344,6 +348,8 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             rank = lead_rank(technique_id)  # pictures you confirmed, then the chosen leads, then the rest
             examples = sorted(examples, key=lambda e: (e['state'] != 'human_reviewed', rank(e)))[:24]
             for e in examples:
+                e['chosen'] = e['state'] == 'human_reviewed' or rank(e) < len(
+                    (json.loads(LEADS.read_text(encoding='utf-8'))['leads'] if LEADS.exists() else {}).get(technique_id, []))
                 del e['provider'], e['provider_item_id']
             goals = store.rows("SELECT g.* FROM technique_links l JOIN goals g ON g.id=l.target_id WHERE "
                                "l.technique_id=? AND l.kind='goal'", (technique_id,))

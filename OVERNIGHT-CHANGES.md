@@ -11,6 +11,76 @@ Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4` at `f9e40
 version number is unchanged (0.4.0). Your real library at `C:\Users\Owner\VisualAtlas`
 was never touched.
 
+## Design root-cause pass (23 November, branch `claude/design-root-cause`)
+
+On your instruction this round stopped the pass-and-rescore loop and went at the causes. The full causes table,
+the fixes and the verification verdicts are in `docs/evaluation/r6/CAUSES.md`; the tactics and their sources (the
+William Web Design kit, impeccable, taste-skill, frontend-design, design-critique, and how Are.na, Cosmos and museum
+collection sites present pictures) are in `docs/evaluation/r6/TACTICS.md`.
+
+**Causes, ranked.**
+- **A. The content and fit of picks** affects 6 screens. The content round had already removed the stock photos and
+  raw titles, picked a lead for each technique and judged moods per picture. Still left:
+  - Ask ignored the curator's leads, so negative-space answers opened on prints whose empty space is the paper
+    margin.
+  - The front-page sample's pictures did not show its brief.
+  - Weak readings taught techniques (Divan Japonais as silhouette).
+  - Two techniques shared one picture on the index.
+- **B. The picture-row system** (orphan rows, uneven phone strips) affects 5 screens.
+- **C. Leftovers specific to one screen:**
+  - Compare's empty key column;
+  - the image title aligned to the bottom;
+  - Explore's boxed goal cards;
+  - tiny Projects pictures;
+  - Library techniques shown only on hover.
+- **D. Reasons** describe pixels, not fit.
+
+**Fixed, and how each was checked.** A fresh reviewer answered one question per screen from before-and-after
+screenshots.
+
+| Cause | Verdict |
+|---|---|
+| Answers lead with the curator's chosen examples; calm and motion prefer pictures that carry them | Partly: scale contrast now opens on the Hiroshige eagle, but no calm picture in the starter shows negative space |
+| Technique pages teach with chosen examples; other readings fold away | Fixed |
+| One index picture per technique | Fixed |
+| Library techniques shown on every tile | Fixed |
+| Goals as a ruled index | Fixed |
+| One lead picture per Projects direction | Fixed |
+| Image title moved to the top | Partly |
+| Compare key column narrowed to hold the legend | Partly; the table columns now also line up with the pictures |
+
+**Codex review of this branch:** three real defects, all fixed with tests:
+- a picture tagged only with motion could pass the warm filter;
+- the curator bonus could outrank a reading you confirmed;
+- the technique routes failed without `leads.json`.
+
+A fourth finding (thumbnail assignment in personal libraries) is a fringe case and was left.
+
+**Final scores** (one fresh pair, screenshots `h-*`):
+- product designer 7.1, editorial designer 6.8, a mean of 6.95, against 7.5 for the content round;
+- both scored the front page 6 because my reworded sample brief read no technique, so the front page showed no
+  pictures. That was fixed after scoring (`2848611`) and a test now guards it. With the front page at its earlier 8,
+  the mean would be about 7.15. That figure is my estimate, not a measured score.
+
+**What still keeps each screen under 9, and the next tactic:**
+
+| Screen | Still under 9 | Next tactic |
+|---|---|---|
+| Ask answer, Projects, Find, Library, Image | Rows end short, and phone strips change width (B) | Lay rows out in code and give a short last row a deliberate half or two-thirds layout. Source: TACTICS B, Flickr-style rows |
+| Ask answer, mood brief | Picks fit the technique, not the brief's mood: eerie Redon for a calm slide | Content: add calm negative-space and warm works to the starter. Ranking already prefers tagged moods |
+| Mood brief | One way, one picture; the honest note sits below it | Lead with the thin-answer note and Find; offer mood techniques first |
+| Explore | Goals have no pictures | One lead picture per goal |
+| Compare | A matrix of dashes, unlabelled numbers | Put shared techniques first; use words or bars |
+| Image | Empty space beside the picture under the buttons | Move the licence and credit into that column |
+| Projects | The saved AI answer's picks are weak (ballet for "neighbours singing") | Curate or pin the example's pictures |
+
+**How reliable the scores are.**
+- The same build drew 6 and 8 for one screen from two scorers.
+- Means moved by 0.1–0.3 between builds with no relevant change.
+- Treat differences under about 0.5 as noise.
+- The direct per-cause checks are the better evidence: 5 of 8 causes fixed, 3 partly.
+- The scores do agree, across every scorer, on what remains: row layout and the fit of picks to the brief.
+
 ## What changed for you, in plain words
 
 **Visual Atlas is now a reference desk.** You, or an AI agent working for you, say what a picture should do. It

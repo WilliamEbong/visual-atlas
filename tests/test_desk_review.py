@@ -412,6 +412,7 @@ def test_serve_says_when_the_port_is_taken():
 def test_more_confident_readings_rank_first(starter_home, monkeypatch, tmp_path):
     """Scorers saw the same two pictures lead every negative-space answer: ties fell back to ref order."""
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(desk, 'LEADS', tmp_path / 'no-leads.json')  # the tie-break itself; curated leads have their own test
     monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
     connection = sqlite3.connect(starter_home / 'atlas.db')
     rows = connection.execute("SELECT a.image_id, a.confidence FROM annotations a WHERE a.technique_id='negative-space' "

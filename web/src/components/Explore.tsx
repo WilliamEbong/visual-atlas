@@ -90,6 +90,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
   const index = taxonomy?.techniques.findIndex((t) => t.id === id) ?? -1
   const lens = data.examples.find((e) => e.state === 'human_reviewed') ?? data.examples[0]
   const confirmed = data.examples.filter((e) => e.state === 'human_reviewed').length
+  const taught = data.examples.some((e) => e.chosen) ? data.examples.filter((e) => e.chosen).length : data.examples.length
   return (
     <>
       <section className="horizon-head" aria-labelledby="technique-title">
@@ -121,7 +122,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
 
       <section className="section" aria-labelledby="examples">
         <div className="section-title">
-          <h2 id="examples">In your library <span className="mono" style={{ fontSize: 14 }}>{data.examples.length} example{data.examples.length === 1 ? '' : 's'}{confirmed ? ` · ${confirmed} confirmed by you` : ''}</span></h2>
+          <h2 id="examples">In your library <span className="mono" style={{ fontSize: 14 }}>{taught} example{taught === 1 ? '' : 's'}{confirmed ? ` · ${confirmed} confirmed by you` : ''}</span></h2>
           <div className="row">
             {!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find more examples</a>}
             <a className="button" href={href('library', { technique: data.id, from })}>Show in the library</a>
@@ -131,7 +132,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         {data.examples.length === 0 ? <Empty title="No examples yet" actions={!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find examples</a>}>
           Find a few, and they will appear here with the evidence for each reading.</Empty> : <>
           <ul className="justified refs-row" aria-label="Examples in your library">
-            {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e) => (
+            {data.examples.filter((e) => e.id !== lens?.id && (e.chosen || !data.examples.some((x) => x.chosen))).slice(0, 12).map((e) => (
               <li key={e.id} className="plate-item" style={{ '--a': aspect(e) } as React.CSSProperties}>
                 <a href={href(`image/${e.id}`, { from })} className="plate">
                   <span className="plate-frame"><img src={media(e.thumb)} alt="" loading="lazy" /></span>
@@ -139,7 +140,10 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
                 {e.state !== 'model_reviewed' && <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span>}
               </li>))}
           </ul>
-          <p className="mono" style={{ marginTop: 10 }}>Unmarked examples were agreed by a second model.</p>
+          {data.examples.some((x) => x.chosen) && data.examples.some((x) => !x.chosen && x.id !== lens?.id) && <details style={{ marginTop: 16 }}>
+            <summary className="mono">{data.examples.filter((x) => !x.chosen && x.id !== lens?.id).length} more readings of this technique, not chosen as examples</summary>
+            <ul style={{ marginTop: 10 }}>{data.examples.filter((x) => !x.chosen && x.id !== lens?.id).map((x) => <li key={x.id}>
+              <a href={href(`image/${x.id}`, { from })}>{cleanTitle(x.title)}</a> <span className="mono">{STATE_LABEL[x.state]}</span></li>)}</ul></details>}
         </>}
       </section>
 
