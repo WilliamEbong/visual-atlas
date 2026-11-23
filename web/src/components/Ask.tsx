@@ -54,7 +54,8 @@ function refLink(ref: DeskRef, from: string, use = 'reference'): string {
     : href('ref', { id: ref.ref, from, ...keep })
 }
 
-const STATE_MARK: Record<string, string> = { 'confirmed by you': '●', 'agreed by a second model': '◐', 'proposed by a model': '○' }
+const STATE_MARK: Record<string, string> = { 'confirmed by you': '●', 'agreed by a second model': '◐', 'proposed by a model': '○',
+  'intended by the prompt, checked by eye': '◐' }
 
 /** "Shows Silhouette (agreed by a second model): A small bird…" as the technique, its evidence and a state mark. */
 export function Reason({ text }: { text: string }) {
@@ -169,7 +170,7 @@ function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: 
   )
   return (
     <details className="goal-choice" open={chosen.length > 0}>
-      <summary className="mono">Change what the picture should do</summary>
+      <summary>Change what the picture should do</summary>
       <div role="group" aria-label="What the picture should do">{chips}</div>
       {read.length > 0 && <p id="goal-choice-note" className="mono">Outlined goals were read from your brief.</p>}
     </details>
@@ -283,11 +284,14 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
       </section>}
       <section className="section" aria-labelledby="refs-title" style={{ marginTop: 56 }}>
         <div className="section-title">
-          <h2 id="refs-title">{shown.size ? 'More references' : 'References'}</h2>
-          <p className="mono">{rest.length ? `${rest.length}${shown.size ? ' more' : ''} of ${data.total_matches} matches` : ''}
+          <h2 id="refs-title">{shown.size ? 'More references' : missed && strong.length === 0 ? 'No references yet' : 'References'}</h2>
+          <p className="mono">{rest.length && !(missed && strong.length === 0) ? `${rest.length}${shown.size ? ' more' : ''} of ${data.total_matches} matches` : ''}
             {use === 'publish' ? ' · free to publish with credit' : ''}</p>
         </div>
-        {data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
+        {missed && strong.length === 0 && shown.size === 0 ? <><p className="lede">Nothing fits until you pick what the picture should do, above, or find new images for this brief.</p>
+          {weak.length > 0 && <details className="weak"><summary className="mono">{weak.length} picture{weak.length === 1 ? '' : 's'} matched only on words</summary>
+            <Plates refs={weak} from={from} use={use} small /></details>}</>
+        : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
           : <>
@@ -329,7 +333,8 @@ export function RefPage({ id }: { id: string }) {
         <div className="image-title">
           <p className="kicker">{layerLabel(r)}</p>
           <h1>{r.title}</h1>
-          {r.creator && <p className="muted">{r.creator}{r.date ? `, ${r.date}` : ''}</p>}
+          {r.generated ? <p className="muted">Made with an image model{r.date ? ` · ${shortDate(r.date)}` : ''}</p>
+            : r.creator && <p className="muted">{r.creator}{r.date ? `, ${shortDate(r.date)}` : ''}</p>}
         </div>
       </div>
       <div className="three">

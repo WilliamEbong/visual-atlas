@@ -1,3 +1,4 @@
+import { cleanTitle } from '../lib/library'
 import { media, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
 import { aspect } from '../lib/library'
@@ -103,7 +104,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         <p className="muted" style={{ marginTop: 12, maxWidth: 760 }}>{data.explanation}</p>
         {data.aliases.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Also called {data.aliases.join(', ')}</p>}
       </div>
-      {lens && <p className="mono" style={{ textAlign: 'right', marginTop: 8 }}>Through the lens: {lens.title}{lens.creator ? `, ${lens.creator}` : ''}</p>}
+      {lens && <p className="mono" style={{ textAlign: 'right', marginTop: 8 }}>Through the lens: {cleanTitle(lens.title)}{lens.creator ? `, ${lens.creator}` : ''}</p>}
 
       <div className="trays section" style={{ marginTop: 48 }}>
         <section className="tray-col rule-blue" aria-labelledby="spot"><h2 id="spot">How to spot it</h2>
@@ -127,12 +128,15 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         </div>
         {data.examples.length === 0 ? <Empty title="No examples yet" actions={!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find examples</a>}>
           Find a few, and they will appear here with the evidence for each reading.</Empty> : <>
-          <div className="strip" style={{ marginTop: 22 }}>
+          <div className="strip captioned" style={{ marginTop: 22 }}>
             {data.examples.slice(0, 12).map((e, i) => (
-              <a key={e.id} href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: STRIP[i % STRIP.length], aspectRatio: aspect(e) }} aria-label={e.title}>
-                <img src={media(e.thumb)} alt="" loading="lazy" /></a>))}
+              <figure key={e.id}>
+                <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: STRIP[i % STRIP.length], aspectRatio: aspect(e) }}>
+                  <img src={media(e.thumb)} alt="" loading="lazy" /></a>
+                <figcaption>{cleanTitle(e.title)}{e.state !== 'model_reviewed' && <> <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span></>}</figcaption>
+              </figure>))}
           </div>
-          <ol className="strip-caption mono">{data.examples.slice(0, 12).map((e, i) => <li key={e.id}>Fig. {i + 1}  {e.title} · <span className={`state ${e.state}`}>{STATE_LABEL[e.state].replace(/^\S+ /, '')}</span></li>)}</ol>
+          <p className="mono" style={{ marginTop: 10 }}>Unmarked examples were agreed by a second model.</p>
         </>}
       </section>
 
@@ -151,7 +155,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
           <p className="mono" style={{ color: 'var(--ink)' }}>Serves these goals</p>
           <ul style={{ listStyle: 'none', padding: 0, margin: '10px 0 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
             {data.goals.map((g) => <li key={g.id}><a href={href(`explore/goal/${g.id}`, { from })}>{g.name}</a></li>)}</ul>
-          <p className="mono" style={{ marginTop: 14 }}>Operation: {data.operations.map((o) => o.name).join(', ')} · Domain: {data.domains.map((d) => d.name).join(', ')}</p>
+          <p className="mono" style={{ marginTop: 14 }}>Works by {data.operations.map((o) => o.name.toLowerCase()).join(', ')} · acts on {data.domains.map((d) => d.name.toLowerCase()).join(', ')}</p>
           <p className="mono" style={{ marginTop: 14 }}>{data.working_definition ? 'Working definition written for Visual Atlas. Background reading: ' : 'Sources: '}
             {data.sources.map((s, i) => <span key={s.url}>{i ? '; ' : ''}<a href={s.url} target="_blank" rel="noreferrer">{s.citation}</a></span>)}</p>
           <p style={{ marginTop: 14 }}><a href={href('connections', { focus: `technique:${data.id}`, from })}>See the connections map →</a></p>

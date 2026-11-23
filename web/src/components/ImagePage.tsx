@@ -64,6 +64,7 @@ export default function ImagePage({ id }: { id: number }) {
   const relatedTechniques = [...new Set(data.related.flatMap((r) => r.via))].sort((a, b) => rank(a) - rank(b))
   const shown = tab ?? relatedTechniques[0] ?? null
   const related = shown ? data.related.filter((r) => r.via.includes(shown)) : data.related
+  const described = new Set((analysis?.observations ?? []).map((o) => o.text.trim()))  // shown under What you can see
   const nameOf = (techniqueId: string) => taxonomy?.techniques.find((t) => t.id === techniqueId)?.name ?? techniqueId
 
   async function decide(annotation: Pick<Annotation, 'technique_id'>, state: 'human_reviewed' | 'rejected', extra: Record<string, unknown> = {}) {
@@ -140,7 +141,7 @@ export default function ImagePage({ id }: { id: number }) {
                 </li>))}
             </ol>
             {analysis.ambiguities.length > 0 && <p className="muted" style={{ marginTop: 12 }}><strong>Left open:</strong> {analysis.ambiguities.join(' ')}</p>}
-            <p className="mono" style={{ marginTop: 12 }}>Described by {backendName(analysis.backend)} ({analysis.model}) on {date(analysis.created_at)}. A model's description of the pixels, not a catalogue record.</p>
+            <p className="mono" style={{ marginTop: 12 }} title={`${backendName(analysis.backend)} (${analysis.model})`}>Described by a model on {date(analysis.created_at)}. A description of the pixels, not a catalogue record.</p>
           </> : <div className="stack" style={{ marginTop: 14 }}><p className="muted">Not analysed yet.</p>
             {!readOnly && <div><button type="button" className="primary" onClick={() => startJob('analyze')}>Analyse this image</button></div>}</div>}
         </section>
@@ -153,17 +154,18 @@ export default function ImagePage({ id }: { id: number }) {
             onSave={(techniqueId, evidence, effect) => decide({ technique_id: techniqueId }, 'human_reviewed', { evidence, effect })} />}
           {data.annotations.length === 0 && <p className="muted" style={{ marginTop: 14 }}>No technique recorded yet.</p>}
           {data.annotations.map((a) => (
-            <article key={a.technique_id} className={`technique-card ${a.state}`}>
+            <article key={a.technique_id} className={`technique-card ${a.state}${a.note?.startsWith('second model disagreed') ? ' disputed' : ''}`}>
               <div className="card-top">
                 <h3><a href={href(`technique/${a.technique_id}`, { from })}>{a.name}</a></h3>
                 <span className={`state ${a.state}`}>{STATE_LABEL[a.state]}</span>
                 {a.note?.startsWith('second model disagreed') && <span className="state disputed">disputed by a second model</span>}
               </div>
               <p style={{ fontSize: 15 }}>{a.effect || 'No effect recorded.'}</p>
-              <p style={{ fontSize: 14 }} className="muted">{a.evidence.join(' ') || '—'}</p>
-              <p className="provenance">{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
-                ? `proposed by ${backendName(a.proposed_backend)}` : 'added by you'}
-                {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ` · checked by ${who(a.changed_by)}` : ''}
+              {a.evidence.filter((e) => !described.has(e.trim())).length > 0 && <p style={{ fontSize: 14 }} className="muted">{a.evidence.filter((e) => !described.has(e.trim())).join(' ')}</p>}
+              <p className="provenance" title={[a.proposed_backend && `Proposed by ${backendName(a.proposed_backend)}`,
+                a.changed_by !== 'human' && `Last checked by ${who(a.changed_by)}`].filter(Boolean).join(' · ')}>{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
+                ? 'proposed by a model' : 'added by you'}
+                {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ' · checked by a second model' : ''}
                 {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}{a.note ? ` · ${a.note}` : ''}</p>
               {!readOnly && (editing === a.technique_id
                 ? <TechniqueForm title="Correct this reading" fixed={a.technique_id} initialEvidence={a.evidence.join('\n')} initialEffect={a.effect}

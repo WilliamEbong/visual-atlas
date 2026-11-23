@@ -39,8 +39,9 @@ export default function Project({ id }: { id?: number }) {
 }
 
 function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: number) => void; onCancel?: () => void }) {
-  const [title, setTitle] = useState(brief?.title ?? '')
-  const [text, setText] = useState(brief?.text ?? new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('text') ?? '')
+  const fromAsk = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('text') ?? ''
+  const [title, setTitle] = useState(brief?.title ?? fromAsk.split(/\s+/).slice(0, 6).join(' ').replace(/[:,.;]+$/, ''))
+  const [text, setText] = useState(brief?.text ?? fromAsk)
   const { fail } = useNotice()
   async function save(event: React.FormEvent) {
     event.preventDefault()

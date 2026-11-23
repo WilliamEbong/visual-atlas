@@ -75,7 +75,7 @@ export default function App() {
     default: page = <Library query={route.query} />
   }
   const current = (key: string) => section === key || (key === 'explore' && ['technique', 'connections'].includes(section))
-    || (key === '' && ['image', 'compare'].includes(section) && !route.query.get('from')?.startsWith('#/ask'))
+    || (key === '' && section === 'image' && !route.query.get('from')?.startsWith('#/ask'))
     || (key === 'ask' && (section === 'ref' || (section === 'image' && !!route.query.get('from')?.startsWith('#/ask'))))
 
   return (

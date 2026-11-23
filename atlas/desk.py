@@ -289,8 +289,10 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     seen, unique = set(), []
     for item in ranked:
         family = VARIANT.sub('', item[1]['ref'])
-        if family not in seen:
-            seen.add(family)
+        # Numbered shots of one subject by one maker ("Frigate Bird ... Sunset 5746" and "... 5738") are one series.
+        series = (re.sub(r'[\s_(-]*\d+\)?$', '', (item[1].get('title') or '').lower()), (item[1].get('creator') or '').lower())
+        if family not in seen and (not all(series) or series not in seen):  # unknown maker: never a series
+            seen.update({family, series})
             unique.append(item)
     ranked = unique
     chosen = []
@@ -305,8 +307,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     return {'reading': {'techniques': [{'id': t, 'name': names[t]} for t in want_t],
                         'goals': [{'id': g, 'name': names[g]} for g in want_g], 'subject_terms': terms},
             'route': routed, 'total_matches': len(ranked), 'results': results,
-            'note': 'Rankings use stored readings and words only, no AI. Check licence and restrictions before use; '
-                    'generated and design-system references are labelled and are not licence-checked by Visual Atlas.'}
+            'note': 'Chosen from your library without AI. Generated examples and design-system pictures have no '
+                    'licence checked by Visual Atlas: use them only as references. Check each licence before you publish.'}
 
 
 def _public(ref: dict) -> dict:

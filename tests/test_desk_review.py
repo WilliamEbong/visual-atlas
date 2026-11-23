@@ -298,3 +298,19 @@ def test_directions_find_technique_examples_behind_many_word_matches(tmp_path, m
     result = desk.directions('tea garden cup', techniques=['silhouette'], count=1, per_direction=3,
                              home=tmp_path / 'home')
     assert [r['ref'] for r in result['directions'][0]['references']] == [r['ref'] for r in shown]
+
+
+def test_numbered_shots_of_one_series_count_once(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = []
+    for rid, title, tool in (('a', 'Frigate Bird Sunset 5746', 'Ann'), ('b', 'Frigate Bird Sunset 5738', 'Ann'),
+                             ('c', 'Frigate Bird Sunset 5701', 'Bea')):
+        Image.new('RGB', (40, 30)).save(folder / f'{rid}.jpg', 'JPEG')
+        items.append({'id': rid, 'file': f'{rid}.jpg', 'title': title, 'tool': tool, 'date': 'd', 'prompt': 'p',
+                      'techniques': ['silhouette']})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    refs = [r['ref'] for r in desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']]
+    assert refs == ['generated:a', 'generated:c']  # one per maker's series, best ranked first

@@ -9,7 +9,7 @@ import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
 interface Saved { shared: string[]; differences: string[]; per_image: { image_id: number; note: string }[]
   technique_notes: { technique_id: string; comment: string }[]; backend: string; model: string; model_version: string | null }
 
-const MARK: Record<State, string> = { model_reviewed: '■', human_reviewed: '●', proposed: '□', rejected: '×' }
+const MARK: Record<State, string> = { model_reviewed: '◐', human_reviewed: '●', proposed: '○', rejected: '×' }
 
 export default function Compare({ ids }: { ids: number[] }) {
   const { query } = useRoute()
@@ -59,7 +59,7 @@ export default function Compare({ ids }: { ids: number[] }) {
 
       <section className="section" aria-labelledby="matrix" style={{ marginTop: 48 }}>
         <h2 id="matrix">Techniques</h2>
-        <p className="mono" style={{ margin: '8px 0 12px' }}>■ agreed by a second model · ● confirmed by you · □ proposed · — not seen{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
+        <p className="mono" style={{ margin: '8px 0 12px' }}>◐ agreed by a second model · ● confirmed by you · ○ proposed by a model · — not seen{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
         <div className="scroll-x"><table className="plain">
           <thead><tr><th scope="col" style={{ width: '34%' }}>Technique</th>{data.images.map((d) => <th key={d.image.id} scope="col">Fig. {d.image.id}</th>)}</tr></thead>
           <tbody>

@@ -19,7 +19,7 @@ export default function Collections({ id }: { id?: number }) {
   const images = data?.reduce((sum, c) => sum + c.size, 0) ?? 0
   return (
     <>
-      <PageHead kicker={data ? `Collections · ${data.length} board${data.length === 1 ? '' : 's'} · ${images} image${images === 1 ? '' : 's'} · credits ready to export` : 'Collections'}
+      <PageHead kicker={data ? `Collections · ${data.length} collection${data.length === 1 ? '' : 's'} · ${images} image${images === 1 ? '' : 's'}${images ? ' · credits ready to export' : ''}` : 'Collections'}
         title="Collections" asideClass="actions"
         aside={!readOnly && <form className="filters" onSubmit={create}>
           <label className="field">New collection<input required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} placeholder="Festival flyer" /></label>
@@ -73,7 +73,7 @@ function CollectionPage({ id, collection, onChange }: { id: number; collection?:
   }
   async function deleteCollection() {
     const sure = await confirm({ title: `Delete “${collection?.name ?? 'this collection'}”?`, danger: true, confirm: 'Delete',
-      body: 'The board and its order are deleted. The images stay in your library. This cannot be undone.' })
+      body: 'The collection and its order are deleted. The images stay in your library. This cannot be undone.' })
     if (sure) run(() => del(`collections/${id}`), 'Collection deleted.').then(() => go('collections'))
   }
   return (
