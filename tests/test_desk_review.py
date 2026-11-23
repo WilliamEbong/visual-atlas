@@ -331,3 +331,43 @@ def test_series_rule_needs_a_shot_number_and_a_known_maker(tmp_path, monkeypatch
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     found = desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']
     assert len(found) == 4  # same-titled works without a shot number, and unknown makers, stay separate
+
+
+# ---- acceptance test by an AI agent (23 Nov 2026) --------------------------------------------------------------
+
+
+def test_layout_words_are_not_subjects(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    terms = desk.search(brief='Slide 1 of a talk on burnout: quiet, room on the left for the title; landing page '
+                              'hero with headline space on the right side', home=starter_home)['reading']['subject_terms']
+    assert not {'left', 'right', 'room', 'side', 'landing', 'headline', 'space'} & set(terms)
+    assert 'burnout' in terms
+
+
+def test_technique_ids_outrank_word_matches(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = [{'id': 'words', 'title': 'Lonely tree and house at dusk', 'subjects': ['tree', 'house', 'dusk', 'lonely'],
+              'techniques': []},
+             {'id': 'shows', 'title': 'Figure', 'subjects': [], 'techniques': ['silhouette']}]
+    for item in items:
+        Image.new('RGB', (40, 30)).save(folder / f"{item['id']}.jpg", 'JPEG')
+        item.update({'file': f"{item['id']}.jpg", 'tool': 'x', 'date': 'd', 'prompt': 'p'})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.search(brief='a lonely tree and a house at dusk', techniques=['silhouette'], layers_wanted=['generated'],
+                        home=tmp_path / 'h')['results']
+    assert [r['ref'] for r in found] == ['generated:shows', 'generated:words']
+
+
+def test_unknown_ids_name_the_real_tool():
+    with pytest.raises(ValueError, match='list_techniques'):
+        desk.search(techniques=['build-trust'])
+
+
+def test_credit_lines_have_one_full_stop():
+    from atlas import rights
+    line = rights.credit_line({'creator': 'Martin Desjardins', 'title': 'Bust', 'date_text': 'n.d.'}, 'Art Institute of Chicago', 'CC0')
+    assert '..' not in line and line == 'Martin Desjardins, Bust, n.d. Art Institute of Chicago. CC0.'

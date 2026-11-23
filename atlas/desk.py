@@ -30,7 +30,9 @@ PUBLISHABLE = {'cc0', 'pd', 'cc-by'}  # licence codes with a documented free lic
 ORIENTATIONS = ('portrait', 'landscape', 'square')
 MAX_TEXT = 4000
 # Format and occasion words say what is being made, not what the picture shows (they still route design systems).
-FORMAT_WORDS = {'deck', 'pitch', 'keynote', 'studio', 'launch', 'brand', 'client', 'opener', 'reel', 'thumbnail'}
+FORMAT_WORDS = {'deck', 'pitch', 'keynote', 'studio', 'launch', 'brand', 'client', 'opener', 'reel', 'thumbnail',
+                # layout words say where text goes, not what the picture shows ('room on the left for the title')
+                'left', 'right', 'room', 'side', 'half', 'corner', 'headline', 'landing', 'space', 'copy', 'text'}
 VARIANT = re.compile(r'-\d+x\d+$')  # the same picture cropped for another format (gen-x-4x5)
 SHOT_NUMBER = re.compile(r'[\s_(-]+\d{2,}\)?$')  # "Sunset 5746", "(7027587519)": a camera's shot number
 
@@ -210,7 +212,7 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     techniques, goals = _clean_list(techniques, 12), _clean_list(goals, 12)
     unknown = [t for t in techniques if t not in known_t] + [g for g in goals if g not in known_g]
     if unknown:
-        raise ValueError(f"unknown technique or goal id: {', '.join(unknown)} (list them with the techniques tool)")
+        raise ValueError(f"unknown technique or goal id: {', '.join(unknown)} (list them with list_techniques)")
     subjects = [w for s in _clean_list(subjects, 8) for w in coding.words(s)]
     wanted_layers = _clean_list(layers_wanted, 3) or list(LAYERS)
     if any(layer not in LAYERS for layer in wanted_layers):
@@ -276,7 +278,9 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
         hits_strong = [t for t in terms if f' {t} ' in f' {strong} ']
         hits_weak = [t for t in terms if t not in hits_strong and f' {t} ' in f' {weak} ']
         if hits_strong or hits_weak:
-            score += 1.5 * len(hits_strong) + 0.5 * len(hits_weak)
+            words_score = 1.5 * len(hits_strong) + 0.5 * len(hits_weak)
+            # When the reading names techniques or goals, shown techniques lead; subject words only break ties.
+            score += min(words_score, 0.9) if want_t or want_g else words_score
             reasons.append(f"Subject matches {', '.join(hits_strong + hits_weak)}")
         if score and routed_system and ref.get('system') == routed_system:
             score += 1

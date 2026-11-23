@@ -328,6 +328,12 @@ The same answers are available on the command line, as JSON by default or as tex
 
 References are named by an id such as `library:12`, `generated:symmetry-01` or `system:harbour-of-drifting:gen-canal-dusk`, never by a file path.
 
+Tips for agents:
+- **Pass what you understood.** The desk reads briefs by matching words. If you can tell what the picture should do, pass the ids (`techniques`, `goals`; the list comes from `list_techniques`). Techniques and goals you pass lead the ranking; subject words then only break ties.
+- **Layout words are not subjects.** "Room on the left for the title" or "headline space" are ignored when matching subjects; the desk has no layout filter, so check the empty area yourself with `view_reference`.
+- **Open-collection results are links, not references.** `search_open_collections` returns the source page, image link, licence and credit, but no `ref`, so `view_reference`, `get_reference` and `similar_references` do not accept them. To keep one, import it with Find in the app.
+- **Same engine, two names.** CLI `advise` = `advise`; `refs` = `search_references`; `ref` = `get_reference`; `directions` = `suggest_directions`; `similar` = `similar_references`; `search-open` = `search_open_collections`.
+
 ## Get directions for a project
 
 1. Open **My project** and enter a project name.

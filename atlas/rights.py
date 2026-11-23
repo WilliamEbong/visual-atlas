@@ -33,7 +33,7 @@ def credit_line(candidate: dict, institution: str, licence: str) -> str:
     parts = [candidate.get('creator') or 'Unknown maker', candidate.get('title') or 'Untitled']
     if candidate.get('date_text'):
         parts.append(candidate['date_text'])
-    return f"{', '.join(parts)}. {institution}. {licence}."
+    return f"{', '.join(parts).rstrip('.')}. {institution}. {licence}."  # "n.d." keeps one full stop
 
 
 def _host_ok(url, policy) -> bool:
