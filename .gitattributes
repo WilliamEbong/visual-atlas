@@ -7,3 +7,9 @@
 design-review/** export-ignore
 graphify-out/** export-ignore
 .graphifyignore export-ignore
+.specify/** export-ignore
+.claude/** export-ignore
+.agents/** export-ignore
+specs/** export-ignore
+OVERNIGHT-CHANGES.md export-ignore
+BUILD-STATE.md export-ignore

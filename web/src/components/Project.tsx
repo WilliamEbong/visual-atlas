@@ -1,4 +1,4 @@
-import { briefName } from '../lib/library'
+import { backendName, briefName } from '../lib/library'
 import { useEffect, useState } from 'react'
 import { del, media, post, put, readOnly, request } from '../lib/client'
 import { date, useData } from '../lib/hooks'
@@ -138,7 +138,7 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
                   <p className="mono" style={{ marginTop: 8 }}>Tradeoffs</p>
                   <ul style={{ fontSize: 14, paddingLeft: 18 }}>{d.tradeoffs.map((e) => <li key={e}>{e}</li>)}</ul>
                 </details>
-                <p className="mono">Suggested by {d.backend} ({d.model_version ?? d.model})</p>
+                <p className="mono">Suggested by {backendName(d.backend)}{d.backend === 'fake' ? '' : ` (${d.model_version ?? d.model})`}</p>
                 {!readOnly && <div className="row" style={{ marginTop: 'auto' }}>
                   {d.state !== 'kept' && <button type="button" className="small" onClick={() => setState(d.id, 'kept', d.title, d.state)}>Keep</button>}
                   <button type="button" className="quiet small" onClick={() => setState(d.id, 'dismissed', d.title, d.state)}>Dismiss</button>

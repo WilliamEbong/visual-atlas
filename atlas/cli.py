@@ -1,6 +1,7 @@
 """Command line for people and agents (Claude Code or Codex). Every command works on the same data home."""
 
 import json
+import socket
 import sys
 import threading
 
@@ -227,6 +228,10 @@ def serve(port: int = typer.Option(8775), worker: bool = typer.Option(True, help
     import uvicorn
 
     from atlas.server import create_app
+    with socket.socket() as probe:  # say so before claiming the address: another app may hold the port
+        if probe.connect_ex(('127.0.0.1', port)) == 0:
+            typer.echo(f'Port {port} is already in use by another program. Try: atlas serve --port {port + 1}')
+            raise typer.Exit(1)
     application = create_app(start_worker=worker)
     typer.echo(f'Visual Atlas on http://127.0.0.1:{port}  (Ctrl+C to stop)')
     uvicorn.run(application, host='127.0.0.1', port=port, access_log=False)

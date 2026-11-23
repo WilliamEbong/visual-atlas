@@ -387,3 +387,23 @@ def test_catalogue_years_are_not_shot_numbers(tmp_path, monkeypatch):
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     refs = {r['ref'] for r in desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']}
     assert {'generated:y1', 'generated:y2'} <= refs and len(refs) == 3  # two dated works stay; one bird shot
+
+
+def test_credits_name_the_collection_not_its_code(starter_home):
+    with jobs.open_store(starter_home) as store:
+        text = transfer.credits(store)
+    assert 'Source: Art Institute of Chicago' in text and 'Source: aic' not in text
+
+
+def test_serve_says_when_the_port_is_taken():
+    import socket
+
+    from typer.testing import CliRunner
+
+    from atlas.cli import app
+    with socket.socket() as holder:
+        holder.bind(('127.0.0.1', 0))
+        holder.listen()
+        port = holder.getsockname()[1]
+        result = CliRunner().invoke(app, ['serve', '--port', str(port)])
+    assert result.exit_code == 1 and 'already in use' in result.output and 'Visual Atlas on' not in result.output
