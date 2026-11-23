@@ -28,6 +28,7 @@ const LAYER_NAMES: Record<string, string> = { library: 'Your library', generated
 
 /** Licence in plain words for the grid; the exact licence stays on the reference page. */
 export function plainLicence(ref: DeskRef): string {
+  if (ref.layer === 'design-system') return 'Private design system: reference only'
   switch (ref.licence.code) {
     case 'cc0': case 'pd': return 'Free to use; credit appreciated'
     case 'cc-by': return 'Free to use with credit'
