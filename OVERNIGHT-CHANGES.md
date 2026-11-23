@@ -45,6 +45,9 @@ released, and the version number is unchanged (0.4.0).
   signature cache kept paths and previews in a shared file; library-only directions could reveal private routing;
   directions dropped technique examples outranked by word matches; `use=Publish` silently meant "everything";
   provider cooldowns were lost between agent searches; long colliding design-system ids broke lookups.
+- **Codex review, round 3** (on those fixes): 3 findings, all confirmed and fixed with failing tests first: the old
+  shared cache file was left on disk; two comparisons could write the cache at once; directions could still miss
+  technique examples ranked below 40 word matches.
 
 ### Proxy blind test (`docs/evaluation/r2/proxy/PROXY-REPORT.md`)
 | Round | Desk arm | A wins / desk wins / ties (two judges) | Fit A vs desk | Licence A vs desk |
