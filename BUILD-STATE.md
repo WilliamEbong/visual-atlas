@@ -4,11 +4,16 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
 ## Landed 2026-11-23
-- 008 Reference desk merged into `visual-atlas-v0.4` as `9f2c85b` and pushed, then dependency security patch `42ead4b`
-  (pillow 13.0.0, certifi, opentelemetry-api; audit clean). CI green. MCP server `visual-atlas` registered for Claude Code.
+- 008 Reference desk merged into `visual-atlas-v0.4` as `a30add4` (was `9f2c85b`) and pushed, then dependency security
+  patch `e3c8d23` (was `42ead4b`; pillow 13.0.0, certifi, opentelemetry-api; audit clean). CI green. MCP server
+  `visual-atlas` registered for Claude Code.
 - `main` and the public demo deliberately left alone until the owner's blind test.
-- The merge added about 413 MB of design-review screenshots to this public branch's history, spot-checked to show only
-  the public starter library. Removing them would need a history rewrite the owner must approve.
+- 2026-11-23, owner approved: the 354 design-review screenshots the merge added (design-review/r2, r3, r4, r5, v0.5;
+  about 400 MB) were removed from the branch history (filter-branch over f9e400c..HEAD; f9e400c and earlier unchanged)
+  and gitignored. The captures are kept locally, not in the repository: in this working copy's design-review/ and in
+  C:\Users\Owner\VisualAtlas-design-review-backup\ (plus earlier overwritten versions and commit-map.txt, old to new
+  hashes). Screenshot paths in this file refer to those local copies; hashes after f9e400c quoted below are pre-rewrite.
+  Local branch backup/v0.4-before-strip keeps the old history (not pushed).
 - Next concrete action: the owner runs docs/evaluation/v0.5/BLIND-TEST.md, then decides whether to bring it to `main`.
 
 ## 008 Reference desk, round 4 (2026-11-23, same branch)
