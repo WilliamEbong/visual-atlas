@@ -123,7 +123,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
           <h2 id="examples">In your library <span className="mono" style={{ fontSize: 14 }}>{data.examples.length} example{data.examples.length === 1 ? '' : 's'}{confirmed ? ` · ${confirmed} confirmed by you` : ''}</span></h2>
           <div className="row">
             {!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find more examples</a>}
-            <a className="button" href={href('', { technique: data.id, from })}>Show in the library</a>
+            <a className="button" href={href('library', { technique: data.id, from })}>Show in the library</a>
             {data.examples.length >= 2 && <a className="button" href={href('compare', { ids: data.examples.slice(0, 4).map((e) => e.id).join(','), from })}>Compare them</a>}
           </div>
         </div>

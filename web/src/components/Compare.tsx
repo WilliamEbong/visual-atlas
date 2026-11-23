@@ -20,7 +20,7 @@ export default function Compare({ ids }: { ids: number[] }) {
   const { data, error, busy, reload } = useData<{ images: ImageDetail[]; comparison: Saved | null }>(valid.length ? `compare?ids=${valid.join(',')}` : null)
   const [jobId, setJobId] = useState<string | null>(null)
   if (valid.length < 2) return <><PageHead kicker="Compare · two to four images" title="Compare" />
-    <Empty title="Choose at least two images" actions={<a className="button primary" href={href('', { from })}>Go to the library</a>}>Use “+ Compare” on any picture in the library, then come back here.</Empty></>
+    <Empty title="Choose at least two images" actions={<a className="button primary" href={href('library', { from })}>Go to the library</a>}>Use “+ Compare” on any picture in the library, then come back here.</Empty></>
   if (error) return <><PageHead kicker="Compare" title="Compare" /><Failure message={error} busy={busy} retry={reload} /></>
   if (!data) return <><PageHead kicker="Compare" title="Compare" /><Loading /></>
   const used = taxonomy?.techniques.filter((t) => data.images.some((d) => d.annotations.some((a) => a.technique_id === t.id && a.state !== 'rejected'))) ?? []
@@ -40,7 +40,7 @@ export default function Compare({ ids }: { ids: number[] }) {
   return (
     <>
       <PageHead kicker={`Compare · ${data.images.length} of up to 4 images`} title="Compare" asideClass="actions"
-        aside={<><a className="button" href={from ?? '#/'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/' }}>Clear</button></>} />
+        aside={<><a className="button" href={from ?? '#/library'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/library' }}>Clear</button></>} />
       <section className="baseline" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
         {data.images.map((d) => <figure key={d.image.id}><img src={media(d.image.display)} alt={d.image.title} />
           <figcaption className="phone-only mono">Fig. {d.image.id}</figcaption></figure>)}

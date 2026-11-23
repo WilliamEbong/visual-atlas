@@ -16,7 +16,7 @@ export default function Welcome() {
     window.location.hash = target
   }
   return (
-    <dialog ref={dialog} aria-labelledby="welcome-title" onCancel={() => close('#/')} style={{ maxWidth: 'min(620px, 92vw)', background: 'var(--ground)' }}>
+    <dialog ref={dialog} aria-labelledby="welcome-title" onCancel={() => close('#/library')} style={{ maxWidth: 'min(620px, 92vw)', background: 'var(--ground)' }}>
       <p className="kicker">Visual Atlas · a library of ways of looking</p>
       <h2 id="welcome-title" style={{ fontSize: 40, marginTop: 6 }}>Welcome</h2>
       <ol className="trays" style={{ gridTemplateColumns: '1fr', gap: 14, listStyle: 'none', padding: 0, marginTop: 18 }}>
@@ -31,7 +31,7 @@ export default function Welcome() {
       <div className="row" style={{ justifyContent: 'flex-start', marginTop: 20 }}>
         <button type="button" className="primary" onClick={() => close('#/ask')}>Ask the atlas</button>
         <button type="button" onClick={() => close('#/find')}>Find new images</button>
-        <button type="button" className="quiet" onClick={() => close('#/')}>Go to the library</button>
+        <button type="button" className="quiet" onClick={() => close('#/library')}>Go to the library</button>
       </div>
     </dialog>
   )

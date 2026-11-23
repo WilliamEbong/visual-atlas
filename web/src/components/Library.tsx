@@ -12,7 +12,6 @@ const COLORS: [string, string][] = [['red', '#A23B2E'], ['orange', '#C47A3A'], [
   ['neutral', '#B8B0A0'], ['monochrome', '#55524C']]
 const STATES: Record<string, string> = { human_reviewed: 'Confirmed by you', model_reviewed: 'Agreed by a second model',
   proposed: 'Proposed only', rejected: 'Has a rejected reading' }
-const HERO = [150, 182, 206, 168, 132]
 
 interface LibraryPage { items: LibraryItem[]; total: number; waiting?: number[] }
 
@@ -62,7 +61,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
   const [panel, setPanel] = useState(false)
   const grid = useRef<HTMLDivElement>(null)
   useEffect(() => setText(filters.q), [filters.q])
-  const set = (change: Partial<Filters>) => go('', { ...toQuery({ ...filters, ...change }), from })
+  const set = (change: Partial<Filters>) => go('library', { ...toQuery({ ...filters, ...change }), from })
   const empty = data && data.total === 0 && activeCount(filters) === 0
   const names: Record<string, string> = { ...PROVIDERS, ...STATES,
     ...Object.fromEntries([...(taxonomy?.techniques ?? []), ...(taxonomy?.goals ?? [])].map((x) => [x.id, x.name])) }
@@ -78,20 +77,12 @@ export default function Library({ query }: { query: URLSearchParams }) {
     if (next !== index) { event.preventDefault(); links[next].focus() }
   }
 
-  // Specimens on the horizon: five pictures spread through the first page, so they do not repeat the first row.
-  const pool = (data?.items ?? []).filter((item) => item.thumb)
-  const hero = pool.length > 10 ? [5, 15, 25, 35, 45].map((i) => pool[Math.min(i, pool.length - 1)]).filter((item, i, all) => all.indexOf(item) === i) : pool.slice(0, 5)
   return (
     <>
       <PageHead kicker={<>Library · {data ? `${data.total} reference${data.total === 1 ? '' : 's'}` : '…'} · {taxonomy?.techniques.length ?? '…'} techniques</>}
-        title="A library of ways of looking"
-        aside={hero.length > 0 && <div className="specimens" aria-hidden="true">
-          {hero.map((item, index) => <span key={item.id} className="specimen" style={{ height: HERO[index], aspectRatio: aspect(item) }}>
-            <img src={media(item.thumb)} alt="" /></span>)}</div>} />
+        title="A library of ways of looking" />
       <div className="under row" style={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
         <p className="lede">Free-to-use pictures from open museum and archive collections, filed by the visual techniques that make them work. Every image keeps its source, its licence and the evidence behind each reading.</p>
-        {hero.length > 0 && <p className="mono hero-caption">Fig. 1–{hero.length}  From your library: {hero.slice(0, 3).map((item) => (cleanMaker(item.creator) || cleanTitle(item.title).replace(/^(.{0,30})\b.*$/, '$1').replace(/[-–\s]+$/, ''))
-          .replace(/^Print made by:\s*/i, '').split(/[,;(]| Published| from /)[0].trim().slice(0, 32)).join(' · ')}</p>}
       </div>
       {(data?.total ?? 0) < 12 && <nav className="drawers" aria-label="Ways in">
         {!readOnly && <a className="drawer" href="#/ask"><span className="letter" aria-hidden="true">A</span><span><strong>Ask the atlas</strong>
@@ -180,7 +171,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
           <div className="active-filters">
             {active.length > 0 && <span className="mono">Filtered by</span>}
             {active.map((filter) => <button key={filter.label} type="button" aria-label={`Remove filter: ${filter.label}`} onClick={() => set(filter.clear)}>{filter.label} ×</button>)}
-            {active.length > 0 && <button type="button" className="clear" onClick={() => go('', { ...toQuery({ ...EMPTY, sort: filters.sort }), from })}>Clear all</button>}
+            {active.length > 0 && <button type="button" className="clear" onClick={() => go('library', { ...toQuery({ ...EMPTY, sort: filters.sort }), from })}>Clear all</button>}
             <span className="mono" style={{ marginLeft: 'auto' }} aria-live="polite">Showing {items.length} of {data.total}</span>
           </div>
           {!readOnly && !!data.waiting?.length && <p className="notice" role="status" style={{ marginTop: 16 }}>
@@ -188,7 +179,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
             {queued ? <a href={href(`jobs/${queued}`)}>Analysis started — see progress</a>
               : <button type="button" className="small" onClick={() => analyseWaiting(data.waiting!)}>Analyse them now</button>}</p>}
           {data.total === 0 ? <Empty title="Nothing matches these filters" actions={<>
-              <button type="button" onClick={() => go('', { ...toQuery({ ...EMPTY, sort: filters.sort }), from })}>Clear filters</button>
+              <button type="button" onClick={() => go('library', { ...toQuery({ ...EMPTY, sort: filters.sort }), from })}>Clear filters</button>
               {!readOnly && <a className="button" href={href('find', { goal: filters.q, technique: filters.technique })}>Find new images like this</a>}</>}>
               {active.length} filter{active.length === 1 ? ' is' : 's are'} on.
             </Empty>

@@ -93,7 +93,7 @@ export default function ImagePage({ id }: { id: number }) {
     const sure = await confirm({ title: 'Remove this image from the library?', danger: true, confirm: 'Remove',
       body: `Its files, readings${data!.collections.length ? ` and places in ${data!.collections.length} collection${data!.collections.length === 1 ? '' : 's'}` : ''} go. A note stays so later searches skip it. This cannot be undone.` })
     if (!sure) return
-    try { await del(`images/${id}`); notify(`Removed “${image.title}” from the library.`); go('', { from }) } catch (reason) { fail(reason) }
+    try { await del(`images/${id}`); notify(`Removed “${image.title}” from the library.`); go('library', { from }) } catch (reason) { fail(reason) }
   }
 
   return (
@@ -246,7 +246,7 @@ function Crumbs({ trail, position, previous, next, from }: { trail: { query: str
   return (
     <nav className="crumbs" aria-label="Results">
       {from?.startsWith('#/ask') ? <a href={from} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Back to your answer</a>
-        : <a href={href('', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>}
+        : <a href={href('library', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>}
       {position >= 0 && !from?.startsWith('#/ask') && <div className="row">
         <span className="mono">{position + 1} of {trail.ids.length} · ← → to move</span>
         <a className="button small" aria-disabled={!previous} href={previous ? href(`image/${previous}`, { from }) : undefined}>← Previous</a>

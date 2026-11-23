@@ -82,7 +82,7 @@ function CollectionPage({ id, collection, onChange }: { id: number; collection?:
         aside={<>
           {!readOnly && <button type="button" onClick={() => run(() => download(`export/collection/${id}`, 'collection.zip'), 'Export downloaded.')}>Export zip</button>}
           {!readOnly && <button type="button" onClick={() => run(() => download(`export/credits?collection=${id}`, 'credits.md'))}>Credits</button>}
-          <a className="button" href={href('', { collection: id, sort: 'collection' })}>Filter in the library</a>
+          <a className="button" href={href('library', { collection: id, sort: 'collection' })}>Filter in the library</a>
           {!readOnly && <button type="button" onClick={() => setEditing(!editing)}>{editing ? 'Close' : 'Rename'}</button>}</>} />
       {collection?.description && !editing && <p className="lede under">{collection.description}</p>}
       {editing && <form className="stack panel" onSubmit={(e) => { e.preventDefault(); run(() => patch(`collections/${id}`, { name, description }), 'Saved.').then(() => setEditing(false)) }}>

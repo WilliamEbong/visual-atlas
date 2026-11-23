@@ -492,3 +492,24 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .refs-row .plate-title { margin-top: 8px; }
 .refs-row .plate-frame img { object-fit: contain; }  /* the whole composition is the evidence */
 .refs-row .strip-reason, .refs-row .strip-meta { min-width: 0; }
+
+/* structural pass A: the answer leads with pictures; tiles are pictures first */
+.way { display: block; }
+.way-text { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr); gap: 8px 32px; align-items: baseline; margin-bottom: 20px; }
+.way-text .guide-def { margin: 0; font-size: 17px; }
+.way .refs-row { --row: 300px; }
+.way-how { margin-top: 18px; }
+.way-how summary { cursor: pointer; }
+.way-how ul { padding-left: 18px; margin: 10px 0 0; display: flex; flex-direction: column; gap: 6px; max-width: 720px; }
+.more-refs > summary { cursor: pointer; font: 20px/1.2 var(--display); padding: 8px 0; }
+.justified:not(.refs-row) { --row: 300px; }
+.justified:not(.refs-row) .plate .maker, .justified:not(.refs-row) .plate .techs { display: none; }
+.justified:not(.refs-row) .plate-item:hover .plate .maker, .justified:not(.refs-row) .plate-item:hover .plate .techs,
+.justified:not(.refs-row) .plate:focus-visible .maker, .justified:not(.refs-row) .plate:focus-visible .techs { display: block; }
+@media (max-width: 760px) {
+  .way-text { grid-template-columns: 1fr; }
+  .way .refs-row { --row: 220px; }
+  .justified:not(.refs-row) { --row: 180px; }
+}
+.way .refs-row::after { display: none; }  /* a way's pictures fill its band, up to a height cap */
+.way .refs-row .plate-item { max-width: calc(var(--a) * 400px); }

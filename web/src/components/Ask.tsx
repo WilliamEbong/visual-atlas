@@ -264,13 +264,14 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
           {ways.directions.map((way, index) => <li key={way.technique.id} className={`way ${['rule-blue', 'rule-green', 'rule-ochre'][index % 3]}`}>
             <div className="way-text">
               <h3><span className="mono way-number">{index + 1}</span><a href={href(`technique/${way.technique.id}`)}>{way.technique.name}</a></h3>
-              <p className="guide-def">{way.idea}</p>
-              {way.serves.length > 0 && <p className="mono">Serves {way.serves.join(' · ')}</p>}
-              <p className="mono" style={{ marginTop: 12 }}>Make sure</p>
-              <ul>{way.make_sure.slice(0, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
-              {way.not_to_confuse_with[0] && <p className="muted guide-note">{way.not_to_confuse_with[0]}</p>}
+              <div><p className="guide-def">{way.idea}</p>
+                {way.serves.length > 0 && <p className="mono">Serves: {way.serves.join(' · ')}</p>}</div>
             </div>
             <RefStrip refs={way.references} from={from} use={use} label={`Pictures that show ${way.technique.name}`} />
+            <details className="way-how"><summary className="mono">How to carry it out</summary>
+              <ul>{way.make_sure.slice(0, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
+              {way.not_to_confuse_with[0] && <p className="muted guide-note">{way.not_to_confuse_with[0]}</p>}
+            </details>
           </li>)}
         </ol>
       </section>
@@ -298,6 +299,12 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
+          : shown.size > 0 ? <details className="more-refs"><summary>See {rest.length} more pictures that match</summary>
+            {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model{strong.some((ref) => ref.generated) ? ' · ◇ intended in a generated example' : ''}</p>
+              <Plates refs={strong} from={from} use={use} /></>}
+            {weak.length > 0 && <><h3 className="weak-title mono">Matched only on words, not on a technique</h3><Plates refs={weak} from={from} use={use} small /></>}
+            {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
+          </details>
           : <>
             {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model{strong.some((ref) => ref.generated) ? ' · ◇ intended in a generated example' : ''}</p>
               <Plates refs={strong} from={from} use={use} /></>}
@@ -306,7 +313,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
                 <Plates refs={weak} from={from} use={use} small /></details>
               : <><h3 className="weak-title mono">Matched only on words, not on a technique</h3><Plates refs={weak} from={from} use={use} small /></>)}
           </>}
-        {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
+        {more && !shown.size && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
       </section>
       <nav className="section next-steps" aria-label="Next steps" style={{ marginTop: 48 }}>
         {missed && strong.length === 0

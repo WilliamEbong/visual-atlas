@@ -17,8 +17,8 @@ import SettingsPage from './components/Settings'
 import { NoticeProvider } from './components/ui'
 import Welcome from './components/Welcome'
 
-const NAV = [['ask', 'Ask'], ['', 'Library'], ['find', 'Find images'], ['explore', 'Explore'], ['project', 'My project'], ['collections', 'Collections']] as const
-const TOOLS = [['jobs', 'Jobs'], ['settings', 'Settings']] as const
+const NAV = [['', 'Ask'], ['library', 'Library'], ['explore', 'Techniques']] as const
+const TOOLS = [['find', 'Find images'], ['project', 'Projects'], ['collections', 'Collections'], ['jobs', 'Jobs'], ['settings', 'Settings']] as const
 
 function readCompare(): Pick[] {
   try { return JSON.parse(sessionStorage.getItem('compare') ?? '[]') } catch { return [] }
@@ -26,7 +26,8 @@ function readCompare(): Pick[] {
 
 export default function App() {
   const route = useRoute()
-  const section = route.path[0] ?? ''
+  // #/ is Ask; an old library link (#/?technique=…) still opens the Library
+  const section = route.path[0] ?? ([...route.query.keys()].length ? 'library' : '')
   const taxonomy = useData<Taxonomy>('taxonomy')
   const [compare, setCompare] = useState<Pick[]>(readCompare)
   const [running, setRunning] = useState<Job | null>(null)
@@ -54,14 +55,14 @@ export default function App() {
   useEffect(checkJobs, [checkJobs, section])
   usePoll(checkJobs, true, running ? 3000 : 30000)  // the 30 s ping also tells the launcher the window is open
   useEffect(() => {
-    const extra: Record<string, string> = { ref: 'Reference', compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
-    if (section !== 'image') document.title = `${NAV.find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Library'} · Visual Atlas`
+    const extra: Record<string, string> = { ask: 'Ask', ref: 'Reference', compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
+    if (section !== 'image') document.title = `${[...NAV, ...TOOLS].find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Ask'} · Visual Atlas`
   }, [section])
 
   let page
   switch (section) {
     case 'image': page = <ImagePage id={Number(route.path[1])} />; break
-    case 'ask': page = <Ask />; break
+    case 'library': page = <Library query={route.query} />; break
     case 'ref': page = <RefPage id={route.query.get('id') ?? ''} />; break
     case 'find': page = <Find />; break
     case 'jobs': page = <Jobs id={route.path[1]} />; break
@@ -72,11 +73,11 @@ export default function App() {
     case 'collections': page = <Collections id={route.path[1] ? Number(route.path[1]) : undefined} />; break
     case 'compare': page = <Compare ids={(route.query.get('ids') ?? compare.map((p) => p.id).join(',')).split(',').map(Number).filter(Boolean)} />; break
     case 'settings': page = <SettingsPage />; break
-    default: page = <Library query={route.query} />
+    default: page = <Ask />
   }
   const current = (key: string) => section === key || (key === 'explore' && ['technique', 'connections'].includes(section))
-    || (key === '' && section === 'image' && !route.query.get('from')?.startsWith('#/ask'))
-    || (key === 'ask' && (section === 'ref' || (section === 'image' && !!route.query.get('from')?.startsWith('#/ask'))))
+    || (key === 'library' && section === 'image' && !route.query.get('from')?.match(/^#\/(ask|$|\?q=)/))
+    || (key === '' && (section === 'ask' || section === 'ref' || (section === 'image' && !!route.query.get('from')?.match(/^#\/(ask|$|\?q=)/))))
 
   return (
     <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]) }}>
