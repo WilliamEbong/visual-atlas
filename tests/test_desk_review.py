@@ -420,3 +420,27 @@ def test_more_confident_readings_rank_first(starter_home, monkeypatch, tmp_path)
     best = rows[0][0]
     first = desk.search(techniques=['negative-space'], limit=3, layers_wanted=['library'], home=starter_home)['results'][0]
     assert first['image_id'] == best
+
+
+
+def test_discarded_words_never_crowd_out_a_subject(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    terms = desk.search(brief='Warm, communal, cosy, festive, hopeful, serious, friendly, elegant picture of a lighthouse',
+                        home=starter_home)['reading']['subject_terms']
+    assert 'lighthouse' in terms
+
+
+def test_goal_evidence_outranks_a_title_word(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = [{'id': 'word', 'title': 'Harbour lights', 'techniques': []},
+             {'id': 'goal', 'title': 'Figure', 'techniques': ['negative-space']}]
+    for item in items:
+        Image.new('RGB', (40, 30)).save(folder / f"{item['id']}.jpg", 'JPEG')
+        item.update({'file': f"{item['id']}.jpg", 'tool': 'x', 'date': 'd', 'prompt': 'p'})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.search(brief='harbour', goals=['create-calm'], layers_wanted=['generated'], home=tmp_path / 'h')['results']
+    assert [r['ref'] for r in found] == ['generated:goal', 'generated:word']

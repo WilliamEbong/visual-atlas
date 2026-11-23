@@ -29,7 +29,7 @@ function ExploreIndex({ from }: { from: string | null }) {
       <p className="lede under">Start from what you want an image to do. Each goal leads to the techniques that can achieve it, and each technique to real examples in your library.</p>
       <section className="section" aria-labelledby="goals" style={{ marginTop: 40 }}>
         <h2 id="goals">Goals</h2>
-        <nav className="drawers" aria-label="Goals" style={{ marginTop: 16 }}>
+        <nav className="drawers goals" aria-label="Goals" style={{ marginTop: 16 }}>
           {taxonomy.goals.map((goal, index) => (
             <a key={goal.id} className="drawer" href={href(`explore/goal/${goal.id}`, { from })}>
               <span className="letter" aria-hidden="true">{index + 1}</span>

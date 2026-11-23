@@ -233,7 +233,8 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
   const wordsOnly = (ref: DeskRef) => ref.reasons.every((reason) => reason.startsWith('Subject matches') || reason.startsWith('Matches the filters'))
   const shown = new Set((ways?.directions ?? []).flatMap((way) => way.references.map((ref) => ref.ref)))
   const rest = data.results.filter((ref) => !shown.has(ref.ref))
-  const strong = rest.filter((ref) => !wordsOnly(ref))
+  // licensed library pictures first; generated examples (no licence asserted) after them
+  const strong = rest.filter((ref) => !wordsOnly(ref)).sort((a, b) => Number(a.layer !== 'library') - Number(b.layer !== 'library'))
   const weak = rest.filter(wordsOnly)
   const available = ['library', ...(data.layers.generated ? ['generated'] : []), ...(data.layers['design-system'].length ? ['design-system'] : [])]
   return (
@@ -291,7 +292,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         </div>
         {missed && strong.length === 0 && shown.size === 0 ? <>
           {weak.length > 0 && <><p className="mono">Only these share your words, not a technique:</p>
-            <RefStrip refs={weak.slice(0, 6)} from={from} use={use} label="Pictures that share your words" /></>}</>
+            <Plates refs={weak} from={from} use={use} small /></>}</>
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>

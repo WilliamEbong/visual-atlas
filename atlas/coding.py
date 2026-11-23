@@ -98,7 +98,7 @@ def _read(text: str, taxonomy: dict) -> tuple[dict, dict, set[str]]:
     return techniques, goals, used
 
 
-def code_request(text: str, taxonomy: dict, technique_ids=(), goal_ids=(), subject: str = '') -> dict:
+def code_request(text: str, taxonomy: dict, technique_ids=(), goal_ids=(), subject: str = '', exclude=frozenset()) -> dict:
     """Cheap, correctable suggestions. Negative clauses veto inferred tags; explicit choices always win."""
     positive, negative = [], []
     # shortcut: clause-level English negation, use the correction controls for nested or figurative instructions.
@@ -124,7 +124,8 @@ def code_request(text: str, taxonomy: dict, technique_ids=(), goal_ids=(), subje
         entries.update(ordered)
     subject_terms = []
     for token in words(subject) + words(' '.join(positive)):
-        if len(token) > 2 and token not in STOPWORDS and token not in used and token not in subject_terms:
+        if len(token) > 2 and token not in STOPWORDS and token not in used and token not in subject_terms \
+                and token not in exclude:  # dropped before the cap, so discarded words never crowd out a subject
             subject_terms.append(token)
     return {'techniques': list(techniques.values()), 'goals': list(goals.values()), 'subject_terms': subject_terms[:8]}
 

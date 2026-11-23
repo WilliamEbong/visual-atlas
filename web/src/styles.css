@@ -453,7 +453,6 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 @media (max-width: 600px) {
   .phone-only { display: block; margin-top: 6px; font-size: 14px; }
   .baseline figure { flex-direction: column; align-items: flex-start; }
-  .baseline-captions { display: none; }
   .head-aside:has(.specimens) { display: none; }
   .beside-lens + p.mono, .lens-caption { text-align: left !important; }
 }
@@ -466,3 +465,19 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   table.plain.techniques td, table.plain.techniques th { border: 0; padding: 4px 0; }
 }
 @media (max-width: 600px) { .lens { position: static; transform: none; width: 100%; max-height: none; margin: 16px 0 0; } }
+
+/* scored design cycle 3: every picture strip is one full-width band, no orphans */
+.ref-strip { flex-wrap: nowrap; gap: 16px; }
+.ref-strip li { flex: 1 1 0; min-width: 0; width: auto; }
+.ref-strip .specimen, .way .ref-strip .specimen { height: auto; width: 100%; }
+.ref-strip .specimen img { object-fit: contain; }
+.ref-strip .strip-label, .ref-strip .strip-meta, .ref-strip .strip-reason { min-width: 0; }
+.ref-strip { align-items: flex-end; }
+.ref-strip li { justify-content: flex-end; }
+.drawers.goals { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 900px) { .drawers.goals { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .ref-strip { flex-wrap: wrap; }
+  .ref-strip li { flex: 1 1 calc(50% - 8px); }
+  .drawers.goals { grid-template-columns: 1fr; }
+}

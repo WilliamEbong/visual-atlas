@@ -228,7 +228,7 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     for name, value in (('colour', colour), ('medium', medium), ('system', system)):
         if not isinstance(value, str) or len(value) > 80:
             raise ValueError(f'{name} must be short text')
-    reading = coding.code_request(brief, taxonomy, techniques, goals) if brief else \
+    reading = coding.code_request(brief, taxonomy, techniques, goals, exclude=coding.GENERIC | FORMAT_WORDS) if brief else \
         {'techniques': [{'id': t, 'exact': True} for t in techniques], 'goals': [{'id': g, 'exact': True} for g in goals],
          'subject_terms': []}
     want_t = [t['id'] for t in reading['techniques']]
@@ -264,7 +264,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
             if tid in shown:
                 note = shown[tid]
                 # A more confident reading of the same state and role ranks higher (otherwise ties fell to ref order).
-                score += STATE_WEIGHT.get(note['state'], 1) + (1 if note.get('role') == 'primary' else 0)                     + 0.5 * note.get('confidence', 0.8)
+                score += (STATE_WEIGHT.get(note['state'], 1) + (1 if note.get('role') == 'primary' else 0)
+                          + 0.5 * note.get('confidence', 0.8))
                 evidence = f": {note['evidence'][0]}" if note.get('evidence') else ''
                 reasons.append(f"Shows {names[tid]} ({STATE_WORDS.get(note['state'], note['state'])}){evidence}")
         for gid in want_g:
@@ -294,7 +295,10 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
         if not score and not (filtered and not (want_t or want_g or terms)):
             continue
         ranked.append((score, ref, reasons))
-    ranked.sort(key=lambda item: (-item[0], item[1]['layer'] != 'library', item[1]['ref']))
+    def order(item):  # pictures that show a requested technique or serve a requested goal always come first
+        evidence = any(reason.startswith(('Shows ', 'Serves ')) for reason in item[2])
+        return (not evidence if want_t or want_g else False, -item[0], item[1]['layer'] != 'library', item[1]['ref'])
+    ranked.sort(key=order)
     # Each other layer with a match keeps its best two places, so library volume never hides them.
     seen, unique = set(), []
     for item in ranked:
@@ -317,7 +321,7 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
             chosen += [item for item in ranked if item[1]['layer'] == layer][:2]
     chosen = chosen[:limit // 2]
     chosen += [item for item in ranked if item not in chosen][:limit - len(chosen)]
-    chosen.sort(key=lambda item: (-item[0], item[1]['layer'] != 'library', item[1]['ref']))
+    chosen.sort(key=order)
     results = [{**_public(ref), 'score': round(score, 2), 'reasons': reasons or ['Matches the filters you set']}
                for score, ref, reasons in chosen]
     return {'reading': {'techniques': [{'id': t, 'name': names[t]} for t in want_t],

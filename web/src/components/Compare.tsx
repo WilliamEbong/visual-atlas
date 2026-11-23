@@ -43,7 +43,7 @@ export default function Compare({ ids }: { ids: number[] }) {
         aside={<><a className="button" href={from ?? '#/'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/' }}>Clear</button></>} />
       <section className="baseline" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
         {data.images.map((d) => <figure key={d.image.id}><img src={media(d.image.display)} alt={d.image.title} />
-          <figcaption className="phone-only"><span className="mono">Fig. {d.image.id}</span> {d.image.title}</figcaption></figure>)}
+          <figcaption className="phone-only mono">Fig. {d.image.id}</figcaption></figure>)}
       </section>
       <div className="baseline-captions" style={columns}>
         {data.images.map((d) => (
