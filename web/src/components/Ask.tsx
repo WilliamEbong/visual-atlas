@@ -256,6 +256,8 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
   // the same test as the desk: evidence means a shown technique or a served goal; anything else is words only
   const wordsOnly = (ref: DeskRef) => !ref.reasons.some((reason) => reason.startsWith('Shows ') || reason.startsWith('Serves '))
   const shown = new Set((ways?.directions ?? []).flatMap((way) => way.references.map((ref) => ref.ref)))
+  // a thin answer says so, and finding more becomes the next step
+  const thin = !!ways && ways.directions.length > 0 && shown.size < 3
   const rest = data.results.filter((ref) => !shown.has(ref.ref))
   // licensed library pictures first; generated examples (no licence asserted) after them
   const strong = rest.filter((ref) => !wordsOnly(ref)).sort((a, b) => Number(a.layer !== 'library') - Number(b.layer !== 'library'))
@@ -297,6 +299,8 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
             </details>
           </li>)}
         </ol>
+        {thin && <p className="thin-note">Your library has little for this yet: {shown.size === 1 ? 'one picture carries' : `${shown.size} pictures carry`} it.{' '}
+          <a href={href('find', { goal: asked })}>Find images for this brief</a> adds more, each licence-checked.</p>}
       </section>
       : data.guidance.length > 0 && <section className="section guidance" aria-labelledby="guidance-title" style={{ marginTop: 40 }}>
         <h2 id="guidance-title">Techniques that could do it</h2>
@@ -322,7 +326,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
-          : shown.size > 0 ? <details className="more-refs" open={moreOpen} onToggle={(event) => setMoreOpen(event.currentTarget.open)}><summary>See {rest.length} more pictures that match</summary>
+          : shown.size > 0 && rest.length > 6 ? <details className="more-refs" open={moreOpen} onToggle={(event) => setMoreOpen(event.currentTarget.open)}><summary>See {rest.length} more pictures that match</summary>
             {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model{strong.some((ref) => ref.generated) ? ' · ◇ intended in a generated example' : ''}</p>
               <Plates refs={strong} from={from} use={use} /></>}
             {weak.length > 0 && <><h3 className="weak-title mono">Matched only on words, not on a technique</h3><Plates refs={weak} from={from} use={use} small /></>}
@@ -339,7 +343,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         {more && !shown.size && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
       </section>
       <nav className="section next-steps" aria-label="Next steps" style={{ marginTop: 48 }}>
-        {missed && strong.length === 0
+        {(missed && strong.length === 0) || thin
           ? <><a className="button" href={href('project', { text: asked })}>Start a project from this brief</a>
             <a className="button primary" href={href('find', { goal: asked })}>Find images for this brief</a></>
           : <><a className="button primary" href={href('project', { text: asked })}>Start a project from this brief</a>

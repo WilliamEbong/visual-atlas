@@ -555,3 +555,4 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .justified::after { content: ''; flex: 999 1 0; }
 .way .refs-row::after, .sample .refs-row::after { display: none; }
 .asked { border-bottom: 0; }
+.thin-note { margin-top: 28px; max-width: 760px; font: 20px/1.35 var(--display); }
