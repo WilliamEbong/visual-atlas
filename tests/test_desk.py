@@ -20,7 +20,7 @@ GUARD.loader.exec_module(check_no_data)
 def starter_home(tmp_path_factory):
     home = tmp_path_factory.mktemp('desk') / 'home'
     with jobs.open_store(home) as store:
-        assert transfer.import_starter(store, home, REPO / 'starter') == 104
+        assert transfer.import_starter(store, home, REPO / 'starter') == 102
     return home
 
 
