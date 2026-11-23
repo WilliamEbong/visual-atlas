@@ -1,12 +1,13 @@
 """Command line for people and agents (Claude Code or Codex). Every command works on the same data home."""
 
 import json
+import socket
 import sys
 import threading
 
 import typer
 
-from atlas import catalog, jobs, transfer
+from atlas import catalog, desk, jobs, transfer
 from atlas.home import home_dir
 
 app = typer.Typer(help='Visual Atlas: find free-to-use images and learn the techniques that make them work.',
@@ -227,6 +228,10 @@ def serve(port: int = typer.Option(8775), worker: bool = typer.Option(True, help
     import uvicorn
 
     from atlas.server import create_app
+    with socket.socket() as probe:  # say so before claiming the address: another app may hold the port
+        if probe.connect_ex(('127.0.0.1', port)) == 0:
+            typer.echo(f'Port {port} is already in use by another program. Try: atlas serve --port {port + 1}')
+            raise typer.Exit(1)
     application = create_app(start_worker=worker)
     typer.echo(f'Visual Atlas on http://127.0.0.1:{port}  (Ctrl+C to stop)')
     uvicorn.run(application, host='127.0.0.1', port=port, access_log=False)
@@ -252,3 +257,134 @@ def taxonomy_sync():
     with jobs.open_store() as store:
         catalog.sync(store, force=True)
     typer.echo('Knowledge files reloaded.')
+
+
+# ---- reference desk (read-only; no AI, no downloads) -----------------------------------------------------------
+def _show(result: dict, text: bool):
+    if not text:
+        _print(result)
+        return
+    reading = result.get('reading', {})
+    if 'like' in result:
+        typer.echo(f"Looks like {result['like']} ({result['note']})")
+    else:
+        typer.echo('Reads as: ' + (', '.join(t['name'] for t in reading.get('goals', []) + reading.get('techniques', []))
+                                   or 'no known goal or technique') + (f"; subjects {', '.join(reading['subject_terms'])}"
+                                                                        if reading.get('subject_terms') else ''))
+    system = (result.get('route') or {}).get('system')
+    if system:
+        typer.echo(f"Design system: {system['name']} ({system['why']})")
+    for item in result.get('guidance', []):
+        typer.echo(f"\n{item['name']}: {item['definition']}\n  Look for: {'; '.join(item['look_for'][:3])}")
+    typer.echo('')
+    for ref in result.get('results', []):
+        typer.echo(f"{ref['ref']}  {ref.get('title', '')[:70]} — {ref.get('creator', '')[:50]}")
+        typer.echo(f"  {ref['layer']} · {ref['licence']['label']}")
+        if ref.get('credit'):
+            typer.echo(f"  Credit: {ref['credit']}")
+        for reason in ref['reasons']:
+            typer.echo(f'  · {reason[:160]}')
+    if not result.get('results'):
+        typer.echo('No reference matched. Try other words, name a technique (atlas refs --technique ID), or find new '
+                   'images with: atlas find "your brief"')
+
+
+@app.command()
+def advise(brief: str = typer.Argument(..., help='The visual decision, in plain words.'),
+           technique: list[str] = typer.Option(None, help='Technique id(s) you read in the brief (atlas taxonomy).'),
+           goal: list[str] = typer.Option(None, help='Goal id(s) you read in the brief.'),
+           limit: int = typer.Option(6, help='How many references (1-40).'),
+           publish: bool = typer.Option(False, help='Only images you may publish (CC0, public domain, CC BY).'),
+           layer: list[str] = typer.Option(None, help='library, generated or design-system (repeatable).'),
+           text: bool = typer.Option(False, help='Readable text instead of JSON.')):
+    """Advice for a visual decision: techniques that fit, how to apply them, and references with reasons."""
+    _show(desk.advise(brief, techniques=technique, goals=goal, limit=limit, publishable_only=publish,
+                      layers_wanted=layer or None), text)
+
+
+@app.command()
+def directions(brief: str = typer.Argument(..., help='The visual decision, in plain words.'),
+               technique: list[str] = typer.Option(None, help='Technique id(s) to steer it.'),
+               goal: list[str] = typer.Option(None, help='Goal id(s) to steer it.'),
+               count: int = typer.Option(3, help='How many directions (1-5).'),
+               publish: bool = typer.Option(False, help='Only images you may publish.'),
+               text: bool = typer.Option(False, help='Readable text instead of JSON.')):
+    """Distinct ways to answer a brief, one technique each, with the references that show it. No AI."""
+    result = desk.directions(brief, techniques=technique, goals=goal, count=count, publishable_only=publish)
+    if not text:
+        _print(result)
+        return
+    for number, item in enumerate(result['directions'], 1):
+        typer.echo(f"{number}. {item['technique']['name']} (serves {', '.join(item['serves'])})\n   {item['idea']}"
+                   f"\n   Make sure: {'; '.join(item['make_sure'][:3])}")
+        for ref in item['references']:
+            typer.echo(f"   {ref['ref']}  {ref.get('title', '')[:60]} · {ref['licence']['label']}")
+            if ref.get('credit'):
+                typer.echo(f"   Credit: {ref['credit']}")
+    if not result['directions']:
+        typer.echo(result['note'])
+
+
+@app.command()
+def refs(brief: str = typer.Argument('', help='Optional brief.'),
+         technique: list[str] = typer.Option(None, help='Technique id(s).'),
+         goal: list[str] = typer.Option(None, help='Goal id(s).'),
+         subject: list[str] = typer.Option(None, help='Subject word(s).'),
+         orientation: str = typer.Option('', help='portrait, landscape or square.'),
+         colour: str = typer.Option(''), medium: str = typer.Option(''),
+         era_from: int = typer.Option(None), era_to: int = typer.Option(None),
+         system: str = typer.Option('', help='Limit to one design system.'),
+         layer: list[str] = typer.Option(None, help='library, generated or design-system (repeatable).'),
+         publish: bool = typer.Option(False, help='Only images you may publish.'),
+         limit: int = typer.Option(8), text: bool = typer.Option(False)):
+    """Ranked references by brief, technique, goal, subject and filters."""
+    _show(desk.search(brief=brief, techniques=technique, goals=goal, subjects=subject, orientation=orientation,
+                      colour=colour, medium=medium, era_from=era_from, era_to=era_to, system=system,
+                      layers_wanted=layer or None, publishable_only=publish, limit=limit), text)
+
+
+@app.command()
+def ref(ref_id: str = typer.Argument(..., help='e.g. library:12, generated:ID or system:NAME:ID')):
+    """One reference in full: evidence, review state, licence, credit and file."""
+    try:
+        _print(desk.get(ref_id))
+    except LookupError as error:
+        typer.echo(str(error))
+        raise typer.Exit(1)
+
+
+@app.command()
+def similar(ref_id: str = typer.Argument(..., help='e.g. library:12, generated:ID or system:NAME:ID'),
+            limit: int = typer.Option(6), publish: bool = typer.Option(False, help='Only images you may publish.'),
+            text: bool = typer.Option(False, help='Readable text instead of JSON.')):
+    """References whose composition looks like this one (light, dark and colour), compared locally."""
+    try:
+        _show(desk.similar(ref_id, limit=limit, publishable_only=publish), text)
+    except LookupError as error:
+        typer.echo(str(error))
+        raise typer.Exit(1)
+
+
+@app.command('search-open')
+def search_open(query: str = typer.Argument(..., help='A subject in a few words.'),
+                collection: list[str] = typer.Option(None, help='commons, met, aic, cma or rijksmuseum (repeatable).'),
+                per_collection: int = typer.Option(6), text: bool = typer.Option(False)):
+    """Search public collections live; only licence-checked results come back. Downloads nothing."""
+    result = desk.open_search(query, providers_wanted=collection, per_provider=per_collection)
+    if not text:
+        _print(result)
+        return
+    for item in result['results']:
+        typer.echo(f"{item['title'][:70]} — {item['creator'][:40]} ({item['provider']})\n  {item['licence']['label']}"
+                   f" · {item['source_url']}")
+        if item.get('credit'):
+            typer.echo(f"  Credit: {item['credit']}")
+    for provider, error in result['errors'].items():
+        typer.echo(f'{provider}: not searched ({error})')
+
+
+@app.command()
+def mcp():
+    """Run the read-only MCP server on stdio (for Claude Code, Codex and other agents)."""
+    from atlas import mcp_server
+    mcp_server.serve()

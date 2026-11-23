@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { del, media, post, readOnly, request } from '../lib/client'
 import { date, useApp, useData } from '../lib/hooks'
-import { aspect } from '../lib/library'
+import { aspect, backendName, cleanTitle } from '../lib/library'
 import { regionBox, regionLabel } from '../lib/regions'
 import { go, href, useRoute } from '../lib/router'
 import type { Annotation, Collection, ImageDetail, Settings } from '../lib/types'
 import { PROVIDERS, STATE_LABEL } from '../lib/types'
+import { MoreLikeThis } from './Ask'
 import { Failure, Loading, useNotice } from './ui'
-
-function backendName(name: string) {
-  return { codex: 'Codex', 'codex-interactive': 'Codex curation agent', claude: 'Claude Code', fake: 'Practice mode (no model)' }[name] ?? name
-}
 
 function who(changedBy: string) {
   if (changedBy === 'human') return 'you'
@@ -31,7 +28,7 @@ function readTrail(): { query: string; ids: number[] } {
 
 export default function ImagePage({ id }: { id: number }) {
   const { query } = useRoute()
-  const from = query.get('from')?.startsWith('#/connections?') ? query.get('from') : null
+  const from = /^#\/(connections\?|ask($|\?))/.test(query.get('from') ?? '') ? query.get('from') : null
   const { data, error, busy, reload, setData } = useData<ImageDetail>(`images/${id}`)
   const { taxonomy, compare, toggleCompare } = useApp()
   const { notify, fail, confirm } = useNotice()
@@ -50,6 +47,7 @@ export default function ImagePage({ id }: { id: number }) {
     function onKey(event: KeyboardEvent) {
       const target = event.target as HTMLElement
       if (event.altKey || event.ctrlKey || event.metaKey || target.closest('input, textarea, select, [contenteditable], dialog[open], .tabs')) return
+      if (from?.startsWith('#/ask')) return  // from an answer: there is no library trail to step through
       if (event.key === 'ArrowLeft' && previous) go(`image/${previous}`, { from })
       if (event.key === 'ArrowRight' && next) go(`image/${next}`, { from })
     }
@@ -62,9 +60,12 @@ export default function ImagePage({ id }: { id: number }) {
   const { image, rights, metrics, analysis } = data
   const picked = compare.some((p) => p.id === image.id)
   const ratio = image.width && image.height ? image.width / image.height : 1.4
-  const relatedTechniques = [...new Set(data.related.flatMap((r) => r.via))]
+  const rank = (techniqueId: string) => ['human_reviewed', 'model_reviewed', 'proposed'].indexOf(
+    data.annotations.find((a) => a.technique_id === techniqueId)?.state ?? 'proposed')
+  const relatedTechniques = [...new Set(data.related.flatMap((r) => r.via))].sort((a, b) => rank(a) - rank(b))
   const shown = tab ?? relatedTechniques[0] ?? null
   const related = shown ? data.related.filter((r) => r.via.includes(shown)) : data.related
+  const described = new Set((analysis?.observations ?? []).map((o) => o.text.trim()))  // shown under What you can see
   const nameOf = (techniqueId: string) => taxonomy?.techniques.find((t) => t.id === techniqueId)?.name ?? techniqueId
 
   async function decide(annotation: Pick<Annotation, 'technique_id'>, state: 'human_reviewed' | 'rejected', extra: Record<string, unknown> = {}) {
@@ -92,7 +93,7 @@ export default function ImagePage({ id }: { id: number }) {
     const sure = await confirm({ title: 'Remove this image from the library?', danger: true, confirm: 'Remove',
       body: `Its files, readings${data!.collections.length ? ` and places in ${data!.collections.length} collection${data!.collections.length === 1 ? '' : 's'}` : ''} go. A note stays so later searches skip it. This cannot be undone.` })
     if (!sure) return
-    try { await del(`images/${id}`); notify(`Removed “${image.title}” from the library.`); go('', { from }) } catch (reason) { fail(reason) }
+    try { await del(`images/${id}`); notify(`Removed “${image.title}” from the library.`); go('library', { from }) } catch (reason) { fail(reason) }
   }
 
   return (
@@ -109,19 +110,20 @@ export default function ImagePage({ id }: { id: number }) {
           })}
         </figure>
         <div className="image-title">
-          <p className="mono">Fig. {image.id} · {PROVIDERS[image.provider] ?? image.provider}{image.medium ? ` · ${image.medium}` : ''}</p>
           <h1 id="image-title">{image.title}</h1>
           <p className="muted">{[image.creator || 'Unknown maker', image.date_text].filter(Boolean).join(' · ')}</p>
+          <p className="mono">{[image.medium, PROVIDERS[image.provider] ?? image.provider].filter(Boolean).join(' · ')}</p>
           {rights && <p className="mono" style={{ color: 'var(--green)' }}>{rights.label} · {date(rights.verified_at)}</p>}
           <div className="row" style={{ marginTop: 6 }}>
             {!readOnly && <SaveToCollection imageId={image.id} member={data.collections} onDone={reload} />}
-            <button type="button" aria-pressed={picked} onClick={() => toggleCompare({ id: image.id, title: image.title, thumb: image.thumb })}>{picked ? '✓ Comparing' : 'Compare'}</button>
+            <button type="button" aria-pressed={picked} disabled={!picked && compare.length >= 4} title={!picked && compare.length >= 4 ? 'Compare holds four images: remove one first' : undefined}
+              onClick={() => toggleCompare({ id: image.id, title: image.title, thumb: image.thumb })}>{!picked && compare.length >= 4 ? 'Compare is full' : 'Compare'}</button>
             {!readOnly && <button type="button" aria-pressed={!!image.favorite} onClick={() => favourite(!image.favorite)}>{image.favorite ? '★ Favourite' : '☆ Favourite'}</button>}
             <a className="button" href={image.source_url} target="_blank" rel="noreferrer">Open at the source ↗</a>
           </div>
         </div>
       </section>
-      <p className="mono under">Fig. {image.id}  {image.width} × {image.height} px{metrics ? ` · ${metrics.orientation} · mostly ${metrics.color_family}` : ''}
+      <p className="mono under">Fig. {image.id} · {image.width} × {image.height} px{metrics ? ` · ${metrics.orientation}` : ''}
         {analysis?.observations.some((o) => regionBox(o.region)) && <> · <button type="button" className="quiet small" aria-pressed={allRegions}
           onClick={() => setAllRegions(!allRegions)}>{allRegions ? 'Hide the marked areas' : 'Show every marked area'}</button></>}
         {image.original && !readOnly && <> · <a href={media(image.original)} target="_blank" rel="noreferrer">open the original file</a></>}</p>
@@ -140,7 +142,7 @@ export default function ImagePage({ id }: { id: number }) {
                 </li>))}
             </ol>
             {analysis.ambiguities.length > 0 && <p className="muted" style={{ marginTop: 12 }}><strong>Left open:</strong> {analysis.ambiguities.join(' ')}</p>}
-            <p className="mono" style={{ marginTop: 12 }}>Described by {backendName(analysis.backend)} ({analysis.model}) on {date(analysis.created_at)}. A model's description of the pixels, not a catalogue record.</p>
+            <p className="mono" style={{ marginTop: 12 }} title={`${backendName(analysis.backend)} (${analysis.model})`}>Described by a model on {date(analysis.created_at)}. A description of the pixels, not a catalogue record.</p>
           </> : <div className="stack" style={{ marginTop: 14 }}><p className="muted">Not analysed yet.</p>
             {!readOnly && <div><button type="button" className="primary" onClick={() => startJob('analyze')}>Analyse this image</button></div>}</div>}
         </section>
@@ -148,22 +150,25 @@ export default function ImagePage({ id }: { id: number }) {
         <section className="why" aria-labelledby="why">
           <div className="ruled-title rule-rust section-title"><h2 id="why">Why it may work</h2>
             {!readOnly && <button type="button" className="quiet small" aria-expanded={adding} onClick={() => setAdding(!adding)}>{adding ? 'Close' : 'Add a technique'}</button>}</div>
-          {data.goals.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Serves: {data.goals.map((g, i) => <span key={g.id}>{i ? ', ' : ''}<a href={href(`explore/goal/${g.id}`, { from })}>{g.name}</a></span>)}</p>}
+          {data.goals.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Serves: {data.goals.slice(0, 3).map((g, i) => <span key={g.id}>{i ? ', ' : ''}<a href={href(`explore/goal/${g.id}`, { from })}>{g.name}</a></span>)}{data.goals.length > 3 ? ` +${data.goals.length - 3}` : ''}</p>}
           {adding && <TechniqueForm title="Add a technique you can see" techniques={taxonomy?.techniques.filter((t) => !data.annotations.some((a) => a.technique_id === t.id)) ?? []}
             onSave={(techniqueId, evidence, effect) => decide({ technique_id: techniqueId }, 'human_reviewed', { evidence, effect })} />}
           {data.annotations.length === 0 && <p className="muted" style={{ marginTop: 14 }}>No technique recorded yet.</p>}
           {data.annotations.map((a) => (
-            <article key={a.technique_id} className={`technique-card ${a.state}`}>
+            <article key={a.technique_id} className={`technique-card ${a.state}${a.note?.startsWith('second model disagreed') ? ' disputed' : ''}`}>
               <div className="card-top">
                 <h3><a href={href(`technique/${a.technique_id}`, { from })}>{a.name}</a></h3>
                 <span className={`state ${a.state}`}>{STATE_LABEL[a.state]}</span>
+                {a.note?.startsWith('second model disagreed') && <span className="state disputed">disputed by a second model</span>}
               </div>
               <p style={{ fontSize: 15 }}>{a.effect || 'No effect recorded.'}</p>
-              <p style={{ fontSize: 14 }} className="muted">{a.evidence.join(' ') || '—'}</p>
-              <p className="mono">{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
-                ? `proposed by ${backendName(a.proposed_backend)}` : 'added by you'}
-                {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ` · checked by ${who(a.changed_by)}` : ''}
-                {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}{a.note ? ` · ${a.note}` : ''}</p>
+              {a.evidence.filter((e) => !described.has(e.trim())).length > 0 && <p style={{ fontSize: 14 }} className="muted">{a.evidence.filter((e) => !described.has(e.trim())).join(' ')}</p>}
+              <p className="provenance" title={[a.proposed_backend && `Proposed by ${backendName(a.proposed_backend)}`,
+                a.changed_by !== 'human' && `Last checked by ${who(a.changed_by)}`].filter(Boolean).join(' · ')}>{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
+                ? 'proposed by a model' : 'added by you'}
+
+                {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}</p>
+              {a.note && <p className="provenance"><strong>Second reading:</strong> {a.note.replace(/^second model (agreed|disagreed):\s*/i, '')}</p>}
               {!readOnly && (editing === a.technique_id
                 ? <TechniqueForm title="Correct this reading" fixed={a.technique_id} initialEvidence={a.evidence.join('\n')} initialEffect={a.effect}
                     onSave={(_, evidence, effect) => decide(a, 'human_reviewed', { evidence, effect })} onCancel={() => setEditing(null)} />
@@ -179,20 +184,25 @@ export default function ImagePage({ id }: { id: number }) {
         </section>
 
         {rights && <aside className="use" aria-labelledby="use">
-          <h2 id="use" className="ruled-title rule-green">Usage and credits</h2>
+          <h2 id="use" className="ruled-title rule-green">Usage and credit</h2>
           <div className="slip" style={{ marginTop: 16 }}>
             <p className="credit">{rights.required_attribution}</p>
             <button type="button" className="small" style={{ marginTop: 14, background: 'var(--ground)' }}
               onClick={() => navigator.clipboard.writeText(rights.required_attribution).then(() => notify('Credit copied.'), fail)}>Copy credit</button>
           </div>
+          <p className="use-line">{['cc0', 'pd', 'pdm'].includes(rights.license_code.toLowerCase()) ? 'Free to use in your work; credit appreciated'
+            : rights.license_code.toUpperCase().startsWith('CC BY') ? 'Free to use in your work with the credit above' : rights.label}</p>
           <dl className="facts">
             <dt>Licence</dt><dd><a href={rights.license_url} target="_blank" rel="noreferrer">{rights.license_code}{rights.license_version ? ` ${rights.license_version}` : ''}</a></dd>
-            <dt>Checked</dt><dd>{date(rights.verified_at)} against the {PROVIDERS[image.provider] ?? image.provider} record
-              ({Object.entries(rights.evidence).filter(([k]) => !/url|Url|image/i.test(k)).map(([k, v]) => `${k} = ${String(v).slice(0, 40)}`).join('; ')})</dd>
-            <dt>Allowed</dt><dd>{rights.permitted_mode}</dd>
+            <dt>Checked</dt><dd>{date(rights.verified_at)}, from {PROVIDERS[image.provider] ?? image.provider}'s own record</dd>
             {rights.restrictions && <><dt>Notes</dt><dd>{rights.restrictions}</dd></>}
-            <dt>File</dt><dd className="mono">SHA-256 {image.file_sha256.slice(0, 16)}…</dd>
           </dl>
+          <details style={{ marginTop: 12 }}><summary className="mono">What was checked</summary>
+            <dl className="facts">
+              <dt>Record</dt><dd className="mono">{Object.entries(rights.evidence).filter(([k]) => !/url|Url|image/i.test(k)).map(([k, v]) => `${k} = ${String(v).slice(0, 40)}`).join('; ')}</dd>
+              <dt>This app may</dt><dd>{rights.permitted_mode}</dd>
+              <dt>File</dt><dd className="mono">SHA-256 {image.file_sha256.slice(0, 16)}…</dd>
+            </dl></details>
           <p className="mono" style={{ marginTop: 12 }}>Labels say what was checked; they are not legal advice. Check the source before publishing.</p>
           {image.description && <details style={{ marginTop: 16, borderTop: '1px solid var(--hair)', paddingTop: 8 }}>
             <summary>From the source record</summary>
@@ -205,17 +215,19 @@ export default function ImagePage({ id }: { id: number }) {
       {data.related.length > 0 && <section className="section" aria-labelledby="related">
         <div className="section-title">
           <h2 id="related">{shown ? `Also shows ${nameOf(shown).replace(/ \(.*\)$/, '').toLowerCase()}` : 'Related images'}</h2>
-          {relatedTechniques.length > 1 && <div className="tabs" role="tablist" aria-label="Related by technique">
-            {relatedTechniques.slice(0, 5).map((t) => <button key={t} type="button" role="tab" aria-selected={t === shown} onClick={() => setTab(t)}>{nameOf(t).replace(/ \(.*\)$/, '')}</button>)}
+          {relatedTechniques.length > 1 && <div className="tabs" role="group" aria-label="Related by technique">
+            {relatedTechniques.slice(0, 5).map((t) => <button key={t} type="button" aria-pressed={t === shown} onClick={() => setTab(t)}>{nameOf(t).replace(/ \(.*\)$/, '')}</button>)}
           </div>}
         </div>
-        <div className="strip" style={{ marginTop: 20 }}>
-          {related.map((r, index) => (
-            <a key={r.id} href={href(`image/${r.id}`, { from })} className="specimen" style={{ height: [200, 150, 176, 220, 132, 190][index % 6], aspectRatio: aspect(r) }} aria-label={r.title}>
-              <img src={media(r.thumb)} alt="" /></a>))}
-        </div>
-        <p className="mono strip-caption">{related.slice(0, 6).map((r) => r.title).join(' · ')}</p>
+        <ul className="ref-strip" style={{ marginTop: 20 }} aria-label="Related images">
+          {related.map((r) => <li key={r.id}>
+            <a href={href(`image/${r.id}`, { from, ...(query.get('use') === 'publish' ? { use: 'publish' } : {}) })} className="specimen"
+              style={{ aspectRatio: aspect(r) }} aria-label={cleanTitle(r.title)}><img src={media(r.thumb)} alt="" /></a>
+            <span className="strip-label">{cleanTitle(r.title)}</span></li>)}
+        </ul>
       </section>}
+
+      <MoreLikeThis refId={`library:${image.id}`} from={window.location.hash} use={query.get('use') ?? 'reference'} />
 
       <section className="section" aria-label="See also" style={{ marginTop: 40 }}>
         <div className="row"><a className="button small" href={href('connections', { focus: `image:${image.id}`, from })}>See connections</a></div>
@@ -233,8 +245,9 @@ export default function ImagePage({ id }: { id: number }) {
 function Crumbs({ trail, position, previous, next, from }: { trail: { query: string; ids: number[] }; position: number; previous: number | null; next: number | null; from: string | null }) {
   return (
     <nav className="crumbs" aria-label="Results">
-      <a href={href('', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>
-      {position >= 0 && <div className="row">
+      {from?.startsWith('#/ask') ? <a href={from} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Back to your answer</a>
+        : <a href={href('library', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>}
+      {position >= 0 && !from?.startsWith('#/ask') && <div className="row">
         <span className="mono">{position + 1} of {trail.ids.length} · ← → to move</span>
         <a className="button small" aria-disabled={!previous} href={previous ? href(`image/${previous}`, { from }) : undefined}>← Previous</a>
         <a className="button small" aria-disabled={!next} href={next ? href(`image/${next}`, { from }) : undefined}>Next →</a>

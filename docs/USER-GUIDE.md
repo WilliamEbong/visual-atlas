@@ -20,6 +20,8 @@ If you've just installed the app, start with [Your first session](#your-first-se
 - [Explore visual techniques](#explore-visual-techniques)
 - [Follow connections](#follow-connections)
 - [Compare images](#compare-images)
+- [Ask the atlas](#ask-the-atlas)
+- [Use Visual Atlas from an AI agent](#use-visual-atlas-from-an-ai-agent)
 - [Get directions for a project](#get-directions-for-a-project)
 - [Make a collection and export it](#make-a-collection-and-export-it)
 - [Manage jobs and usage limits](#manage-jobs-and-usage-limits)
@@ -84,7 +86,7 @@ After updating a source checkout, run `uv sync`, the two npm commands, and `uv r
 
 Try this with the starter library. It takes you from an intention to a pair of examples without making an AI call.
 
-1. Open **Explore**, then **See connections**.
+1. Open **Techniques**, then **See connections**.
 2. In **Start or focus on**, choose **Make one thing stand out**.
 3. In the context panel, follow **Isolate**, then **Space and depth**.
 4. Follow **Negative space isolation** in the map or List. Its explanation describes a subject surrounded by a large, quiet area.
@@ -162,7 +164,7 @@ For the solitude example, look for **Create calm and order**, **Negative space i
 3. Edit **Subject words**, separated by commas. Use concrete search words such as `person, coast, boat`, rather than layout instructions such as `leave room for title`.
 4. Check the summary above the editor, then start the search or ask for project directions.
 
-Corrections apply to the next submitted request. They do not rewrite your original text or the readings attached to library images. Changing the request fields recalculates the automatic reading and clears the correction; in My project, editing the saved brief clears it too. Use **Use automatic reading** to discard your corrections deliberately.
+Corrections apply to the next submitted request. They do not rewrite your original text or the readings attached to library images. Changing the request fields recalculates the automatic reading and clears the correction; in Projects, editing the saved brief clears it too. Use **Use automatic reading** to discard your corrections deliberately.
 
 If the automatic reading is unavailable in Find, the page says so and leaves the correction controls available. You can also continue with your original request. Unfamiliar descriptions, conflicting instructions and phrases such as "avoid X and use Y" still need care. A mistaken suggestion affects reference ranking, but does not remove all other candidates from consideration.
 
@@ -219,7 +221,7 @@ History records changes. If a later analysis drops an earlier model proposal, th
 
 ## Explore visual techniques
 
-Use **Explore** when you know what you want an image to do but do not yet have a reference in mind.
+Use **Techniques** when you know what you want an image to do but do not yet have a reference in mind.
 
 | Term | Example | Meaning |
 |---|---|---|
@@ -258,9 +260,85 @@ If you want a written explanation, select **Ask an assistant to compare them**. 
 
 When you started from Connections, use **Return to your exploration** to resume that exact route.
 
+## Ask the atlas
+
+**Ask** is the first page. Describe the picture you need and what it is for, for example "a calm opening slide: one small figure in a lot of empty space". The atlas shows:
+
+- how it read the brief: the goals, techniques and subject words it recognised;
+- **Ways to do it**: up to three techniques that could do the job, one each, with what to make sure of, what not to confuse it with, and pictures that show it;
+- **More references**: the other matches, folded under **See N more pictures that match**, each with the reasons it was chosen and its licence. Pictures chosen only because a word matched (no technique evidence yet) are kept apart.
+
+Once you have asked, the brief shows on one line; choose **Change the brief** to edit it.
+
+The atlas reads briefs by matching words, so it misses some ways of saying things. Under the reading, choose what the picture should do (**Make one thing stand out**, **Create calm and order**, **Show size or scale** and so on): the answer changes at once. Choose **In published work** to see only CC0, public-domain and CC BY pictures. Their credits are included. Asking uses no AI and sends nothing anywhere: it reads the readings, words and licences already in your library.
+
+On a reference or image page, **More like this** shows pictures whose light, dark and colour sit in similar places, from every layer. It compares small thumbnails on your computer; it finds compositions that look alike, not the same subject.
+
+Pictures come from up to three places, and each is labelled:
+
+| Label | What it is |
+|---|---|
+| Library | Your library. Each licence is checked by Visual Atlas against the source's record. |
+| Generated example | Original images made for Visual Atlas with Codex image generation to show techniques with few examples. Each one keeps its prompt, the works studied for craft, and its review. No licence is asserted, and they never appear under **In published work**. |
+| Design system | Private style libraries on the computer they belong to. See below. |
+
+### Private design-system libraries (the owner's computer only)
+
+Visual Atlas can read the four design-system libraries that exist on its author's computer (archive-of-looking, garden-of-lingering, citadel-of-watching and harbour-of-drifting). It reads them in place and never copies them. They are not part of Visual Atlas, and on any other computer this layer is empty. To turn it on, add `VISUAL_ATLAS_DESIGN_SYSTEMS=auto` to the `.env` file in your library folder, or set it for the MCP server as shown below. `auto` means the four folders under `%USERPROFILE%\.claude\skills`; you can also give folders separated by `;`. The atlas then also suggests which design system suits a brief. Their licences come from each system's own catalogue, not from Visual Atlas's checks.
+
+## Use Visual Atlas from an AI agent
+
+Agents such as Claude Code and Codex can ask the atlas for references while they design a slide, a page or a poster. The MCP server runs on your computer, reads your library and changes nothing. It never calls an AI model and never downloads anything. One tool, `search_open_collections`, goes online: it sends one search to each public collection it asks (Wikimedia Commons, the Met, the Art Institute of Chicago, the Cleveland Museum of Art, the Rijksmuseum) and returns only the results whose licence Visual Atlas can confirm.
+
+Add it to Claude Code (replace the folder with your Visual Atlas folder):
+
+```powershell
+claude mcp add visual-atlas -s user -- uv run --directory C:\VisualAtlas atlas mcp
+```
+
+Add it to Codex:
+
+```powershell
+codex mcp add visual-atlas -- uv run --directory C:\VisualAtlas atlas mcp
+```
+
+On the owner's computer, add `-e VISUAL_ATLAS_DESIGN_SYSTEMS=auto` (Claude Code, before `--`) or `--env VISUAL_ATLAS_DESIGN_SYSTEMS=auto` (Codex) to include the design-system libraries.
+
+| Tool | What the agent gets |
+|---|---|
+| `advise` | How a brief reads, techniques that fit and how to apply them, and ranked references with reasons, licence and credit. `use: "publish"` keeps only CC0, public-domain and CC BY images. An agent can add the technique and goal ids it reads in the brief; when the words match nothing, the answer includes the list of ids. |
+| `suggest_directions` | One to five distinct ways to answer a brief, one technique each: the idea, why it works, what to make sure of, what to watch out for, and the pictures that show it. |
+| `search_open_collections` | Live search of public collections for a subject, licence-checked from each record, with credit. Downloads and stores nothing. |
+| `similar_references` | Pictures whose composition (light, dark and colour) looks like a given reference. |
+| `search_references` | References by brief or by technique and goal ids, subjects, orientation, colour, medium, era or design system. |
+| `get_reference` | One reference in full: evidence and effect for each technique, review state, licence, restrictions and credit. |
+| `view_reference` | The picture itself, at most 1024 pixels, with its credit. |
+| `list_techniques`, `get_technique` | The goals and techniques, with guidance and the best examples. |
+| `route_brief` | Which design system and which of your collections suit a brief. |
+
+The same answers are available on the command line, as JSON by default or as text with `--text`:
+
+| Command | Purpose |
+|---|---|
+| `uv run atlas advise "calm opener, one small figure" --text` | Advice for a visual decision. Add `--publish` for publishable images only. |
+| `uv run atlas refs --technique silhouette --orientation portrait` | References by technique, goal (`--goal`), subject, shape, colour, medium, era or layer. |
+| `uv run atlas ref library:12` | One reference in full. |
+| `uv run atlas directions "calm opener" --goal create-calm --text` | Distinct ways to answer a brief, with pictures for each. |
+| `uv run atlas similar library:12 --text` | Pictures with a similar composition. |
+| `uv run atlas search-open "lighthouse at night" --text` | Live, licence-checked search of public collections (goes online; downloads nothing). |
+| `uv run atlas mcp` | Run the MCP server on stdio (agents start this themselves). |
+
+References are named by an id such as `library:12`, `generated:symmetry-01` or `system:harbour-of-drifting:gen-canal-dusk`, never by a file path.
+
+Tips for agents:
+- **Pass what you understood.** The desk reads briefs by matching words. If you can tell what the picture should do, pass the ids (`techniques`, `goals`; the list comes from `list_techniques`). Techniques and goals you pass lead the ranking; subject words then only break ties.
+- **Layout words are not subjects.** "Room on the left for the title" or "headline space" are ignored when matching subjects; the desk has no layout filter, so check the empty area yourself with `view_reference`.
+- **Open-collection results are links, not references.** `search_open_collections` returns the source page, image link, licence and credit, but no `ref`, so `view_reference`, `get_reference` and `similar_references` do not accept them. To keep one, import it with Find in the app.
+- **Same engine, two names.** CLI `advise` = `advise`; `refs` = `search_references`; `ref` = `get_reference`; `directions` = `suggest_directions`; `similar` = `similar_references`; `search-open` = `search_open_collections`.
+
 ## Get directions for a project
 
-1. Open **My project** and enter a project name.
+1. Open **Projects** (top right) and enter a project name.
 2. Write the brief with its audience, message, format, mood and constraints. For example: "An A2 poster for a public talk about solitude. Calm, with a small person in a wide landscape. Keep the top third quiet enough for a title."
 3. Choose **Save and continue**. Saving the brief does not request AI advice.
 4. Read and, if necessary, correct its goals, techniques and subject words.

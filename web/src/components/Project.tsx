@@ -1,8 +1,9 @@
+import { backendName, briefName } from '../lib/library'
 import { useEffect, useState } from 'react'
 import { del, media, post, put, readOnly, request } from '../lib/client'
 import { date, useData } from '../lib/hooks'
 import { go, href } from '../lib/router'
-import type { Brief, Job, ReadingCorrection, Settings } from '../lib/types'
+import type { Brief, Direction, Job, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
 import ReadingEditor from './ReadingEditor'
 import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
@@ -15,7 +16,7 @@ export default function Project({ id }: { id?: number }) {
   if (id) return <BriefPage id={id} onChange={list.reload} />
   return (
     <>
-      <PageHead kicker="My project · directions grounded in your library" title="Help with my project" />
+      <PageHead kicker="Projects · directions grounded in your library" title="Projects" />
       <div className="split" style={{ marginTop: 40 }}>
         <section className="main-col stack" aria-labelledby="new-brief">
           <h2 id="new-brief">A new brief</h2>
@@ -25,7 +26,7 @@ export default function Project({ id }: { id?: number }) {
         <aside className="side-col" aria-labelledby="briefs">
           <h2 id="briefs">Your briefs</h2>
           {list.error ? <Failure message={list.error} busy={list.busy} retry={list.reload} /> : !list.data ? <Loading plates={false} />
-            : list.data.length === 0 ? <p className="muted" style={{ marginTop: 12 }}>None yet. Briefs and their suggestions are saved, so reopening one costs nothing.</p>
+            : list.data.length === 0 ? <p className="muted" style={{ marginTop: 12 }}>None yet. Save a brief and ask for directions: two to five ways to approach it, each with its techniques, pictures from your library, how to carry it out, and what it costs you.</p>
             : <nav className="drawers" aria-label="Your briefs" style={{ gridTemplateColumns: '1fr', marginTop: 16 }}>
               {list.data.map((b, index) => <a key={b.id} className="drawer" href={href(`project/${b.id}`)}>
                 <span className="letter" aria-hidden="true">{index + 1}</span>
@@ -34,13 +35,15 @@ export default function Project({ id }: { id?: number }) {
             </nav>}
         </aside>
       </div>
+      {list.data?.length === 0 && !readOnly && <ExampleBrief />}
     </>
   )
 }
 
 function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: number) => void; onCancel?: () => void }) {
-  const [title, setTitle] = useState(brief?.title ?? '')
-  const [text, setText] = useState(brief?.text ?? '')
+  const fromAsk = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('text') ?? ''
+  const [title, setTitle] = useState(brief?.title ?? briefName(fromAsk))
+  const [text, setText] = useState(brief?.text ?? fromAsk)
   const { fail } = useNotice()
   async function save(event: React.FormEvent) {
     event.preventDefault()
@@ -51,11 +54,11 @@ function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: 
   }
   return (
     <form className="stack slip" onSubmit={save}>
-      <label className="field">Project name<input required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Solitude talk — poster" /></label>
+      <label className="field">Project name<input required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Solitude talk: poster" /></label>
       <label className="field">The brief: audience, message, format, mood, constraints
-        <textarea required rows={6} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} style={{ fontFamily: 'var(--mono)' }}
-          placeholder="A poster for a public talk about solitude and attention. Calm, a little melancholy, not lonely-sad. A2 portrait, title at the top, lots of room for text." /></label>
-      <div className="row"><button type="submit" className="primary">{brief ? 'Save brief' : 'Save and continue'}</button>
+        <textarea required rows={6} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)}
+          placeholder="For example: a poster for a public talk about solitude and attention. Calm, a little melancholy, not lonely-sad. A2 portrait, title at the top, lots of room for text." /></label>
+      <div className="row"><button type="submit" className="primary">{brief ? 'Save brief' : 'Save brief, then get directions'}</button>
         {onCancel && <button type="button" onClick={onCancel}>Cancel</button>}</div>
     </form>
   )
@@ -136,7 +139,7 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
                   <p className="mono" style={{ marginTop: 8 }}>Tradeoffs</p>
                   <ul style={{ fontSize: 14, paddingLeft: 18 }}>{d.tradeoffs.map((e) => <li key={e}>{e}</li>)}</ul>
                 </details>
-                <p className="mono">Suggested by {d.backend} ({d.model_version ?? d.model})</p>
+                <p className="mono">Suggested by {backendName(d.backend)}{d.backend === 'fake' ? '' : ` (${d.model_version ?? d.model})`}</p>
                 {!readOnly && <div className="row" style={{ marginTop: 'auto' }}>
                   {d.state !== 'kept' && <button type="button" className="small" onClick={() => setState(d.id, 'kept', d.title, d.state)}>Keep</button>}
                   <button type="button" className="quiet small" onClick={() => setState(d.id, 'dismissed', d.title, d.state)}>Dismiss</button>
@@ -146,5 +149,37 @@ function BriefPage({ id, onChange }: { id: number; onChange: () => void }) {
       </section>
       {!readOnly && <p style={{ marginTop: 48 }}><button type="button" className="quiet small" style={{ color: 'var(--danger)' }} onClick={remove}>Delete this brief…</button></p>}
     </>
+  )
+}
+
+/** A saved real run of Suggest directions: what a brief gives back, before you write your own. */
+function ExampleBrief() {
+  const example = useData<{ title: string; text: string; backend: string; model: string; made: string
+    directions: Pick<Direction, 'title' | 'idea' | 'rationale' | 'execution' | 'tradeoffs' | 'images' | 'techniques'>[] }>('briefs/example')
+  if (!example.data?.directions.length) return null
+  const e = example.data
+  return (
+    <section className="section" aria-labelledby="example-title">
+      <div className="section-title"><h2 id="example-title">For example: {e.title}</h2>
+        <p className="mono">A real answer, suggested by {backendName(e.backend)} on {e.made}</p></div>
+      <p className="slip-text" style={{ maxWidth: 760, marginTop: 8 }}>{e.text}</p>
+      <div className="trays" style={{ marginTop: 22, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+        {e.directions.map((d, index) => (
+          <article key={d.title} className={`tray-col ${RULES[index % RULES.length]}`} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <p className="mono">Direction {index + 1}</p>
+            <h3 className="direction-title">{d.title}</h3>
+            {d.images.length > 0 && <div className="contact" style={{ height: 170, gap: 10 }}>
+              {d.images.slice(0, 2).map((img) => <a key={img.id} href={href(`image/${img.id}`)} aria-label={img.title}>
+                <img src={media(img.thumb)} alt="" style={{ height: 170, maxWidth: '100%', objectFit: 'contain' }} /></a>)}</div>}
+            <p style={{ fontSize: 15 }}>{d.idea}</p>
+            <p className="mono">{d.techniques.map((t, i) => <span key={t.id}>{i ? ' · ' : ''}<a href={href(`technique/${t.id}`)}>{t.name.replace(/ \(.*\)$/, '')}</a></span>)}</p>
+            <details><summary>How to do it, and tradeoffs</summary>
+              <ul style={{ fontSize: 14, paddingLeft: 18 }}>{d.execution.map((x) => <li key={x}>{x}</li>)}</ul>
+              <p className="mono" style={{ marginTop: 8 }}>Tradeoffs</p>
+              <ul style={{ fontSize: 14, paddingLeft: 18 }}>{d.tradeoffs.map((x) => <li key={x}>{x}</li>)}</ul>
+            </details>
+          </article>))}
+      </div>
+    </section>
   )
 }

@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "author": "Opus subagent writing as designers",
+  "status": "Provisional model-authored judgments; not independent expert ground truth.",
+  "created": "2026-11-23",
+  "inputs_read": ["atlas/data/taxonomy.json", "docs/evaluation/v0.4/brief-heldout.json"],
+  "policies": {
+    "goals_policy": "Expected goals reflect communication outcomes requested in the brief, not every taxonomy goal associated with an expected technique.",
+    "subjects_policy": "subjects lists required useful subject words; not_subjects lists particular instruction, format, or mechanism words that should not become subject searches. Other sensible subject words are not penalized by these lists.",
+    "techniques_policy": "Expected techniques require a named mechanism or concrete descriptive evidence. A mood or generic style alone does not establish a mechanism. Explicitly negated techniques are excluded."
+  },
+  "cases": [
+    {
+      "id": "d01",
+      "category": "direct-name",
+      "text": "Looking for chiaroscuro portraits for a jazz festival poster. Moody, intimate.",
+      "techniques": ["value-contrast"],
+      "goals": [],
+      "subjects": ["portraits"],
+      "not_subjects": ["looking", "chiaroscuro", "festival", "poster", "moody", "intimate"],
+      "rationale": "Chiaroscuro is named directly; moody and intimate are mood words, not a requested communication outcome."
+    },
+    {
+      "id": "d02",
+      "category": "direct-name",
+      "text": "Frame within a frame shots for a hotel brochure - rooms seen past a pulled-back curtain, or a courtyard glimpsed through an open door.",
+      "techniques": ["framing"],
+      "goals": [],
+      "subjects": ["hotel", "courtyard"],
+      "not_subjects": ["frame", "within", "shots", "brochure", "glimpsed"],
+      "rationale": "The mechanism is named and reinforced by curtain and door openings enclosing the subject."
+    },
+    {
+      "id": "d03",
+      "category": "direct-name",
+      "text": "Leading lines, something like a long pier running out to sea. It's for an annual report cover and I want people's eye pulled to the very end of it.",
+      "techniques": ["leading-lines"],
+      "goals": ["guide-the-eye"],
+      "subjects": ["pier", "sea"],
+      "not_subjects": ["leading", "lines", "annual", "report", "cover", "pulled"],
+      "rationale": "Named technique with an explicit request to pull the eye along to a point."
+    },
+    {
+      "id": "d04",
+      "category": "direct-name",
+      "text": "Show me visual puns, like a lightbulb that's also something else, for an innovation campaign.",
+      "techniques": ["visual-metaphor"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["lightbulb", "innovation"],
+      "not_subjects": ["show", "visual", "puns", "campaign", "else"],
+      "rationale": "Visual pun names the metaphor mechanism, and the campaign asks to express the abstract idea of innovation."
+    },
+    {
+      "id": "d05",
+      "category": "direct-name",
+      "text": "Atmospheric perspective references - hills fading back in layers - for a wellness app onboarding screen.",
+      "techniques": ["atmospheric-perspective", "layered-depth"],
+      "goals": [],
+      "subjects": ["hills"],
+      "not_subjects": ["atmospheric", "perspective", "references", "wellness", "app", "onboarding", "screen"],
+      "rationale": "Atmospheric perspective is named and the hills are described as separate receding planes; wellness context implies no stated outcome."
+    },
+    {
+      "id": "d06",
+      "category": "direct-name",
+      "text": "I need a good odd-one-out image for a slide about standing out from competitors. Rows of the same thing, one that's different.",
+      "techniques": ["repetition-with-interruption", "rhythm-pattern"],
+      "goals": ["draw-attention"],
+      "subjects": [],
+      "not_subjects": ["odd", "slide", "competitors", "rows", "same", "different"],
+      "rationale": "Odd one out is named with rows of identical items setting the pattern; the slide asks for one thing to stand out, with no concrete subject given."
+    },
+    {
+      "id": "d07",
+      "category": "direct-name",
+      "text": "Figure-ground illusion for a logo moodboard, the two faces making a vase kind of thing.",
+      "techniques": ["figure-ground-ambiguity"],
+      "goals": [],
+      "subjects": ["faces", "vase"],
+      "not_subjects": ["figure", "ground", "illusion", "logo", "moodboard", "kind"],
+      "rationale": "The reversible-figure mechanism is named and illustrated by the classic face/vase example."
+    },
+    {
+      "id": "d08",
+      "category": "direct-name",
+      "text": "Shallow depth of field shots of perfume bottles, the hero bottle needs to pop.",
+      "techniques": ["selective-focus"],
+      "goals": ["draw-attention"],
+      "subjects": ["perfume", "bottles"],
+      "not_subjects": ["shallow", "depth", "field", "shots", "hero", "pop"],
+      "rationale": "Shallow depth of field is named and the brief asks for one bottle to stand out."
+    },
+    {
+      "id": "d09",
+      "category": "described",
+      "text": "A tiny hiker on the edge of a massive glacier, for a climate report cover.",
+      "techniques": ["scale-contrast"],
+      "goals": ["show-scale"],
+      "subjects": ["hiker", "glacier"],
+      "not_subjects": ["edge", "climate", "report", "cover"],
+      "rationale": "A small familiar figure set against a huge form makes the glacier's size legible."
+    },
+    {
+      "id": "d10",
+      "category": "described",
+      "text": "Poster for a dance night. I want it to feel like everyone's caught off the ground mid-jump, hair flying, total energy.",
+      "techniques": ["implied-motion"],
+      "goals": ["suggest-motion"],
+      "subjects": ["dance"],
+      "not_subjects": ["poster", "night", "feel", "everyone", "energy"],
+      "rationale": "Bodies caught mid-action with hair flying are concrete motion cues, and energy is the stated outcome."
+    },
+    {
+      "id": "d11",
+      "category": "described",
+      "text": "Hero image for a meditation retreat site: one small canoe on a big flat lake with nothing else around, top half left clear for the headline. Should feel still.",
+      "techniques": ["negative-space"],
+      "goals": ["create-calm"],
+      "subjects": ["canoe", "lake"],
+      "not_subjects": ["hero", "image", "meditation", "site", "headline", "half"],
+      "rationale": "An isolated small subject in an empty surround with space reserved for type is negative space; stillness is the requested outcome."
+    },
+    {
+      "id": "d12",
+      "category": "described",
+      "text": "Shots looking straight up at skyscrapers so they feel like they're closing in on you. Book cover about the city.",
+      "techniques": ["vantage-point"],
+      "goals": ["create-tension"],
+      "subjects": ["skyscrapers", "city"],
+      "not_subjects": ["shots", "book", "cover", "closing"],
+      "rationale": "An extreme upward viewpoint is described, and the closing-in feeling is a request for unease."
+    },
+    {
+      "id": "d13",
+      "category": "described",
+      "text": "Packaging moodboard for a coffee brand - burlap sack next to a glossy ceramic cup, rough versus slick.",
+      "techniques": ["texture-contrast"],
+      "goals": [],
+      "subjects": ["coffee", "burlap", "cup"],
+      "not_subjects": ["packaging", "moodboard", "brand", "versus"],
+      "rationale": "Coarse and glossy surfaces set side by side describe texture contrast without naming it."
+    },
+    {
+      "id": "d14",
+      "category": "described",
+      "text": "Someone standing in an open garage door with the sunny street behind, so you only see their outline in black.",
+      "techniques": ["silhouette", "framing"],
+      "goals": [],
+      "subjects": ["person", "street", "garage"],
+      "not_subjects": ["outline", "black", "sunny"],
+      "rationale": "A dark featureless figure against bright light is a silhouette, and the door opening encloses the figure."
+    },
+    {
+      "id": "d15",
+      "category": "described",
+      "text": "Editorial spread on loneliness in cities: one guy on a bench, the crowd flowing past together, and he's clearly off on his own.",
+      "techniques": ["proximity-grouping"],
+      "goals": ["group-and-relate", "make-an-idea-visible"],
+      "subjects": ["bench", "crowd", "city", "loneliness"],
+      "not_subjects": ["editorial", "spread", "clearly"],
+      "rationale": "Separation by distance from a group carries the meaning, and the spread asks to show the idea of loneliness."
+    },
+    {
+      "id": "d16",
+      "category": "described",
+      "text": "Interiors where the whole room is shades of one sage green, walls, sofa, everything. For a paint brand.",
+      "techniques": ["color-harmony"],
+      "goals": [],
+      "subjects": ["room", "sofa", "interior"],
+      "not_subjects": ["shades", "brand", "everything"],
+      "rationale": "A single hue in many tones across the whole image is a limited-palette harmony."
+    },
+    {
+      "id": "d17",
+      "category": "described",
+      "text": "Website hero, a road running dead straight through a forest and vanishing at the horizon. Product name sits right where it ends.",
+      "techniques": ["leading-lines"],
+      "goals": ["guide-the-eye"],
+      "subjects": ["road", "forest"],
+      "not_subjects": ["website", "hero", "product", "name", "ends"],
+      "rationale": "A converging road carries the eye to a deliberate end point where the name will sit."
+    },
+    {
+      "id": "d18",
+      "category": "described",
+      "text": "A woman glancing toward the edge of the frame so the text column beside her feels connected to her.",
+      "techniques": ["gaze-direction"],
+      "goals": ["guide-the-eye"],
+      "subjects": ["woman"],
+      "not_subjects": ["glancing", "edge", "frame", "text", "column", "connected"],
+      "rationale": "The figure's look is used to direct attention toward the adjacent text."
+    },
+    {
+      "id": "d19",
+      "category": "described",
+      "text": "For a festival poster I want everything off-kilter, like the world is tipping over - buildings and horizon cocked hard on purpose.",
+      "techniques": ["diagonal-energy"],
+      "goals": ["create-tension"],
+      "subjects": ["buildings"],
+      "not_subjects": ["festival", "poster", "world", "tipping", "purpose"],
+      "rationale": "Deliberately tipped buildings and horizon put the main lines on a diagonal, asking for instability."
+    },
+    {
+      "id": "d20",
+      "category": "described",
+      "text": "Just the hands of an old fisherman mending a net, no face, filling the whole picture.",
+      "techniques": ["tight-cropping"],
+      "goals": [],
+      "subjects": ["fisherman", "hands", "net"],
+      "not_subjects": ["face", "picture", "filling"],
+      "rationale": "A part standing for the whole and filling the frame is a tight crop."
+    },
+    {
+      "id": "d21",
+      "category": "described",
+      "text": "Pitch deck slide on the past meeting the future: a horse-drawn cart parked next to an electric car.",
+      "techniques": ["juxtaposition"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["horse", "cart", "electric car"],
+      "not_subjects": ["pitch", "deck", "slide", "past", "future", "meeting"],
+      "rationale": "Two unlike things placed together for comparison express the abstract old-versus-new idea."
+    },
+    {
+      "id": "d22",
+      "category": "described",
+      "text": "A giraffe standing in an office lift, completely deadpan. Ad campaign about thinking differently.",
+      "techniques": ["contextual-incongruity"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["giraffe", "office", "lift"],
+      "not_subjects": ["deadpan", "campaign", "thinking", "differently"],
+      "rationale": "An animal in a setting where it does not belong is incongruity, used to carry the campaign's idea."
+    },
+    {
+      "id": "d23",
+      "category": "described",
+      "text": "Mountain ridges stacking back one after another, each paler and bluer than the last. Book jacket, calm tone.",
+      "techniques": ["atmospheric-perspective", "layered-depth"],
+      "goals": ["create-calm"],
+      "subjects": ["mountains", "ridges"],
+      "not_subjects": ["stacking", "paler", "bluer", "book", "jacket", "tone"],
+      "rationale": "Overlapping planes that fade paler and bluer with distance combine layering and aerial perspective; calm is requested."
+    },
+    {
+      "id": "d24",
+      "category": "described",
+      "text": "One red umbrella in a sea of black ones, shot from high up. Annual report, theme is individuality.",
+      "techniques": ["repetition-with-interruption", "color-contrast", "vantage-point"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["umbrella"],
+      "not_subjects": ["sea", "shot", "annual", "report", "theme"],
+      "rationale": "A single colour exception in a repeated field, seen from above, is used to express individuality."
+    },
+    {
+      "id": "d25",
+      "category": "described",
+      "text": "A face lit from one side by a single desk lamp, rest of the room pitch black. Thriller novel cover.",
+      "techniques": ["value-contrast"],
+      "goals": ["create-tension"],
+      "subjects": ["face", "lamp"],
+      "not_subjects": ["room", "thriller", "novel", "cover", "pitch"],
+      "rationale": "One directional light against deep darkness is tonal contrast, and the thriller cover asks for tension."
+    },
+    {
+      "id": "d26",
+      "category": "described",
+      "text": "Looking down on a market square where the stall roofs make a neat grid of colour.",
+      "techniques": ["vantage-point", "rhythm-pattern"],
+      "goals": [],
+      "subjects": ["market", "stalls", "roofs"],
+      "not_subjects": ["looking", "neat", "grid"],
+      "rationale": "An overhead view turning repeated roofs into a regular grid gives viewpoint plus pattern."
+    },
+    {
+      "id": "d27",
+      "category": "described",
+      "text": "Older couples dancing in little twos spread across a big hall. Leaflet for a community centre, it's about connection.",
+      "techniques": ["proximity-grouping"],
+      "goals": ["group-and-relate"],
+      "subjects": ["couples", "dancing", "hall"],
+      "not_subjects": ["leaflet", "community", "centre", "connection", "twos"],
+      "rationale": "Pairs clustered with gaps between them read as units, and the leaflet asks to show who belongs together."
+    },
+    {
+      "id": "d28",
+      "category": "described",
+      "text": "Lanterns lined up along a jetty, getting smaller as they go out into the dusk. Wedding invite, should feel peaceful.",
+      "techniques": ["rhythm-pattern", "leading-lines"],
+      "goals": ["create-calm"],
+      "subjects": ["lanterns", "jetty", "dusk"],
+      "not_subjects": ["lined", "smaller", "wedding", "invite", "peaceful"],
+      "rationale": "A diminishing series of lanterns along a receding jetty gives rhythm and a line into depth; peaceful is requested."
+    },
+    {
+      "id": "d29",
+      "category": "described",
+      "text": "Cathedral nave shot dead centre, left and right sides matching each other, for an order-of-service booklet.",
+      "techniques": ["symmetry"],
+      "goals": [],
+      "subjects": ["cathedral", "nave"],
+      "not_subjects": ["shot", "centre", "sides", "matching", "order", "service", "booklet"],
+      "rationale": "A central axis with matching halves describes symmetry without naming it."
+    },
+    {
+      "id": "d30",
+      "category": "described",
+      "text": "Bright orange kayak on a dark teal river for a sporty brand's homepage. It has to jump out.",
+      "techniques": ["color-contrast"],
+      "goals": ["draw-attention"],
+      "subjects": ["kayak", "river"],
+      "not_subjects": ["sporty", "brand", "homepage", "jump"],
+      "rationale": "A warm accent against a cool field is colour contrast, used to make the kayak stand out."
+    },
+    {
+      "id": "d31",
+      "category": "negated",
+      "text": "Single tree on a wide, empty hillside for a pension brochure. Calm, but please not a black outline against a sunset.",
+      "techniques": ["negative-space"],
+      "goals": ["create-calm"],
+      "subjects": ["tree", "hillside"],
+      "not_subjects": ["pension", "brochure", "outline", "sunset", "black"],
+      "rationale": "An isolated subject in empty surroundings is negative space; the silhouette treatment is explicitly refused."
+    },
+    {
+      "id": "d32",
+      "category": "negated",
+      "text": "Team photo ideas for an About page, people clustered naturally in little groups. Avoid the stiff symmetrical line-up look.",
+      "techniques": ["proximity-grouping"],
+      "goals": ["group-and-relate"],
+      "subjects": ["team", "people"],
+      "not_subjects": ["photo", "ideas", "about", "page", "stiff", "symmetrical", "line-up"],
+      "rationale": "Clustering into groups is described while symmetry is explicitly ruled out."
+    },
+    {
+      "id": "d33",
+      "category": "negated",
+      "text": "Product shot of a wristwatch, not too busy, lots of plain surface around it. And no blurry bokeh stuff, I want it sharp front to back.",
+      "techniques": ["negative-space"],
+      "goals": [],
+      "subjects": ["wristwatch"],
+      "not_subjects": ["product", "shot", "busy", "surface", "blurry", "bokeh", "sharp"],
+      "rationale": "Quiet plain surroundings isolate the watch; selective focus is explicitly excluded."
+    },
+    {
+      "id": "d34",
+      "category": "negated",
+      "text": "Menu cover: a big bowl of noodles dead centre, both halves balanced, calm. Avoid anything tilted or shot from weird angles.",
+      "techniques": ["symmetry"],
+      "goals": ["create-calm"],
+      "subjects": ["noodles", "bowl"],
+      "not_subjects": ["menu", "cover", "halves", "tilted", "angles", "weird"],
+      "rationale": "A centred subject with balanced halves is symmetry; diagonal energy and unusual vantage points are refused."
+    },
+    {
+      "id": "d35",
+      "category": "negated",
+      "text": "Conference banner, city at night. Not hazy or foggy - crisp right to the horizon, with buildings overlapping deep into the distance.",
+      "techniques": ["layered-depth"],
+      "goals": ["build-depth"],
+      "subjects": ["city", "night", "buildings"],
+      "not_subjects": ["conference", "banner", "hazy", "foggy", "crisp", "overlapping"],
+      "rationale": "Overlapping buildings receding into space build depth by layering, while haze-based atmospheric perspective is excluded."
+    },
+    {
+      "id": "d36",
+      "category": "no-mechanism",
+      "text": "Something nostalgic for a bakery's Instagram, warm and homely.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["bakery"],
+      "not_subjects": ["something", "nostalgic", "instagram", "warm", "homely"],
+      "rationale": "Only mood and subject are given; no visual mechanism or outcome is described."
+    },
+    {
+      "id": "d37",
+      "category": "no-mechanism",
+      "text": "Pictures of beekeepers for a honey label.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["beekeepers", "honey"],
+      "not_subjects": ["pictures", "label"],
+      "rationale": "A plain subject request with no mechanism or communication goal."
+    },
+    {
+      "id": "d38",
+      "category": "no-mechanism",
+      "text": "Moody ocean pictures for a podcast cover about grief.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["ocean", "grief"],
+      "not_subjects": ["moody", "pictures", "podcast", "cover"],
+      "rationale": "Mood and topic only; moodiness does not establish any mechanism."
+    },
+    {
+      "id": "d39",
+      "category": "no-mechanism",
+      "text": "Hopeful, optimistic shots of kids planting trees for an NGO annual report.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["kids", "planting", "trees"],
+      "not_subjects": ["hopeful", "optimistic", "shots", "ngo", "annual", "report"],
+      "rationale": "Emotional tone and subject only, with no compositional or visual mechanism described."
+    },
+    {
+      "id": "d40",
+      "category": "no-mechanism",
+      "text": "Old harbour towns, any time of day, for a travel zine spread.",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["harbour", "towns"],
+      "not_subjects": ["time", "day", "travel", "zine", "spread"],
+      "rationale": "A subject-only request; no mechanism or outcome is asked for."
+    }
+  ]
+}

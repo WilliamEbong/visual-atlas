@@ -3,7 +3,57 @@
 Durable checkpoint for the autonomous build. Newest status first. Plan of record:
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
-## Next concrete action
+## 008 Reference desk, round 4 (2026-11-23, same branch)
+- Acceptance: an Opus "designer" installed the release zip in temp and an Opus "agent" used MCP and the CLI. Everything
+  worked; what they hit is fixed with tests (layout and mood words, evidence first, credits, serve port, zip contents).
+- Merge rehearsal onto visual-atlas-v0.4: clean, every check green. Steps and rollback: OVERNIGHT-CHANGES.md "How to merge".
+- Scored design cycle: 6.7/6.6, 6.9/6.3, 7.45/6.9, 7.5/7.15, then 7.1/6.85, so it stopped. Screenshots
+  design-review/r4. Remaining design items are listed in OVERNIGHT-CHANGES.md "Round 4".
+- Structural design: the diagnosis (no centre; pictures beneath text) led to pass A, where Ask is the front page with
+  three places and the answer is in picture bands, and pass B, one picture system and one job per screen. Both
+  were kept (flat). Pass C, rows measured in code, scored lower and was reverted at fb5bae3. Stopped after three
+  approaches. What blocks a 9 is in OVERNIGHT-CHANGES.md "Structural design", mostly content curation.
+- Content round: curated starter (102 refs, museum works for stock), leads by strength, mood goals plus per-picture
+  moods, Find and Projects show results, long tail, two Codex reviews fixed. Fresh-scorer mean 7.05 -> 7.5. What
+  still blocks a 9 is in OVERNIGHT-CHANGES.md "Content round".
+- Final Codex review of the whole branch: 3 findings, all fixed with tests (MCP file containment, MCP UTF-8 input,
+  credits in readable CLI output). 477 backend and 18 web tests pass.
+- Next concrete action: owner's blind test (docs/evaluation/v0.5/BLIND-TEST.md), then the merge.
+
+## 008 Reference desk, design pass and round 3 (2026-11-23, same branch)
+- Design pass: seven lens reviewers, six fix batches, four review rounds; screenshots design-review/r3
+  (before-*, after-*, final-*). Record: OVERNIGHT-CHANGES.md "Design pass".
+- Round 3: dead code and two round-2 extras removed (~−340 lines, −1.3 MB per release zip); MCP server starts
+  ~1.2 s faster; graphify graph in graphify-out/ (query: `graphify query "<question>"`). Record: "Round 3".
+- (Round 4 followed; see above.)
+
+## 008 Reference desk, overnight round 2 (2026-11-23, same branch)
+- Owner approved continuing: close open items, run a proxy of the blind test, extend along the Later list, a
+  second design cycle, Codex review each round. Record: OVERNIGHT-CHANGES.md ("Round 2").
+- Built: brief-reading evaluation on 80 frozen briefs (docs/evaluation/r2), 594 independent cue phrases;
+  suggest_directions, similar_references and search_open_collections MCP tools (+ atlas directions, similar,
+  search-open); agent-supplied ids and codebook fallback in advise; Ask "Ways to do it", goal chips, word-only
+  matches apart, More like this; 11 typography/poster/infographic starter references (93 to 104); 9 more
+  generated references (18 kept, 3 dropped) with IPTC provenance labels; warm
+  caches; Rijksmuseum and Commons title fixes.
+- Proxy blind test (docs/evaluation/r2/proxy/PROXY-REPORT.md): the desk lost both rounds to an Opus agent with
+  web search (8-1-1 twice; then 6-1-3 and 7-2-1 with open search). Honest finding, recorded as a proxy.
+- More like this keeps picture signatures in memory only; the app computes them in the background at start.
+- Next concrete action: owner runs docs/evaluation/v0.5/BLIND-TEST.md; Codex review rounds continue until two
+  in a row find nothing.
+
+## 008 Reference desk (overnight 2026-11-22/23, branch claude/product-direction-d8e569)
+- Owner handoff: build continuously toward a genuinely useful product. Thesis, research and decisions:
+  docs/research/05-thesis.md. Spec Kit feature: specs/008-reference-desk (spec, plan, tasks, session-log).
+- Summary for the owner and merge steps: OVERNIGHT-CHANGES.md. Evidence and the Later list are kept there.
+- Built: atlas/desk.py (deterministic reference desk), atlas/layers.py (generated and design-system layers),
+  atlas/mcp_server.py (read-only stdio MCP, stdlib), CLI advise/refs/ref/mcp, /api/desk and /layer-media, Ask page,
+  generated/ layer, commit guard for design-system files, constitution 1.1.0.
+- Invariants kept: rights.py is still the only gate into the library; no new dependency; no migration; the
+  owner's real library was untouched (all runs used %TEMP%\va-home); design systems were read in place.
+- Next concrete action: the owner runs docs/evaluation/v0.5/BLIND-TEST.md, then decides whether to merge.
+
+## Next concrete action (v0.4, superseded by 008 above)
 v0.4.0 local release implemented and verified. Launch with `uv run visual-atlas`, or extract
 `release/VisualAtlas-v0.4.0.zip` and run `Install Visual Atlas.cmd`. No pending core implementation task.
 Owner's latest instruction authorizes committing and pushing the implementation and documentation.

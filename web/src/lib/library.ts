@@ -63,11 +63,6 @@ export function nextPages<T extends { id: number }>(previous: Pages<T>, key: str
 }
 
 /** Arrow-key movement in a grid of `count` items laid out in `columns` columns. */
-export function nextIndex(index: number, key: string, columns: number, count: number): number {
-  const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns, Home: -index, End: count - 1 - index }[key]
-  if (step === undefined || count === 0) return index
-  return Math.min(count - 1, Math.max(0, index + step))
-}
 
 export interface Box { left: number; top: number; width: number }
 
@@ -109,4 +104,41 @@ export function activeFilters(filters: Filters, names: Record<string, string>): 
   if (filters.favorite) out.push({ label: 'Favourites', clear: { favorite: false } })
   if (filters.collection) out.push({ label: 'In a collection', clear: { collection: 0 } })
   return out
+}
+
+/** A catalogue title without the noise of file names: "Slovenian Sunset (7027587519)" → "Slovenian Sunset",
+ *  "Alice 05a-1116x1492" → "Alice 05a", "…Sunset 5746" stays (it is part of the title). Display only. */
+export function cleanTitle(title: string, maker = '', date = ''): string {
+  let clean = title.replace(/\s*\(\d{6,}\)$/, '').replace(/[-_ ]\d{2,5}x\d{2,5}(-\d+)?$/, '').replace(/\.(jpe?g|png|tiff?)\b.*$/i, '').trim()
+  const name = maker.trim()
+  if (name && clean.toLowerCase().startsWith(`${name.toLowerCase()} - `)) clean = clean.slice(name.length + 3)  // "Maker - Title"
+  const year = /\d{4}/.exec(date)?.[0]
+  if (year) clean = clean.replace(new RegExp(`,\\s*${year}$`), '')  // "Title, 1926" when 1926 is the date
+  return clean.trim() || title
+}
+
+/** Dates as people write them: camera timestamps lose their time of day. */
+export function shortDate(date?: string | null): string {
+  return (date ?? '').replace(/^(\d{4}-\d{2}-\d{2})[ T]\d{1,2}:\d{2}(:\d{2})?.*$/, '$1')
+    .replace(/,? \d{1,2}:\d{2}(:\d{2})?( \(according to Exif data\))?$/, '')
+}
+
+/** Assistant and job-state names as people say them. */
+export function backendName(name: string): string {
+  return ({ codex: 'Codex', 'codex-interactive': 'Codex curation agent', claude: 'Claude Code', fake: 'Practice mode (no model)' } as Record<string, string>)[name] ?? name
+}
+export const JOB_STATE: Record<string, string> = { queued: 'Waiting', running: 'Working', cancelling: 'Stopping', paused: 'Paused',
+  done: 'Finished', failed: 'Stopped', cancelled: 'Cancelled' }
+
+/** A maker as a catalogue prints it: "Unknown author Unknown author" → "", a phrase said twice said once. */
+export function cleanMaker(maker?: string | null): string {
+  const once = (maker ?? '').trim().replace(/^(.+?)\s+\1$/i, '$1')
+  return /^unknown (author|artist|maker)$/i.test(once) ? '' : once
+}
+
+/** A short name from a brief: up to the first comma, colon or full stop, at most eight words, never ending on "in". */
+export function briefName(text: string): string {
+  let name = text.split(/[,:;.!?\n]/)[0].trim().split(/\s+/).slice(0, 8).join(' ')
+  while (/\s(in|for|of|a|an|the|and|with|to|on|at|about)$/i.test(name)) name = name.replace(/\s+\S+$/, '')
+  return name
 }

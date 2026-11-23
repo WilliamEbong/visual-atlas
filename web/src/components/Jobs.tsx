@@ -1,3 +1,4 @@
+import { backendName, JOB_STATE } from '../lib/library'
 import { useCallback } from 'react'
 import { date, useData, usePoll } from '../lib/hooks'
 import { href } from '../lib/router'
@@ -24,7 +25,7 @@ export default function Jobs({ id }: { id?: string }) {
             <tr key={job.id}>
               <td className="mono">{date(job.created_at)}</td>
               <td><a href={href(`jobs/${job.id}`)}>{KIND[job.kind] ?? job.kind}</a>{typeof job.spec.goal === 'string' && job.spec.goal ? <div className="mono">“{job.spec.goal.slice(0, 80)}”</div> : null}</td>
-              <td>{job.state}</td><td>{job.message}</td><td className="mono">{job.backend}</td>
+              <td>{JOB_STATE[job.state] ?? job.state}</td><td>{job.message}</td><td>{backendName(job.backend)}</td>
             </tr>))}</tbody></table></div>}
     </>
   )

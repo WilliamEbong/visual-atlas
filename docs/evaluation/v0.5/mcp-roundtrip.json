@@ -1,0 +1,64 @@
+{
+ "protocol_version": "2025-11-25",
+ "server_info": "name='visual-atlas' title='Visual Atlas reference desk' version='0.4.0' description=None website_url=None icons=None",
+ "tools": [
+  "advise",
+  "search_references",
+  "get_reference",
+  "view_reference",
+  "list_techniques",
+  "get_technique",
+  "route_brief"
+ ],
+ "advise": {
+  "is_error": false,
+  "route": null,
+  "refs": [
+   [
+    "library:24",
+    "library",
+    "CC0 — source checked",
+    [
+     "Shows Scale contrast (proposed by a model, not yet checked): Brown ruined walls, a tall broken structure, and an open columned gateway cluster on the left bank.",
+     "Serves “Create calm and order” through Off-centre placement, Atmospheric perspective (agreed by a second model): Blue sky with pale, loosely rendered clouds occupies roughly the upper two-thirds of the painted scene."
+    ]
+   ],
+   [
+    "library:41",
+    "library",
+    "CC0 — source checked",
+    [
+     "Shows Scale contrast (agreed by a second model): An enormous coiled serpent occupies the upper and right portions of the illustration; its open mouth and head loom above a much smaller human figure.",
+     "Serves “Create calm and order” through Rhythm and pattern (agreed by a second model): Outlined polygonal scales repeat across the serpent's body, while broad transverse plates repeat along its pale underside."
+    ]
+   ],
+   [
+    "library:22",
+    "library",
+    "CC0 — source checked",
+    [
+     "Serves “Create calm and order” through Off-centre placement, Atmospheric perspective (agreed by a second model): A broken stone arch, tower, and long masonry wall occupy the lower left portion of the scene.",
+     "Subject matches boat"
+    ]
+   ],
+   [
+    "library:63",
+    "library",
+    "CC0 — source checked",
+    [
+     "Serves “Create calm and order” through Silhouette, Limited palette harmony (agreed by a second model): A small boat at lower left appears mostly dark, with its pointed bow outlined against pink water.",
+     "Subject matches boat"
+    ]
+   ]
+  ]
+ },
+ "view": {
+  "ref": "library:24",
+  "mime": "image/jpeg",
+  "base64_chars": 50860
+ },
+ "traversal": {
+  "is_error": true,
+  "text": "ref looks like library:12, generated:some-id or system:archive-of-looking:some-id"
+ }
+}

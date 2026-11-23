@@ -29,7 +29,7 @@ COMMONS_LICENCES = ('haswbstatement:P275=Q6938433|P275=Q20007257|P275=Q14947546|
 
 def _clip(value, limit=500) -> str:
     # Commons templates leak Wikidata residue such as "1812 date QS:P571,+1812-00-00T00:00:00Z/9".
-    text = re.sub(r'\s*\b(?:date|title|label)\s+QS:[PL]\w*,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
+    text = re.sub(r'\s*\b(?:date|title|label)\s+QS:[PL][\w-]*,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
     return text.strip()[:limit]
 
 
@@ -160,7 +160,7 @@ def _commons(fetcher, query, page, per_page):
         meta = info.get('extmetadata') or {}
         if info.get('mime') not in ('image/jpeg', 'image/png', 'image/webp'):
             continue
-        title = _clip((meta.get('ObjectName') or {}).get('value'), 300) or item.get('title', '').removeprefix('File:')
+        title = _commons_title((meta.get('ObjectName') or {}).get('value')) or item.get('title', '').removeprefix('File:')
         results.append({
             'provider': 'commons', 'provider_item_id': str(item.get('pageid')), 'title': title[:300],
             'creator': _clip((meta.get('Artist') or {}).get('value'), 200),
@@ -173,6 +173,17 @@ def _commons(fetcher, query, page, per_page):
     return results
 
 
+def _commons_title(value) -> str:
+    """One clean name from a Commons ObjectName: the English one when the template gives several languages, without
+    hidden Wikidata labels, footnote markers or a description run on after ' ; '. It becomes the credit line."""
+    text = re.sub(r'<div style="display:\s*none;?">.*?</div>', '', str(value or ''), flags=re.S)
+    english = re.search(r'<(\w+)[^>]*\blang="en"[^>]*>(.*?)</\1>', text, re.S)
+    title = _clip(english.group(2) if english else text, 300)
+    title = re.split(r'\s*\[\s*1\s*\]', title)[0]  # "Name [ 1 ] or Other name [ 2 ]": the first name
+    title = re.split(r'\s+;\s+', title)[0]  # "Name ; the painting depicts ...": the name only
+    return title.strip(' .;,')
+
+
 def _english(entries, classified: str | None = None) -> str:
     """The English text of a Linked Art name or note list (optionally of one classification), else the first."""
     matches = [e for e in entries or [] if isinstance(e, dict) and isinstance(e.get('content'), str)
@@ -180,6 +191,12 @@ def _english(entries, classified: str | None = None) -> str:
                and (classified is None or any(c.get('id') == classified for c in e.get('classified_as') or []))]
     english = [e for e in matches if any(lang.get('id') == ENGLISH for lang in e.get('language') or [])]
     return (english or matches or [{'content': ''}])[0]['content']
+
+
+def _one(value) -> dict:
+    """Linked Art allows a list where one object is usual: take the first object, or nothing."""
+    value = value[0] if isinstance(value, list) and value else value
+    return value if isinstance(value, dict) else {}
 
 
 def _first_id(entries) -> str:
@@ -212,7 +229,7 @@ def _rijksmuseum(fetcher, query, page, per_page):
             if error.code == 'http_404':
                 continue
             raise
-        produced = item.get('produced_by') or {}
+        produced = _one(item.get('produced_by'))
         makers = [_english(part.get('referred_to_by'), CREATOR_NOTE)
                   for part in produced.get('part') or [] if isinstance(part, dict)]
         pages = [_first_id(carrier.get('access_point')) for s in item.get('subject_of') or [] if isinstance(s, dict)
@@ -228,7 +245,7 @@ def _rijksmuseum(fetcher, query, page, per_page):
             'provider': 'rijksmuseum', 'provider_item_id': object_url.rsplit('/', 1)[-1],
             'title': _clip(_english(item.get('identified_by')), 300),
             'creator': _clip(re.sub(r'\s*\([^)]*\)\s*$', '', next((m for m in makers if m), '')), 200),
-            'date_text': _clip(_english((produced.get('timespan') or {}).get('identified_by')), 80),
+            'date_text': _clip(_english(_one(produced.get('timespan')).get('identified_by')), 80),
             'medium': _clip(_english(item.get('referred_to_by'), MATERIAL_NOTE), 200),
             'description': _clip(_english(item.get('referred_to_by'), DESCRIPTION_NOTE), 400),
             'source_url': page_url or (f'https://www.rijksmuseum.nl/en/collection/{number}' if number else ''),

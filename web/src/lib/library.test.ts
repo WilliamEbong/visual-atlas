@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextIndex, nextPages, toQuery } from './library'
+import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextPages, toQuery } from './library'
+import { briefName, cleanMaker, cleanTitle, shortDate } from './library'
 
 describe('justified grid keyboard movement', () => {
   // two rows of different lengths: [0 wide][1][2] / [3][4 wide]
@@ -42,17 +43,6 @@ describe('library filters', () => {
   })
 })
 
-describe('grid keyboard movement', () => {
-  it('moves by row and column and stays inside the grid', () => {
-    expect(nextIndex(0, 'ArrowRight', 4, 10)).toBe(1)
-    expect(nextIndex(5, 'ArrowUp', 4, 10)).toBe(1)
-    expect(nextIndex(8, 'ArrowDown', 4, 10)).toBe(9)
-    expect(nextIndex(0, 'ArrowLeft', 4, 10)).toBe(0)
-    expect(nextIndex(3, 'End', 4, 10)).toBe(9)
-    expect(nextIndex(7, 'Home', 4, 10)).toBe(0)
-    expect(nextIndex(2, 'Enter', 4, 10)).toBe(2)
-  })
-})
 
 describe('appendPage', () => {
   it('adds the next page without repeating images whose offsets shifted', () => {
@@ -69,5 +59,39 @@ describe('nextPages', () => {
     expect(pages.consumed).toBe(4)  // the next request asks for rows after these, not the same offset again
     expect(nextPages(pages, 'k', []).done).toBe(true)
     expect(nextPages(pages, 'other filters', [{ id: 1 }]).consumed).toBe(1)  // new filters start over
+  })
+})
+
+describe('cleanTitle', () => {
+  it('drops file-name noise but keeps real titles', () => {
+    expect(cleanTitle('Slovenian Sunset (7027587519)')).toBe('Slovenian Sunset')
+    expect(cleanTitle('Alice 05a-1116x1492')).toBe('Alice 05a')
+    expect(cleanTitle('Tube map 1908.jpg')).toBe('Tube map 1908')
+    expect(cleanTitle('Frigate Bird Silhouette Against St Lucia Sunset 5746')).toBe('Frigate Bird Silhouette Against St Lucia Sunset 5746')
+  })
+})
+
+describe('cleanMaker and briefName', () => {
+  it('reads like a catalogue and like a name', () => {
+    expect(cleanMaker('Unknown author Unknown author')).toBe('')
+    expect(cleanMaker('Wilfredor')).toBe('Wilfredor')
+    expect(briefName('Poster for a choir concert in a church, warm and communal')).toBe('Poster for a choir concert in a church')
+    expect(briefName('A calm opening slide for a talk about burnout and rest at work')).toBe('A calm opening slide for a talk')
+  })
+})
+
+describe('shortDate', () => {
+  it('drops the time of day from camera timestamps', () => {
+    expect(shortDate('2019-09-05 20:10:00')).toBe('2019-09-05')
+    expect(shortDate('Taken on 19 February 2003, 20:37')).toBe('Taken on 19 February 2003')
+    expect(shortDate('c. 1861')).toBe('c. 1861')
+    expect(cleanTitle('Ronchamp17f.jpg - Flickr - scarletgreen')).toBe('Ronchamp17f')
+  })
+})
+
+describe('cleanTitle with its maker and date', () => {
+  it('does not repeat what the next line says', () => {
+    expect(cleanTitle('Ludwig Hohlwein - Igeha Schokolade, 1926', 'Ludwig Hohlwein', '1926')).toBe('Igeha Schokolade')
+    expect(cleanTitle('Igeha Schokolade, 1926', 'Someone', '1930')).toBe('Igeha Schokolade, 1926')
   })
 })

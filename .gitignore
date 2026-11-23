@@ -36,3 +36,17 @@ web/public-demo/
 scratch/
 docs/media/tour-frames/
 WELCOME-BACK.md
+
+# the owner's private design-system libraries are indexed in place (atlas/layers.py), never copied here
+*.skill
+**/assets/library/
+**/references/images.csv
+archive-of-looking/
+garden-of-lingering/
+citadel-of-watching/
+harbour-of-drifting/
+
+# graphify: local interpreter path and extraction cache stay out of the repo
+graphify-out/cache/
+graphify-out/.graphify_python
+graphify-out/.graphify_root

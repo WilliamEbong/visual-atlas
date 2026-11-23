@@ -3,6 +3,7 @@ import { media, readOnly, request } from './lib/client'
 import { AppContext, useData, usePoll, type Pick } from './lib/hooks'
 import { href, useRoute } from './lib/router'
 import type { Job, Taxonomy } from './lib/types'
+import Ask, { RefPage } from './components/Ask'
 import Collections from './components/Collections'
 import Compare from './components/Compare'
 import Connections from './components/Connections'
@@ -16,8 +17,8 @@ import SettingsPage from './components/Settings'
 import { NoticeProvider } from './components/ui'
 import Welcome from './components/Welcome'
 
-const NAV = [['', 'Library'], ['find', 'Find images'], ['explore', 'Explore'], ['project', 'My project'], ['collections', 'Collections']] as const
-const TOOLS = [['jobs', 'Jobs'], ['settings', 'Settings']] as const
+const NAV = [['', 'Ask'], ['library', 'Library'], ['explore', 'Techniques']] as const
+const TOOLS = [['find', 'Find images'], ['project', 'Projects'], ['collections', 'Collections'], ['jobs', 'Jobs'], ['settings', 'Settings']] as const
 
 function readCompare(): Pick[] {
   try { return JSON.parse(sessionStorage.getItem('compare') ?? '[]') } catch { return [] }
@@ -25,30 +26,44 @@ function readCompare(): Pick[] {
 
 export default function App() {
   const route = useRoute()
-  const section = route.path[0] ?? ''
+  // #/ is Ask; an old library link (#/?technique=…) still opens the Library
+  const section = route.path[0] ?? (readOnly || [...route.query.keys()].length ? 'library' : '')
   const taxonomy = useData<Taxonomy>('taxonomy')
   const [compare, setCompare] = useState<Pick[]>(readCompare)
   const [running, setRunning] = useState<Job | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => { try { sessionStorage.setItem('compare', JSON.stringify(compare)) } catch { /* private mode */ } }, [compare])
   useEffect(() => setMenuOpen(false), [route])
+  const pageKey = route.path.join('/')
+  useEffect(() => {  // a new page: start at its top, with keyboard and screen-reader focus on the content
+    window.scrollTo(0, 0)
+    document.getElementById('content')?.focus({ preventScroll: true })
+  }, [pageKey])
   const toggleCompare = useCallback((pick: Pick) => setCompare((picks) => picks.some((p) => p.id === pick.id)
     ? picks.filter((p) => p.id !== pick.id) : picks.length >= 4 ? picks : [...picks, pick]), [])
+  const [finished, setFinished] = useState<Job | null>(null)
   const checkJobs = useCallback(() => {
     if (readOnly) return
-    request<Job[]>('jobs?limit=5').then((jobs) => setRunning(jobs.find((job) => ['queued', 'running', 'cancelling'].includes(job.state)) ?? null))
-      .catch(() => setRunning(null))
+    request<Job[]>('jobs?limit=5').then((jobs) => {
+      const active = jobs.find((job) => ['queued', 'running', 'cancelling'].includes(job.state)) ?? null
+      setRunning((previous) => {
+        if (previous && !active) setFinished(jobs.find((job) => job.id === previous.id) ?? null)  // it just ended
+        return active
+      })
+    }).catch(() => setRunning(null))
   }, [])
   useEffect(checkJobs, [checkJobs, section])
   usePoll(checkJobs, true, running ? 3000 : 30000)  // the 30 s ping also tells the launcher the window is open
   useEffect(() => {
-    const extra: Record<string, string> = { compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
-    if (section !== 'image') document.title = `${NAV.find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Library'} · Visual Atlas`
+    const extra: Record<string, string> = { ask: 'Ask', ref: 'Reference', compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
+    if (section !== 'image') document.title = `${[...NAV, ...TOOLS].find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Ask'} · Visual Atlas`
   }, [section])
 
   let page
   switch (section) {
     case 'image': page = <ImagePage id={Number(route.path[1])} />; break
+    case 'library': page = <Library query={route.query} />; break
+    case 'ref': page = <RefPage id={route.query.get('id') ?? ''} />; break
     case 'find': page = <Find />; break
     case 'jobs': page = <Jobs id={route.path[1]} />; break
     case 'explore': page = <Explore route={route} />; break
@@ -58,13 +73,14 @@ export default function App() {
     case 'collections': page = <Collections id={route.path[1] ? Number(route.path[1]) : undefined} />; break
     case 'compare': page = <Compare ids={(route.query.get('ids') ?? compare.map((p) => p.id).join(',')).split(',').map(Number).filter(Boolean)} />; break
     case 'settings': page = <SettingsPage />; break
-    default: page = <Library query={route.query} />
+    default: page = <Ask />
   }
   const current = (key: string) => section === key || (key === 'explore' && ['technique', 'connections'].includes(section))
-    || (key === '' && ['image', 'compare'].includes(section))
+    || (key === 'library' && section === 'image' && !route.query.get('from')?.match(/^#\/(ask|$|\?q=)/))
+    || (key === '' && (section === 'ask' || section === 'ref' || (section === 'image' && !!route.query.get('from')?.match(/^#\/(ask|$|\?q=)/))))
 
   return (
-    <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]), refreshTaxonomy: taxonomy.reload }}>
+    <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]) }}>
       <NoticeProvider>
         <a className="skip" href="#content" onClick={(event) => { event.preventDefault(); document.getElementById('content')?.focus() }}>Skip to content</a>
         <header className="topbar">
@@ -73,11 +89,13 @@ export default function App() {
             <button type="button" className="menu-button small" aria-expanded={menuOpen} aria-controls="main-nav" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? 'Close' : 'Menu'}</button>
             <nav id="main-nav" className={`nav${menuOpen ? ' open' : ''}`} aria-label="Main">
-              {NAV.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
+              {NAV.map(([key, label]) => <a key={key} href={key === '' && readOnly ? '#/ask' : `#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
               <span style={{ flex: '1 1 auto' }} aria-hidden="true" />
               {TOOLS.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
             </nav>
             {readOnly ? <span className="status-line">Read-only online demo</span>
+              : !running && finished ? <a className="status-line" role="status" href={href(`jobs/${finished.id}`)} onClick={() => setFinished(null)}>
+                {finished.state === 'done' ? 'Finished' : 'Stopped'}: {finished.message.slice(0, 60)} · see results</a>
               : running && <a className="status-line" href={href(`jobs/${running.id}`)}><span className="pulse" aria-hidden="true" />
                 {(running.message || running.stage).slice(0, 48)}</a>}
           </div>

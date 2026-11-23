@@ -1,0 +1,23 @@
+# Knowledge graph of the code and its documentation only: no pictures, screenshots, data dumps or builds.
+starter/media/
+generated/
+design-review/
+docs/media/
+docs/evaluation/
+release/
+web/dist/
+web/node_modules/
+.playwright-mcp/
+.specify/
+.claude/
+graphify-out/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.json
+*.lock
+.agents/
+*.svg

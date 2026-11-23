@@ -16,7 +16,7 @@ from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from atlas import __version__, images
+from atlas import __version__, catalog, images
 from atlas.store import APPEND_ONLY, MAINTENANCE_KEY, LibraryBusy, Store
 
 MAX_ARCHIVE_BYTES = 20 * 1024**3
@@ -68,13 +68,14 @@ def credits(store: Store, image_ids: list[int] | None = None,
                              row['source_url'], licence, row['license_url'],
                              row['required_attribution'], row['restrictions']))
         return output.getvalue()
+    names = {p['id']: p['name'] for p in catalog.load()[1]['providers']}  # "Art Institute of Chicago", not "aic"
     lines = ['# Visual Atlas credits', '',
              'Labels describe what was checked and are not legal advice.', '']
     for row in rows:
         licence = ' '.join(filter(None, (row['license_code'], row['license_version'])))
         lines.extend((f"## {row['title']} (#{row['id']})", '',
                       f"Creator: {row['creator']}", f"Date: {row['date_text']}",
-                      f"Source: {row['provider']}",
+                      f"Source: {names.get(row['provider'], row['provider'])}",
                       f"Licence: {row['label'] or 'Not recorded'} — [{licence}]({row['license_url'] or ''})",
                       '', row['required_attribution'] or '', '', f"Source URL: {row['source_url']}"))
         if row['restrictions']:

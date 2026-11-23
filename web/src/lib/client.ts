@@ -7,7 +7,7 @@ export const readOnly = import.meta.env.VITE_DEMO === '1'
 /** The library is in maintenance (a restore is running): nothing failed, the change can be tried again shortly. */
 export class BusyError extends Error {}
 
-function token(): string {
+export function token(): string {
   return document.querySelector<HTMLMetaElement>('meta[name="atlas-token"]')?.content ?? ''
 }
 
@@ -54,4 +54,12 @@ export async function download(path: string, fallbackName: string) {
 export function media(path: string | null | undefined): string | undefined {
   if (!path) return undefined
   return readOnly ? `${import.meta.env.BASE_URL}${path.replace(/^\/media\//, 'media/')}` : path
+}
+
+/** Pictures behind the launch token (private layer images): fetched with the token and shown from a blob URL, so
+ *  the token never appears in a URL. Other paths are returned unchanged. */
+export async function protectedImage(path: string): Promise<string> {
+  const response = await fetch(path, { headers: { 'X-Atlas-Token': token() } })
+  if (!response.ok) throw new Error('image unavailable')
+  return URL.createObjectURL(await response.blob())
 }

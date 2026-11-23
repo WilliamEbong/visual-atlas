@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { post, readOnly, request } from '../lib/client'
-import { useApp, useData } from '../lib/hooks'
-import { useRoute } from '../lib/router'
-import type { Job, Reading, ReadingCorrection, Settings } from '../lib/types'
+import { media, post, readOnly, request } from '../lib/client'
+import { useApp, useData, usePoll } from '../lib/hooks'
+import { aspect, cleanMaker, cleanTitle } from '../lib/library'
+import { href, useRoute } from '../lib/router'
+import type { Job, LibraryItem, Reading, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
 import ReadingEditor from './ReadingEditor'
 import { PageHead, useNotice } from './ui'
@@ -12,6 +13,15 @@ const ASSISTANTS: [string, string][] = [['codex:claude', 'Codex analyses, Claude
   ['claude:codex', 'Claude Code analyses, Codex checks'], ['claude:none', 'Claude Code only'], ['fake:none', 'Practice mode (offline, no real analysis)']]
 export interface Source { id: string; name: string; status: string; rule?: string; reason?: string; label?: string; attribution?: string
   evidence_urls: string[]; checked_on: string; notes?: string; default_on?: boolean; setup?: string }
+
+function AnalysisSettings({ count, setCount, assistant, setAssistant }: { count: number; setCount: (n: number) => void
+  assistant: string; setAssistant: (value: string) => void }) {
+  return <div className="filters">
+    <label className="field">How many new images<input type="number" min={1} max={40} value={count} onChange={(event) => setCount(Number(event.target.value))} /></label>
+    <label className="field grow">Who analyses<select value={assistant} onChange={(event) => setAssistant(event.target.value)}>
+      {ASSISTANTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+  </div>
+}
 
 export default function Find() {
   const route = useRoute()
@@ -77,8 +87,7 @@ export default function Find() {
   return (
     <>
       <PageHead kicker="Find · searches open collections · keeps only pictures you may use" title={mode === 'find' ? 'Find images' : 'Grow my library'}
-        aside={<ol className="mono" aria-label="What happens" style={{ listStyle: 'none', padding: '0 0 24px', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <li>1  Search</li><li>2  Check permissions</li><li>3  Analyse</li><li>4  File by technique</li></ol>} />
+ />
       <div className="split" style={{ marginTop: 40 }}>
         <form className="main-col slip stack" style={{ gap: 22, padding: 28 }} onSubmit={submit}>
           <fieldset><legend className="sr-only">What to do</legend>
@@ -89,10 +98,11 @@ export default function Find() {
           </fieldset>
           {mode === 'find' ? <>
             <label className="field"><span className="label" style={{ fontSize: 17, color: 'var(--ink)' }}>Describe what you need</span>
-              <textarea rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} style={{ fontFamily: 'var(--mono)', fontSize: 16 }}
+              <textarea rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} style={{ fontSize: 16 }}
                 placeholder="a quiet image where one small figure stands alone in a big empty landscape" /></label>
             {readingFailed && <p role="status" className="mono">The automatic reading is unavailable. Choose goals, techniques and subject words below, or continue with your original request.</p>}
-            <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />
+            {goal.trim() && <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />}
+            <details className="refine"><summary>Refine: goal, technique, subject, shape, colour, how many</summary>
             <div className="filters">
               <label className="field">Goal<select value={goalId} onChange={(event) => setGoalId(event.target.value)}><option value="">Any</option>
                 {taxonomy?.goals.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
@@ -111,24 +121,23 @@ export default function Find() {
               <label className="field">Main colour<select value={color} onChange={(event) => setColor(event.target.value)}>
                 {COLORS.map((c) => <option key={c} value={c}>{c || 'Any'}</option>)}</select></label>
             </div>
-          </> : <fieldset><legend>Techniques to find more examples of (fewest examples first)</legend>
+            <AnalysisSettings count={count} setCount={setCount} assistant={assistant} setAssistant={setAssistant} />
+            </details>
+          </> : <><fieldset><legend>Techniques to find more examples of (fewest examples first)</legend>
             <div className="row">{coverage.data?.slice(0, 12).map((t) => (
               <label key={t.id} className="choice plain" style={{ minWidth: 240 }}><input type="checkbox" checked={growTechniques.includes(t.id)}
                 onChange={(event) => setGrowTechniques(event.target.checked ? [...growTechniques, t.id] : growTechniques.filter((x) => x !== t.id))} />
                 {t.name} <span className="mono">{t.examples}</span></label>))}</div>
             <p className="mono" style={{ marginTop: 8 }}>Searches use each technique's curated search hints; no AI is used for planning.</p>
-          </fieldset>}
-          <div className="filters">
-            <label className="field">How many new images<input type="number" min={1} max={40} value={count} onChange={(event) => setCount(Number(event.target.value))} /></label>
-            <label className="field grow">Who analyses<select value={assistant} onChange={(event) => setAssistant(event.target.value)}>
-              {ASSISTANTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          </div>
+          </fieldset>
+          <details className="refine"><summary>Refine: how many, who reads the pictures</summary>
+            <AnalysisSettings count={count} setCount={setCount} assistant={assistant} setAssistant={setAssistant} /></details></>}
           <fieldset style={{ borderTop: '1px solid var(--keyline)', paddingTop: 16 }}><legend className="label" style={{ color: 'var(--ink)', fontSize: 15 }}>Sources (each item's licence is checked)</legend>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '6px 16px' }}>
+            <div className="sources">
               {enabled.map((s) => (
                 <label key={s.id} className="choice plain"><input type="checkbox" checked={chosen.includes(s.id)}
                   onChange={(event) => setProviders(event.target.checked ? [...chosen, s.id] : chosen.filter((p) => p !== s.id))} />
-                  <span>{s.name} {s.label && <span className="mono" style={{ fontSize: 11 }}>{s.label}</span>}
+                  <span title={s.label}>{s.name}{s.label && <span className="mono source-note">{s.label.length > 48 ? 'Licence read from each file' : s.label}</span>}
                     {s.setup && <span className="mono" style={{ display: 'block', fontSize: 11 }}>{s.setup}</span>}</span></label>))}
             </div>
           </fieldset>
@@ -150,6 +159,28 @@ export default function Find() {
           </div>}
         </aside>
       </div>
+      <RecentlyAdded watching={!!jobId} />
     </>
+  )
+}
+
+/** What finding gives you: the pictures most recently added to the library, each filed with its licence. */
+function RecentlyAdded({ watching }: { watching: boolean }) {
+  const recent = useData<{ items: LibraryItem[]; total: number }>(readOnly ? null : 'library?sort=newest&limit=8&offset=0')
+  usePoll(recent.reload, watching, 5000)
+  if (!recent.data?.items.length) return null
+  return (
+    <section className="section" aria-labelledby="recent-title">
+      <div className="section-title"><h2 id="recent-title">Recently added to your library</h2>
+        <a href={href('library', { sort: 'newest' })}>See all {recent.data.total}</a></div>
+      <ul className="justified refs-row" aria-label="Recently added pictures">
+        {recent.data.items.map((item) => <li key={item.id} className="plate-item" style={{ '--a': aspect(item) } as React.CSSProperties}>
+          <a className="plate" href={href(`image/${item.id}`)}>
+            <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" /></span>
+            <span className="plate-title">{cleanTitle(item.title, cleanMaker(item.creator), item.date_text)}</span></a>
+          <span className="mono strip-meta">{item.techniques.slice(0, 2).map((t) => t.name.replace(/ \(.*\)$/, '')).join(' · ') || 'Waiting for analysis'}</span>
+        </li>)}
+      </ul>
+    </section>
   )
 }

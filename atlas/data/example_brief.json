@@ -1,0 +1,95 @@
+{
+ "title": "Winter concert poster for a community choir",
+ "text": "A poster for a community choir's winter concert in a village church. Warm and welcoming, so neighbours who have never been feel invited. A3 portrait for noticeboards and shop windows; the title and date must read from across the street.",
+ "backend": "codex",
+ "model": "gpt-6-astra",
+ "made": "2026-11-23",
+ "directions": [
+  {
+   "title": "An open church door",
+   "idea": "An open doorway surrounds a softly lit glimpse of the choir, making the invitation feel literal. Borrow the enclosing architecture and light–dark structure of Architectural Fantasy: Bridge and Monuments.",
+   "rationale": "A welcoming threshold connects directly to the village church and gives first-time visitors a clear sense of arrival.",
+   "execution": [
+    "Draw a simple dark doorway around a pale interior, with a few recognisable singers facing the entrance.",
+    "Place the concert title in large, plain lettering across the pale upper opening; put the date immediately beneath it.",
+    "Keep the church name, time and invitation in a separate footer; avoid detailed masonry behind text."
+   ],
+   "tradeoffs": [
+    "Heavy shadows could feel forbidding; keep the doorway wide and the interior dominant.",
+    "Architectural detail must remain secondary to title and date."
+   ],
+   "techniques": [
+    "framing",
+    "value-contrast"
+   ],
+   "images": [
+    "smithsonian:ld1-1643399887910-1643399892781-0"
+   ]
+  },
+  {
+   "title": "Neighbours singing together",
+   "idea": "Show a compact, friendly group of local singers beneath an oversized headline. Adapt the grouping in Ballet at the Paris Opéra and the unified lettering and illustration palette of Poster for the Lembrée Gallery.",
+   "rationale": "People make the community aspect visible and help unfamiliar neighbours imagine joining the audience.",
+   "execution": [
+    "Illustrate six to eight singers with varied ages, winter jumpers and relaxed expressions; overlap shoulders so they read as one choir.",
+    "Use cream, terracotta and dark brown throughout the illustration and lettering.",
+    "Reserve the top half for a short concert title and a bold date line; keep faces and song sheets in the lower half."
+   ],
+   "tradeoffs": [
+    "Tiny faces will disappear at street distance, so use broad gestures and simple shapes.",
+    "Overly formal concert clothes could undermine the approachable tone."
+   ],
+   "techniques": [
+    "proximity-grouping",
+    "color-harmony"
+   ],
+   "images": [
+    "aic:61603",
+    "cma:143846"
+   ]
+  },
+  {
+   "title": "A quiet winter sprig",
+   "idea": "Set one delicate winter branch in generous pale space, with bold typography doing most of the work. Use the isolated botanical composition of Floral Fantasy, \"Fleurs de Gout\" and the restrained palette of Poster for the Lembrée Gallery.",
+   "rationale": "The spacious layout protects distance readability while a modest seasonal illustration adds warmth without overwhelming a small community event.",
+   "execution": [
+    "Use warm cream paper with deep brown lettering and a muted evergreen illustration.",
+    "Draw a single pine or bare winter sprig along the bottom corner, leaving the central field quiet.",
+    "Stack the title in two or three large lines, followed by a nearly equally prominent date; put practical details below with clear spacing."
+   ],
+   "tradeoffs": [
+    "The botanical motif alone does not identify music; include “Community Choir” prominently.",
+    "Thin decorative lettering would weaken the otherwise strong distance readability."
+   ],
+   "techniques": [
+    "negative-space",
+    "color-harmony"
+   ],
+   "images": [
+    "smithsonian:ld1-1643399887910-1643399904695-0",
+    "cma:143846"
+   ]
+  },
+  {
+   "title": "Winter village, warm gathering",
+   "idea": "Build a simplified village scene with crisp nearby rooftops and pale distant buildings, gathering attention around the church. Take the receding winter atmosphere from Landscape: Beautiful Scenery Frozen in Mist.",
+   "rationale": "A recognisable local setting makes the concert feel rooted in neighbours’ everyday surroundings, while soft depth gives the poster a calm winter mood.",
+   "execution": [
+    "Illustrate a familiar church in the middle distance, with a few dark foreground rooflines and softer buildings behind it.",
+    "Use pale gray and cream washes, adding small amber windows to suggest an inhabited, welcoming evening.",
+    "Keep the upper third as uninterrupted pale sky for a dark, oversized title and date; confine the landscape to the lower portion."
+   ],
+   "tradeoffs": [
+    "Too much mist can make the scene feel cold or remote; keep the church clearly outlined and visibly inhabited.",
+    "Local architectural accuracy takes more preparation than a generic seasonal motif."
+   ],
+   "techniques": [
+    "atmospheric-perspective",
+    "layered-depth"
+   ],
+   "images": [
+    "aic:103302"
+   ]
+  }
+ ]
+}

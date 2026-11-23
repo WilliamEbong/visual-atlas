@@ -1,0 +1,291 @@
+[
+ {
+  "provider": "met",
+  "item_id": "337070",
+  "title": "Frank Johnson, Leader of the Brass Band of the 128th Regiment in Saratoga, with his wife, Helen",
+  "observations": [
+   "Two full-length figures in solid black cut paper stand in profile on a plain buff mount: a man at left playing a keyed bugle, a woman at right in a long full skirt.",
+   "Interior detail is almost absent; only a few fine white lines mark coat seams, hair and the folds of the skirt.",
+   "The outlines carry the information: the raised instrument, the man's coat tails, the woman's hair bun and the bell of her skirt.",
+   "Handwritten labels below each figure name Frank Johnson and Helen Johnson of Philadelphia, with Saratoga dates of 1842 and 1844."
+  ],
+  "techniques": [
+   {"technique": "silhouette", "role": "primary", "evidence": ["o1", "o2", "o3"],
+    "effect": "With interior detail removed, each person is identified by contour alone, the bugle, coat tails and skirt shape, so the pair reads at once against the pale ground."}
+  ],
+  "summary": "A pair of nineteenth-century cut-paper portraits shows how a profile outline alone can identify a person and what they do.",
+  "teaching_value": "The classic cut-paper silhouette: full-length, profile, no interior modelling. A direct model for icon and pictogram design where a figure must read by outline.",
+  "ambiguity": "The two figures were cut two years apart and mounted together, so their spacing reflects the mount, not one composed scene.",
+  "subjects": ["silhouette", "portrait", "cut paper", "musician"]
+ },
+ {
+  "provider": "met",
+  "item_id": "370826",
+  "title": "South Sea Islanders",
+  "observations": [
+   "Black cut-paper figures stand and move across a pale sepia wash landscape with palms, a mountain and a wide plain.",
+   "In the foreground one figure swings a club-like object overhead while holding the wrist of a seated figure; their limbs and the weapon read only as outline.",
+   "Smaller black figures with spears and feathered headdresses recede toward the horizon, the smallest in the far middle distance.",
+   "The landscape is painted in soft brown wash with visible brushwork, while the figures are flat and uniformly black."
+  ],
+  "techniques": [
+   {"technique": "silhouette", "role": "primary", "evidence": ["o1", "o2", "o4"],
+    "effect": "Flat black figures against a soft painted ground read as clear gestures and poses before any detail, so the action is legible at a glance."},
+   {"technique": "layered-depth", "role": "supporting", "evidence": ["o1", "o3"],
+    "effect": "Figures shrinking from foreground to horizon set up near, middle and far planes even though each figure is flat."}
+  ],
+  "summary": "A cut-paper scene set on a painted wash shows silhouettes carrying action and depth through outline and size alone.",
+  "teaching_value": "Silhouettes used for a whole narrative scene rather than a portrait, with depth made by diminishing size.",
+  "ambiguity": "The scene is a European artist's depiction of Pacific Islanders and of a violent encounter; it records the maker's view, not documented events. Cut figures combined with a painted background are a hybrid technique.",
+  "subjects": ["silhouette", "figures", "landscape", "cut paper"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "21049148",
+  "title": "Cinderella, silhouette illustration",
+  "observations": [
+   "A girl in a full skirt leaps with both arms raised, drawn as a solid black shape on white; ribbons on her arms and a bow in her hair are readable only by outline.",
+   "Two small black dogs jump toward her, one from the lower left and one from the right.",
+   "Black trees with lacy foliage stand at both sides, and a small black disc sits in the upper left sky.",
+   "The white ground is left open between the figures, so each shape stays mostly separate from the others."
+  ],
+  "techniques": [
+   {"technique": "silhouette", "role": "primary", "evidence": ["o1", "o2", "o4"],
+    "effect": "Pure black shapes on white make the pose and the dogs read instantly from contour, keeping the scene simple and graphic."},
+   {"technique": "implied-motion", "role": "supporting", "evidence": ["o1", "o2"],
+    "effect": "Raised arms, the lifted skirt and the dogs caught mid-jump freeze a leap, so the picture reads as movement."}
+  ],
+  "summary": "A 1919 book illustration tells a lively moment with black silhouette, outline and pose alone.",
+  "teaching_value": "Illustration silhouette with motion: shows how separated, unoverlapped outlines keep a busy scene readable.",
+  "ambiguity": "The black disc could be a sun or a moon; nothing in the image settles it.",
+  "subjects": ["silhouette", "illustration", "dancing", "dogs"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "113335605",
+  "title": "Neujahrsglückwunsch (New Year's greeting), 1800",
+  "observations": [
+   "An oval wreath of black cut-paper leaves encircles a black landscape scene on white paper, with an eagle with spread wings cut at the top.",
+   "Inside the oval a temple, trees, a castle on a crag, a carriage with horses and a sailing boat are all cut as flat black shapes, readable by their outlines.",
+   "Fine cuts inside the black areas open small white gaps for windows, waves, rocks and lettering.",
+   "Tools, weapons and emblems are scattered around the outside of the wreath."
+  ],
+  "techniques": [
+   {"technique": "silhouette", "role": "primary", "evidence": ["o1", "o2", "o3"],
+    "effect": "Every element is a flat black shape against white, so the scene is read from contour and cut openings, not from shading."},
+   {"technique": "framing", "role": "supporting", "evidence": ["o1", "o4"],
+    "effect": "The oval wreath encloses the landscape like a window and separates the scene from the emblems around it."}
+  ],
+  "summary": "A cut-paper greeting from 1800 builds a whole landscape from black silhouettes inside an oval wreath.",
+  "teaching_value": "Shows the range of silhouette: architecture, vehicles and plants all made legible by outline and small cut openings.",
+  "ambiguity": "Parts are backed with colour and gold, so not every area is pure black and white; the emblems and small lettering are hard to read at this size and are not interpreted.",
+  "subjects": ["silhouette", "cut paper", "landscape", "wreath"]
+ },
+ {
+  "provider": "cma",
+  "item_id": "152499",
+  "title": "The Moon-Viewing Promontory, from One Hundred Views of Famous Places in Edo",
+  "observations": [
+   "An open room with a green tatami floor, wooden posts and ceiling frames a view of the bay, with many boats on the horizon and a full moon at upper left.",
+   "On the translucent paper screen at the left edge a dark grey shadow of a figure with an elaborate hairstyle and hair ornaments is cast, with no interior detail.",
+   "At the right edge only part of a seated person's clothing is visible, cut by the doorframe.",
+   "A pine branch and a potted plant on the veranda sit in front of the room at lower right."
+  ],
+  "techniques": [
+   {"technique": "framing", "role": "primary", "evidence": ["o1", "o4"],
+    "effect": "Posts, ceiling and floor edges enclose the bay, so the moonlit water reads as a picture within the picture."},
+   {"technique": "silhouette", "role": "supporting", "evidence": ["o2"],
+    "effect": "The figure on the screen is known only by its outline, suggesting a person present but unseen."}
+  ],
+  "summary": "A woodblock print frames a moonlit bay through a room, with a guest present only as a shadow on a paper screen.",
+  "teaching_value": "A silhouette made by a cast shadow on a screen rather than a cut shape: presence without detail.",
+  "ambiguity": "The shadow is softer and greyer than a cut or backlit silhouette; who the figure is cannot be told from the pixels.",
+  "subjects": ["woodblock print", "interior", "moon", "bay"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "152783",
+  "title": "Der Auserwählte (The Chosen One)",
+  "observations": [
+   "Six standing winged figures in near-identical long pale blue robes and white cloaks are spaced evenly across the picture, each with long dark hair and a similar upright pose.",
+   "A small nude child kneels on the ground in the lower centre facing a sapling; it is the only figure that is low, unclothed and turned toward the others.",
+   "Hands and heads vary slightly: some figures hold small flowers, some fold their hands at the chest, and heads tilt different ways.",
+   "The figures float above a meadow with small white flowers, with a band of distant landscape and sky behind."
+  ],
+  "techniques": [
+   {"technique": "repetition-with-interruption", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "The evenly repeated robed figures set up a strong expectation, and the single small kneeling child breaks it, so the eye goes to the child first."},
+   {"technique": "rhythm-pattern", "role": "supporting", "evidence": ["o1", "o3"],
+    "effect": "Near-identical vertical figures at regular intervals make a steady beat across the canvas, with small variations in hands and heads."}
+  ],
+  "summary": "A symbolist painting repeats six almost identical robed figures and breaks the series with one small kneeling child.",
+  "teaching_value": "A clean odd-one-out in painting: same colour, size and pose repeated six times, one figure different in size, pose and colour.",
+  "ambiguity": "The meaning of the scene is not established from the pixels; this reading is about structure only. Colour may differ from the original painting in this photograph.",
+  "subjects": ["painting", "figures", "child", "symbolism"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "541408",
+  "title": "Stephoidea, plate from Kunstformen der Natur",
+  "observations": [
+   "Twelve white skeletal radiolarian forms are arranged in rows on a black ground, most built from open rings with spiky branches.",
+   "At the centre one form is a closed, round latticed sphere with a pink interior, unlike the open rings around it.",
+   "Two forms, top centre and bottom centre, are surrounded by many small yellow dots and have pink and orange cores."
+  ],
+  "techniques": [
+   {"technique": "repetition-with-interruption", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "Among many open, spiky ring shapes the single closed sphere breaks the series and pulls the eye to the centre of the plate."},
+   {"technique": "value-contrast", "role": "supporting", "evidence": ["o1"],
+    "effect": "Bright white forms on a black ground make every outline stand out sharply."}
+  ],
+  "summary": "A 1904 scientific plate repeats related forms on black, with one closed sphere at the centre breaking the series.",
+  "teaching_value": "Repetition with variation in a specimen plate: shows how one change of shape inside a family of forms becomes the focal point.",
+  "ambiguity": "The forms vary throughout (repetition with variation), so the central sphere is the clearest break rather than the only one; the two dotted forms also stand apart.",
+  "subjects": ["natural history plate", "radiolaria", "pattern"]
+ },
+ {
+  "provider": "aic",
+  "item_id": "30113",
+  "title": "Procession of a Daimyo",
+  "observations": [
+   "About a dozen men stride toward the left in one dense group, all in the same pose with the left leg forward, black socks, sandals and swords at the waist.",
+   "Most wear black outer jackets over patterned robes; one man near the front wears a pale green robe and carries a tall feathered spear, and the leader carries a tall black cased object.",
+   "Shaved crowns with topknots repeat at two heights across the sheet.",
+   "The paper ground is left plain, with no setting."
+  ],
+  "techniques": [
+   {"technique": "repetition-with-interruption", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "The repeated stride and black jackets set a marching rhythm; the pale green robe and tall spear break it and mark one man out at the front."},
+   {"technique": "rhythm-pattern", "role": "supporting", "evidence": ["o1", "o3"],
+    "effect": "Repeated legs, swords and heads at regular intervals make the group read as one marching column."}
+  ],
+  "summary": "A seventeenth-century woodblock print repeats striding figures in black jackets and breaks the pattern with one pale robe near the front.",
+  "teaching_value": "Odd one out inside a crowd: colour change in one repeated figure among many identical poses.",
+  "ambiguity": "Two leading figures differ (the pale green robe and the pale-robed leader), so the break is shared rather than single; the men's ranks are not established from the image.",
+  "subjects": ["woodblock print", "procession", "figures"]
+ },
+ {
+  "provider": "aic",
+  "item_id": "61603",
+  "title": "Ballet at the Paris Opéra",
+  "observations": [
+   "A tight line of dancers in white tutus stands overlapping right of centre on the stage, their dark hair and skirts merging into one mass.",
+   "One dancer poses at left with an arm raised, separated from the line by open stage floor, with two fainter dancers just behind her.",
+   "Heads of spectators fill the bottom edge, cut off by the frame, and the scroll of a double bass rises at the right edge.",
+   "The stage scenery behind is loosely handled in green and blue."
+  ],
+  "techniques": [
+   {"technique": "proximity-grouping", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "Packing the corps into one overlapping line and setting the soloist apart across empty floor makes the line read as one unit and the soloist as separate."},
+   {"technique": "tight-cropping", "role": "supporting", "evidence": ["o3"],
+    "effect": "Audience heads and an instrument cut by the frame put the viewer in the seats, glimpsing the stage between them."}
+  ],
+  "summary": "A pastel of a ballet groups the corps into one overlapping line apart from a soloist, seen past cropped heads in the audience.",
+  "teaching_value": "Grouping by spacing alone: same costumes, but the gap decides who belongs together.",
+  "ambiguity": "Two faint dancers stand behind the soloist, so she is not entirely alone; the cropped heads also form a foreground layer, which is not counted here.",
+  "subjects": ["pastel", "ballet", "theatre", "audience"]
+ },
+ {
+  "provider": "aic",
+  "item_id": "18951",
+  "title": "Yellow Dancers (In the Wings)",
+  "observations": [
+   "Three dancers in yellow tutus fill the right two-thirds of the canvas, pressed together shoulder to shoulder.",
+   "The right-hand dancer is cut by the right edge, and the skirts run off the bottom edge.",
+   "At left a painted stage flat hides most of the stage; only several pairs of bare legs and feet show beneath it.",
+   "The tutus are brushed loosely in yellow-green, while faces and arms are more defined."
+  ],
+  "techniques": [
+   {"technique": "tight-cropping", "role": "primary", "evidence": ["o2", "o3"],
+    "effect": "Cutting the dancers at the edges and showing others only as feet under a flat gives a glimpsed, offstage view rather than a posed portrait."},
+   {"technique": "proximity-grouping", "role": "supporting", "evidence": ["o1", "o3"],
+    "effect": "The three dancers huddled into one mass read as a single group, separate from the anonymous feet beyond the flat."}
+  ],
+  "summary": "A backstage painting crops dancers at the edges and shows others only as feet below a stage flat.",
+  "teaching_value": "Cropping as viewpoint: the frame cuts figures the way a casual glance would.",
+  "ambiguity": "The loose skirts against more defined faces could also be read as selective focus; it is not counted here.",
+  "subjects": ["painting", "ballet", "dancers", "backstage"]
+ },
+ {
+  "provider": "met",
+  "item_id": "56689",
+  "title": "Kinryūsan Temple at Asakusa, from the series \"One Hundred Famous Views of Edo\"",
+  "observations": [
+   "A huge red and black paper lantern hangs from the top edge, cut off by the frame so only its lower half shows.",
+   "A red and green gate post runs the full height of the left edge, also cut by the frame.",
+   "Through this opening a snowy temple precinct with a red gate, a five-storey pagoda and small figures with umbrellas recedes into falling snow."
+  ],
+  "techniques": [
+   {"technique": "tight-cropping", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "Cutting the lantern and post at the edges puts the viewer right under the gate, so the near objects feel immediate and the precinct far away."},
+   {"technique": "framing", "role": "supporting", "evidence": ["o1", "o2", "o3"],
+    "effect": "The post and lantern form an inner frame around the snowy view of the temple."}
+  ],
+  "summary": "A woodblock print crops a giant lantern and gate post at the edges to frame a snowy temple view.",
+  "teaching_value": "Foreground cropped by the frame: a fragment of a large object implies scale and places the viewer.",
+  "ambiguity": "The large lantern also creates scale contrast with the small figures; only cropping and framing are counted.",
+  "subjects": ["woodblock print", "temple", "snow", "lantern"]
+ },
+ {
+  "provider": "aic",
+  "item_id": "26605",
+  "title": "Fukagawa Susaki and Jumantsubo (Fukagawa Susaki Jumantsubo), from the series \"One Hundred Famous Views of Edo (Meisho Edo hyakkei)\"",
+  "observations": [
+   "A large eagle dives from the top of the sheet, seen from above and behind, its wings cut by the top and right edges.",
+   "Far below, a snowy flat plain with small trees, water and a tiny floating tub spreads to a horizon with a distant white mountain.",
+   "Sky fills the space between the eagle and the land, flecked with falling snow."
+  ],
+  "techniques": [
+   {"technique": "vantage-point", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "Looking down on the land from beside the eagle gives a bird's-eye view: the plain becomes a small pattern and the viewer shares the bird's height."},
+   {"technique": "tight-cropping", "role": "supporting", "evidence": ["o1"],
+    "effect": "Cutting the wings at the frame edges makes the eagle too big to fit, increasing its closeness and force."},
+   {"technique": "scale-contrast", "role": "supporting", "evidence": ["o1", "o2"],
+    "effect": "The huge near eagle against the tiny landscape below makes the distance dramatic."}
+  ],
+  "summary": "A woodblock print views a snowy plain from the height of a diving eagle whose wings are cut by the frame.",
+  "teaching_value": "High vantage made with a single near element: the eagle places the viewer in the air.",
+  "ambiguity": "The vantage is implied by the eagle over the land rather than strict perspective; the plain is drawn fairly flat.",
+  "subjects": ["woodblock print", "eagle", "snow", "landscape"]
+ },
+ {
+  "provider": "cma",
+  "item_id": "159609",
+  "title": "Sir John Herschel (1792-1871)",
+  "observations": [
+   "The face is the sharpest area: wrinkles, eyes and fine strands of white hair are clearly resolved.",
+   "The white hair at the edges and the dark cloak below are softer and lose detail, merging into the background.",
+   "The background is a nearly uniform dark brown with no visible setting."
+  ],
+  "techniques": [
+   {"technique": "selective-focus", "role": "primary", "evidence": ["o1", "o2"],
+    "effect": "Only the face is crisp; the softer hair and cloak dissolve into darkness, so attention settles on the eyes and lined skin."},
+   {"technique": "value-contrast", "role": "supporting", "evidence": ["o1", "o3"],
+    "effect": "The lit face and white hair against near-black surroundings make the head the brightest area."}
+  ],
+  "summary": "A Victorian portrait photograph keeps the face sharp while hair and cloak soften into a dark ground.",
+  "teaching_value": "Selective focus before modern lenses: sharpness concentrated on the face of a sitter.",
+  "ambiguity": "The softness may come from lens, focus and exposure in a wet collodion print rather than a chosen shallow depth of field; the reading is about the visible result.",
+  "subjects": ["photograph", "portrait", "scientist"]
+ },
+ {
+  "provider": "cma",
+  "item_id": "172504",
+  "title": "Julia Jackson",
+  "observations": [
+   "The head fills most of the frame, cropped at the top of the hair and just below the neck.",
+   "The eyes, nose and mouth are fairly sharp, while the long hair at the sides is soft and blurred.",
+   "The background is dark and mottled; only the face and neck catch light."
+  ],
+  "techniques": [
+   {"technique": "tight-cropping", "role": "primary", "evidence": ["o1"],
+    "effect": "Filling the frame with the face removes setting and body, making the portrait direct and close."},
+   {"technique": "selective-focus", "role": "supporting", "evidence": ["o2", "o3"],
+    "effect": "With the features sharper than the soft hair, the eye settles on the face and gaze."}
+  ],
+  "summary": "A close Victorian portrait photograph fills the frame with a face, softening the hair around it.",
+  "teaching_value": "A frame-filling head: cropping and soft surroundings direct attention to the gaze.",
+  "ambiguity": "The face is not fully sharp either, so the focus difference is moderate; the second Cameron portrait in the pack differs in crop and lighting.",
+  "subjects": ["photograph", "portrait", "woman"]
+ }
+]

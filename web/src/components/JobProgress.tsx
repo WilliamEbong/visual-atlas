@@ -1,3 +1,4 @@
+import { backendName } from '../lib/library'
 import { useCallback, useState } from 'react'
 import { media, post } from '../lib/client'
 import { date, useData, usePoll } from '../lib/hooks'
@@ -61,7 +62,7 @@ export default function JobProgress({ jobId, compact = false }: { jobId: string;
     <section className="stack" aria-label="Job progress" style={{ gap: 0 }}>
       <div className="section-title">
         <h2>{title}</h2>
-        <span className="mono">{KIND[job.kind] ?? job.kind} · {job.backend}{job.spec.verify_with ? ` + ${job.spec.verify_with} check` : ''} · {date(job.created_at)}</span>
+        <span className="mono">{KIND[job.kind] ?? job.kind} · {backendName(job.backend)}{job.spec.verify_with ? `, checked by ${backendName(String(job.spec.verify_with))}` : ''} · {date(job.created_at)}</span>
       </div>
       {typeof job.spec.goal === 'string' && job.spec.goal && <p className="mono" style={{ marginTop: 6 }}>“{job.spec.goal.slice(0, 120)}”</p>}
       {discovery && <ol className="timeline" aria-label="Progress">

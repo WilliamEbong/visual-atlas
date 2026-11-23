@@ -9,7 +9,7 @@ import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
 interface Saved { shared: string[]; differences: string[]; per_image: { image_id: number; note: string }[]
   technique_notes: { technique_id: string; comment: string }[]; backend: string; model: string; model_version: string | null }
 
-const MARK: Record<State, string> = { model_reviewed: '■', human_reviewed: '●', proposed: '□', rejected: '×' }
+const MARK: Record<State, string> = { model_reviewed: '◐', human_reviewed: '●', proposed: '○', rejected: '×' }
 
 export default function Compare({ ids }: { ids: number[] }) {
   const { query } = useRoute()
@@ -20,7 +20,7 @@ export default function Compare({ ids }: { ids: number[] }) {
   const { data, error, busy, reload } = useData<{ images: ImageDetail[]; comparison: Saved | null }>(valid.length ? `compare?ids=${valid.join(',')}` : null)
   const [jobId, setJobId] = useState<string | null>(null)
   if (valid.length < 2) return <><PageHead kicker="Compare · two to four images" title="Compare" />
-    <Empty title="Choose at least two images" actions={<a className="button primary" href={href('', { from })}>Go to the library</a>}>Use “+ Compare” on any picture in the library, then come back here.</Empty></>
+    <Empty title="Choose at least two images" actions={<a className="button primary" href={href('library', { from })}>Go to the library</a>}>Use “+ Compare” on any picture in the library, then come back here.</Empty></>
   if (error) return <><PageHead kicker="Compare" title="Compare" /><Failure message={error} busy={busy} retry={reload} /></>
   if (!data) return <><PageHead kicker="Compare" title="Compare" /><Loading /></>
   const used = taxonomy?.techniques.filter((t) => data.images.some((d) => d.annotations.some((a) => a.technique_id === t.id && a.state !== 'rejected'))) ?? []
@@ -40,13 +40,12 @@ export default function Compare({ ids }: { ids: number[] }) {
   return (
     <>
       <PageHead kicker={`Compare · ${data.images.length} of up to 4 images`} title="Compare" asideClass="actions"
-        aside={<><a className="button" href={from ?? '#/'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/' }}>Clear</button></>} />
-      <section className="baseline" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
-        {data.images.map((d) => <figure key={d.image.id}><img src={media(d.image.display)} alt={d.image.title} /></figure>)}
-      </section>
-      <div className="baseline-captions" style={columns}>
-        {data.images.map((d) => (
-          <div key={d.image.id} className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
+        aside={<><a className="button" href={from ?? '#/library'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/library' }}>Clear</button></>} />
+      <section className="compare-grid" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
+        <div className="compare-col compare-key"><span /><p className="mono">Side by side, on one baseline. The table below lines up with each picture.</p></div>
+        {data.images.map((d) => <div key={d.image.id} className="compare-col">
+          <figure><img src={media(d.image.display)} alt={d.image.title} /></figure>
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
             <div>
               <p className="mono">Fig. {d.image.id}</p>
               <h2 style={{ fontSize: 24, lineHeight: 1.1, marginTop: 2 }}><a href={href(`image/${d.image.id}`, { from })}>{d.image.title}</a></h2>
@@ -54,13 +53,13 @@ export default function Compare({ ids }: { ids: number[] }) {
               {data.comparison?.per_image.find((n) => n.image_id === d.image.id) && <p style={{ fontSize: 14, marginTop: 8 }}>{data.comparison.per_image.find((n) => n.image_id === d.image.id)!.note}</p>}
             </div>
             <button type="button" className="small" aria-label={`Remove ${d.image.title} from the comparison`} onClick={() => drop(d.image.id, d.image.title)}>×</button>
-          </div>))}
-      </div>
+          </div></div>)}
+      </section>
 
       <section className="section" aria-labelledby="matrix" style={{ marginTop: 48 }}>
         <h2 id="matrix">Techniques</h2>
-        <p className="mono" style={{ margin: '8px 0 12px' }}>■ agreed by a second model · ● confirmed by you · □ proposed · — not seen{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
-        <div className="scroll-x"><table className="plain">
+        <p className="mono" style={{ margin: '8px 0 12px' }}>◐ agreed by a second model · ● confirmed by you · ○ proposed by a model · — not seen{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
+        <div className="scroll-x"><table className="plain compare-table">
           <thead><tr><th scope="col" style={{ width: '34%' }}>Technique</th>{data.images.map((d) => <th key={d.image.id} scope="col">Fig. {d.image.id}</th>)}</tr></thead>
           <tbody>
             {used.map((t) => <tr key={t.id}><th scope="row"><a href={href(`technique/${t.id}`, { from })}>{t.name}</a></th>
@@ -72,7 +71,7 @@ export default function Compare({ ids }: { ids: number[] }) {
               {data.images.map((d) => <td key={d.image.id}><span className="palette" role="img" aria-label={`Palette: ${d.metrics?.palette.map((p) => p.name).join(', ') ?? 'not measured'}`}>
                 {d.metrics?.palette.map((p) => <span key={p.hex} style={{ background: p.hex, flex: `${p.share} 1 0` }} />)}</span></td>)}</tr>
             <tr><th scope="row" className="mono">Shape · contrast · colourfulness</th>
-              {data.images.map((d) => <td key={d.image.id} className="mono" style={{ color: 'var(--ink)' }}>{d.metrics ? `${d.metrics.orientation} · ${Math.round(d.metrics.contrast)} · ${Math.round(d.metrics.colorfulness)}` : '—'}</td>)}</tr>
+              {data.images.map((d) => <td key={d.image.id} className="mono" style={{ color: 'var(--ink)' }}>{d.metrics ? `${d.metrics.orientation} · contrast ${Math.round(d.metrics.contrast)} · colour ${Math.round(d.metrics.colorfulness)}` : '—'}</td>)}</tr>
           </tbody>
         </table></div>
       </section>

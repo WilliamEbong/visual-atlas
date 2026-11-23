@@ -1,0 +1,456 @@
+"""Regression tests for the Codex review of the reference desk (2026-11-23). Each fails on the code before the fix."""
+
+import importlib.util
+import io
+import json
+import os
+import re
+import shutil
+import sqlite3
+import subprocess
+
+import pytest
+from PIL import Image
+
+from atlas import desk, jobs, layers, mcp_server, transfer
+from atlas.home import REPO
+
+GUARD = importlib.util.spec_from_file_location('check_no_data', REPO / 'scripts' / 'check_no_data.py')
+check_no_data = importlib.util.module_from_spec(GUARD)
+GUARD.loader.exec_module(check_no_data)
+
+
+@pytest.fixture(scope='module')
+def starter_home(tmp_path_factory):
+    home = tmp_path_factory.mktemp('review') / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+    return home
+
+
+def _system(tmp_path, rows):
+    root = tmp_path / 'skills' / 'garden-of-lingering'
+    (root / 'references').mkdir(parents=True)
+    (root / 'SKILL.md').write_text('---\ndescription: >-\n  Gardens, tea and flowers.\n---\n', encoding='utf-8')
+    header = 'id,slots,subjects,ground,colour,medium,title,creator,date,licence,credit,page,image,notes,size'
+    (root / 'references' / 'images.csv').write_text('\n'.join([header, *rows]) + '\n', encoding='utf-8')
+    for row in rows:
+        path = root / 'assets' / 'library' / f"{row.split(',')[0]}.jpg"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new('RGB', (300, 200), (len(row) % 255, 90, 60)).save(path, 'JPEG')
+    return root
+
+
+@pytest.mark.parametrize('note, code', [('CC BY-NC 4.0', 'unclear'), ('CC BY-SA 2.0', 'unclear'),
+                                        ('not in the public domain', 'unclear'), ('CC BY 4.0', 'cc-by'),
+                                        ('NASA (no US copyright)', 'pd'),
+                                        ('public domain; source states: "Copyright Status: Public Domain"', 'pd')])
+def test_licence_notes_read_the_claim_and_catch_restrictions(note, code):
+    assert layers._licence(note)['code'] == code
+
+
+def test_design_system_images_are_never_publishable(starter_home, tmp_path, monkeypatch):
+    root = _system(tmp_path, ['tea-cc0,window,tea;garden,light,muted,painting,Tea garden,A,1800,CC0 (Met),A,'
+                              'https://x,,tea,300x200',
+                              'tea-nc,window,tea;garden,light,muted,painting,Tea house,B,1800,CC BY-NC 4.0,B,'
+                              'https://x,,tea,300x200'])
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', str(root))
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    everything = {r['ref']: r for r in desk.search(brief='tea garden', home=starter_home)['results']}
+    assert 'Restricted' in everything['system:garden-of-lingering:tea-nc']['licence']['label']
+    published = desk.search(brief='tea garden', publishable_only=True, home=starter_home)['results']
+    assert all(r['layer'] == 'library' for r in published)
+
+
+def test_desk_never_creates_or_migrates_a_library(tmp_path, monkeypatch):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    empty = tmp_path / 'empty-home'
+    assert desk.search(techniques=['silhouette'], home=empty)['results'] == []
+    assert desk.route('tea house', empty)['collections'] == []
+    assert not (empty / 'atlas.db').exists()
+    old = tmp_path / 'old-home'
+    old.mkdir()
+    connection = sqlite3.connect(old / 'atlas.db')
+    connection.execute('PRAGMA user_version=1')
+    connection.close()
+    before = (old / 'atlas.db').read_bytes()
+    with pytest.raises(ValueError, match='another version'):
+        desk.search(techniques=['silhouette'], home=old)
+    assert (old / 'atlas.db').read_bytes() == before and not list(old.glob('*.bak'))
+
+
+def test_a_file_swapped_after_indexing_is_not_served(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    Image.new('RGB', (100, 100)).save(folder / 'g-01.jpg', 'JPEG')
+    (folder / 'manifest.json').write_text(json.dumps({'images': [
+        {'id': 'g-01', 'file': 'g-01.jpg', 'title': 't', 'tool': 'x', 'date': 'd', 'prompt': 'p'}]}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    assert layers.find('generated:g-01')  # indexed and cached
+    secret = tmp_path / 'secret.txt'
+    secret.write_text('private', encoding='utf-8')
+    (folder / 'g-01.jpg').unlink()
+    assert layers.find('generated:g-01') is None  # gone since indexing: checked at access time
+    try:
+        os.symlink(secret, folder / 'g-01.jpg')
+    except OSError:
+        pytest.skip('this account cannot create symbolic links')
+    assert layers.find('generated:g-01') is None
+
+
+def test_guard_reads_what_would_be_committed_not_the_working_file(tmp_path):
+    library = tmp_path / 'private' / 'assets' / 'library'
+    library.mkdir(parents=True)
+    Image.new('RGB', (64, 64), (200, 30, 30)).save(library / 'secret.jpg', 'JPEG')
+    repo = tmp_path / 'repo'
+    repo.mkdir()
+    git = ['git', '-c', 'user.email=t@example.invalid', '-c', 'user.name=t']
+    subprocess.run([*git, 'init', '-q'], cwd=repo, check=True)
+    shutil.copy(library / 'secret.jpg', repo / 'notes.txt')  # renamed and re-extensioned
+    subprocess.run([*git, 'add', 'notes.txt'], cwd=repo, check=True)
+    (repo / 'notes.txt').write_text('harmless now', encoding='utf-8')  # the working copy no longer matches
+    assert check_no_data.design_system_copies(repo, [library]) == ['notes.txt']
+
+
+def test_mcp_session_survives_hostile_frames():
+    lines = ['[' * 200000, '{"a": ' + '1' * 5000 + '}', json.dumps({'jsonrpc': '2.0', 'id': 7, 'method': 'ping'})]
+    out = io.StringIO()
+    mcp_server.serve(io.StringIO('\n'.join(lines) + '\n'), out)
+    replies = [json.loads(line) for line in out.getvalue().splitlines()]
+    assert replies[-1] == {'jsonrpc': '2.0', 'id': 7, 'result': {}}
+    assert replies[0]['error']['code'] in (-32700, -32600)
+
+
+def test_goal_reasons_quote_one_technique_with_its_own_state(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    results = desk.search(goals=['create-calm'], limit=20, home=starter_home)['results']
+    reasons = [reason for r in results for reason in r['reasons'] if reason.startswith('Serves')]
+    assert reasons
+    for reason in reasons:
+        assert re.match(r'Serves “[^”]+” through [^,(]+ \(', reason), reason
+
+
+# ---- round 2 -------------------------------------------------------------------------------------------------
+
+
+def test_restricted_library_codes_are_never_publishable(starter_home, tmp_path, monkeypatch):
+    home = tmp_path / 'copy'
+    shutil.copytree(starter_home, home)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    target = desk.search(techniques=['silhouette'], publishable_only=True, home=home)['results'][0]['image_id']
+    connection = sqlite3.connect(home / 'atlas.db')
+    columns = [row[1] for row in connection.execute('PRAGMA table_info(rights_records)') if row[1] != 'id']
+    copied = ', '.join("'CC-BY-NC'" if c == 'license_code' else "'Noncommercial only'" if c == 'label' else c
+                       for c in columns)
+    connection.execute(f"INSERT INTO rights_records({', '.join(columns)}) SELECT {copied} FROM rights_records "
+                       "WHERE image_id=? ORDER BY id DESC LIMIT 1", (target,))
+    connection.commit()
+    connection.close()
+    published = desk.search(techniques=['silhouette'], publishable_only=True, limit=40, home=home)['results']
+    assert target not in {r.get('image_id') for r in published}
+
+
+def test_custom_folder_names_give_refs_that_open(starter_home, tmp_path, monkeypatch):
+    root = _system(tmp_path, ['tea-1,window,tea;garden,light,muted,painting,Tea garden,A,1800,CC0,A,https://x,,tea,'
+                              '300x200'])
+    custom = root.with_name('Studio References')
+    root.rename(custom)
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', str(custom))
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    found = desk.search(brief='tea garden', home=starter_home)['results']
+    ref = next(r['ref'] for r in found if r['layer'] == 'design-system')
+    assert ref == 'system:studio-references:tea-1'
+    assert desk.get(ref, home=starter_home)['title'] == 'Tea garden'
+
+
+def test_guard_covers_folders_configured_in_the_home_env_file(tmp_path, monkeypatch):
+    home = tmp_path / 'home'
+    home.mkdir()
+    root = _system(tmp_path, ['a-1,window,tea,light,muted,painting,T,A,1800,CC0,A,https://x,,n,300x200'])
+    (home / '.env').write_text(f'VISUAL_ATLAS_DESIGN_SYSTEMS={root}\n', encoding='utf-8')
+    monkeypatch.setenv('VISUAL_ATLAS_HOME', str(home))
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    assert root / 'assets' / 'library' in check_no_data.libraries()
+
+
+def test_mcp_discards_an_oversized_frame_and_answers_the_next(monkeypatch):
+    monkeypatch.setattr(mcp_server, 'MAX_FRAME', 100)
+
+    class Bounded(io.StringIO):  # every read must be bounded; reading a whole line at once is the defect
+        def readline(self, size=-1):
+            assert 0 < size <= 101
+            return super().readline(size)
+
+        def __iter__(self):
+            raise AssertionError('unbounded line iteration')
+
+    out = io.StringIO()
+    ping = json.dumps({'jsonrpc': '2.0', 'id': 8, 'method': 'ping'})
+    mcp_server.serve(Bounded('x' * 1000 + '\n' + ping + '\n'), out)
+    replies = [json.loads(line) for line in out.getvalue().splitlines()]
+    assert replies == [{'jsonrpc': '2.0', 'id': None, 'error': {'code': -32700, 'message': 'Parse error'}},
+                       {'jsonrpc': '2.0', 'id': 8, 'result': {}}]
+
+
+# ---- round 3 (overnight round 2) -----------------------------------------------------------------------------
+
+
+def test_every_generated_file_carries_its_provenance_label():
+    manifest = json.loads((REPO / 'generated' / 'manifest.json').read_text(encoding='utf-8'))
+    for item in manifest['images']:
+        xmp = Image.open(REPO / 'generated' / item['file']).info.get('xmp', b'')
+        assert b'digitalsourcetype/trainedAlgorithmicMedia' in xmp, item['file']
+        assert item['id'].encode() in xmp
+
+
+def test_more_like_this_ranks_the_closest_composition_first(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    pictures = {'red-left': [(200, 30, 30), (240, 240, 240)], 'red-left-copy': [(190, 40, 35), (235, 235, 230)],
+                'blue-right': [(240, 240, 240), (30, 30, 200)]}
+    items = []
+    for name, (left, right) in pictures.items():
+        picture = Image.new('RGB', (200, 100), right)
+        picture.paste(Image.new('RGB', (100, 100), left), (0, 0))
+        picture.save(folder / f'{name}.jpg', 'JPEG')
+        items.append({'id': name, 'file': f'{name}.jpg', 'title': name, 'tool': 'x', 'date': 'd', 'prompt': 'p'})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.similar('generated:red-left', layers_wanted=['generated'], home=tmp_path / 'home')
+    assert [r['ref'] for r in found['results']] == ['generated:red-left-copy', 'generated:blue-right']
+    assert found['results'][0]['score'] > 0.9 > found['results'][1]['score']
+    assert not (tmp_path / 'home').exists()  # reads only: nothing written
+
+
+def test_open_search_returns_only_rights_checked_candidates(monkeypatch):
+    from atlas import providers
+    found = [{'provider': 'aic', 'title': 'Lighthouse', 'creator': 'A', 'date_text': '1900', 'medium': 'oil',
+              'source_url': 'https://www.artic.edu/artworks/1', 'image_url': 'https://www.artic.edu/iiif/2/x/full/843,/0/default.jpg',
+              'image_headers': {}, 'credit_line': '', 'raw': {'is_public_domain': True, 'image_id': 'x'}},
+             {'provider': 'aic', 'title': 'Modern', 'creator': 'B', 'date_text': '1990', 'medium': 'oil',
+              'source_url': 'https://www.artic.edu/artworks/2', 'image_url': '', 'image_headers': {}, 'credit_line': '',
+              'raw': {'is_public_domain': False, 'image_id': None}}]
+    calls = []
+
+    def fake(fetcher, provider, query, page, per_page, home=None):
+        calls.append((provider, query, per_page))
+        return found
+    monkeypatch.setattr(providers, 'search', fake)
+    result = desk.open_search('lighthouse at night', providers_wanted=['aic'], per_provider=3, fetcher=object())
+    assert calls == [('aic', 'lighthouse at night', 3)]
+    assert [r['title'] for r in result['results']] == ['Lighthouse'] and result['results'][0]['publishable']
+    assert result['results'][0]['licence']['checked_by'] == 'atlas/rights.py' and sum(result['rejected'].values()) == 1
+    for bad in ({'query': ''}, {'query': 'x' * 201}, {'query': 'x', 'providers_wanted': ['nga']},
+                {'query': 'x', 'per_provider': 11}):
+        with pytest.raises(ValueError):
+            desk.open_search(**bad, fetcher=object())
+
+
+
+# ---- Codex review, overnight round 2 ------------------------------------------------------------------------------
+
+
+def test_open_search_never_widens_an_empty_selection(monkeypatch):
+    from atlas import providers
+    calls = []
+    monkeypatch.setattr(providers, 'search', lambda *a, **k: calls.append(a) or [])
+    for empty in ([], [''], ['  ']):
+        with pytest.raises(ValueError, match='at least one collection'):
+            desk.open_search('lighthouse', providers_wanted=empty, fetcher=object())
+    assert calls == []
+    assert mcp_server.call('search_open_collections', {'query': 'x', 'collections': []})['isError'] is True
+
+
+def test_open_searches_share_one_fetcher_so_cooldowns_carry_over(monkeypatch):
+    from atlas import providers
+    seen = []
+    monkeypatch.setattr(providers, 'search', lambda fetcher, *a, **k: seen.append(fetcher) or [])
+    desk.open_search('a', providers_wanted=['met'])
+    desk.open_search('b', providers_wanted=['met'])
+    assert len(seen) == 2 and seen[0] is seen[1]
+
+
+def test_library_only_directions_do_not_route_to_private_systems(starter_home, tmp_path, monkeypatch):
+    root = _system(tmp_path, ['tea-1,window,tea;garden,light,muted,painting,Tea,A,1800,CC0,A,https://x,,tea,300x200'])
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', str(root))
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    assert desk.search(brief='tea garden calm', home=starter_home)['route']['system']  # routed when allowed
+    scoped = desk.directions('tea garden calm', goals=['create-calm'], layers_wanted=['library'], home=starter_home)
+    assert scoped['route']['system'] is None and scoped['directions']
+
+
+
+# ---- Codex review, overnight round 3 ------------------------------------------------------------------------------
+
+
+def test_directions_find_technique_examples_behind_many_word_matches(tmp_path, monkeypatch):
+    def record(i, techniques, subjects):
+        return {'ref': f'generated:r-{i}', 'layer': 'generated', 'title': f'Picture {i}', 'subjects': subjects,
+                'techniques': [{'id': t, 'state': 'proposed'} for t in techniques], 'generated': True,
+                'licence': {'label': 'Generated', 'code': 'generated'}, 'width': 10, 'height': 10}
+    crowd = [record(i, [], ['tea', 'garden', 'cup']) for i in range(50)]
+    shown = [record(100 + i, ['silhouette'], ['night']) for i in range(3)]
+    monkeypatch.setattr(desk, 'references', lambda home=None, layer_names=desk.LAYERS: crowd + shown)
+    result = desk.directions('tea garden cup', techniques=['silhouette'], count=1, per_direction=3,
+                             home=tmp_path / 'home')
+    assert [r['ref'] for r in result['directions'][0]['references']] == [r['ref'] for r in shown]
+
+
+def test_numbered_shots_of_one_series_count_once(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = []
+    for rid, title, tool in (('a', 'Frigate Bird Sunset 5746', 'Ann'), ('b', 'Frigate Bird Sunset 5738', 'Ann'),
+                             ('c', 'Frigate Bird Sunset 5701', 'Bea')):
+        Image.new('RGB', (40, 30)).save(folder / f'{rid}.jpg', 'JPEG')
+        items.append({'id': rid, 'file': f'{rid}.jpg', 'title': title, 'tool': tool, 'date': 'd', 'prompt': 'p',
+                      'techniques': ['silhouette']})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    refs = [r['ref'] for r in desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']]
+    assert refs == ['generated:a', 'generated:c']  # one per maker's series, best ranked first
+
+
+
+def test_series_rule_needs_a_shot_number_and_a_known_maker(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = []
+    for rid, title, tool in (('u1', 'Untitled', 'Ann'), ('u2', 'Untitled', 'Ann'),
+                             ('k1', 'Harbour 0412', 'Unknown author'), ('k2', 'Harbour 0413', 'Unknown author')):
+        Image.new('RGB', (40, 30)).save(folder / f'{rid}.jpg', 'JPEG')
+        items.append({'id': rid, 'file': f'{rid}.jpg', 'title': title, 'tool': tool, 'date': 'd', 'prompt': 'p',
+                      'techniques': ['silhouette']})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']
+    assert len(found) == 4  # same-titled works without a shot number, and unknown makers, stay separate
+
+
+# ---- acceptance test by an AI agent (23 Nov 2026) --------------------------------------------------------------
+
+
+def test_layout_words_are_not_subjects(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    terms = desk.search(brief='Slide 1 of a talk on burnout: quiet, room on the left for the title; landing page '
+                              'hero with headline space on the right side', home=starter_home)['reading']['subject_terms']
+    assert not {'left', 'right', 'room', 'side', 'landing', 'headline', 'space', 'quiet'} & set(terms)
+    assert 'burnout' in terms
+
+
+def test_technique_ids_outrank_word_matches(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = [{'id': 'words', 'title': 'Lonely tree and house at dusk', 'subjects': ['tree', 'house', 'dusk', 'lonely'],
+              'techniques': []},
+             {'id': 'shows', 'title': 'Figure', 'subjects': [], 'techniques': ['silhouette']}]
+    for item in items:
+        Image.new('RGB', (40, 30)).save(folder / f"{item['id']}.jpg", 'JPEG')
+        item.update({'file': f"{item['id']}.jpg", 'tool': 'x', 'date': 'd', 'prompt': 'p'})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.search(brief='a lonely tree and a house at dusk', techniques=['silhouette'], layers_wanted=['generated'],
+                        home=tmp_path / 'h')['results']
+    assert [r['ref'] for r in found] == ['generated:shows', 'generated:words']
+
+
+def test_unknown_ids_name_the_real_tool():
+    with pytest.raises(ValueError, match='list_techniques'):
+        desk.search(techniques=['build-trust'])
+
+
+def test_credit_lines_have_one_full_stop():
+    from atlas import rights
+    line = rights.credit_line({'creator': 'Martin Desjardins', 'title': 'Bust', 'date_text': 'n.d.'}, 'Art Institute of Chicago', 'CC0')
+    assert '..' not in line and line == 'Martin Desjardins, Bust, n.d. Art Institute of Chicago. CC0.'
+
+
+def test_catalogue_years_are_not_shot_numbers(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = []
+    for rid, title in (('y1', 'Igeha Schokolade, 1926'), ('y2', 'Igeha Schokolade, 1928'),
+                       ('s1', 'Frigate Bird Sunset 5746'), ('s2', 'Frigate Bird Sunset 5738')):
+        Image.new('RGB', (40, 30)).save(folder / f'{rid}.jpg', 'JPEG')
+        items.append({'id': rid, 'file': f'{rid}.jpg', 'title': title, 'tool': 'Hohlwein', 'date': 'd', 'prompt': 'p',
+                      'techniques': ['silhouette']})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    refs = {r['ref'] for r in desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']}
+    assert {'generated:y1', 'generated:y2'} <= refs and len(refs) == 3  # two dated works stay; one bird shot
+
+
+def test_credits_name_the_collection_not_its_code(starter_home):
+    with jobs.open_store(starter_home) as store:
+        text = transfer.credits(store)
+    assert 'Source: Art Institute of Chicago' in text and 'Source: aic' not in text
+
+
+def test_serve_says_when_the_port_is_taken():
+    import socket
+
+    from typer.testing import CliRunner
+
+    from atlas.cli import app
+    with socket.socket() as holder:
+        holder.bind(('127.0.0.1', 0))
+        holder.listen()
+        port = holder.getsockname()[1]
+        result = CliRunner().invoke(app, ['serve', '--port', str(port)])
+    assert result.exit_code == 1 and 'already in use' in result.output and 'Visual Atlas on' not in result.output
+
+
+def test_more_confident_readings_rank_first(starter_home, monkeypatch, tmp_path):
+    """Scorers saw the same two pictures lead every negative-space answer: ties fell back to ref order."""
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    connection = sqlite3.connect(starter_home / 'atlas.db')
+    rows = connection.execute("SELECT a.image_id, a.confidence FROM annotations a WHERE a.technique_id='negative-space' "
+                              "AND a.state='model_reviewed' AND a.role='primary' ORDER BY a.confidence DESC").fetchall()
+    connection.close()
+    best = rows[0][0]
+    first = desk.search(techniques=['negative-space'], limit=3, layers_wanted=['library'], home=starter_home)['results'][0]
+    assert first['image_id'] == best
+
+
+
+def test_discarded_words_never_crowd_out_a_subject(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    terms = desk.search(brief='Warm, communal, cosy, festive, hopeful, serious, friendly, elegant picture of a lighthouse',
+                        home=starter_home)['reading']['subject_terms']
+    assert 'lighthouse' in terms
+
+
+def test_goal_evidence_outranks_a_title_word(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = [{'id': 'word', 'title': 'Harbour lights', 'techniques': []},
+             {'id': 'goal', 'title': 'Figure', 'techniques': ['negative-space']}]
+    for item in items:
+        Image.new('RGB', (40, 30)).save(folder / f"{item['id']}.jpg", 'JPEG')
+        item.update({'file': f"{item['id']}.jpg", 'tool': 'x', 'date': 'd', 'prompt': 'p'})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.search(brief='harbour', goals=['create-calm'], layers_wanted=['generated'], home=tmp_path / 'h')['results']
+    assert [r['ref'] for r in found] == ['generated:goal', 'generated:word']
+
+
+def test_a_picture_teaches_one_way_only(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    for brief in ('Poster for a community choir concert in a church, warm and communal',
+                  'Make one product stand out on a dark poster with a sense of scale and drama'):
+        refs = [r['ref'] for way in desk.directions(brief, count=4, per_direction=3, home=starter_home)['directions']
+                for r in way['references']]
+        assert len(refs) == len(set(refs)), brief

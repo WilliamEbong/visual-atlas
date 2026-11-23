@@ -5,6 +5,7 @@ import re
 import secrets
 import sqlite3
 import threading
+from contextlib import suppress
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -12,9 +13,20 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from atlas import __version__, catalog, coding, images, jobs, transfer
+from atlas import __version__, catalog, coding, desk, images, jobs, transfer
+from atlas import layers as desk_layers
 from atlas.home import REPO, home_dir, local_setting
 from atlas.store import LibraryBusy, Store
+
+LEADS = REPO / 'atlas' / 'data' / 'leads.json'
+EXAMPLE = REPO / 'atlas' / 'data' / 'example_brief.json'
+
+
+def lead_rank(technique_id: str):
+    """Sort key: a technique's chosen lead examples first, strongest first; the rest keep their order."""
+    order = json.loads(LEADS.read_text(encoding='utf-8'))['leads'].get(technique_id, [])
+    return lambda row: order.index(f"{row['provider']}:{row['provider_item_id']}") \
+        if f"{row['provider']}:{row['provider_item_id']}" in order else len(order)
 
 # Every order ends with the image id, so offset pages never repeat or skip an image with an equal sort value.
 SORTS = {'newest': 'i.created_at DESC, i.id DESC', 'oldest': 'i.created_at, i.id', 'title': 'i.title COLLATE NOCASE, i.id',
@@ -86,6 +98,14 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             app.state.thread.start()
 
     start()
+    if start_worker:  # warm the desk's caches (catalogues, tokenised references) so the first Ask is quick
+        def warm():
+            with suppress(Exception):  # only a speed-up: a failure here shows up properly on the first real Ask
+                desk.advise('warm up', home=home)
+                first = next(iter(desk.references(home)), None)
+                if first:  # also fills the picture-signature cache used by "More like this"
+                    desk.similar(first['ref'], home=home)
+        threading.Thread(target=warm, daemon=True, name='atlas-warm').start()
 
     def db() -> Store:
         return Store(jobs.db_path(home))
@@ -152,7 +172,12 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         if technique:
             where.append("i.id IN (SELECT image_id FROM annotations WHERE technique_id=? AND state!='rejected')")
             params.append(technique)
-        if goal:
+        gated, tagged = desk.moods()
+        if goal in gated:  # a mood belongs to the picture itself, as on Ask
+            keys = [k for k, v in tagged.items() if goal in v]
+            where.append("(i.provider || ':' || i.provider_item_id) IN (SELECT value FROM json_each(?))")
+            params.append(json.dumps(keys))
+        elif goal:
             where.append("i.id IN (SELECT a.image_id FROM annotations a JOIN technique_links l ON l.technique_id="
                          "a.technique_id AND l.kind='goal' WHERE l.target_id=? AND a.state!='rejected')")
             params.append(goal)
@@ -280,11 +305,22 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     def taxonomy():
         with db() as store, store.reading():
             counts = {r['id']: r['examples'] for r in catalog.coverage(store)}
+            best = {}  # one picture per technique for the index: the best-checked, most confident reading
+            candidates = {}
+            for row in store.rows("SELECT a.technique_id, a.state, i.thumb_path, i.provider, i.provider_item_id "
+                                  "FROM annotations a JOIN images i ON i.id=a.image_id "
+                                  "WHERE a.state!='rejected' AND i.removed_at IS NULL AND i.thumb_path IS NOT NULL "
+                                  "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC"):
+                candidates.setdefault(row['technique_id'], []).append(row)
+            for technique_id, rows in candidates.items():
+                rank = lead_rank(technique_id)
+                best[technique_id] = min(rows, key=lambda r: (r['state'] != 'human_reviewed', rank(r)))['thumb_path']
             techniques = []
             for row in store.rows('SELECT id, data_json FROM techniques ORDER BY name'):
                 data = json.loads(row['data_json'])
                 techniques.append({k: data[k] for k in ('id', 'name', 'aliases', 'definition', 'goals', 'operations',
-                                                        'domains')} | {'examples': counts.get(row['id'], 0)})
+                                                        'domains')} | {'examples': counts.get(row['id'], 0),
+                                                                       'thumb': media_url(best.get(row['id']))})
             return {'goals': store.rows('SELECT * FROM goals ORDER BY name'),
                     'operations': store.rows('SELECT * FROM operations ORDER BY name'),
                     'domains': [{**d, 'variables': json.loads(d.pop('variables_json'))}
@@ -301,10 +337,14 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             names = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM techniques')}
             examples = store.rows(
                 "SELECT i.id, i.title, i.creator, i.date_text, i.thumb_path, i.analysis_path, i.width, i.height, a.state, "
-                "a.effect, a.role FROM annotations a "
+                "a.effect, a.role, i.provider, i.provider_item_id FROM annotations a "
                 "JOIN images i ON i.id=a.image_id WHERE a.technique_id=? AND a.state!='rejected' AND i.removed_at IS NULL "
-                "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC LIMIT 24",
+                "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC",
                 (technique_id,))
+            rank = lead_rank(technique_id)  # pictures you confirmed, then the chosen leads, then the rest
+            examples = sorted(examples, key=lambda e: (e['state'] != 'human_reviewed', rank(e)))[:24]
+            for e in examples:
+                del e['provider'], e['provider_item_id']
             goals = store.rows("SELECT g.* FROM technique_links l JOIN goals g ON g.id=l.target_id WHERE "
                                "l.technique_id=? AND l.kind='goal'", (technique_id,))
             operations = store.rows("SELECT o.* FROM technique_links l JOIN operations o ON o.id=l.target_id WHERE "
@@ -522,6 +562,24 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         with db() as store:
             return store.rows('SELECT * FROM briefs ORDER BY updated_at DESC')
 
+    @app.get('/api/briefs/example')
+    def example_brief():
+        """A saved real run of Suggest directions, shown on Projects before you write a brief. Its pictures are the
+        starter references in this library; any you removed are left out."""
+        if not EXAMPLE.exists():
+            raise HTTPException(404, 'No example brief.')
+        example = json.loads(EXAMPLE.read_text(encoding='utf-8'))
+        with db() as store, store.reading():
+            local = {f"{r['provider']}:{r['provider_item_id']}": r for r in store.rows(
+                'SELECT id, title, thumb_path, provider, provider_item_id FROM images WHERE removed_at IS NULL')}
+            names = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM techniques')}
+        directions = [{**{k: d[k] for k in ('title', 'idea', 'rationale', 'execution', 'tradeoffs')},
+                       'images': [{'id': local[ref]['id'], 'title': local[ref]['title'], 'thumb': media_url(local[ref]['thumb_path'])}
+                                  for ref in d['images'] if ref in local],
+                       'techniques': [{'id': t, 'name': names.get(t, t)} for t in d['techniques']]}
+                      for d in example['directions']]
+        return {**{k: example[k] for k in ('title', 'text', 'backend', 'model', 'made')}, 'directions': directions}
+
     @app.post('/api/briefs', status_code=201)
     def create_brief(body: BriefInput):
         with db() as store:
@@ -661,6 +719,79 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         # Maintenance mode refuses to start while a job is active and blocks every write (this app's worker,
         # other windows, the CLI) until the restore has finished or failed.
         return transfer.restore(home, name)
+
+    # ---- reference desk (read-only, no AI) --------------------------------------------------------------
+    def publish_mode(use: str) -> bool:
+        if use not in ('reference', 'publish'):
+            raise ValueError('use is "reference" or "publish"')
+        return use == 'publish'
+
+    def for_web(ref: dict) -> dict:
+        """No local file paths in the browser: library pictures by media URL, layer pictures by ref."""
+        out = {k: v for k, v in ref.items() if k != 'file'}
+        if ref['layer'] == 'library':
+            out['image'] = media_url(ref.get('display'))
+            out['thumb'] = media_url(ref.get('thumb'))
+        else:
+            out['image'] = out['thumb'] = f"/api/desk/media?ref={ref['ref']}"
+        return out
+
+    @app.get('/api/desk')
+    def desk_advice(brief: str = '', use: str = 'reference', layers: str = '', limit: int = 12, technique: str = '',
+                    goals: str = ''):
+        wanted = [part for part in layers.split(',') if part] or None
+        if brief.strip():
+            chosen = [part for part in goals.split(',') if part] or None  # the person's own reading of the brief
+            result = desk.advise(brief, goals=chosen, limit=max(1, min(limit, 40)), publishable_only=publish_mode(use),
+                                 layers_wanted=wanted, home=home)
+        elif technique:
+            result = desk.search(techniques=[technique], limit=max(1, min(limit, 40)),
+                                 publishable_only=publish_mode(use), layers_wanted=wanted, home=home)
+            result['guidance'] = desk.guidance([technique])
+        else:
+            raise ValueError('Describe what the picture should do.')
+        result['results'] = [for_web(r) for r in result['results']]
+        result['layers'] = {'generated': bool(desk_layers.generated()), 'design-system': [
+            {'name': s['name'], 'count': len(s['references'])} for s in desk_layers.systems(home)]}
+        return result
+
+    @app.get('/api/desk/directions')
+    def desk_directions(brief: str, use: str = 'reference', layers: str = '', goals: str = ''):
+        result = desk.directions(brief, goals=[part for part in goals.split(',') if part] or None, count=3,
+                                 per_direction=3, publishable_only=publish_mode(use),
+                                 layers_wanted=[part for part in layers.split(',') if part] or None, home=home)
+        for item in result['directions']:
+            item['references'] = [for_web(r) for r in item['references']]
+        return result
+
+    @app.get('/api/desk/similar')
+    def desk_similar(ref: str, use: str = 'reference', limit: int = 6):
+        try:
+            result = desk.similar(ref, limit=max(1, min(limit, 24)), publishable_only=publish_mode(use), home=home)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from None
+        result['results'] = [for_web(r) for r in result['results']]
+        return result
+
+    @app.get('/api/desk/ref')
+    def desk_reference(ref: str):
+        try:
+            return for_web(desk.get(ref, home))
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from None
+
+    @app.get('/api/desk/media')
+    def layer_media(ref: str):
+        """Pictures from the generated and design-system layers: behind the launch token (private files), found by
+        ref in their index, never by path, and checked again on disk at the moment they are served."""
+        try:
+            found = desk_layers.find(ref, home) if desk.REF.match(ref) else None
+        except (OSError, ValueError):
+            found = None
+        path = found and desk_layers.safe_file(found)
+        if not path:
+            raise HTTPException(404)
+        return FileResponse(path, headers={'Cache-Control': 'private, max-age=3600'})
 
     @app.get('/media/{path:path}', include_in_schema=False)
     def media(path: str):

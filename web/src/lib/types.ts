@@ -36,7 +36,7 @@ export interface ImageDetail {
 
 export interface Goal { id: string; name: string; description: string }
 export interface TaxonomyTechnique { id: string; name: string; aliases: string[]; definition: string; goals: string[]
-  operations: string[]; domains: string[]; examples: number }
+  operations: string[]; domains: string[]; examples: number; thumb?: string | null }
 export interface Taxonomy { goals: Goal[]; operations: Goal[]; domains: (Goal & { variables: string[] })[]; techniques: TaxonomyTechnique[] }
 
 export interface TechniqueDetail {
@@ -87,3 +87,31 @@ export const PROVIDERS: Record<string, string> = {
   aic: 'Art Institute of Chicago', met: 'The Met', cma: 'Cleveland Museum of Art', smithsonian: 'Smithsonian', commons: 'Wikimedia Commons',
   rijksmuseum: 'Rijksmuseum', nga: 'National Gallery of Art',
 }
+
+// Reference desk (atlas/desk.py via /api/desk)
+export interface DeskRef {
+  ref: string; layer: 'library' | 'generated' | 'design-system'; system?: string; title: string; creator?: string; date?: string
+  medium?: string; subjects?: string[]; orientation?: string; width?: number; height?: number; generated: boolean
+  licence: { label: string; code: string; note?: string; checked_by: string; restrictions?: string }
+  credit?: string; source_url?: string; prompt?: string; notes?: string
+  studied?: { title: string; creator: string; source_url: string; lesson?: string }[]
+  techniques: { id: string; state: string; name?: string; state_means?: string }[]
+  image_id?: number; image: string | null; thumb: string | null; score?: number; reasons: string[]
+}
+export interface DeskGuidance {
+  id: string; name: string; definition: string; how_it_works: string; when_it_helps: string[]; look_for: string[]
+  limitations: string; not_to_confuse_with: { technique: string; how_to_tell: string }[]
+}
+export interface DeskAnswer {
+  reading: { techniques: { id: string; name: string }[]; goals: { id: string; name: string }[]; subject_terms: string[] }
+  route: { system: { name: string; why: string } | null }
+  total_matches: number; results: DeskRef[]; guidance: DeskGuidance[]; note: string
+  layers: { generated: boolean; 'design-system': { name: string; count: number }[] }
+  codebook?: { goals: Goal[] }
+}
+export interface DeskDirection {
+  technique: { id: string; name: string }; serves: string[]; idea: string; why_it_works: string; make_sure: string[]
+  watch_out: string; not_to_confuse_with: string[]; references: DeskRef[]
+}
+export interface DeskDirections { reading: DeskAnswer['reading']; directions: DeskDirection[]; note: string }
+export interface DeskSimilar { like: string; results: DeskRef[]; compared: number; note: string }

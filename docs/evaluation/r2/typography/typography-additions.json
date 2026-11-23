@@ -1,0 +1,156 @@
+[
+ {
+  "provider": "commons",
+  "item_id": "78985578",
+  "technique": "leading-lines",
+  "observations": [
+   "In the lower map a broad pink band runs from Kowno on the left, rising and narrowing across the sheet to Moscou at the upper right.",
+   "A thin black band returns from Moscou back toward the left edge, running beneath the pink band; a temperature graph sits along the bottom.",
+   "An upper map traces a second, narrower pink band from Spain across southern Gaul to the Alps."
+  ],
+  "effect": "The continuous bands carry the eye along the route out and back, so the reader follows the campaign as a journey before reading the labels.",
+  "teaching_value": "A nineteenth-century information graphic uses a single directional band as the reading path; its width also encodes quantity, so it teaches flow lines in charts and maps.",
+  "ambiguity": "Band width (scale) carries the data as strongly as direction; this reading counts the path the eye follows, not the statistical encoding.",
+  "subjects": ["map", "chart", "information design"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "4339099",
+  "technique": "scale-contrast",
+  "observations": [
+   "A very large green circle with a pink inner circle sits at the far left, labelled Empire Russe.",
+   "To its right a row of progressively smaller circles sits on one baseline, ending in small circles labelled Prusse, France pays and Portugal.",
+   "Vertical lines rise from each circle against a ruled grid, joined by dotted diagonals."
+  ],
+  "effect": "Placing one huge circle beside a row of much smaller ones makes the difference in extent readable at a glance before any figure is read.",
+  "teaching_value": "An early statistical chart compares quantities by circle size on a common baseline; a clear historical model for size as data in information design.",
+  "ambiguity": "Circle area versus diameter is not stated on the chart, so the exact proportional rule is not established from the pixels.",
+  "subjects": ["chart", "circles", "information design"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "32217474",
+  "technique": "proximity-grouping",
+  "observations": [
+   "Nineteen occupation names are listed down the left, each with a crimson horizontal bar; the top bar runs almost the full width.",
+   "From Railroad employees down to Hostlers the bars are short stubs, and a tall curly bracket gathers them.",
+   "The bracket points to a single longer crimson bar set off to the right of the stubs."
+  ],
+  "effect": "Bracketing the many short bars and showing their total as one bar lets small categories be read as one group without losing the individual rows.",
+  "teaching_value": "A hand-drawn 1900 data portrait groups a long tail of small values with a bracket and a combined bar; a direct lesson in grouping for charts and interfaces.",
+  "ambiguity": "Scale contrast between the first bar and the stubs is also strong; the grouping reading rests on the bracket and the combined bar.",
+  "subjects": ["bar chart", "occupations", "information design"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "4375968",
+  "technique": "color-contrast",
+  "observations": [
+   "Thick route lines in red, blue, black, green, yellow, orange, brown and violet cross a pale grey street map of London.",
+   "A reference box at the upper left pairs each railway name with a short sample of its line colour.",
+   "The title UNDERGROUND appears in large pale capitals on a black band across a green border."
+  ],
+  "effect": "Giving each route a distinct saturated hue against the muted street map lets a reader trace one line through crossings and tell the routes apart.",
+  "teaching_value": "An early transit map uses hue to separate overlapping routes and a key to name them; a wayfinding precedent for colour-coded navigation and interface legends.",
+  "ambiguity": "Several hues (dark blue, black, brown) are close in value at small size; colour separation is clearer for the bright routes than the dark ones.",
+  "subjects": ["transit map", "wayfinding", "london"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "21034059",
+  "technique": "scale-contrast",
+  "observations": [
+   "The right-hand page shows four blocks of a bold sans-serif headed Gothic No. 2; each block opens with one large all-capital word such as COMMERCE or BENCH.",
+   "Below each capital word, mixed-case lines in the same face are set noticeably smaller.",
+   "The left-hand page is filled with small engraved stock cuts: ears, eyes, coffins, buildings and harness."
+  ],
+  "effect": "Setting one large capital word over smaller lines in each block creates a clear typographic hierarchy, and the type page reads as bold against the busy engraved page.",
+  "teaching_value": "A 1882 foundry specimen shows display type at several sizes with headline-and-subline pairs, a compact lesson in typographic hierarchy by size.",
+  "ambiguity": "The spread pairing with the engraving page comes from the book's binding; only the type page is counted as the deliberate size hierarchy.",
+  "subjects": ["type specimen", "typography", "sans serif"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "50505576",
+  "technique": "rhythm-pattern",
+  "observations": [
+   "One page repeats the same two-line unit, a mixed-case sentence and an all-capital line with numerals, eight times from 8 Point to 36 Point Bodoni Book.",
+   "Each unit is a little larger than the one above, and fewer words fit across the fixed measure as the size grows.",
+   "Thin orange vertical rules and an inch scale run across the whole block behind the type."
+  ],
+  "effect": "Repeating one unit at steadily increasing sizes sets up a stepped beat down the page, so the reader compares sizes by rhythm rather than by reading.",
+  "teaching_value": "A twentieth-century type specimen page shows a regular progressive series on a measured grid; a model for size ramps and type scales in layout and interface design.",
+  "ambiguity": "This is a photograph of a printed specimen page; the CC BY licence is the photographer's. The progression is also a scale-contrast example.",
+  "subjects": ["type specimen", "typography", "serif"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "122361807",
+  "technique": "diagonal-energy",
+  "observations": [
+   "A large red triangle points from the upper left down to the right, its tip touching the edge of a white circle on a black field.",
+   "The sheet is split by a diagonal boundary between a white area at left and a black area at right.",
+   "Cyrillic words are set at angles: one runs downward at the upper left, another is rotated along the triangle's lower edge."
+  ],
+  "effect": "Driving the red wedge and the rotated lettering along diagonals makes the composition read as forceful and in motion rather than static.",
+  "teaching_value": "A 1919 lithographic poster builds its whole message from tilted geometric shapes and angled type, a foundational constructivist example of diagonal layout.",
+  "ambiguity": "Colour contrast and value contrast are also strong; the political message is from source context, not established by this reading.",
+  "subjects": ["poster", "geometric shapes", "constructivism"]
+ },
+ {
+  "provider": "met",
+  "item_id": "334197",
+  "technique": "silhouette",
+  "observations": [
+   "A woman in a black dress and wide black hat fills the centre as one flat black shape with almost no interior detail.",
+   "Behind her, the stage, orchestra and a man in a top hat are drawn in yellow, grey and olive.",
+   "Hand-drawn lettering Divan Japonais runs across the top, and Ed Fournier directeur sits at lower left."
+  ],
+  "effect": "Reducing the main figure to a large flat black mass against lighter colour makes her shape read instantly from a distance, which suits a street poster.",
+  "teaching_value": "A colour lithograph poster from 1892-93 shows how a flat dark silhouette can anchor a poster and carry the composition with lettering around it.",
+  "ambiguity": "The figure is a dark shape on a lighter scene rather than a backlit outline; the performer at the top is also cut off by the edge (tight cropping).",
+  "subjects": ["poster", "woman", "lithograph"]
+ },
+ {
+  "provider": "cma",
+  "item_id": "143846",
+  "technique": "color-harmony",
+  "observations": [
+   "The poster uses a small set of colours: orange and rust for the woman's cloak, a pale green curtain and portfolio, cream paper and dark blue outlines.",
+   "The same orange returns in the wall telephone, the floor and the lettering ESTAMPES & ENCADREMENTS D'ART.",
+   "A lettered band at the bottom reads N. LEMBREE AVENUE LOUISE 17 BRUXELLES in dark blue on cream."
+  ],
+  "effect": "Repeating a few related colours across figure, room and lettering ties image and text into one calm, unified sheet.",
+  "teaching_value": "An 1897 lithographic shop poster shows a restricted palette shared between illustration and lettering, a useful model for a small brand colour set.",
+  "ambiguity": "Orange against pale green also gives some complementary contrast; the reading counts the repetition of a limited palette.",
+  "subjects": ["poster", "woman", "prints"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "54368989",
+  "technique": "scale-contrast",
+  "observations": [
+   "The words SI and NO alternate in a line stepping from the upper left down to the lower right.",
+   "The first SI is small at the top-left corner; each later word is larger, ending in a SI with an accent that fills most of the right-hand height.",
+   "The ground is split horizontally into orange above and olive green below, with the letters in dark red and black."
+  ],
+  "effect": "Letting the same short words grow from small to very large makes the last word dominate and gives the sequence a sense of rising emphasis.",
+  "teaching_value": "A 1932 futurist book page makes typography itself the image, using escalating letter size to build emphasis; a direct reference for expressive display type.",
+  "ambiguity": "The stepped descent also reads as a diagonal. This is a reproduction of a book page; any meaning beyond the printed words is not established here.",
+  "subjects": ["typography", "letters", "futurism"]
+ },
+ {
+  "provider": "commons",
+  "item_id": "88261490",
+  "technique": "negative-space",
+  "observations": [
+   "A smiling woman in a red cloche hat and black coat is shown from the chest up, centred on a plain cream sheet with no background scene.",
+   "The red script word Igeha sits in the empty space at upper left and smaller black script Schokolade at upper right.",
+   "Large areas of blank cream remain above the hat and on both sides of the figure."
+  ],
+  "effect": "Leaving the ground empty isolates the figure and gives the lettering clear room, so the product name and face read quickly.",
+  "teaching_value": "A 1926 lithographed advertising poster shows how open space around one figure makes room for brand lettering, a pattern still used in posters and landing pages.",
+  "ambiguity": "Visible product and brand names are historical and do not imply endorsement; the black coat also works as a silhouette.",
+  "subjects": ["poster", "woman", "lettering"]
+ }
+]

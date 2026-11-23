@@ -1,0 +1,236 @@
+{
+ "judge": "1",
+ "briefs": [
+  {
+   "id": "p01",
+   "X": {
+    "fit": 4,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Hammershoi Randers file PD",
+     "Monk by the Sea PD"
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Silhouette eines Steinwaelzers CC BY 4.0, 3365x3365",
+     "Slovenian Sunset CC BY 2.0"
+    ]
+   },
+   "winner": "tie",
+   "why": "Both pairs give a lone small figure and open space for the title; X is more painterly, Y more literal about the left-side space, neither clearly better."
+  },
+  {
+   "id": "p02",
+   "X": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Thomas Webster A Village Choir PD",
+     "Watoto Church Choir CC0 (dated 2026-07-30)"
+    ]
+   },
+   "Y": {
+    "fit": 3,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, The Organ Rehearsal MET CC0",
+     "Watoto Church Choir CC0"
+    ]
+   },
+   "winner": "X",
+   "why": "X's Webster shows a crowded church choir singing together, while Y's Lerolle is one singer with a few listeners and misses 'lots of voices'."
+  },
+  {
+   "id": "p03",
+   "X": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Seeing stars ESO CC BY 4.0",
+     "IRAM telescope CC BY-SA 4.0, share-alike correctly flagged"
+    ]
+   },
+   "Y": {
+    "fit": 3,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Cleveland open-access API 1927.477.10: Everywhere Eyeballs are Aflame, 1888, CC0",
+     "commons API: exists, Backlit laptop keyboard CC0"
+    ]
+   },
+   "winner": "X",
+   "why": "X's two telescopes give 'watchful' without tech clichés; Y's Redon eye is strong but the glowing keyboard sits close to the stock-tech cliché the brief warns against."
+  },
+  {
+   "id": "p04",
+   "X": {
+    "fit": 5,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Fishermen salmon catch c.1900 PD",
+     "Alaska salmon jumping PD, 3658x2400; provenance caveat is reasonable"
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Fishermen salmon catch PD",
+     "Sockeye salmon sun glistening PD but only 658x434, too small for a printed cover and not flagged"
+    ]
+   },
+   "winner": "X",
+   "why": "Same then/now idea and same historic photo, but X's 'now' image has print-usable resolution while Y's sockeye is only 658 px wide."
+  },
+  {
+   "id": "p05",
+   "X": {
+    "fit": 5,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Domaci hljeb CC BY-SA 4.0, 900x1600 portrait; share-alike noted",
+     "Berckheyde The Baker PD"
+    ]
+   },
+   "Y": {
+    "fit": 3,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Odd one out CC BY 2.0",
+     "Loaves of Bread (Unsplash) CC0"
+    ]
+   },
+   "winner": "X",
+   "why": "X found a photo of one dark loaf standing out from pale ones, which is the brief itself; Y offers sneakers as a layout idea plus a generic bread shelf."
+  },
+  {
+   "id": "p06",
+   "X": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Met API 436593: Fantastic Landscape, Guardi, isPublicDomain true",
+     "AIC API 71971: Mist Rising at Sunset in the Catskills, is_public_domain true (artic.edu page 403 to WebFetch, checked via API)"
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Hobbema 001 PD",
+     "commons API: exists, Amboy Route 66 CC BY-SA 4.0, 5065x2570; share-alike noted"
+    ]
+   },
+   "winner": "Y",
+   "why": "Y's two one-point-perspective roads pull the eye to the horizon more forcefully and clearly than X's capriccio and sunset."
+  },
+  {
+   "id": "p07",
+   "X": {
+    "fit": 5,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Moonlight, Wood Island Light PD",
+     "Sidi Bou Afi lighthouse CC BY-SA 4.0, 3503x5253 portrait; share-alike caveat correct"
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Moonlight, Wood Island Light PD",
+     "Cleveland API 1927.477.5: He Raises the Bronze Urn, 1888, CC0"
+    ]
+   },
+   "winner": "X",
+   "why": "Both use the Homer, but X's second pick is a portrait-format lighthouse with visible beams, while Y's Redon matches only the light-and-dark idea, not the setting."
+  },
+  {
+   "id": "p08",
+   "X": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "AIC API 16564: Monet Branch of the Seine near Giverny (Mist), PD",
+     "AIC API 10926: Hiroshige Mishima Morning Mist, PD"
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Whistler Nocturne Blue and Silver Chelsea PD",
+     "commons API: exists, Hammershoi Moonlight Strandgade 30 CC0"
+    ]
+   },
+   "winner": "Y",
+   "why": "Both Y picks are near-empty and low-contrast; X's Hiroshige has a busy foreground that X itself says to leave out."
+  },
+  {
+   "id": "p09",
+   "X": {
+    "fit": 3,
+    "reasoning": 3,
+    "licence": 5,
+    "verified": [
+     "AIC API 39609: Denon Profile Portrait of the Printers, PD",
+     "SAAM page 79388: Taft medal, 'Free to use' (Smithsonian Open Access)"
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 5,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Meeting of Waters (Manaus) CC0",
+     "commons API: exists, Confluence Arve/Rhone CC BY 4.0, 7500x4219"
+    ]
+   },
+   "winner": "Y",
+   "why": "Y's river confluences show 'different but one channel' at a glance; X's double portrait and medal need explaining."
+  },
+  {
+   "id": "p10",
+   "X": {
+    "fit": 5,
+    "reasoning": 3,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Turner Rain Steam and Speed PD",
+     "commons API: exists, Night Light Trail Lagos CC BY-SA 4.0; picked without viewing, as X admits"
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "commons API: exists, Frigate Bird Silhouette CC BY 4.0",
+     "commons API: exists, Turner PD"
+    ]
+   },
+   "winner": "X",
+   "why": "X's Lagos light trails tie the motion to an emerging-market city, which Y's frigate bird does not, though X admits it never viewed that image."
+  }
+ ],
+ "overall": "Every source URL resolved and every licence and may_publish claim matched the source (Commons extmetadata, Met, AIC, Cleveland and Smithsonian records), so licence accuracy did not separate the two; both flagged CC BY-SA share-alike and personality rights where they applied. The difference was fit: X more often found an image that literally contains the brief (a seeded loaf among pale ones, a crowded church choir, a portrait lighthouse, Lagos traffic), while Y was stronger on pure compositional metaphors (perspective roads, river confluences, near-empty nocturnes). Y sometimes offered a layout analogy from an unrelated subject (sneakers) or a weaker second pick (keyboard, Redon urn). Reasoning quality was similar and mostly concrete on both sides; X lost a point for admitting it chose one image unseen, and Y missed that its sockeye image is too small for a cover."
+}

@@ -119,7 +119,7 @@ export default function Connections({ focus }: { focus: string }) {
           return <div className="row" key={t.id}><a href={navigate(`technique:${t.id}`)}>{t.name}</a><span className="mono">{shown} of {total} shown</span>
             {shown < total && (start === `technique:${t.id}` && limit < 200 ? <button type="button" className="small" onClick={() => go('connections', { focus: start, view, limit: Math.min(200, limit + 12), trail: trail.join('|') })}>Show more examples</button>
               : <a href={navigate(`technique:${t.id}`)}>Explore examples</a>)}
-            <a href={href('', { technique: t.id, from: context })}>View all {total} in library</a></div>
+            <a href={href('library', { technique: t.id, from: context })}>View all {total} in library</a></div>
         })}
         {!examples.length && <p>No examples yet. <a href={href('find', { technique: start.startsWith('technique:') ? start.slice(10) : undefined })}>Find images</a> to grow this part of your library.</p>}
       </section>

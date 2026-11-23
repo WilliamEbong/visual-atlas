@@ -1,0 +1,23 @@
+{
+ "schema_version": 1,
+ "author": "Claude (mood-goals task), written before the mood goals were added",
+ "status": "Provisional model-authored judgments; not expert ground truth. Written before any cue was chosen; cues were not tuned to these texts afterwards.",
+ "created": "2026-11-23",
+ "note": "Energetic briefs (m03, m04) expect suggest-motion, which already covers energy (decided from the taxonomy, not from results). m13 added with the wistful goal before its cues were run.",
+ "policy": "goals lists the mood goal the brief asks the picture to carry. Other goals the brief may also want are not penalised by this set.",
+ "cases": [
+  {"id": "m01", "text": "Poster for a community choir concert in a church, warm and communal.", "goals": ["feel-warm"]},
+  {"id": "m02", "text": "Flyer for the village harvest supper: everyone round one long table, the kind of evening that makes you feel at home.", "goals": ["feel-warm"]},
+  {"id": "m03", "text": "Launch campaign for a new boxing gym. It has to be punchy and high-octane, all adrenaline.", "goals": ["suggest-motion"]},
+  {"id": "m04", "text": "Opening slide for a festival of street dance, loud, lively and buzzing with life.", "goals": ["suggest-motion"]},
+  {"id": "m05", "text": "Cover for our annual report to shareholders. Serious, authoritative, nothing frivolous.", "goals": ["feel-serious"]},
+  {"id": "m06", "text": "Header image for a law firm's page on compliance, it should feel trustworthy and dependable.", "goals": ["feel-serious"]},
+  {"id": "m07", "text": "Playful flyer for the school's kids' book fair, silly and fun.", "goals": ["feel-playful"]},
+  {"id": "m08", "text": "Social post for an ice-cream van's summer tour, cheeky and whimsical, make people grin.", "goals": ["feel-playful"]},
+  {"id": "m09", "text": "Magazine ad for a luxurious new perfume, elegant and refined.", "goals": ["feel-luxurious"]},
+  {"id": "m10", "text": "Hero image for a five-star hotel's spring offer; it should feel exclusive, opulent, high-end.", "goals": ["feel-luxurious"]},
+  {"id": "m11", "text": "Calm image for a wellness slide about breathing exercises.", "goals": ["create-calm"]},
+  {"id": "m12", "text": "Background for a mindfulness app's sleep screen, soft and soothing, slowing everything down.", "goals": ["create-calm"]},
+  {"id": "m13", "text": "Cover for a memoir about leaving home, quiet and bittersweet, the empty platform after the train has gone.", "goals": ["feel-wistful"]}
+ ]
+}

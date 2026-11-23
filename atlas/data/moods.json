@@ -1,0 +1,141 @@
+{
+ "about": "Moods each starter picture itself conveys, judged from its pixels by a reviewer; a mood brief prefers pictures that carry the mood. Only the goals listed in \"goals\" are gated by these tags; calm and motion are produced by composition, so their techniques still serve them.",
+ "goals": [
+  "feel-warm",
+  "feel-serious",
+  "feel-playful",
+  "feel-luxurious",
+  "feel-wistful"
+ ],
+ "moods": {
+  "aic:16564": [
+   "create-calm"
+  ],
+  "aic:71971": [
+   "create-calm"
+  ],
+  "aic:10926": [
+   "create-calm"
+  ],
+  "aic:103302": [
+   "create-calm"
+  ],
+  "aic:11": [
+   "feel-serious"
+  ],
+  "aic:111": [
+   "feel-serious"
+  ],
+  "aic:27": [
+   "feel-wistful"
+  ],
+  "aic:27992": [
+   "create-calm"
+  ],
+  "aic:65": [
+   "create-calm"
+  ],
+  "aic:9": [
+   "feel-luxurious"
+  ],
+  "aic:16": [
+   "suggest-motion"
+  ],
+  "aic:12007": [
+   "feel-wistful"
+  ],
+  "met:219376": [
+   "feel-luxurious"
+  ],
+  "met:42138": [
+   "feel-luxurious"
+  ],
+  "met:334690": [
+   "feel-playful"
+  ],
+  "cma:109200": [
+   "feel-wistful"
+  ],
+  "cma:170828": [
+   "feel-luxurious",
+   "feel-playful"
+  ],
+  "cma:124084": [
+   "feel-warm"
+  ],
+  "cma:118931": [
+   "create-calm"
+  ],
+  "smithsonian:ld1-1643381040022-1643381067909-0": [
+   "feel-serious",
+   "feel-luxurious"
+  ],
+  "smithsonian:ld1-1643398738600-1643398743692-0": [
+   "feel-serious"
+  ],
+  "aic:39903": [
+   "feel-serious"
+  ],
+  "commons:89915033": [
+   "feel-playful"
+  ],
+  "commons:95146237": [
+   "suggest-motion"
+  ],
+  "commons:88194558": [
+   "create-calm"
+  ],
+  "commons:113625810": [
+   "feel-serious"
+  ],
+  "commons:108924712": [
+   "feel-playful"
+  ],
+  "commons:821174": [
+   "feel-playful"
+  ],
+  "commons:78985578": [
+   "feel-serious"
+  ],
+  "commons:32217474": [
+   "feel-serious"
+  ],
+  "commons:122361807": [
+   "suggest-motion"
+  ],
+  "met:334197": [
+   "feel-luxurious"
+  ],
+  "commons:54368989": [
+   "suggest-motion"
+  ],
+  "commons:88261490": [
+   "feel-warm"
+  ],
+  "commons:21049148": [
+   "feel-playful",
+   "suggest-motion"
+  ],
+  "cma:152499": [
+   "create-calm"
+  ],
+  "commons:152783": [
+   "create-calm"
+  ],
+  "aic:30113": [
+   "suggest-motion"
+  ],
+  "met:56689": [
+   "create-calm"
+  ],
+  "aic:26605": [
+   "suggest-motion"
+  ],
+  "cma:159609": [
+   "feel-serious"
+  ],
+  "cma:172504": [
+   "feel-wistful"
+  ]
+ }
+}
