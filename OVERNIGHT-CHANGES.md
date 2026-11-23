@@ -3,6 +3,42 @@
 Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. Round 1: 13 commits on top of `f9e400c`; round 2 added more (see `git log d6117cf..HEAD`). Nothing has been pushed, merged, tagged or
 released, and the version number is unchanged (0.4.0).
 
+## Design pass (23 November, after your note on UI/UX for the apps)
+
+**How it was run.** Every journey was captured at 1440 px and 375 px (`design-review/r3/before-*`). Seven
+fresh-context Opus reviewers each took one lens: first impression and identity (the William Web Design reviewer),
+hierarchy and type (with `impeccable` and `frontend-design`), pictures and credits (`taste-skill`), words
+(`design:ux-copy`, `humanizer`), flow and states (`design:design-critique`), accessibility
+(`design:accessibility-review`, contrast computed from the tokens), and a designer on a two-hour deadline. Fixes went
+in four batches, each checked in the browser; then a second round of three fresh reviewers
+(`design-review/r3/after-*`) and a third round of two (`design-review/r3/final-*`).
+
+**What changed, and who notices**
+| Change | Who notices |
+|---|---|
+| Ask opens on pictures: a sample answer before you type | everyone opening Ask |
+| "Ways to do it" pictures are not repeated below; one picture per numbered series | everyone who asks |
+| Reasons read as technique, a state mark (○ ◐ ●) and the evidence, without lab wording | everyone who asks |
+| A brief the atlas could not read shows the goal choices and no stray word match | anyone with a business or mood brief |
+| Goal chips are square, fold away once the brief is read, and goals read from the brief say so | anyone correcting a reading |
+| A next step after every answer: start a project from the brief (named for you), or find more images | everyone who asks |
+| Opening an image from an answer leads back to the answer, and the nav says Ask | everyone who asks |
+| Image page in catalogue order, a plain line on what you may do with the picture, checks in words, no model or vendor names in the readings, evidence not repeated | everyone opening an image |
+| Captions under each figure on technique pages and strips; file-name noise and camera timestamps removed from titles | everyone browsing |
+| Library: the five boxed "ways in" only for a new library; two pictures per row on a phone (page half as long) | every Library visit |
+| Collapsed sections show + / − | everyone |
+| Keyboard focus visible on every thumbnail; each new page starts at the top with focus on its content | keyboard and screen-reader users |
+| Field borders, caption grey and dark-mode region tags meet WCAG AA | low-vision users |
+| Finished jobs say so in the top bar; plain job states and assistant names; Compare says when it is full | anyone running Find or Grow |
+| One vocabulary for review states: proposed by a model / agreed by a second model / confirmed by you | everyone |
+
+Screenshots: before `design-review/r3/before-*`, after the first passes `after-*`, current `final-*`.
+
+**Left on purpose** (fringe, or needs a decision): a spacing and type scale token refactor (many small inline values;
+no single screen is wrong enough to notice); Explore goal cards without pictures; Find's two sets of goal controls
+(changing it touches how Find reads a request); the Settings source table's exact rules; Connections map
+(cytoscape) redrawn as SVG.
+
 ## Round 2 (23 November, after your approval to keep going)
 
 **The headline is a negative result.** In a proxy of your blind test, Opus judges preferred an Opus agent

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextIndex, nextPages, toQuery } from './library'
-import { cleanTitle } from './library'
+import { briefName, cleanMaker, cleanTitle } from './library'
 
 describe('justified grid keyboard movement', () => {
   // two rows of different lengths: [0 wide][1][2] / [3][4 wide]
@@ -79,5 +79,14 @@ describe('cleanTitle', () => {
     expect(cleanTitle('Alice 05a-1116x1492')).toBe('Alice 05a')
     expect(cleanTitle('Tube map 1908.jpg')).toBe('Tube map 1908')
     expect(cleanTitle('Frigate Bird Silhouette Against St Lucia Sunset 5746')).toBe('Frigate Bird Silhouette Against St Lucia Sunset 5746')
+  })
+})
+
+describe('cleanMaker and briefName', () => {
+  it('reads like a catalogue and like a name', () => {
+    expect(cleanMaker('Unknown author Unknown author')).toBe('')
+    expect(cleanMaker('Wilfredor')).toBe('Wilfredor')
+    expect(briefName('Poster for a choir concert in a church, warm and communal')).toBe('Poster for a choir concert in a church')
+    expect(briefName('A calm opening slide for a talk about burnout and rest at work')).toBe('A calm opening slide for a talk')
   })
 })

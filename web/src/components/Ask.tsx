@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { protectedImage, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { cleanTitle } from '../lib/library'
+import { cleanMaker, cleanTitle } from '../lib/library'
 import { go, href, useRoute } from '../lib/router'
 import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
@@ -101,6 +101,7 @@ export default function Ask() {
   return (
     <>
       <PageHead kicker="Ask the atlas" title="What should the picture do?" />
+      {!asked && <p className="lede under">Describe the picture you need. You get ways to do it and pictures that show them, each with its reason and licence. No AI is used.</p>}
       <form className="ask-form under" onSubmit={(event) => { event.preventDefault(); set({ q: text.trim(), goals: '' }) }}>
         <label className="field ask-brief">Describe the picture you need and what it is for
           <textarea rows={3} value={text} maxLength={4000} onChange={(event) => setText(event.target.value)}
@@ -130,22 +131,24 @@ export default function Ask() {
         ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
       {!asked && <SampleAnswer brief={EXAMPLES[0]} open={() => set({ q: EXAMPLES[0], goals: '' })} />}
-      {!asked && <p className="lede" style={{ marginTop: 40 }}>Describe what the picture should do. You get ways to do it and pictures that show them, each with its reason and licence. Nothing is sent to an AI service.</p>}
+
     </>
   )
 }
 
 /** The empty page shows what an answer looks like, with pictures, before anyone types. */
 function SampleAnswer({ brief, open }: { brief: string; open: () => void }) {
-  const sample = useData<DeskAnswer>(`desk?${new URLSearchParams({ brief, limit: '5' })}`)
-  if (!sample.data?.results.length) return null
+  const sample = useData<DeskAnswer>(`desk?${new URLSearchParams({ brief, limit: '20' })}`)
+  // Only pictures whose reading a second model or a person checked: the first screen must judge well.
+  const checked = (sample.data?.results ?? []).filter((ref) => /agreed by a second model|confirmed by you/.test(ref.reasons[0] ?? '')).slice(0, 5)
+  if (!checked.length) return null
   return (
     <section className="section sample" aria-labelledby="sample-title" style={{ marginTop: 40 }}>
       <div className="section-title">
         <h2 id="sample-title">For example: “{brief}”</h2>
         <button type="button" className="quiet" onClick={open}>See the whole answer</button>
       </div>
-      <RefStrip refs={sample.data.results} from="#/ask" use="reference" label="Pictures from a sample answer" />
+      <RefStrip refs={checked} from="#/ask" use="reference" label="Pictures from a sample answer" />
     </section>
   )
 }
@@ -214,7 +217,7 @@ function Plates({ refs, from, small, use }: { refs: DeskRef[]; from: string; sma
           <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
           {ref.layer !== 'library' && <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>}
           <span className="plate-title">{cleanTitle(ref.title)}</span>
-          {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${shortDate(ref.date)}` : ''}</span>}
+          {cleanMaker(ref.creator) && <span className="maker">{cleanMaker(ref.creator)}{ref.date ? `, ${shortDate(ref.date)}` : ''}</span>}
         </a>
         <p className="reason" title={ref.reasons.join('\n')}><Reason text={ref.reasons[0]} /></p>
         <p className="licence-line">{plainLicence(ref)}</p>
@@ -284,18 +287,19 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
       </section>}
       <section className="section" aria-labelledby="refs-title" style={{ marginTop: 56 }}>
         <div className="section-title">
-          <h2 id="refs-title">{shown.size ? 'More references' : missed && strong.length === 0 ? 'No references yet' : 'References'}</h2>
+          <h2 id="refs-title">{shown.size ? 'More references' : missed && strong.length === 0 ? 'Nothing matches a technique yet' : 'References'}</h2>
           <p className="mono">{rest.length && !(missed && strong.length === 0) ? `${rest.length}${shown.size ? ' more' : ''} of ${data.total_matches} matches` : ''}
             {use === 'publish' ? ' · free to publish with credit' : ''}</p>
         </div>
-        {missed && strong.length === 0 && shown.size === 0 ? <><p className="lede">Nothing fits until you pick what the picture should do, above, or find new images for this brief.</p>
+        {missed && strong.length === 0 && shown.size === 0 ? <><p className="lede">Pick what the picture should do, above, or find new images for this brief.</p>
           {weak.length > 0 && <details className="weak"><summary className="mono">{weak.length} picture{weak.length === 1 ? '' : 's'} matched only on words</summary>
             <Plates refs={weak} from={from} use={use} small /></details>}</>
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
           : <>
-            {strong.length > 0 && <Plates refs={strong} from={from} use={use} />}
+            {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model</p>
+              <Plates refs={strong} from={from} use={use} /></>}
             {weak.length > 0 && (strong.length + shown.size >= 3
               ? <details className="weak"><summary className="mono">{weak.length} more matched only on words, not on a technique</summary>
                 <Plates refs={weak} from={from} use={use} small /></details>

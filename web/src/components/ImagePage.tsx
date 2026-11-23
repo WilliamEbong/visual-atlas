@@ -111,7 +111,7 @@ export default function ImagePage({ id }: { id: number }) {
         <div className="image-title">
           <h1 id="image-title">{image.title}</h1>
           <p className="muted">{[image.creator || 'Unknown maker', image.date_text].filter(Boolean).join(' · ')}</p>
-          <p className="mono">{[image.medium, PROVIDERS[image.provider] ?? image.provider, `Fig. ${image.id}`].filter(Boolean).join(' · ')}</p>
+          <p className="mono">{[image.medium, PROVIDERS[image.provider] ?? image.provider].filter(Boolean).join(' · ')}</p>
           {rights && <p className="mono" style={{ color: 'var(--green)' }}>{rights.label} · {date(rights.verified_at)}</p>}
           <div className="row" style={{ marginTop: 6 }}>
             {!readOnly && <SaveToCollection imageId={image.id} member={data.collections} onDone={reload} />}
@@ -165,8 +165,9 @@ export default function ImagePage({ id }: { id: number }) {
               <p className="provenance" title={[a.proposed_backend && `Proposed by ${backendName(a.proposed_backend)}`,
                 a.changed_by !== 'human' && `Last checked by ${who(a.changed_by)}`].filter(Boolean).join(' · ')}>{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
                 ? 'proposed by a model' : 'added by you'}
-                {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ' · checked by a second model' : ''}
-                {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}{a.note ? ` · ${a.note}` : ''}</p>
+
+                {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}</p>
+              {a.note && <p className="provenance"><strong>Second reading:</strong> {a.note.replace(/^second model (agreed|disagreed):\s*/i, '')}</p>}
               {!readOnly && (editing === a.technique_id
                 ? <TechniqueForm title="Correct this reading" fixed={a.technique_id} initialEvidence={a.evidence.join('\n')} initialEffect={a.effect}
                     onSave={(_, evidence, effect) => decide(a, 'human_reviewed', { evidence, effect })} onCancel={() => setEditing(null)} />

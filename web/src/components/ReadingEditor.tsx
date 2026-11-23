@@ -7,6 +7,7 @@ export default function ReadingEditor({ reading, value, onChange }: {
   const { taxonomy } = useApp()
   const current = value ?? { technique_ids: reading?.techniques.map((t) => t.id) ?? [],
     goal_ids: reading?.goals.map((g) => g.id) ?? [], subject_terms: reading?.subject_terms ?? [] }
+  if (!reading && !value) return null  // nothing typed yet: nothing to show
   const names = (kind: 'techniques' | 'goals', ids: string[]) => ids.map((id) => taxonomy?.[kind].find((t) => t.id === id)?.name ?? id).join(', ')
   return <section aria-label="Interpretation" className="stack" style={{ gap: 12 }}>
     <div className="mono" aria-live="polite">

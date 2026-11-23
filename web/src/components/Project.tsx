@@ -1,3 +1,4 @@
+import { briefName } from '../lib/library'
 import { useEffect, useState } from 'react'
 import { del, media, post, put, readOnly, request } from '../lib/client'
 import { date, useData } from '../lib/hooks'
@@ -40,7 +41,7 @@ export default function Project({ id }: { id?: number }) {
 
 function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: number) => void; onCancel?: () => void }) {
   const fromAsk = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('text') ?? ''
-  const [title, setTitle] = useState(brief?.title ?? fromAsk.split(/\s+/).slice(0, 6).join(' ').replace(/[:,.;]+$/, ''))
+  const [title, setTitle] = useState(brief?.title ?? briefName(fromAsk))
   const [text, setText] = useState(brief?.text ?? fromAsk)
   const { fail } = useNotice()
   async function save(event: React.FormEvent) {

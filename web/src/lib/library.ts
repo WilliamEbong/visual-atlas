@@ -123,3 +123,16 @@ export function backendName(name: string): string {
 }
 export const JOB_STATE: Record<string, string> = { queued: 'Waiting', running: 'Working', cancelling: 'Stopping', paused: 'Paused',
   done: 'Finished', failed: 'Stopped', cancelled: 'Cancelled' }
+
+/** A maker as a catalogue prints it: "Unknown author Unknown author" → "", a phrase said twice said once. */
+export function cleanMaker(maker?: string | null): string {
+  const once = (maker ?? '').trim().replace(/^(.+?)\s+\1$/i, '$1')
+  return /^unknown (author|artist|maker)$/i.test(once) ? '' : once
+}
+
+/** A short name from a brief: up to the first comma, colon or full stop, at most eight words, never ending on "in". */
+export function briefName(text: string): string {
+  let name = text.split(/[,:;.!?\n]/)[0].trim().split(/\s+/).slice(0, 8).join(' ')
+  while (/\s(in|for|of|a|an|the|and|with|to|on|at|about)$/i.test(name)) name = name.replace(/\s+\S+$/, '')
+  return name
+}

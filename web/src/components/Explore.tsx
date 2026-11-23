@@ -35,7 +35,7 @@ function ExploreIndex({ from }: { from: string | null }) {
             <a key={goal.id} className="drawer" href={href(`explore/goal/${goal.id}`, { from })}>
               <span className="letter" aria-hidden="true">{index + 1}</span>
               <span><strong>{goal.name}</strong><span className="text">{goal.description}</span>
-                <span className="mono" style={{ display: 'block', marginTop: 6 }}>{taxonomy.techniques.filter((t) => t.goals.includes(goal.id)).length} techniques</span></span>
+                <span className="mono" style={{ display: 'block', marginTop: 6 }}>{taxonomy.techniques.filter((t) => t.goals.includes(goal.id)).length} technique{taxonomy.techniques.filter((t) => t.goals.includes(goal.id)).length === 1 ? '' : 's'}</span></span>
             </a>))}
         </nav>
       </section>
@@ -129,7 +129,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         {data.examples.length === 0 ? <Empty title="No examples yet" actions={!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find examples</a>}>
           Find a few, and they will appear here with the evidence for each reading.</Empty> : <>
           <div className="strip captioned" style={{ marginTop: 22 }}>
-            {data.examples.slice(0, 12).map((e, i) => (
+            {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e, i) => (
               <figure key={e.id}>
                 <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: STRIP[i % STRIP.length], aspectRatio: aspect(e) }}>
                   <img src={media(e.thumb)} alt="" loading="lazy" /></a>

@@ -92,7 +92,7 @@ export default function Find() {
               <textarea rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} style={{ fontSize: 16 }}
                 placeholder="a quiet image where one small figure stands alone in a big empty landscape" /></label>
             {readingFailed && <p role="status" className="mono">The automatic reading is unavailable. Choose goals, techniques and subject words below, or continue with your original request.</p>}
-            <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />
+            {goal.trim() && <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />}
             <div className="filters">
               <label className="field">Goal<select value={goalId} onChange={(event) => setGoalId(event.target.value)}><option value="">Any</option>
                 {taxonomy?.goals.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
