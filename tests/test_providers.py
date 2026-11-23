@@ -169,3 +169,25 @@ def test_rijksmuseum_survives_list_shaped_dates_and_productions():
 
     found = providers.search(Stub(), 'rijksmuseum', 'poster', 0, 5)
     assert [(r['title'], r['date_text']) for r in found] == [('Poster', '1910'), ('Print', '1890')]
+
+
+@pytest.mark.parametrize('value, title', [
+    ('<div class="fn"><div style="font-size:0.9em;display:inline-block;">German:  <div style="display:inline-block" '
+     'dir="ltr" lang="de"><i>Allee von Middelharnis </i></div></div><br><div style="font-weight:bold;display:inline-block;">'
+     '<div style="display:inline-block" dir="ltr" lang="en"><i>The Avenue at Middelharnis</i></div></div>'
+     '<div style="display: none;">label QS:Lde-ch,"Allee"</div></div>', 'The Avenue at Middelharnis'),
+    ('The Arnolfini Portrait label QS:Lde-ch,"Arnolfini-Hochzeit" label QS:Len-gb,"Arnolfini Portrait"', 'The Arnolfini Portrait'),
+    ('Interior with Young Woman from Behind [ 1 ] or Young Woman from Behind . [ 2 ]', 'Interior with Young Woman from Behind'),
+    ('Rain, Steam and Speed - The Great Western Railway ; the painting depicts an early locomotive', 'Rain, Steam and Speed - The Great Western Railway'),
+])
+def test_commons_titles_are_one_clean_english_name(value, title):
+    """Found by blind judges (23 Nov 2026): credits carried language prefixes, Wikidata labels and descriptions."""
+    page = {'pageid': 1, 'index': 0, 'title': 'File:x.jpg', 'imageinfo': [{
+        'mime': 'image/jpeg', 'descriptionurl': 'https://commons.wikimedia.org/wiki/File:x.jpg',
+        'url': 'https://upload.wikimedia.org/x.jpg', 'extmetadata': {'ObjectName': {'value': value}}}]}
+
+    class Stub:
+        def get_json(self, provider, url, **kwargs):
+            return {'query': {'pages': [page]}}
+
+    assert providers.search(Stub(), 'commons', 'x', 0, 1)[0]['title'] == title

@@ -29,7 +29,7 @@ COMMONS_LICENCES = ('haswbstatement:P275=Q6938433|P275=Q20007257|P275=Q14947546|
 
 def _clip(value, limit=500) -> str:
     # Commons templates leak Wikidata residue such as "1812 date QS:P571,+1812-00-00T00:00:00Z/9".
-    text = re.sub(r'\s*\b(?:date|title|label)\s+QS:[PL]\w*,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
+    text = re.sub(r'\s*\b(?:date|title|label)\s+QS:[PL][\w-]*,(?:[a-z-]+:)?(?:"[^"]*"|\S*)\S*', '', plain(value))
     return text.strip()[:limit]
 
 
@@ -160,7 +160,7 @@ def _commons(fetcher, query, page, per_page):
         meta = info.get('extmetadata') or {}
         if info.get('mime') not in ('image/jpeg', 'image/png', 'image/webp'):
             continue
-        title = _clip((meta.get('ObjectName') or {}).get('value'), 300) or item.get('title', '').removeprefix('File:')
+        title = _commons_title((meta.get('ObjectName') or {}).get('value')) or item.get('title', '').removeprefix('File:')
         results.append({
             'provider': 'commons', 'provider_item_id': str(item.get('pageid')), 'title': title[:300],
             'creator': _clip((meta.get('Artist') or {}).get('value'), 200),
@@ -171,6 +171,17 @@ def _commons(fetcher, query, page, per_page):
             'raw': {'extmetadata': {k: {'value': (v or {}).get('value')} for k, v in meta.items()},
                     'width': info.get('width'), 'height': info.get('height')}})
     return results
+
+
+def _commons_title(value) -> str:
+    """One clean name from a Commons ObjectName: the English one when the template gives several languages, without
+    hidden Wikidata labels, footnote markers or a description run on after ' ; '. It becomes the credit line."""
+    text = re.sub(r'<div style="display:\s*none;?">.*?</div>', '', str(value or ''), flags=re.S)
+    english = re.search(r'<(\w+)[^>]*\blang="en"[^>]*>(.*?)</\1>', text, re.S)
+    title = _clip(english.group(2) if english else text, 300)
+    title = re.split(r'\s*\[\s*1\s*\]', title)[0]  # "Name [ 1 ] or Other name [ 2 ]": the first name
+    title = re.split(r'\s+;\s+', title)[0]  # "Name ; the painting depicts ...": the name only
+    return title.strip(' .;,')
 
 
 def _english(entries, classified: str | None = None) -> str:
