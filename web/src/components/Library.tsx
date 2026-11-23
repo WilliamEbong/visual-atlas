@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { activeCount, activeFilters, apiPath, appendPage, aspect, EMPTY, fromQuery, nextByPosition, nextPages, PAGE, toQuery, type Filters, type Pages } from '../lib/library'
+import { activeCount, activeFilters, apiPath, appendPage, aspect, cleanTitle, EMPTY, fromQuery, nextByPosition, nextPages, PAGE, toQuery, type Filters, type Pages } from '../lib/library'
 import { go, href } from '../lib/router'
 import type { LibraryItem, Settings } from '../lib/types'
 import { PROVIDERS } from '../lib/types'
@@ -202,7 +202,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
                     <a className="plate" href={href(`image/${item.id}`, { from })}>
                       <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" decoding="async" /></span>
                       <span className="fig">Fig. {item.id}{plateState(item) ? `  ${plateState(item)}` : ''}</span>
-                      <span className="plate-title">{item.title}</span>
+                      <span className="plate-title">{cleanTitle(item.title)}</span>
                       <span className="maker">{[item.creator, item.date_text].filter(Boolean).join(', ') || 'Unknown maker'}</span>
                       <span className="techs">{item.techniques.slice(0, 3).map((t) => t.name.replace(/ \(.*\)$/, '')).join(' · ') || (item.status === 'pending' ? 'Waiting for analysis' : 'No technique yet')}</span>
                     </a>

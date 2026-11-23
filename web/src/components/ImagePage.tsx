@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { del, media, post, readOnly, request } from '../lib/client'
 import { date, useApp, useData } from '../lib/hooks'
-import { aspect } from '../lib/library'
+import { aspect, cleanTitle } from '../lib/library'
 import { regionBox, regionLabel } from '../lib/regions'
 import { go, href, useRoute } from '../lib/router'
 import type { Annotation, Collection, ImageDetail, Settings } from '../lib/types'
@@ -112,9 +112,9 @@ export default function ImagePage({ id }: { id: number }) {
           })}
         </figure>
         <div className="image-title">
-          <p className="mono">Fig. {image.id} · {PROVIDERS[image.provider] ?? image.provider}{image.medium ? ` · ${image.medium}` : ''}</p>
           <h1 id="image-title">{image.title}</h1>
           <p className="muted">{[image.creator || 'Unknown maker', image.date_text].filter(Boolean).join(' · ')}</p>
+          <p className="mono">{[image.medium, PROVIDERS[image.provider] ?? image.provider, `Fig. ${image.id}`].filter(Boolean).join(' · ')}</p>
           {rights && <p className="mono" style={{ color: 'var(--green)' }}>{rights.label} · {date(rights.verified_at)}</p>}
           <div className="row" style={{ marginTop: 6 }}>
             {!readOnly && <SaveToCollection imageId={image.id} member={data.collections} onDone={reload} />}
@@ -183,20 +183,25 @@ export default function ImagePage({ id }: { id: number }) {
         </section>
 
         {rights && <aside className="use" aria-labelledby="use">
-          <h2 id="use" className="ruled-title rule-green">Usage and credits</h2>
+          <h2 id="use" className="ruled-title rule-green">Usage and credit</h2>
           <div className="slip" style={{ marginTop: 16 }}>
             <p className="credit">{rights.required_attribution}</p>
             <button type="button" className="small" style={{ marginTop: 14, background: 'var(--ground)' }}
               onClick={() => navigator.clipboard.writeText(rights.required_attribution).then(() => notify('Credit copied.'), fail)}>Copy credit</button>
           </div>
+          <p className="use-line">{['cc0', 'pd', 'pdm'].includes(rights.license_code.toLowerCase()) ? 'Free to use in your work; credit appreciated'
+            : rights.license_code.toUpperCase().startsWith('CC BY') ? 'Free to use in your work with the credit above' : rights.label}</p>
           <dl className="facts">
             <dt>Licence</dt><dd><a href={rights.license_url} target="_blank" rel="noreferrer">{rights.license_code}{rights.license_version ? ` ${rights.license_version}` : ''}</a></dd>
-            <dt>Checked</dt><dd>{date(rights.verified_at)} against the {PROVIDERS[image.provider] ?? image.provider} record
-              ({Object.entries(rights.evidence).filter(([k]) => !/url|Url|image/i.test(k)).map(([k, v]) => `${k} = ${String(v).slice(0, 40)}`).join('; ')})</dd>
-            <dt>Allowed</dt><dd>{rights.permitted_mode}</dd>
+            <dt>Checked</dt><dd>{date(rights.verified_at)}, from {PROVIDERS[image.provider] ?? image.provider}'s own record</dd>
             {rights.restrictions && <><dt>Notes</dt><dd>{rights.restrictions}</dd></>}
-            <dt>File</dt><dd className="mono">SHA-256 {image.file_sha256.slice(0, 16)}…</dd>
           </dl>
+          <details style={{ marginTop: 12 }}><summary className="mono">What was checked</summary>
+            <dl className="facts">
+              <dt>Record</dt><dd className="mono">{Object.entries(rights.evidence).filter(([k]) => !/url|Url|image/i.test(k)).map(([k, v]) => `${k} = ${String(v).slice(0, 40)}`).join('; ')}</dd>
+              <dt>This app may</dt><dd>{rights.permitted_mode}</dd>
+              <dt>File</dt><dd className="mono">SHA-256 {image.file_sha256.slice(0, 16)}…</dd>
+            </dl></details>
           <p className="mono" style={{ marginTop: 12 }}>Labels say what was checked; they are not legal advice. Check the source before publishing.</p>
           {image.description && <details style={{ marginTop: 16, borderTop: '1px solid var(--hair)', paddingTop: 8 }}>
             <summary>From the source record</summary>
@@ -209,16 +214,15 @@ export default function ImagePage({ id }: { id: number }) {
       {data.related.length > 0 && <section className="section" aria-labelledby="related">
         <div className="section-title">
           <h2 id="related">{shown ? `Also shows ${nameOf(shown).replace(/ \(.*\)$/, '').toLowerCase()}` : 'Related images'}</h2>
-          {relatedTechniques.length > 1 && <div className="tabs" role="tablist" aria-label="Related by technique">
-            {relatedTechniques.slice(0, 5).map((t) => <button key={t} type="button" role="tab" aria-selected={t === shown} onClick={() => setTab(t)}>{nameOf(t).replace(/ \(.*\)$/, '')}</button>)}
+          {relatedTechniques.length > 1 && <div className="tabs" role="group" aria-label="Related by technique">
+            {relatedTechniques.slice(0, 5).map((t) => <button key={t} type="button" aria-pressed={t === shown} onClick={() => setTab(t)}>{nameOf(t).replace(/ \(.*\)$/, '')}</button>)}
           </div>}
         </div>
-        <div className="strip" style={{ marginTop: 20 }}>
-          {related.map((r, index) => (
-            <a key={r.id} href={href(`image/${r.id}`, { from })} className="specimen" style={{ height: [200, 150, 176, 220, 132, 190][index % 6], aspectRatio: aspect(r) }} aria-label={r.title}>
-              <img src={media(r.thumb)} alt="" /></a>))}
-        </div>
-        <p className="mono strip-caption">{related.slice(0, 6).map((r) => r.title).join(' · ')}</p>
+        <ul className="ref-strip" style={{ marginTop: 20 }} aria-label="Related images">
+          {related.map((r) => <li key={r.id}>
+            <a href={href(`image/${r.id}`, { from })} className="specimen" style={{ aspectRatio: aspect(r) }}><img src={media(r.thumb)} alt="" /></a>
+            <span className="strip-label">{cleanTitle(r.title)}</span></li>)}
+        </ul>
       </section>}
 
       <MoreLikeThis refId={`library:${image.id}`} from={window.location.hash} use={query.get('use') ?? 'reference'} />

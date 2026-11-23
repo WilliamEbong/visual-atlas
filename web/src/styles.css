@@ -180,8 +180,8 @@ legend { font: 12px/1.4 var(--mono); color: var(--caption); padding: 0; margin-b
 .region { position: absolute; border: 1px solid rgba(243, 239, 228, .85); box-shadow: 0 0 0 1px rgba(29, 28, 26, .35); pointer-events: none; transition: opacity .2s; opacity: 0; }
 .figure.regions-on .region { opacity: 1; }
 .region.lit { border: 2px solid var(--accent); box-shadow: 0 0 0 1px rgba(243, 239, 228, .7); opacity: 1; }
-.region-tag { position: absolute; left: -1px; top: -22px; background: var(--graphite); color: #F3EFE4; padding: 1px 6px; font: 12px var(--mono); }
-.region.lit .region-tag { background: var(--accent); }
+.region-tag { position: absolute; left: -1px; top: -22px; background: #3C3A35; color: #F3EFE4; padding: 1px 6px; font: 12px var(--mono); }
+.region.lit .region-tag { background: #A2573B; }
 .image-title { flex: 1 1 300px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .image-title h1 { font-size: clamp(32px, 3.4vw, 46px); line-height: 1.04; }
 .three { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 40px; margin-top: 44px; align-items: start; }
@@ -207,7 +207,7 @@ dl.facts dd { margin: 0; overflow-wrap: anywhere; }
 details > summary { cursor: pointer; font: 500 15px var(--label); min-height: 36px; display: flex; align-items: center; }
 .tabs { display: flex; gap: 22px; flex-wrap: wrap; border-bottom: 1px solid var(--hair); }
 .tabs button { border: 0; border-bottom: 2px solid transparent; padding: 10px 0; min-height: 40px; font: 15px var(--text); color: var(--graphite); }
-.tabs button[aria-selected="true"] { border-bottom-color: var(--ink); color: var(--ink); font-family: var(--label); font-weight: 500; }
+.tabs button[aria-pressed="true"] { border-bottom-color: var(--ink); color: var(--ink); font-family: var(--label); font-weight: 500; }
 .palette { display: flex; height: 16px; width: 160px; outline: 1px solid var(--hair); }
 .palette span { display: block; height: 100%; }
 
@@ -260,7 +260,7 @@ details > summary { cursor: pointer; font: 500 15px var(--label); min-height: 36
 
 /* ── dialogs ───────────────────────────────────────────────────────────── */
 dialog { border: 1px solid var(--rule-strong); background: var(--paper); color: var(--ink); max-width: min(560px, 92vw); padding: 28px; }
-dialog::backdrop { background: rgba(29, 28, 26, .45); }
+dialog::backdrop { background: rgba(29, 28, 26, .28); }
 dialog h2 { font-size: 30px; }
 dialog .row { justify-content: flex-end; margin-top: 20px; }
 
@@ -426,3 +426,4 @@ button.primary:disabled { opacity: 1; background: transparent; color: var(--capt
   .ask-controls button.primary { width: 100%; }
 }
 #content:focus, #content:focus-visible { outline: none; }  /* focused by script on each new page; not a control */
+.use-line { margin-top: 14px; font: 500 16px/1.4 var(--label); color: var(--ink); }

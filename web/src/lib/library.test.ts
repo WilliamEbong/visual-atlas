@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextIndex, nextPages, toQuery } from './library'
+import { cleanTitle } from './library'
 
 describe('justified grid keyboard movement', () => {
   // two rows of different lengths: [0 wide][1][2] / [3][4 wide]
@@ -69,5 +70,14 @@ describe('nextPages', () => {
     expect(pages.consumed).toBe(4)  // the next request asks for rows after these, not the same offset again
     expect(nextPages(pages, 'k', []).done).toBe(true)
     expect(nextPages(pages, 'other filters', [{ id: 1 }]).consumed).toBe(1)  // new filters start over
+  })
+})
+
+describe('cleanTitle', () => {
+  it('drops file-name noise but keeps real titles', () => {
+    expect(cleanTitle('Slovenian Sunset (7027587519)')).toBe('Slovenian Sunset')
+    expect(cleanTitle('Alice 05a-1116x1492')).toBe('Alice 05a')
+    expect(cleanTitle('Tube map 1908.jpg')).toBe('Tube map 1908')
+    expect(cleanTitle('Frigate Bird Silhouette Against St Lucia Sunset 5746')).toBe('Frigate Bird Silhouette Against St Lucia Sunset 5746')
   })
 })

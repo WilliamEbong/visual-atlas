@@ -110,3 +110,9 @@ export function activeFilters(filters: Filters, names: Record<string, string>): 
   if (filters.collection) out.push({ label: 'In a collection', clear: { collection: 0 } })
   return out
 }
+
+/** A catalogue title without the noise of file names: "Slovenian Sunset (7027587519)" → "Slovenian Sunset",
+ *  "Alice 05a-1116x1492" → "Alice 05a", "…Sunset 5746" stays (it is part of the title). Display only. */
+export function cleanTitle(title: string): string {
+  return title.replace(/\s*\(\d{6,}\)$/, '').replace(/[-_ ]\d{2,5}x\d{2,5}(-\d+)?$/, '').replace(/\.(jpe?g|png|tiff?)$/i, '').trim() || title
+}

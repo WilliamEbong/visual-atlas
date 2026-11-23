@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { protectedImage, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
+import { cleanTitle } from '../lib/library'
 import { go, href, useRoute } from '../lib/router'
 import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
@@ -166,7 +167,7 @@ function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; l
       {refs.map((ref) => <li key={ref.ref}>
         <a href={refLink(ref, from, use)} className="specimen" style={{ aspectRatio: aspect(ref) }}>
           <RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></a>
-        <span className="strip-label">{ref.title}</span>
+        <span className="strip-label">{cleanTitle(ref.title)}</span>
         <span className="mono strip-meta">{layerLabel(ref)} · {plainLicence(ref)}</span>
       </li>)}
     </ul>
@@ -195,7 +196,7 @@ function Plates({ refs, from, small, use }: { refs: DeskRef[]; from: string; sma
         <a className="plate" href={refLink(ref, from, use)}>
           <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
           {ref.layer !== 'library' && <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>}
-          <span className="plate-title">{ref.title}</span>
+          <span className="plate-title">{cleanTitle(ref.title)}</span>
           {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${shortDate(ref.date)}` : ''}</span>}
         </a>
         <p className="reason" title={ref.reasons.join('\n')}><Reason text={ref.reasons[0]} /></p>
