@@ -98,7 +98,7 @@ References the reviewers cited:
 **Pass C: rows measured in code.** Commit `87b6b78`, reverted. A justified-layout function sized every row from the
 container's width. Both scorers called it the single biggest lever, provided it also balanced the last row, but the
 pass scored lower, so it was reverted as the rule requires. It can be restored with
-`git revert <the revert commit>`.
+`git revert fb5bae3`.
 
 **Stopped: three structural approaches did not raise the score.** Fresh scorers put every build since round 4
 between 6.8 and 7.1. This is what blocks a 9, from the eight reports of this cycle:
