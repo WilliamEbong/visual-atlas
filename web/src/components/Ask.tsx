@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { protectedImage, readOnly } from '../lib/client'
 import { useData } from '../lib/hooks'
 import { go, href, useRoute } from '../lib/router'
-import type { DeskAnswer, DeskRef } from '../lib/types'
+import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar, Taxonomy } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
 
 const EXAMPLES = ['A calm opening slide: one small figure in a lot of empty space',
@@ -13,15 +13,19 @@ const EXAMPLES = ['A calm opening slide: one small figure in a lot of empty spac
 /** A reference picture; layer pictures sit behind the launch token, so they are fetched rather than linked. */
 function RefImage({ src, alt }: { src: string | null; alt: string }) {
   const [shown, setShown] = useState<string | undefined>(src && !src.startsWith('/api/') ? src : undefined)
+  const [failed, setFailed] = useState(!src)
   useEffect(() => {
+    setFailed(!src)
     if (!src || !src.startsWith('/api/')) { setShown(src ?? undefined); return }
     let live = true
     let url: string | undefined
     protectedImage(src).then((value) => { url = value; if (live) setShown(value); else URL.revokeObjectURL(value) })
-      .catch(() => { if (live) setShown(undefined) })
+      .catch(() => { if (live) { setShown(undefined); setFailed(true) } })
     return () => { live = false; if (url) URL.revokeObjectURL(url) }
   }, [src])
-  return shown ? <img src={shown} alt={alt} loading="lazy" decoding="async" /> : <span className="sr-only">{alt}</span>
+  if (failed) return <span className="picture-missing mono" role="img" aria-label={`${alt} (picture unavailable)`}>Picture unavailable</span>
+  return shown ? <img src={shown} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />
+    : <span className="sr-only">{alt}</span>
 }
 
 const LAYER_NAMES: Record<string, string> = { library: 'Your library', generated: 'Generated examples', 'design-system': 'Design systems' }
@@ -55,14 +59,18 @@ export default function Ask() {
   const asked = route.query.get('q') ?? ''
   const use = route.query.get('use') === 'publish' ? 'publish' : 'reference'
   const off = (route.query.get('off') ?? '').split(',').filter(Boolean)
+  const goals = (route.query.get('goals') ?? '').split(',').filter(Boolean)
   const [text, setText] = useState(asked)
   useEffect(() => setText(asked), [asked])
   const limit = Math.min(40, Math.max(12, Number(route.query.get('limit')) || 12))
-  const query = new URLSearchParams({ brief: asked, use, limit: String(limit) })
+  const query = new URLSearchParams({ brief: asked, use })
   const wanted = Object.keys(LAYER_NAMES).filter((layer) => !off.includes(layer))
   if (off.length) query.set('layers', wanted.join(','))
-  const answer = useData<DeskAnswer>(!readOnly && asked.trim() ? `desk?${query}` : null)
-  const set = (changes: Record<string, string>) => go('ask', { q: asked, use, off: off.join(','), limit: '', ...changes })
+  if (goals.length) query.set('goals', goals.join(','))
+  const live = !readOnly && asked.trim()
+  const answer = useData<DeskAnswer>(live ? `desk?${query}&limit=${limit}` : null)
+  const ways = useData<DeskDirections>(live ? `desk/directions?${query}` : null)
+  const set = (changes: Record<string, string>) => go('ask', { q: asked, use, off: off.join(','), goals: goals.join(','), limit: '', ...changes })
   const from = window.location.hash
 
   if (readOnly) return <><PageHead kicker="Ask the atlas" title="What should the picture do?" />
@@ -72,11 +80,11 @@ export default function Ask() {
   return (
     <>
       <PageHead kicker="Ask the atlas" title="What should the picture do?" />
-      <form className="ask-form under" onSubmit={(event) => { event.preventDefault(); set({ q: text.trim() }) }}>
+      <form className="ask-form under" onSubmit={(event) => { event.preventDefault(); set({ q: text.trim(), goals: '' }) }}>
         <label className="field ask-brief">Describe the picture you need and what it is for
           <textarea rows={3} value={text} maxLength={4000} onChange={(event) => setText(event.target.value)}
             placeholder="For example: a calm opening slide with one small figure in a lot of empty space"
-            onKeyDown={(event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) set({ q: text.trim() }) }} />
+            onKeyDown={(event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) set({ q: text.trim(), goals: '' }) }} />
         </label>
         <div className="ask-controls">
           <fieldset>
@@ -91,12 +99,13 @@ export default function Ask() {
         </div>
         {!asked && <div className="examples" role="group" aria-label="Examples">
           <span className="mono">Try</span>
-          {EXAMPLES.map((example) => <button key={example} type="button" className="quiet" onClick={() => set({ q: example })}>{example}</button>)}
+          {EXAMPLES.map((example) => <button key={example} type="button" className="quiet" onClick={() => set({ q: example, goals: '' })}>{example}</button>)}
         </div>}
       </form>
       {asked && answer.error && <Failure message={answer.error} busy={answer.busy} retry={answer.reload} />}
       {asked && !answer.data && !answer.error && <Loading label="Reading your brief…" />}
-      {answer.data && <Answer data={answer.data} use={use} off={off} from={from} more={limit < 40 && answer.data.total_matches > limit
+      {answer.data && <Answer data={answer.data} ways={ways.data} goals={goals} use={use} off={off} from={from}
+        choose={(goal) => set({ goals: (goals.includes(goal) ? goals.filter((g) => g !== goal) : [...goals, goal]).join(',') })} more={limit < 40 && answer.data.total_matches > limit
         ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
       {!asked && <p className="lede" style={{ marginTop: 40 }}>The atlas reads your brief, names the techniques that could serve it,
@@ -105,25 +114,115 @@ export default function Ask() {
   )
 }
 
-function Answer({ data, use, off, from, toggle, more }: { data: DeskAnswer; use: string; off: string[]; from: string
-  toggle: (layer: string) => void; more?: () => void }) {
+/** What the picture should do, chosen by the person: the word reader misses paraphrase, a click does not. */
+function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: string[]; choose: (goal: string) => void; missed: boolean }) {
+  const taxonomy = useData<Taxonomy>('taxonomy')
+  if (!taxonomy.data) return null
+  return (
+    <div className="goal-choice" role="group" aria-labelledby="goal-choice-label">
+      <p id="goal-choice-label" className={missed ? 'goal-ask' : 'mono'}>{missed
+        ? 'The words did not say what the picture should do. Choose one or two:' : 'Adjust what it should do'}</p>
+      <div className="chips">
+        {taxonomy.data.goals.map((goal) => {
+          const on = chosen.includes(goal.id) || read.includes(goal.id)
+          return <button key={goal.id} type="button" className="chip" aria-pressed={on} title={goal.description}
+            disabled={on && !chosen.includes(goal.id)} onClick={() => choose(goal.id)}>{goal.name}</button>
+        })}
+      </div>
+    </div>
+  )
+}
+
+/** Thumbnails that open their reference; shared by Ways to do it and More like this. */
+function RefStrip({ refs, from, label }: { refs: DeskRef[]; from: string; label: string }) {
+  return (
+    <ul className="ref-strip" aria-label={label}>
+      {refs.map((ref) => <li key={ref.ref}>
+        <a href={refLink(ref, from)} className="specimen" style={{ aspectRatio: aspect(ref) }}>
+          <RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></a>
+        <span className="strip-label">{ref.title}</span>
+      </li>)}
+    </ul>
+  )
+}
+
+/** "More like this": pictures whose light, dark and colour sit in the same places, from every layer. */
+export function MoreLikeThis({ refId, from }: { refId: string; from: string }) {
+  const alike = useData<DeskSimilar>(readOnly ? null : `desk/similar?ref=${encodeURIComponent(refId)}&limit=8`)
+  if (!alike.data?.results.length) return null
+  return (
+    <section className="section" aria-labelledby="alike-title" style={{ marginTop: 56 }}>
+      <div className="section-title">
+        <h2 id="alike-title">More like this</h2>
+        <p className="mono">Similar placement of light, dark and colour, compared on this computer</p>
+      </div>
+      <RefStrip refs={alike.data.results} from={from} label="Pictures with a similar composition" />
+    </section>
+  )
+}
+
+function Plates({ refs, from, small }: { refs: DeskRef[]; from: string; small?: boolean }) {
+  return (
+    <div className={`justified desk-results${small ? ' small' : ''}`}>
+      {refs.map((ref) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
+        <a className="plate" href={refLink(ref, from)}>
+          <span className="plate-frame"><RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></span>
+          <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>
+          <span className="plate-title">{ref.title}</span>
+          {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${ref.date}` : ''}</span>}
+        </a>
+        <p className="reason" title={ref.reasons.join('\n')}>{ref.reasons[0]}</p>
+        <p className="licence-line">{plainLicence(ref)}</p>
+      </article>)}
+    </div>
+  )
+}
+
+function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, more }: { data: DeskAnswer
+  ways: DeskDirections | null; goals: string[]; use: string; off: string[]; from: string
+  toggle: (layer: string) => void; choose: (goal: string) => void; more?: () => void }) {
   const goals = data.reading.goals.map((g) => g.name)
   const techniques = data.reading.techniques.map((t) => t.name)
+  const missed = !goals.length && !techniques.length
+  const wordsOnly = (ref: DeskRef) => ref.reasons.every((reason) => reason.startsWith('Subject matches') || reason.startsWith('Matches the filters'))
+  const strong = data.results.filter((ref) => !wordsOnly(ref))
+  const weak = data.results.filter(wordsOnly)
   const available = ['library', ...(data.layers.generated ? ['generated'] : []), ...(data.layers['design-system'].length ? ['design-system'] : [])]
   return (
     <>
       <section className="reading-line" aria-label="How the atlas read your brief">
-        <p>{goals.length || techniques.length ? <>{goals.length > 0 && <><span className="mono">Goal </span>{goals.join(' · ')} </>}
-          {techniques.length > 0 && <><span className="mono">{goals.length ? ' Techniques ' : 'Techniques '}</span>{techniques.join(' · ')}</>}</>
-          : 'The atlas did not recognise a goal or technique in this brief yet.'}</p>
+        <p>{!missed ? <>{goals.length > 0 && <><span className="mono">Goal </span>{goals.join(' · ')} </>}
+          {techniques.length > 0 && !(ways?.directions.length || data.guidance.length) && <><span className="mono">{goals.length ? ' Techniques ' : 'Techniques '}</span>{techniques.join(' · ')}</>}
+          {goals.length === 0 && techniques.length > 0 && (ways?.directions.length || data.guidance.length) ? 'Read as a technique; ways to do it below.' : ''}</>
+          : 'No goal or technique recognised yet.'}</p>
         {data.reading.subject_terms.length > 0 && <p className="mono">Subject words: {data.reading.subject_terms.join(', ')}</p>}
+        <GoalChoice chosen={chosen} read={data.reading.goals.map((g) => g.id).filter((g) => !chosen.includes(g))} choose={choose} missed={missed} />
         {data.route.system && data.layers['design-system'].length > 0 && <p className="mono">Design system: {data.route.system.name}. {data.route.system.why}.</p>}
         {available.length > 1 && <div className="row layer-toggles" role="group" aria-label="Where to look">
           {available.map((layer) => <label key={layer} className="choice plain"><input type="checkbox" checked={!off.includes(layer)}
             onChange={() => toggle(layer)} />{LAYER_NAMES[layer]}</label>)}
         </div>}
       </section>
-      {data.guidance.length > 0 && <section className="section guidance" aria-labelledby="guidance-title" style={{ marginTop: 40 }}>
+      {ways && ways.directions.length > 0 ? <section className="section ways" aria-labelledby="ways-title" style={{ marginTop: 40 }}>
+        <div className="section-title">
+          <h2 id="ways-title">Ways to do it</h2>
+          <p className="mono">One technique each, with pictures that show it</p>
+        </div>
+        <ol className="ways-list">
+          {ways.directions.map((way, index) => <li key={way.technique.id} className={`way ${['rule-blue', 'rule-green', 'rule-ochre'][index % 3]}`}>
+            <div className="way-text">
+              <h3><span className="mono way-number">{index + 1}</span><a href={href(`technique/${way.technique.id}`)}>{way.technique.name}</a></h3>
+              <p className="guide-def">{way.idea}</p>
+              {way.serves.length > 0 && <p className="mono">Serves {way.serves.join(' · ')}</p>}
+              <p className="mono" style={{ marginTop: 12 }}>Make sure</p>
+              <ul>{way.make_sure.slice(0, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
+              {way.not_to_confuse_with[0] && <p className="muted guide-note">{way.not_to_confuse_with[0]}</p>}
+            </div>
+            <RefStrip refs={way.references} from={from} label={`Pictures that show ${way.technique.name}`} />
+          </li>)}
+        </ol>
+      </section>
+      : data.guidance.length > 0 && <section className="section guidance" aria-labelledby="guidance-title" style={{ marginTop: 40 }}>
         <h2 id="guidance-title">Techniques that could do it</h2>
         <div className="trays" style={{ marginTop: 20 }}>
           {data.guidance.map((g, index) => <div key={g.id} className={`tray-col ${['rule-blue', 'rule-green', 'rule-ochre', 'rule-rust'][index % 4]}`}>
@@ -137,30 +236,31 @@ function Answer({ data, use, off, from, toggle, more }: { data: DeskAnswer; use:
       </section>}
       <section className="section" aria-labelledby="refs-title" style={{ marginTop: 56 }}>
         <div className="section-title">
-          <h2 id="refs-title">References</h2>
+          <h2 id="refs-title">{ways?.directions.length ? 'All references' : 'References'}</h2>
           <p className="mono">{data.results.length ? `${data.results.length} of ${data.total_matches} matches` : ''}
             {use === 'publish' ? ' · free to publish with credit' : ''}</p>
         </div>
         {data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
-          : <div className="justified desk-results">
-            {data.results.map((ref) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
-              <a className="plate" href={refLink(ref, from)}>
-                <span className="plate-frame"><RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></span>
-                <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>
-                <span className="plate-title">{ref.title}</span>
-                {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${ref.date}` : ''}</span>}
-              </a>
-              <p className="reason">{ref.reasons[0]}</p>
-              <p className="licence-line">{plainLicence(ref)}</p>
-            </article>)}
-          </div>}
+          : <>
+            {strong.length > 0 && <Plates refs={strong} from={from} />}
+            {weak.length > 0 && <>
+              <h3 className="weak-title mono">{strong.length ? 'Matched on words only' : 'Matched on words only: no technique evidence yet'}</h3>
+              <Plates refs={weak} from={from} small />
+            </>}
+          </>}
         {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
       </section>
       <p className="muted" style={{ marginTop: 40, maxWidth: 760, fontSize: 14, lineHeight: 1.5 }}>{data.note}</p>
     </>
   )
+}
+
+/** The brief part of a generation prompt: what was asked for, without the instructions to the tool. */
+function briefOf(prompt: string): string {
+  const start = prompt.indexOf('BRIEF\n')
+  return (start >= 0 ? prompt.slice(start + 6) : prompt).trim()
 }
 
 export function RefPage({ id }: { id: string }) {
@@ -172,8 +272,7 @@ export function RefPage({ id }: { id: string }) {
   const r = ref.data
   return (
     <>
-      <div className="crumbs">{back ? <a href={back}>← Back to your answer</a> : <a href="#/ask">← Ask the atlas</a>}
-        <span className="mono">{layerLabel(r)}</span></div>
+      <div className="crumbs">{back ? <a href={back}>← Back to your answer</a> : <a href="#/ask">← Ask the atlas</a>}</div>
       <div className="image-head">
         <figure className="figure" style={{ aspectRatio: aspect(r) }}><RefImage src={r.image} alt={r.title} /></figure>
         <div className="image-title">
@@ -192,7 +291,10 @@ export function RefPage({ id }: { id: string }) {
         </section>
         <section className="why">
           <h2 className="ruled-title rule-green">{r.generated ? 'How it was made' : 'Where it comes from'}</h2>
-          {r.prompt && <><p className="mono" style={{ marginTop: 14 }}>Prompt</p><p className="slip-text" style={{ whiteSpace: 'pre-line' }}>{r.prompt}</p></>}
+          {r.prompt && <><p className="mono" style={{ marginTop: 14 }}>Brief given to the image model</p>
+            <p className="slip-text" style={{ whiteSpace: 'pre-line' }}>{briefOf(r.prompt)}</p>
+            <details style={{ marginTop: 8 }}><summary className="mono">Full prompt, with the tool instructions</summary>
+              <p className="slip-text" style={{ whiteSpace: 'pre-line', fontSize: 13 }}>{r.prompt}</p></details></>}
           {r.studied && r.studied.length > 0 && <><p className="mono" style={{ marginTop: 14 }}>Works studied for craft (not copied)</p>
             <ul>{r.studied.map((s) => <li key={s.title}><a href={s.source_url} rel="noreferrer noopener" target="_blank">{s.title}</a>, {s.creator}{s.lesson ? `: ${s.lesson}` : ''}</li>)}</ul></>}
           {r.source_url?.startsWith('https://') && <p style={{ marginTop: 14 }}><a href={r.source_url} rel="noreferrer noopener" target="_blank">Source record</a></p>}
@@ -205,6 +307,7 @@ export function RefPage({ id }: { id: string }) {
           {r.layer === 'design-system' && <p className="muted" style={{ marginTop: 14, fontSize: 14 }}>From a private design-system library on this computer. It is not part of Visual Atlas and is never shared or exported by it.</p>}
         </section>
       </div>
+      <MoreLikeThis refId={r.ref} from={window.location.hash} />
     </>
   )
 }

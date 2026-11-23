@@ -6,6 +6,7 @@ import { regionBox, regionLabel } from '../lib/regions'
 import { go, href, useRoute } from '../lib/router'
 import type { Annotation, Collection, ImageDetail, Settings } from '../lib/types'
 import { PROVIDERS, STATE_LABEL } from '../lib/types'
+import { MoreLikeThis } from './Ask'
 import { Failure, Loading, useNotice } from './ui'
 
 function backendName(name: string) {
@@ -62,7 +63,9 @@ export default function ImagePage({ id }: { id: number }) {
   const { image, rights, metrics, analysis } = data
   const picked = compare.some((p) => p.id === image.id)
   const ratio = image.width && image.height ? image.width / image.height : 1.4
-  const relatedTechniques = [...new Set(data.related.flatMap((r) => r.via))]
+  const rank = (techniqueId: string) => ['human_reviewed', 'model_reviewed', 'proposed'].indexOf(
+    data.annotations.find((a) => a.technique_id === techniqueId)?.state ?? 'proposed')
+  const relatedTechniques = [...new Set(data.related.flatMap((r) => r.via))].sort((a, b) => rank(a) - rank(b))
   const shown = tab ?? relatedTechniques[0] ?? null
   const related = shown ? data.related.filter((r) => r.via.includes(shown)) : data.related
   const nameOf = (techniqueId: string) => taxonomy?.techniques.find((t) => t.id === techniqueId)?.name ?? techniqueId
@@ -157,6 +160,7 @@ export default function ImagePage({ id }: { id: number }) {
               <div className="card-top">
                 <h3><a href={href(`technique/${a.technique_id}`, { from })}>{a.name}</a></h3>
                 <span className={`state ${a.state}`}>{STATE_LABEL[a.state]}</span>
+                {a.note?.startsWith('second model disagreed') && <span className="state disputed">disputed by a second model</span>}
               </div>
               <p style={{ fontSize: 15 }}>{a.effect || 'No effect recorded.'}</p>
               <p style={{ fontSize: 14 }} className="muted">{a.evidence.join(' ') || '—'}</p>
@@ -216,6 +220,8 @@ export default function ImagePage({ id }: { id: number }) {
         </div>
         <p className="mono strip-caption">{related.slice(0, 6).map((r) => r.title).join(' · ')}</p>
       </section>}
+
+      <MoreLikeThis refId={`library:${image.id}`} from={window.location.hash} />
 
       <section className="section" aria-label="See also" style={{ marginTop: 40 }}>
         <div className="row"><a className="button small" href={href('connections', { focus: `image:${image.id}`, from })}>See connections</a></div>

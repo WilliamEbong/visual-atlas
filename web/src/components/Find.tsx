@@ -89,7 +89,7 @@ export default function Find() {
           </fieldset>
           {mode === 'find' ? <>
             <label className="field"><span className="label" style={{ fontSize: 17, color: 'var(--ink)' }}>Describe what you need</span>
-              <textarea rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} style={{ fontFamily: 'var(--mono)', fontSize: 16 }}
+              <textarea rows={3} value={goal} onChange={(event) => setGoal(event.target.value)} style={{ fontSize: 16 }}
                 placeholder="a quiet image where one small figure stands alone in a big empty landscape" /></label>
             {readingFailed && <p role="status" className="mono">The automatic reading is unavailable. Choose goals, techniques and subject words below, or continue with your original request.</p>}
             <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />

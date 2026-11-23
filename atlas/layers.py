@@ -137,7 +137,7 @@ def _read_generated(path: Path, mtime: float) -> list[dict]:
             'studied': item.get('studied', []), 'review': item.get('review', {}),
             'licence': {'label': 'Generated image: no licence asserted', 'code': 'generated',
                         'note': data.get('licence_note', ''), 'checked_by': 'not a rights decision'},
-            'credit': f"Generated for Visual Atlas with {item['tool']} on {item['date']}", 'source_url': '',
+            'credit': f"Generated for Visual Atlas, {item['date']} (tool: {item['tool'].split(' (')[0]})", 'source_url': '',
             'file': str(file), 'root': str(root)})
     return refs
 

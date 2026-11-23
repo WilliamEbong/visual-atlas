@@ -107,4 +107,11 @@ export interface DeskAnswer {
   route: { system: { name: string; why: string } | null }
   total_matches: number; results: DeskRef[]; guidance: DeskGuidance[]; note: string
   layers: { generated: boolean; 'design-system': { name: string; count: number }[] }
+  codebook?: { goals: Goal[] }
 }
+export interface DeskDirection {
+  technique: { id: string; name: string }; serves: string[]; idea: string; why_it_works: string; make_sure: string[]
+  watch_out: string; not_to_confuse_with: string[]; references: DeskRef[]
+}
+export interface DeskDirections { reading: DeskAnswer['reading']; directions: DeskDirection[]; note: string }
+export interface DeskSimilar { like: string; results: DeskRef[]; compared: number; note: string }
