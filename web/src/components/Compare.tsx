@@ -42,7 +42,7 @@ export default function Compare({ ids }: { ids: number[] }) {
       <PageHead kicker={`Compare · ${data.images.length} of up to 4 images`} title="Compare" asideClass="actions"
         aside={<><a className="button" href={from ?? '#/library'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/library' }}>Clear</button></>} />
       <section className="compare-grid" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
-        <div className="compare-col compare-key"><span /><p className="mono">Side by side, on one baseline. The table below lines up with each picture.</p></div>
+        <div className="compare-col compare-key"><span /><p className="mono">Each column below is the picture above it.<br />● confirmed by you<br />◐ agreed by a second model<br />○ proposed by a model</p></div>
         {data.images.map((d) => <div key={d.image.id} className="compare-col">
           <figure><img src={media(d.image.display)} alt={d.image.title} /></figure>
           <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
