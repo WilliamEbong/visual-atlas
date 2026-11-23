@@ -230,7 +230,8 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
   const goals = data.reading.goals.map((g) => g.name)
   const techniques = data.reading.techniques.map((t) => t.name)
   const missed = !goals.length && !techniques.length
-  const wordsOnly = (ref: DeskRef) => ref.reasons.every((reason) => reason.startsWith('Subject matches') || reason.startsWith('Matches the filters'))
+  // the same test as the desk: evidence means a shown technique or a served goal; anything else is words only
+  const wordsOnly = (ref: DeskRef) => !ref.reasons.some((reason) => reason.startsWith('Shows ') || reason.startsWith('Serves '))
   const shown = new Set((ways?.directions ?? []).flatMap((way) => way.references.map((ref) => ref.ref)))
   const rest = data.results.filter((ref) => !shown.has(ref.ref))
   // licensed library pictures first; generated examples (no licence asserted) after them

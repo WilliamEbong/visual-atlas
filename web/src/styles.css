@@ -477,7 +477,7 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .drawers.goals { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 900px) { .drawers.goals { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
-  .ref-strip { flex-wrap: wrap; }
-  .ref-strip li { flex: 1 1 calc(50% - 8px); }
+  .ref-strip { flex-wrap: nowrap; overflow-x: auto; }
+  .ref-strip li { flex: 0 0 44%; }
   .drawers.goals { grid-template-columns: 1fr; }
 }
