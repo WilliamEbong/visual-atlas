@@ -8,7 +8,7 @@ import { go, href, useRoute } from '../lib/router'
 import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
 
-const EXAMPLES = ['A cover where figures are read by their outline alone', 'A calm opening slide: one small figure in a lot of empty space',
+const EXAMPLES = ['A cover with silhouettes: figures read by their outline alone', 'A calm opening slide: one small figure in a lot of empty space',
   'Make one product stand out on a dark poster', 'Show how big the mountains are for a travel talk',
   'A surprising image for an essay about cities']
 /** A reference picture; layer pictures sit behind the launch token, so they are fetched rather than linked. */
@@ -120,7 +120,7 @@ export default function Ask() {
         set({ q: text.trim(), goals: '' }) }}>
         <label className="field ask-brief">Describe the picture you need and what it is for
           <textarea rows={3} value={text} maxLength={4000} onChange={(event) => setText(event.target.value)}
-            placeholder="For example: a cover where figures are read by their outline alone"
+            placeholder="For example: a cover with silhouettes, figures read by their outline alone"
             onKeyDown={(event) => { if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) set({ q: text.trim(), goals: '' }) }} />
         </label>
         <div className="ask-controls">

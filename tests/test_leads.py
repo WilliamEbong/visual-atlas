@@ -75,3 +75,17 @@ def test_each_technique_has_its_own_index_picture(tmp_path):
     assert len(thumbs) == len(set(thumbs))
     examples = client.get('/api/techniques/silhouette').json()['examples']
     assert examples[0]['chosen'] and any(not e['chosen'] for e in examples)
+
+
+def test_the_front_page_sample_brief_is_answered_with_pictures(tmp_path, monkeypatch):
+    import re
+
+    from atlas import desk, layers
+    sample = re.search(r"const EXAMPLES = \['([^']+)'", (REPO / 'web/src/components/Ask.tsx').read_text(encoding='utf-8')).group(1)
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    ways = desk.directions(sample, home=home)['directions']
+    assert ways and all(way['references'] for way in ways)
