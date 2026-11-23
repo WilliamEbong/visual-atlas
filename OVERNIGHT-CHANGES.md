@@ -45,6 +45,91 @@ whether you may publish it.
 3. Optionally: add mood goals such as "warm and welcoming" to the taxonomy (both testers asked for them); decide
    whether merging to `main` should publish the demo.
 
+## Structural design (23 November, after round 4)
+
+Polishing had stalled at about 7 out of 10, and the target is 9 on every main screen. So the work stopped polishing
+and looked for the cause.
+
+**Diagnosis.** One reader went through every reviewer report from five scored rounds. Three fresh Opus reviewers,
+each with a different lens (information architecture, editorial identity, image tools), looked at the app as it
+stood (`design-review/r5/base-*`). All three named the same cause:
+- **The app had no centre.** The brief was typed into three different forms (Ask, Find, My project), and none of
+  them was the first screen: `#/` opened an uncurated 8,000 px wall.
+- **In the answer, pictures were subordinate to text.** The answer's own pictures were 100 to 170 px beside a text
+  column, smaller than the leftover "More references" below them.
+- Navigation had six peer places plus two tools.
+
+The comment reader added two causes. There was no single picture system, and content problems (stock photos,
+raw titles, thin matches) that layout cannot fix.
+
+References the reviewers cited:
+- Are.na: the brief or technique as the one container.
+- Rijksmuseum and Cooper Hewitt object pages: one large picture with a quiet register.
+- Cosmos and Savee: a near-captionless grid, with detail on demand.
+
+**Pass A: Ask is the centre; pictures lead.** Commit `1881e76`; screenshots `design-review/r5/a-*`.
+- **Navigation:** three places, Ask, Library and Techniques. Find images, Projects, Collections, Jobs and Settings
+  are tools on the right. `#/` opens Ask, the Library moved to `#/library`, and old `#/?technique=…` links still open
+  the Library.
+- **The answer:** each way is a full-width band. The technique and its idea sit above, and its pictures fill the
+  band at up to 400 px tall. "How to carry it out" folds away. The other matches fold under "See N more pictures
+  that match".
+- **Library:** tiles show the picture and its title, with maker and techniques on hover or focus. Rows are taller
+  (300 px). The random hero collage is gone.
+
+| Pass | Product designer | Editorial designer | Kept? |
+|---|---|---|---|
+| before (round 5 scores) | 7.1 | 6.85 | |
+| A | 6.9 | 7.0 | kept: flat (6.95 against 6.98), but both scorers named the answer bands the best composition in the app |
+| B | 7.0 | 7.1 | kept: flat (7.05) |
+| C | 6.8 | 6.8 | reverted: lower (6.8). Its screenshots stay as `design-review/r5/c-*` |
+
+**Pass B: one picture system, one job per screen.** Commit `5d94449`; screenshots `b-*`.
+- Picture rows fill their width, capped at 1.6 times the row height.
+- Once you have asked, the brief folds to one line.
+- The sample answer shows only pictures and their technique.
+- Compare keeps each picture with its caption, and the table lines up with the pictures.
+- Find shows the request and the sources, with the rest under Refine.
+- Projects shows a sample while it is empty.
+- The technique lens carries its own caption.
+- Explore folds its glossary away.
+- The review buttons on the image page appear on hover or focus.
+
+**Pass C: rows measured in code.** Commit `87b6b78`, reverted. A justified-layout function sized every row from the
+container's width. Both scorers called it the single biggest lever, provided it also balanced the last row, but the
+pass scored lower, so it was reverted as the rule requires. It can be restored with
+`git revert <the revert commit>`.
+
+**Stopped: three structural approaches did not raise the score.** Fresh scorers put every build since round 4
+between 6.8 and 7.1. This is what blocks a 9, from the eight reports of this cycle:
+1. **Content, which layout cannot fix.** Every scorer, every round, names the pictures themselves:
+   - stock photos (sunsets, laptops, bins) beside museum works;
+   - raw source titles ("Odd one out" several times, "MA9 Mashup Camp…", file numbers);
+   - weak technique examples (sunsets as the silhouette lead);
+   - generated examples among museum works.
+
+   A 9 needs a curated starter: museum works first, cleaned display titles, and a lead example chosen by
+   strength.
+2. **Missed briefs.** "Warm and communal" reads as nothing, because there are no mood goals. That is the
+   taxonomy decision already listed for you.
+3. **Screens with no pictures of what you get back.**
+   - Find shows no recent results.
+   - Projects shows no real example direction. Directions come from an assistant, so a convincing sample needs a
+     saved real run, not a mock-up.
+4. **A long tail on every screen.** Each scorer finds two or three new items per screen:
+   - Compare's numbers have no labels;
+   - phone tabs wrap;
+   - text links are 4 px off the edge;
+   - "Fig. 10 843 × 979" reads as one number.
+
+   Fixing these lifts single screens, but no 2-screen change moves a 10-screen mean.
+5. **The measurement.** The same build drew 8 and 6 for Explore from two scorers. Pass-to-pass differences of
+   0.1 to 0.25 are inside that noise. A 9 would need a steady panel of scorers, or a smaller set of screens.
+
+The most-named next step is to restore pass C with a balanced last row, then move the image page's two old strips
+onto it. After that comes content curation (point 1), which matters more than any layout change.
+
+
 ## Round 4: acceptance, merge rehearsal, scored design (23 November)
 
 **Independent acceptance.** Two fresh Opus testers, each given only the README and the user guide.

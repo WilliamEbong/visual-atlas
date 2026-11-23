@@ -542,11 +542,3 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   .asked-brief { font-size: 21px; }
 }
 @media (max-width: 600px) { .lens .lens-caption { position: static; display: block; margin-top: 8px; } }
-
-/* structural pass C: rows measured in code, so every full row fills its width exactly and none balloons */
-.justified.measured > .plate-item { flex: none; max-width: none; min-width: 0; }
-.justified:not(.refs-row) .plate .techs { display: block; }  /* the library is filed by technique: say so on every tile */
-.asked { border-bottom: 0; }
-.strip-reason, .refs-row .strip-reason { font-size: 13px; }
-.phone-legend { display: none; }
-@media (max-width: 760px) { .phone-legend { display: inline; } }

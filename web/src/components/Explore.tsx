@@ -1,5 +1,3 @@
-import { useRef } from 'react'
-import { useJustified } from '../lib/justify'
 import { cleanTitle } from '../lib/library'
 import { media, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
@@ -87,10 +85,6 @@ function GoalPage({ id, from }: { id: string; from: string | null }) {
 function TechniquePage({ id, from }: { id: string; from: string | null }) {
   const { taxonomy } = useApp()
   const { data, error, busy, reload } = useData<TechniqueDetail>(`techniques/${id}`)
-  const strip = useRef<HTMLUListElement>(null)
-  const lensPick = data ? data.examples.find((e) => e.state === 'human_reviewed') ?? data.examples[0] : undefined
-  const examples = (data?.examples ?? []).filter((e) => e.id !== lensPick?.id).slice(0, 12)
-  const widths = useJustified(strip, examples.map(aspect), 240, 190)
   if (error) return <><PageHead kicker={<a href={href('explore', { from })}>Techniques</a>} title="Technique" /><Failure message={error} busy={busy} retry={reload} /></>
   if (!data) return <><PageHead kicker={<a href={href('explore', { from })}>Techniques</a>} title="…" /><Loading /></>
   const index = taxonomy?.techniques.findIndex((t) => t.id === id) ?? -1
@@ -136,9 +130,9 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         </div>
         {data.examples.length === 0 ? <Empty title="No examples yet" actions={!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find examples</a>}>
           Find a few, and they will appear here with the evidence for each reading.</Empty> : <>
-          <ul ref={strip} className={`justified refs-row${widths ? ' measured' : ''}`} aria-label="Examples in your library">
-            {examples.map((e, i) => (
-              <li key={e.id} className="plate-item" style={{ '--a': aspect(e), width: widths?.[i] } as React.CSSProperties}>
+          <ul className="justified refs-row" aria-label="Examples in your library">
+            {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e) => (
+              <li key={e.id} className="plate-item" style={{ '--a': aspect(e) } as React.CSSProperties}>
                 <a href={href(`image/${e.id}`, { from })} className="plate">
                   <span className="plate-frame"><img src={media(e.thumb)} alt="" loading="lazy" /></span>
                   <span className="plate-title">{cleanTitle(e.title)}</span>{e.creator && <span className="sr-only">, {e.creator}</span>}</a>

@@ -1,4 +1,3 @@
-import { useJustified } from '../lib/justify'
 import { useEffect, useRef, useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
@@ -62,7 +61,6 @@ export default function Library({ query }: { query: URLSearchParams }) {
   const [panel, setPanel] = useState(false)
   const grid = useRef<HTMLDivElement>(null)
   useEffect(() => setText(filters.q), [filters.q])
-  const widths = useJustified(grid, (data?.items ?? []).map(aspect), 300, 170)
   const set = (change: Partial<Filters>) => go('library', { ...toQuery({ ...filters, ...change }), from })
   const empty = data && data.total === 0 && activeCount(filters) === 0
   const names: Record<string, string> = { ...PROVIDERS, ...STATES,
@@ -185,11 +183,11 @@ export default function Library({ query }: { query: URLSearchParams }) {
               {!readOnly && <a className="button" href={href('find', { goal: filters.q, technique: filters.technique })}>Find new images like this</a>}</>}>
               {active.length} filter{active.length === 1 ? ' is' : 's are'} on.
             </Empty>
-            : <div className={`justified${widths ? ' measured' : ''}`} ref={grid} onKeyDown={onGridKey}>
-              {items.map((item, i) => {
+            : <div className="justified" ref={grid} onKeyDown={onGridKey}>
+              {items.map((item) => {
                 const picked = compare.some((p) => p.id === item.id)
                 return (
-                  <article key={item.id} className="plate-item" style={{ '--a': aspect(item), width: widths?.[i] } as React.CSSProperties}>
+                  <article key={item.id} className="plate-item" style={{ '--a': aspect(item) } as React.CSSProperties}>
                     <a className="plate" href={href(`image/${item.id}`, { from })}>
                       <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" decoding="async" /></span>
                       <span className="fig">Fig. {item.id}{plateState(item) ? `  ${plateState(item)}` : ''}</span>
