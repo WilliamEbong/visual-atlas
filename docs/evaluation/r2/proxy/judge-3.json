@@ -1,0 +1,236 @@
+{
+ "judge": "3",
+ "briefs": [
+  {
+   "id": "p01",
+   "X": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 4,
+    "verified": [
+     "Commons API (file page metadata): Munch Melancholy exists, PD-old-80-expired, matches; viewed image: figure lower right, shoreline sweeps left (as claimed, though colourful rather than low-contrast).",
+     "Commons API (file page metadata): Hammershoi Randers file exists, PD-old-100; credit string is a garbled scraped label."
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Hammershoi Randers file exists, PD-old-100; viewed image: woman on right as claimed, but left half holds a tureen and framed picture, not 'almost empty wall'.",
+     "Commons API (file page metadata): Monk by the Sea exists, PD-Art old-100, matches."
+    ]
+   },
+   "winner": "Y",
+   "why": "Monk by the Sea gives the cleanest quiet field for a title and Y's credits are clean, while X's Munch is busier and one credit is garbled."
+  },
+  {
+   "id": "p02",
+   "X": {
+    "fit": 3,
+    "reasoning": 3,
+    "licence": 4,
+    "verified": [
+     "Commons API (file page metadata): Ghent Singing Angels detail exists, PD-old-100; credit carries a scraped 'Dutch: Zingende engelen' label.",
+     "Commons API (file page metadata): Collins choir photo exists, PD US FSA/OWI, correct."
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Webster A Village Choir exists, PD-old-100, matches.",
+     "Commons API (file page metadata): Watoto choir exists, CC0, matches; personality-rights caveat is a useful, correct note."
+    ]
+   },
+   "winner": "Y",
+   "why": "Webster's Village Choir is exactly a warm communal church choir, whereas X offers angels and a black-and-white documentary shot."
+  },
+  {
+   "id": "p03",
+   "X": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 4,
+    "verified": [
+     "Commons API (file page metadata): Searchlights Gibraltar exists; Commons tag is UK Government artistic works (expired Crown copyright), so PD is right but 'Public Domain Mark 1.0' is the wrong label; viewed image: crossing beams over dark water, strong fit.",
+     "Commons API (file page metadata): Durer Little Owl exists, PD-old-100."
+    ]
+   },
+   "Y": {
+    "fit": 3,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Seeing stars (ESO) exists, CC BY 4.0 (category 'ESO images (review needed)' but ESO licence is CC BY 4.0), credit fine.",
+     "Commons API (file page metadata): IRAM telescope exists, CC BY-SA 4.0, share-alike caveat correctly stated."
+    ]
+   },
+   "winner": "X",
+   "why": "X's searchlights and staring owl give two distinct, tense watchful images, while Y's two telescopes are near-duplicates and calmer than 'a bit tense'."
+  },
+  {
+   "id": "p04",
+   "X": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 4,
+    "verified": [
+     "Commons API (file page metadata): Columbia River 1895 photo exists, PD-old-70; 'creator' is a LoC collection name, not the photographer.",
+     "Commons API (file page metadata): Takahashi Salmon exists, PD-Japan/old-100, tall 2500x7529 as described."
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Ford c.1900 beach haul exists, PD-old-100 (file is small, 700x560).",
+     "Commons API (file page metadata): Sockeye USFWS exists, PD US FWS, correct."
+    ]
+   },
+   "winner": "tie",
+   "why": "Both pair a historic haul with a single fish and give correct PD claims; X's lone hanging salmon is starker, Y's credits are cleaner."
+  },
+  {
+   "id": "p05",
+   "X": {
+    "fit": 3,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Met API object 436946 The Brioche: isPublicDomain true, image URL matches, CC0 correct.",
+     "Commons API (file page metadata): Lithuanian bakery exists, PD US FSA/OWI."
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 2,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Domaci hljeb file exists, CC BY-SA 4.0 with conditions stated; viewed image: the seeded loaf stands out, but it is not 'dark' and the others are golden, not 'pale white'.",
+     "Commons API (file page metadata): Berckheyde The Baker exists, PD-old-100."
+    ]
+   },
+   "winner": "Y",
+   "why": "Y's first pick literally shows one loaf standing out from a rack of others, though its description misstates the colours; X's brioche has no 'others' to stand out from."
+  },
+  {
+   "id": "p06",
+   "X": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Meindert Hobbema 001 exists (5707px), PD-old-100.",
+     "Commons API (file page metadata): Amboy Route 66 exists, CC BY-SA 4.0, 5065x2570 (about 2:1 as stated), share-alike noted."
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 4,
+    "verified": [
+     "Commons API (file page metadata): Hobbema Het laantje file exists, PD; credit has a scraped 'German: Allee von...' label.",
+     "Commons API (file page metadata): Wanderer above the Sea of Fog exists, PD-old-100; credit uses odd 'The hiker above...' label."
+    ]
+   },
+   "winner": "X",
+   "why": "Both use Hobbema, but X's straight desert road adds a second true vanishing-point image while Wanderer pulls the eye less directly."
+  },
+  {
+   "id": "p07",
+   "X": {
+    "fit": 4,
+    "reasoning": 3,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Homer Moonlight, Wood Island Light exists, PD-old-100; viewed image: dark sea with moonlit surf, the lighthouse light is barely visible, so 'single distant light as focal point' overstates it.",
+     "Commons API (file page metadata): Sidi Bou Afi lighthouse exists, CC BY-SA 4.0, portrait 3503x5253 as stated, share-alike caveat correct."
+    ]
+   },
+   "Y": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Wright of Derby Moonlight with a Lighthouse exists, PD-old-100; viewed image: dark field, lit lighthouse and moon, strong fit.",
+     "Commons API (file page metadata): Bell Rock after Turner exists, PD; Y itself admits it is too light."
+    ]
+   },
+   "winner": "tie",
+   "why": "Each side has one strong dark-with-one-light pick (X's fog beams, Y's Wright) and one weaker one (X's Homer, Y's Bell Rock)."
+  },
+  {
+   "id": "p08",
+   "X": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Whistler Nocturne exists, PD-old-100.",
+     "Commons API (file page metadata): Hammershoi Moonlight Strandgade 30 exists, tagged CC0 (Met Open Access), correct."
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Whistler Nocturne exists, PD.",
+     "Met API object 436005 The Calm Sea: isPublicDomain true, image URL matches."
+    ]
+   },
+   "winner": "tie",
+   "why": "Both lead with the same Whistler and add an equally calm second picture with correct licences."
+  },
+  {
+   "id": "p09",
+   "X": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Meeting of Waters (Manaus) exists, CC0, correct.",
+     "Commons API (file page metadata): Confluence Arve/Rhone exists, CC BY 4.0, 7500x4219, credit adequate."
+    ]
+   },
+   "Y": {
+    "fit": 3,
+    "reasoning": 3,
+    "licence": 3,
+    "verified": [
+     "Commons API (file page metadata): Arnolfini Portrait exists, PD-old-100, but the credit is a garbled 'label QS:Lde-ch...' string, not usable.",
+     "Met API object 436533 Shoes (van Gogh): isPublicDomain true, image URL matches."
+    ]
+   },
+   "winner": "X",
+   "why": "Two rivers that share one channel but keep distinct colours is the brief made visible and slide-ready; Y's marriage portrait and shoes are looser metaphors with an unusable credit."
+  },
+  {
+   "id": "p10",
+   "X": {
+    "fit": 4,
+    "reasoning": 4,
+    "licence": 3,
+    "verified": [
+     "Commons API (file page metadata): Boccioni City Rises exists, tagged PD Old (died 1916), correct.",
+     "Commons API (file page metadata): Turner Rain Steam and Speed exists, PD; credit is a long scraped description, not usable as written."
+    ]
+   },
+   "Y": {
+    "fit": 5,
+    "reasoning": 4,
+    "licence": 5,
+    "verified": [
+     "Commons API (file page metadata): Turner Rain Steam and Speed exists, PD-old-100, clean credit.",
+     "Commons API (file page metadata): Lagos light trail exists, CC BY-SA 4.0, share-alike noted; Y discloses it did not view it."
+    ]
+   },
+   "winner": "Y",
+   "why": "Y's Lagos light trails tie forward motion to an actual emerging-market city, and its credits are clean where X's Turner credit is unusable."
+  }
+ ],
+ "overall": "All 40 source URLs resolved and every licence and may_publish claim checked out; I found no wrong 'yes, may publish', and both sides flagged CC BY-SA share-alike conditions where relevant. Differences came down to fit and credit hygiene. X's best answers (p03, p09) picked fresh, literal visual metaphors, but X several times pasted raw Commons description labels as credits (p01, p02, p10), and one licence label was off (PDM for a UK Crown expired-copyright photo). Y more often picked the most on-brief image (Village Choir, Lagos light trails, seeded loaf) with clean credits, though one of its credits was unusable (p09 Arnolfini) and a couple of its descriptions overstated what the picture shows (bread colours, Hammershoi's 'empty' left half). Both sides reused famous canonical paintings (Hobbema, Whistler, Turner, Hammershoi), which made several briefs close."
+}

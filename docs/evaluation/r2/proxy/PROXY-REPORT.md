@@ -38,4 +38,30 @@ bakery post answered with an "odd one out" photograph that is not bread).
 - The arm B prompt for round 2 says fit comes first.
 
 ## Result, round 2
-See below once it has run (arm B2 against the same arm A, new random labels, two new blind judges).
+Arm B2 (`B2.json`) had the new open search and was told fit comes first; it took all 20 picks from it (Commons and
+the Met). Same arm A, new random labels (`blind2.json`, `key2.json`), two new blind judges (`judge-3.json`,
+`judge-4.json`).
+
+| | Judge 3 | Judge 4 |
+|---|---|---|
+| A wins / B2 wins / ties | 6 / 1 / 3 | 7 / 2 / 1 |
+
+| Mean score (20 ratings per arm) | Fit | Reasoning | Licence |
+|---|---|---|---|
+| A, without the desk | 4.50 | 4.00 | 5.00 |
+| B2, with the desk and open search | 3.95 | 3.90 | 4.20 |
+
+**Still a loss, but the fit gap halved** (1.00 to 0.55). Both judges found every licence claim correct and no wrong
+"may publish" on either side. B2 lost licence points on **credit quality**: the credit lines it copied from the desk
+carried Commons metadata noise ("Dutch: Zingende engelen Singing Angels", hidden Wikidata labels, footnote markers,
+a description run on after the title). That was a real defect in `atlas/providers.py`, now fixed with tests
+(commit `2c2a750`).
+
+## What this proxy says, and does not say
+- An Opus agent with plain web search already finds well-fitting public-domain pictures and reads their licences
+  correctly. On this evidence, "licence-checked references" alone is not a reason for such an agent to use the desk.
+- The desk's own corpus is too small to compete on fit; searching the open collections narrows the gap.
+- The desk's reasoning (techniques, what to make sure of) did not lift the judges' reasoning scores in either round.
+- It does not measure what the thesis is about for William: whether his own briefs, with his taste, get better
+  references, and whether weaker or cheaper agents (which misread licences more often) gain more than Opus does.
+  Those need the real blind test.

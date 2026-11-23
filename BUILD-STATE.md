@@ -3,6 +3,21 @@
 Durable checkpoint for the autonomous build. Newest status first. Plan of record:
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
+## 008 Reference desk, overnight round 2 (2026-11-23, same branch)
+- Owner approved continuing: close open items, run a proxy of the blind test, extend along the Later list, a
+  second design cycle, Codex review each round. Record: OVERNIGHT-CHANGES.md ("Round 2").
+- Built: brief-reading evaluation on 80 frozen briefs (docs/evaluation/r2), 594 independent cue phrases;
+  suggest_directions, similar_references and search_open_collections MCP tools (+ atlas directions, similar,
+  search-open); agent-supplied ids and codebook fallback in advise; Ask "Ways to do it", goal chips, word-only
+  matches apart, More like this; 11 typography/poster/infographic starter references (93 to 104); 9 more
+  generated references (18 kept, 3 dropped) with IPTC provenance labels; design-system id numbering; warm
+  caches; Rijksmuseum and Commons title fixes.
+- Proxy blind test (docs/evaluation/r2/proxy/PROXY-REPORT.md): the desk lost both rounds to an Opus agent with
+  web search (8-1-1 twice; then 6-1-3 and 7-2-1 with open search). Honest finding, recorded as a proxy.
+- Signature cache for More like this lives in %TEMP%\visual-atlas (per library, opaque keys), never in the library.
+- Next concrete action: owner runs docs/evaluation/v0.5/BLIND-TEST.md; Codex review rounds continue until two
+  in a row find nothing.
+
 ## 008 Reference desk (overnight 2026-11-22/23, branch claude/product-direction-d8e569)
 - Owner handoff: build continuously toward a genuinely useful product. Thesis, research and decisions:
   docs/research/05-thesis.md. Spec Kit feature: specs/008-reference-desk (spec, plan, tasks, session-log).

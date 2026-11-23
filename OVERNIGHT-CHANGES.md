@@ -1,7 +1,73 @@
 # Overnight changes, 22–23 November 2026
 
-Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. 13 commits on top of `f9e400c` (including this record). Nothing has been pushed, merged, tagged or
+Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. Round 1: 13 commits on top of `f9e400c`; round 2 added more (see `git log d6117cf..HEAD`). Nothing has been pushed, merged, tagged or
 released, and the version number is unchanged (0.4.0).
+
+## Round 2 (23 November, after your approval to keep going)
+
+**The headline is a negative result.** In a proxy of your blind test, Opus judges preferred an Opus agent
+*without* the desk on most briefs, in both rounds. Everything else below is what I built and fixed around that.
+
+### What changed
+- **Brief reading, measured properly.** 80 new briefs written by Opus subagents acting as designers and as AI agents,
+  split dev/test by a hash and frozen before any change (`docs/evaluation/r2/BRIEF-REPORT.md`). A third subagent,
+  who never saw a brief, wrote 594 everyday phrases for the codebook. On the **test split** (not looked at while
+  tuning): recall **0.18 → 0.37**, precision **0.77 → 0.87**, briefs with at least one right code **13/40 → 24/40**.
+  Word matching still misses about half of paraphrases, so:
+- **Agents and people can say what the words missed.** `advise` and `suggest_directions` take technique and goal ids;
+  when the words match nothing, the answer includes the codebook. On **Ask**, goal chips under the reading change
+  the answer with one click.
+- **New agent tools** (MCP and CLI): `suggest_directions` (`atlas directions`): distinct ways to answer a brief, one
+  technique each, with pictures; `similar_references` (`atlas similar`): composition look-alikes;
+  `search_open_collections` (`atlas search-open`): live search of Commons, the Met, AIC, Cleveland and the
+  Rijksmuseum, every result licence-checked by `atlas/rights.py`, nothing downloaded or stored. It is the one tool
+  that goes online.
+- **Ask page:** "Ways to do it" (one technique each, with its pictures), pictures that matched on words only kept
+  apart, "Picture unavailable" instead of blank boxes, longer reasons. **More like this** on reference and image
+  pages. Image page: a reading the second model disputed is marked; related tabs open on the best-checked technique.
+  Full-app design review by a fresh-context reviewer: 14 findings, 12 applied (skipped: removing the Library's five
+  boxed ways in; numbering plates on the technique page). Before/after screenshots: `design-review/r2/`.
+- **Starter library 93 → 104:** 11 typography, poster and information-design references (Minard, Playfair, Du Bois,
+  the 1908 Underground map, type specimens, Lissitzky, Toulouse-Lautrec, Hohlwein, Marinetti). Rights by
+  `atlas/rights.py`; readings `proposed`. `docs/evaluation/r2/typography/CURATION.md`.
+- **Generated layer 9 → 18:** two each for leading lines, tight cropping, gaze direction, contextual incongruity, and
+  a figure–ground retry (all nine passed the rubric). Every generated file now carries an IPTC
+  "trainedAlgorithmicMedia" XMP label (C2PA-readable; not a signed manifest), added without re-encoding.
+- **Closed from the round 1 list:** design-system id clash (numbered, within the ref grammar); `generated/` stays in
+  the release on purpose (the layer needs it); release zip rebuilt and installed into a temp folder (installer
+  exit 0, CLI and MCP answer from the installed copy); slow Ask traced to tokenising every reference on each
+  request (now cached, ~0.2 s → ~0.08 s) plus a cold first call (the app now warms the desk at start).
+- **Defects fixed with failing tests first:** Rijksmuseum search crashed on list-shaped Linked Art dates; Commons
+  credits carried language prefixes, hidden Wikidata labels, footnote markers and run-on descriptions (found by the
+  blind judges); "centre" alone was read as off-centre placement.
+- **Codex review, round 2:** 8 findings, all confirmed and fixed, each with a test that fails on the old code: an
+  empty collection choice searched every provider; publish mode was lost on the way to More like this; the
+  signature cache kept paths and previews in a shared file; library-only directions could reveal private routing;
+  directions dropped technique examples outranked by word matches; `use=Publish` silently meant "everything";
+  provider cooldowns were lost between agent searches; long colliding design-system ids broke lookups.
+
+### Proxy blind test (`docs/evaluation/r2/proxy/PROXY-REPORT.md`)
+| Round | Desk arm | A wins / desk wins / ties (two judges) | Fit A vs desk | Licence A vs desk |
+|---|---|---|---|---|
+| 1 | local library + generated | 8/1/1 and 8/1/1 | 4.65 vs 3.65 | 5.00 vs 4.95 |
+| 2 | + open search, fit first | 6/1/3 and 7/2/1 | 4.50 vs 3.95 | 5.00 vs 4.20 (credit noise, now fixed) |
+
+What it means: an Opus agent with web search already finds good public-domain pictures and reads their licences
+correctly, so licence checking alone does not make the desk worth calling for that agent. It does not test your
+taste, your briefs, or weaker agents. **Your blind test is still the deciding one**; it is ready.
+
+### Decisions, and how to undo each
+| Decision | Undo |
+|---|---|
+| One MCP tool goes online (`search_open_collections`), bounded, nothing stored | Delete it from `TOOLS` in `atlas/mcp_server.py` |
+| More like this caches 8×8 signatures in `%TEMP%\visual-atlas` (per library, opaque keys) | Delete the folder; set `desk.SIGNATURES` elsewhere |
+| 594 cue phrases merged into `atlas/data/taxonomy.json` | `git revert` the commit `5485765`, or edit the phrases |
+| Kept a figure–ground image whose lower half also reads as a bust | Remove `fg-ambiguity-03` from `generated/manifest.json` |
+
+### Not done in round 2
+- Interface and instrument-panel references (none found within the search budget).
+- A signed C2PA manifest (needs a signing certificate); the IPTC label is the cheap equivalent.
+- The release zip has not been rebuilt since the last commits; rebuild with `scripts/build-release.ps1` before use.
 
 ## Product thesis, in five lines
 1. **For** designers, and the AI agents that now pick images for their slides, pages and posters.
