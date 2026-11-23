@@ -6,7 +6,7 @@ import threading
 
 import typer
 
-from atlas import catalog, jobs, transfer
+from atlas import catalog, desk, jobs, transfer
 from atlas.home import home_dir
 
 app = typer.Typer(help='Visual Atlas: find free-to-use images and learn the techniques that make them work.',
@@ -252,3 +252,77 @@ def taxonomy_sync():
     with jobs.open_store() as store:
         catalog.sync(store, force=True)
     typer.echo('Knowledge files reloaded.')
+
+
+# ---- reference desk (read-only; no AI, no downloads) -----------------------------------------------------------
+def _layers(include: list[str] | None) -> list[str] | None:
+    return include or None
+
+
+def _show(result: dict, text: bool):
+    if not text:
+        _print(result)
+        return
+    reading = result.get('reading', {})
+    typer.echo('Reads as: ' + (', '.join(t['name'] for t in reading.get('goals', []) + reading.get('techniques', []))
+                               or 'no known goal or technique') + (f"; subjects {', '.join(reading['subject_terms'])}"
+                                                                    if reading.get('subject_terms') else ''))
+    system = (result.get('route') or {}).get('system')
+    if system:
+        typer.echo(f"Design system: {system['name']} ({system['why']})")
+    for item in result.get('guidance', []):
+        typer.echo(f"\n{item['name']}: {item['definition']}\n  Look for: {'; '.join(item['look_for'][:3])}")
+    typer.echo('')
+    for ref in result.get('results', []):
+        typer.echo(f"{ref['ref']}  {ref.get('title', '')[:70]} — {ref.get('creator', '')[:50]}")
+        typer.echo(f"  {ref['layer']} · {ref['licence']['label']}")
+        for reason in ref['reasons']:
+            typer.echo(f'  · {reason[:160]}')
+    if not result.get('results'):
+        typer.echo('No reference matched. Try other words, name a technique (atlas refs --technique ID), or find new '
+                   'images with: atlas find "your brief"')
+
+
+@app.command()
+def advise(brief: str = typer.Argument(..., help='The visual decision, in plain words.'),
+           limit: int = typer.Option(6, help='How many references (1-40).'),
+           publish: bool = typer.Option(False, help='Only images you may publish (CC0, public domain, CC BY).'),
+           layer: list[str] = typer.Option(None, help='library, generated or design-system (repeatable).'),
+           text: bool = typer.Option(False, help='Readable text instead of JSON.')):
+    """Advice for a visual decision: techniques that fit, how to apply them, and references with reasons."""
+    _show(desk.advise(brief, limit=limit, publishable_only=publish, layers_wanted=_layers(layer)), text)
+
+
+@app.command()
+def refs(brief: str = typer.Argument('', help='Optional brief.'),
+         technique: list[str] = typer.Option(None, help='Technique id(s).'),
+         goal: list[str] = typer.Option(None, help='Goal id(s).'),
+         subject: list[str] = typer.Option(None, help='Subject word(s).'),
+         orientation: str = typer.Option('', help='portrait, landscape or square.'),
+         colour: str = typer.Option(''), medium: str = typer.Option(''),
+         era_from: int = typer.Option(None), era_to: int = typer.Option(None),
+         system: str = typer.Option('', help='Limit to one design system.'),
+         layer: list[str] = typer.Option(None, help='library, generated or design-system (repeatable).'),
+         publish: bool = typer.Option(False, help='Only images you may publish.'),
+         limit: int = typer.Option(8), text: bool = typer.Option(False)):
+    """Ranked references by brief, technique, goal, subject and filters."""
+    _show(desk.search(brief=brief, techniques=technique, goals=goal, subjects=subject, orientation=orientation,
+                      colour=colour, medium=medium, era_from=era_from, era_to=era_to, system=system,
+                      layers_wanted=_layers(layer), publishable_only=publish, limit=limit), text)
+
+
+@app.command()
+def ref(ref_id: str = typer.Argument(..., help='e.g. library:12, generated:ID or system:NAME:ID')):
+    """One reference in full: evidence, review state, licence, credit and file."""
+    try:
+        _print(desk.get(ref_id))
+    except LookupError as error:
+        typer.echo(str(error))
+        raise typer.Exit(1)
+
+
+@app.command()
+def mcp():
+    """Run the read-only MCP server on stdio (for Claude Code, Codex and other agents)."""
+    from atlas import mcp_server
+    mcp_server.serve()
