@@ -394,6 +394,373 @@
         "checked_by": "Claude (Opus) by eye, full size",
         "notes": "All eight rubric checks pass. Teapot crisp (glaze highlight, knob, crack line); foreground cups and room loose and blurred; teapot not brighter than its surroundings."
       }
+    },
+    {
+      "id": "leading-lines-01",
+      "file": "leading-lines-01.jpg",
+      "title": "Boardwalk across a salt marsh",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "boardwalk",
+        "salt marsh",
+        "hut",
+        "dusk"
+      ],
+      "techniques": [
+        "leading-lines"
+      ],
+      "colour": "muted",
+      "notes": "The plank boardwalk starts wide at the bottom edge and narrows straight to a small hut on the horizon, so both rails and the plank lines carry the eye to it.",
+      "width": 1024,
+      "height": 755,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art photograph on medium-format colour film, calm dusk light, muted greens and soft violet sky. A straight timber boardwalk with a simple rail on each side starts wide across the whole bottom edge of the frame and runs dead straight away from the viewer across a flat salt marsh, narrowing to a single point on the horizon. Exactly at that point sits one small weathered wooden hut, the only built thing in view. The plank lines, both rails and the edges of the walk all converge on the hut. Viewpoint low and centred, a little above the planks. Wide empty marsh grass on both sides, a low horizon about a third of the way down the frame, a quiet pale sky.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Avenue at Middelharnis",
+          "creator": "Meindert Hobbema",
+          "date": "1689",
+          "source_url": "https://en.wikipedia.org/wiki/The_Avenue_at_Middelharnis",
+          "lesson": "A road and two rows of trees run from the bottom edge to one point on the horizon; the eye travels the whole depth."
+        },
+        {
+          "title": "Paris Street; Rainy Day",
+          "creator": "Gustave Caillebotte",
+          "date": "1877",
+          "source_url": "https://en.wikipedia.org/wiki/Paris_Street;_Rainy_Day",
+          "lesson": "Kerb lines and building edges converge on a distant point, pulling the eye past the foreground figures."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. Planks, both rails and the walk edges converge on the hut at the horizon; low centred viewpoint; even dusk light, no artefacts in the rail posts."
+      }
+    },
+    {
+      "id": "leading-lines-02",
+      "file": "leading-lines-02.jpg",
+      "title": "Vine rows to a farmhouse",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated gouache-style illustration",
+      "subjects": [
+        "vineyard",
+        "rows",
+        "farmhouse",
+        "hills"
+      ],
+      "techniques": [
+        "leading-lines"
+      ],
+      "colour": "muted",
+      "notes": "Curved vine rows sweep from the lower left foreground up the slope and all end at a small white farmhouse high on the right.",
+      "width": 1024,
+      "height": 683,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA gouache illustration with flat matte colour and visible brush texture, late-summer afternoon light, ochre, olive and dusty blue. A rolling hillside vineyard: long parallel rows of vines start large in the lower left foreground and sweep in gentle curves up and across the slope, narrowing with distance, so every row ends at one small white farmhouse with a terracotta roof set high on the right third of the picture. Nothing else competes: no people, no vehicles, a plain pale sky. The rows are clear stripes of green vine and ochre earth so their direction reads at once.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Avenue at Middelharnis",
+          "creator": "Meindert Hobbema",
+          "date": "1689",
+          "source_url": "https://en.wikipedia.org/wiki/The_Avenue_at_Middelharnis",
+          "lesson": "A road and two rows of trees run from the bottom edge to one point on the horizon; the eye travels the whole depth."
+        },
+        {
+          "title": "Paris Street; Rainy Day",
+          "creator": "Gustave Caillebotte",
+          "date": "1877",
+          "source_url": "https://en.wikipedia.org/wiki/Paris_Street;_Rainy_Day",
+          "lesson": "Kerb lines and building edges converge on a distant point, pulling the eye past the foreground figures."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. Curved vine rows narrow up the slope towards the farmhouse on the right; flat gouache texture, no text. The convergence point sits a little left of the house, so the lead is clear but not exact."
+      }
+    },
+    {
+      "id": "tight-cropping-01",
+      "file": "tight-cropping-01.jpg",
+      "title": "Bow of a fishing boat",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "fishing boat",
+        "peeling paint",
+        "rope",
+        "texture"
+      ],
+      "techniques": [
+        "tight-cropping"
+      ],
+      "colour": "muted",
+      "notes": "The weathered bow fills the frame and is cut by all four edges; only painted planks, a rope and rivets remain, so the boat is felt rather than shown.",
+      "width": 936,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art close-up photograph on medium-format colour film, soft overcast light. An extremely tight crop of the bow of an old wooden fishing boat: the curved painted planks fill the entire frame and run out past all four edges, so the whole boat is never seen. Faded blue paint peels to show red undercoat and grey wood; a thick coil of rope crosses the lower right corner and is cut off by the frame; a short row of rust-streaked iron rivets runs diagonally. No sky, no water, no background at all. Rich but muted colour, fine detail in the paint.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Child's Bath",
+          "creator": "Mary Cassatt",
+          "date": "1893",
+          "source_url": "https://en.wikipedia.org/wiki/The_Child%27s_Bath",
+          "lesson": "A high, close view cut at the frame edges puts the viewer inside the moment; nothing outside it competes."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. The bow fills the frame and leaves it on every side; rivets, peeling paint and the cut rope coil carry it. Reads as texture contrast too, which is related, not a confusion."
+      }
+    },
+    {
+      "id": "tight-cropping-02",
+      "file": "tight-cropping-02.jpg",
+      "title": "Figs in a bowl, cropped close",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "figs",
+        "bowl",
+        "fruit",
+        "table"
+      ],
+      "techniques": [
+        "tight-cropping"
+      ],
+      "colour": "vivid",
+      "notes": "Seen from directly above, the bowl rim runs out of the frame on three sides and the figs press to the edges; one split fig sits just off centre.",
+      "width": 1024,
+      "height": 936,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art food photograph on medium-format colour film, seen from directly above, soft window light from the left. A shallow glazed ceramic bowl heaped with ripe purple figs, cropped so tightly that the bowl rim leaves the frame on the top, left and bottom edges and the figs press right up against the frame. One fig, cut in half to show its pink seeded inside, sits just right of centre. No table, cloth or background visible beyond a sliver at the right edge. Deep purples, green stems, pink flesh, a cream glaze.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Child's Bath",
+          "creator": "Mary Cassatt",
+          "date": "1893",
+          "source_url": "https://en.wikipedia.org/wiki/The_Child%27s_Bath",
+          "lesson": "A high, close view cut at the frame edges puts the viewer inside the moment; nothing outside it competes."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. Figs press to the edges and the bowl rim is cut by the frame; one split fig right of centre. The rim leaves on fewer sides than briefed, the crop still reads at once."
+      }
+    },
+    {
+      "id": "gaze-direction-01",
+      "file": "gaze-direction-01.jpg",
+      "title": "Fox looking out of frame",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "fox",
+        "snow",
+        "winter",
+        "field"
+      ],
+      "techniques": [
+        "gaze-direction"
+      ],
+      "colour": "muted",
+      "notes": "A red fox sits in the left third with its head turned sharply to the right, ears forward; the open snow to the right and the frame edge are where the eye goes.",
+      "width": 1024,
+      "height": 683,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art wildlife photograph on medium-format colour film, soft grey winter light. A red fox sits upright in a smooth snowfield, placed in the left third of a wide landscape frame. Its body faces the viewer but its head is turned sharply to the right, ears pricked forward, eyes fixed on something beyond the right edge of the picture that is not shown. The right two thirds are empty, even snow with a faint line of bare birch trunks far behind. The fox is sharp and correctly formed: four legs, one tail, natural fur.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "Young Man at His Window",
+          "creator": "Gustave Caillebotte",
+          "date": "1876",
+          "source_url": "https://en.wikipedia.org/wiki/Young_Man_at_His_Window",
+          "lesson": "A figure seen from behind looks out to the street, so the viewer looks where he looks."
+        },
+        {
+          "title": "Girl with a Pearl Earring",
+          "creator": "Johannes Vermeer",
+          "date": "c. 1665",
+          "source_url": "https://en.wikipedia.org/wiki/Girl_with_a_Pearl_Earring",
+          "lesson": "A turned head and sideways eyes make a direction and a question; the gaze is the subject."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. Fox in the left third, head turned to the right edge, ears forward; the empty snow takes the eye where it looks. Anatomy checked at full size."
+      }
+    },
+    {
+      "id": "gaze-direction-02",
+      "file": "gaze-direction-02.jpg",
+      "title": "Two climbers looking up",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated gouache-style illustration",
+      "subjects": [
+        "climbers",
+        "cliff",
+        "mountain",
+        "rope"
+      ],
+      "techniques": [
+        "gaze-direction"
+      ],
+      "colour": "muted",
+      "notes": "Two small climbers at the foot of the frame both look up and to the left; their raised heads and a pointing arm send the eye up the rock face to a pale ledge.",
+      "width": 936,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA gouache illustration with flat matte colour and simple shapes, cool morning light, slate blue, grey and a single warm orange. Two small climbers in orange jackets stand at the bottom right of the picture at the foot of a tall grey rock face that fills the frame. Both tilt their heads back and look up and to the left; one points up with an outstretched arm. High on the upper left, a small pale ledge catches the light where they are looking. Figures are simple and clear (no faces needed): their posture and head direction carry the look.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "Young Man at His Window",
+          "creator": "Gustave Caillebotte",
+          "date": "1876",
+          "source_url": "https://en.wikipedia.org/wiki/Young_Man_at_His_Window",
+          "lesson": "A figure seen from behind looks out to the street, so the viewer looks where he looks."
+        },
+        {
+          "title": "Girl with a Pearl Earring",
+          "creator": "Johannes Vermeer",
+          "date": "c. 1665",
+          "source_url": "https://en.wikipedia.org/wiki/Girl_with_a_Pearl_Earring",
+          "lesson": "A turned head and sideways eyes make a direction and a question; the gaze is the subject."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. Both climbers look up and left and one points; the lit ledge high on the left is where their gaze lands. Simple faces, correct limbs."
+      }
+    },
+    {
+      "id": "incongruity-01",
+      "file": "incongruity-01.jpg",
+      "title": "Dinner table in the surf",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "dinner table",
+        "sea",
+        "beach",
+        "dawn"
+      ],
+      "techniques": [
+        "contextual-incongruity"
+      ],
+      "colour": "muted",
+      "notes": "A formally laid table with white linen, silver and candles stands in shallow surf on an empty beach; each object is ordinary, the place is wrong.",
+      "width": 1024,
+      "height": 683,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art photograph on medium-format colour film, pale dawn light, muted blues and cream. On an empty sandy beach, a long dining table laid formally for eight (white linen cloth, white plates, polished cutlery, stemmed glasses and two unlit silver candlesticks, with plain wooden chairs) stands in shallow surf: a thin sheet of sea water runs around the table and chair legs. Everything on the table is neat and dry, as if waiting for guests. No people. Calm sea to the horizon, an even sky. Shot straight on from the side of the table at seated eye level.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Song of Love",
+          "creator": "Giorgio de Chirico",
+          "date": "1914",
+          "source_url": "https://en.wikipedia.org/wiki/The_Song_of_Love",
+          "lesson": "Ordinary objects, each painted plainly, placed where they do not belong; the mismatch alone makes the second look."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. A formally laid table for eight stands in shallow surf; every object is ordinary and dry, only the place is wrong. Chairs and cutlery are consistent."
+      }
+    },
+    {
+      "id": "incongruity-02",
+      "file": "incongruity-02.jpg",
+      "title": "Reading chair in a wheat field",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated photograph-style image (medium-format colour film look)",
+      "subjects": [
+        "armchair",
+        "lamp",
+        "wheat field",
+        "summer"
+      ],
+      "techniques": [
+        "contextual-incongruity"
+      ],
+      "colour": "muted",
+      "notes": "A worn velvet armchair, a side table with a book and a lit standard lamp stand in the middle of a ripe wheat field at noon.",
+      "width": 1024,
+      "height": 683,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA fine-art photograph on medium-format colour film, bright high summer noon light, golden wheat and deep blue sky. In the middle of a wide ripe wheat field stands a worn green velvet armchair, a small wooden side table with an open book and a cup, and a tall standard lamp with a fabric shade that is switched on and glowing weakly in daylight, its flex trailing into the wheat. The wheat reaches the seat of the chair. No people, no house in sight, a flat horizon. Everything else is ordinary and real.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "The Song of Love",
+          "creator": "Giorgio de Chirico",
+          "date": "1914",
+          "source_url": "https://en.wikipedia.org/wiki/The_Song_of_Love",
+          "lesson": "Ordinary objects, each painted plainly, placed where they do not belong; the mismatch alone makes the second look."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "All eight checks pass. A velvet armchair, side table with book and cup, and a lit standard lamp with its flex stand in a ripe wheat field at noon. Shadows agree with the high sun."
+      }
+    },
+    {
+      "id": "fg-ambiguity-03",
+      "file": "fg-ambiguity-03.jpg",
+      "title": "Pawn or two faces",
+      "tool": "Codex image generation (ChatGPT image tool) via the Codex CLI",
+      "date": "2026-11-23",
+      "medium": "generated screenprint-style illustration",
+      "subjects": [
+        "chess pawn",
+        "faces",
+        "positive and negative shape"
+      ],
+      "techniques": [
+        "figure-ground-ambiguity"
+      ],
+      "colour": "muted",
+      "notes": "A cream chess pawn stands in the centre of a dark green field; the green spaces either side are two human profiles facing each other, sharing the pawn's contours.",
+      "width": 683,
+      "height": 1024,
+      "prompt": "Use your built-in image generation tool to generate exactly one image from the brief below. Do not write code, run shell commands or edit files. When the image is saved, reply with one line: the full local path of the saved image file.\n\nBRIEF\nA flat two-colour screenprint illustration in dark bottle green and warm cream only, no shading, gradients or outlines, faint paper grain. A single tall cream chess pawn stands upright in the exact centre, filling the full height of the frame, on a dark green ground. Its left and right contours are drawn so that the two green spaces beside it read equally as two human faces in profile facing each other: the pawn's round head forms the space between two foreheads, its neck collar the noses, its narrow waist the lips and chins, its wide base the necks and shoulders. Both readings must be equally strong: a pawn, or two faces nearly touching. Perfectly symmetrical, nothing else in the picture.\n\nAvoid: any text, letters, numbers, signatures, logos or watermarks; real people, real landmarks and brands; glossy 3D-render look, HDR glow, oversaturated colour, fake lens flare; warped or melted objects.\n",
+      "studied": [
+        {
+          "title": "Sky and Water I",
+          "creator": "M. C. Escher",
+          "date": "1938",
+          "source_url": "https://www.nga.gov/artworks/54215-sky-and-water-i",
+          "lesson": "Two flat tones of equal weight; the flip happens where shapes share every contour."
+        },
+        {
+          "title": "Rubin's vase demonstrations",
+          "creator": "Edgar Rubin",
+          "date": "1915",
+          "source_url": "https://en.wikipedia.org/wiki/Rubin_vase",
+          "lesson": "A centred shape whose outer contour is recognisable from the other side flips most reliably; no shading."
+        }
+      ],
+      "review": {
+        "rubric": "generated/RUBRIC.md",
+        "result": "pass",
+        "checked_by": "Claude (Opus) by eye, full size",
+        "notes": "Passes. The cream pawn and the two green profiles share one contour and the picture flips between them. The wide lower half also suggests a bust, a weaker third reading; kept because the pawn/faces flip is clear at a glance."
+      }
     }
   ],
   "dropped": [

@@ -69,3 +69,45 @@ Lessons:
 - Cameron's soft focus comes from a shallow plane, long exposures and gentle side light. Softness reads as atmosphere, and the one sharp area pulls the eye.
 - The subject keeps the same light and colour as its surroundings, and only sharpness separates it. This is what distinguishes selective focus from value contrast.
 - Blur should be smooth and optically plausible: discs of light in the background, with no cut-out edges around the sharp subject.
+
+## Leading lines (`leading-lines`), batch 2
+
+| Work | Creator | Date | Source |
+|---|---|---|---|
+| The Avenue at Middelharnis | Meindert Hobbema | 1689 | https://en.wikipedia.org/wiki/The_Avenue_at_Middelharnis |
+| Paris Street; Rainy Day | Gustave Caillebotte | 1877 | https://en.wikipedia.org/wiki/Paris_Street;_Rainy_Day |
+
+Lessons:
+- A road or path that starts at the bottom edge and runs to one point carries the eye through the whole depth; whatever sits at that point is read last and remembered.
+- Rails, kerbs and rows repeat the same direction, so several weak lines make one strong pull.
+
+## Tight cropping (`tight-cropping`), batch 2
+
+| Work | Creator | Date | Source |
+|---|---|---|---|
+| The Child's Bath | Mary Cassatt | 1893 | https://en.wikipedia.org/wiki/The_Child%27s_Bath |
+
+Lessons:
+- A close, high view cut by the frame edges puts the viewer inside the moment; nothing outside it competes.
+- What leaves the frame is implied, not lost: the eye completes the bowl, the boat, the scene.
+
+## Gaze direction (`gaze-direction`), batch 2
+
+| Work | Creator | Date | Source |
+|---|---|---|---|
+| Young Man at His Window | Gustave Caillebotte | 1876 | https://en.wikipedia.org/wiki/Young_Man_at_His_Window |
+| Girl with a Pearl Earring | Johannes Vermeer | c. 1665 | https://en.wikipedia.org/wiki/Girl_with_a_Pearl_Earring |
+
+Lessons:
+- A figure looking somewhere makes the viewer look there too; leave room in that direction.
+- A turned head and sideways eyes make a question; the target can stay out of the frame.
+
+## Contextual incongruity (`contextual-incongruity`), batch 2
+
+| Work | Creator | Date | Source |
+|---|---|---|---|
+| The Song of Love | Giorgio de Chirico | 1914 | https://en.wikipedia.org/wiki/The_Song_of_Love |
+
+Lessons:
+- Ordinary objects, each shown plainly and correctly, placed where they do not belong. The mismatch alone makes the second look; nothing needs to be strange in itself.
+- Studied for the device only; the generated pictures use different objects, places and light.
