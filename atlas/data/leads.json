@@ -1,4 +1,154 @@
 {
-  "about": "Lead examples per technique, strongest first, as provider:item id. Chosen by a reviewer from the starter pack; a picture you confirm yourself still comes first.",
-  "leads": {}
+ "about": "Lead examples per technique, strongest first, as provider:item id. Chosen by a reviewer from the starter pack; a picture you confirm yourself still comes first.",
+ "leads": {
+  "asymmetric-balance": [
+   "aic:65",
+   "cma:109202",
+   "aic:27",
+   "smithsonian:ld1-1777715310928-1777715319626-0",
+   "met:436593"
+  ],
+  "atmospheric-perspective": [
+   "aic:10926",
+   "aic:58702",
+   "met:436594",
+   "aic:103302"
+  ],
+  "color-contrast": [
+   "commons:92159104",
+   "aic:71971",
+   "aic:12007",
+   "commons:95146237"
+  ],
+  "color-harmony": [
+   "aic:16564",
+   "cma:143846",
+   "aic:11",
+   "cma:154283"
+  ],
+  "contextual-incongruity": [
+   "met:10499",
+   "commons:108924712",
+   "commons:88194558",
+   "cma:109206"
+  ],
+  "diagonal-energy": [
+   "commons:122361807",
+   "aic:16",
+   "aic:86983"
+  ],
+  "figure-ground-ambiguity": [
+   "commons:140206665",
+   "commons:7373382"
+  ],
+  "framing": [
+   "cma:152499",
+   "cma:118931",
+   "smithsonian:ld1-1643399887910-1643399892781-0",
+   "met:219376",
+   "commons:113335605"
+  ],
+  "gaze-direction": [
+   "aic:48950",
+   "aic:39609",
+   "commons:90031920",
+   "cma:154283"
+  ],
+  "implied-motion": [
+   "commons:21049148",
+   "aic:16",
+   "cma:119922",
+   "aic:86983",
+   "aic:16179"
+  ],
+  "juxtaposition": [
+   "cma:109200",
+   "commons:89915033",
+   "aic:111"
+  ],
+  "layered-depth": [
+   "aic:27992",
+   "aic:58702",
+   "cma:118931",
+   "aic:10926",
+   "met:436594"
+  ],
+  "leading-lines": [
+   "aic:82687",
+   "aic:16179",
+   "commons:78985578"
+  ],
+  "negative-space": [
+   "cma:109206",
+   "aic:86983",
+   "met:42138",
+   "commons:88261490",
+   "aic:39609"
+  ],
+  "proximity-grouping": [
+   "aic:61603",
+   "commons:90127892",
+   "commons:32217474"
+  ],
+  "repetition-with-interruption": [
+   "commons:152783",
+   "commons:541408",
+   "aic:30113"
+  ],
+  "rhythm-pattern": [
+   "commons:152783",
+   "aic:30113",
+   "aic:16179",
+   "commons:50505576"
+  ],
+  "scale-contrast": [
+   "aic:26605",
+   "commons:54368989",
+   "aic:9",
+   "smithsonian:ld1-1643399887910-1643399892781-0",
+   "commons:21034059"
+  ],
+  "selective-focus": [
+   "cma:159609",
+   "cma:172504"
+  ],
+  "silhouette": [
+   "met:337070",
+   "commons:21049148",
+   "met:370826",
+   "commons:113335605"
+  ],
+  "symmetry": [
+   "smithsonian:ld1-1643399887910-1643399897456-0"
+  ],
+  "texture-contrast": [
+   "commons:92159104",
+   "aic:65",
+   "smithsonian:ld1-1646149545906-1646149748699-2",
+   "smithsonian:ld1-1643621402936-1643621404528-1"
+  ],
+  "tight-cropping": [
+   "aic:18951",
+   "aic:26605",
+   "met:56689",
+   "cma:172504",
+   "aic:61603"
+  ],
+  "value-contrast": [
+   "cma:109201",
+   "cma:159609",
+   "cma:109203",
+   "aic:11",
+   "aic:48950"
+  ],
+  "vantage-point": [
+   "aic:26605",
+   "commons:93430663"
+  ],
+  "visual-metaphor": [
+   "commons:1043070",
+   "commons:97798889",
+   "commons:113625810"
+  ]
+ }
 }
