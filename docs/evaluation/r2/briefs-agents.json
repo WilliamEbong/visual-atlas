@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "author": "Opus subagent writing as AI agents",
+  "status": "Provisional model-authored judgments; not independent expert ground truth.",
+  "created": "2026-11-23",
+  "inputs_read": ["atlas/data/taxonomy.json", "docs/evaluation/v0.4/brief-heldout.json"],
+  "policies": {
+    "goals_policy": "Expected goals reflect communication outcomes requested in the brief, not every taxonomy goal associated with an expected technique.",
+    "subjects_policy": "subjects lists required useful subject words; not_subjects lists particular instruction, format, or mechanism words that should not become subject searches. Other sensible subject words are not penalized by these lists.",
+    "techniques_policy": "Expected techniques require a named mechanism or concrete descriptive evidence. A mood or generic style alone does not establish a mechanism. Explicitly negated techniques are excluded."
+  },
+  "cases": [
+    {
+      "id": "a01",
+      "category": "direct-name",
+      "text": "slide 7 of a board deck on our merger: juxtaposition of a 1950s print shop and a modern room full of servers",
+      "techniques": ["juxtaposition"],
+      "goals": [],
+      "subjects": ["print", "shop", "servers"],
+      "not_subjects": ["slide", "board", "deck", "juxtaposition", "modern"],
+      "rationale": "The mechanism is named outright and the two compared subjects are given; no separate outcome is requested."
+    },
+    {
+      "id": "a02",
+      "category": "direct-name",
+      "text": "atmospheric perspective, mountain ridges, for the background of a meditation app onboarding screen",
+      "techniques": ["atmospheric-perspective"],
+      "goals": [],
+      "subjects": ["mountain", "ridges"],
+      "not_subjects": ["atmospheric", "perspective", "background", "app", "onboarding", "screen"],
+      "rationale": "Terse keyword query naming the technique; the meditation context sets mood but no outcome is stated."
+    },
+    {
+      "id": "a03",
+      "category": "direct-name",
+      "text": "User wants repetition with interruption for a poster about getting noticed in a crowded job market. Something like a crowd of matching grey umbrellas and a single yellow one.",
+      "techniques": ["repetition-with-interruption"],
+      "goals": ["draw-attention"],
+      "subjects": ["umbrellas"],
+      "not_subjects": ["user", "wants", "repetition", "interruption", "poster", "job", "market", "matching"],
+      "rationale": "Named mechanism plus an example of one odd unit in a repeated set; getting noticed asks for one thing to pull attention."
+    },
+    {
+      "id": "a04",
+      "category": "direct-name",
+      "text": "proximity grouping - 3 people talking in a tight knot, 1 person standing apart. for a slide on onboarding remote hires who feel left out",
+      "techniques": ["proximity-grouping"],
+      "goals": ["group-and-relate"],
+      "subjects": ["people"],
+      "not_subjects": ["proximity", "grouping", "slide", "onboarding", "remote", "hires"],
+      "rationale": "Named mechanism; the left-out hire asks the image to show who belongs and who is apart."
+    },
+    {
+      "id": "a05",
+      "category": "direct-name",
+      "text": "Need a reference that uses selective focus: a barista's hands pouring milk into a cup, the cafe behind melting away. For a blog header.",
+      "techniques": ["selective-focus"],
+      "goals": [],
+      "subjects": ["barista", "hands", "milk", "cup", "cafe"],
+      "not_subjects": ["reference", "selective", "focus", "blog", "header", "melting"],
+      "rationale": "Named mechanism with matching description of a dissolving background; no further outcome requested."
+    },
+    {
+      "id": "a06",
+      "category": "direct-name",
+      "text": "goal: show scale. a person standing at the foot of a dam wall. infographic header for a hydropower report",
+      "techniques": ["scale-contrast"],
+      "goals": ["show-scale"],
+      "subjects": ["person", "dam"],
+      "not_subjects": ["goal", "show", "scale", "infographic", "header", "hydropower", "report"],
+      "rationale": "The goal is named directly and a familiar small figure beside a far larger structure is concrete evidence of scale contrast."
+    },
+    {
+      "id": "a07",
+      "category": "described",
+      "text": "hero image for a landing page about a budgeting app; should feel steady and trustworthy. the whole left half should be plain sky so the headline can sit there, with a single small house on the right",
+      "techniques": ["negative-space", "asymmetric-balance"],
+      "goals": ["create-calm"],
+      "subjects": ["house", "sky"],
+      "not_subjects": ["hero", "landing", "page", "budgeting", "app", "headline", "left", "half"],
+      "rationale": "A half-frame of plain sky around one small subject is negative space, the subject pushed to one side is off-centre placement, and steadiness asks for calm."
+    },
+    {
+      "id": "a08",
+      "category": "described",
+      "text": "slide 4 of a pitch deck: show that our market is small today but will be far bigger later. maybe a seedling next to the full-grown tree it grows into",
+      "techniques": ["scale-contrast", "visual-metaphor"],
+      "goals": ["make-an-idea-visible", "show-scale"],
+      "subjects": ["seedling", "tree"],
+      "not_subjects": ["slide", "pitch", "deck", "market", "today", "later"],
+      "rationale": "The seedling stands in for the market and its size against the grown tree carries the growth claim, so both mechanisms and both outcomes are requested."
+    },
+    {
+      "id": "a09",
+      "category": "described",
+      "text": "The user says: \"I want people to look at the red door first, everything else on the street is grey and washed out.\" It's for a poetry collection cover.",
+      "techniques": ["color-contrast"],
+      "goals": ["draw-attention"],
+      "subjects": ["door", "street"],
+      "not_subjects": ["user", "says", "people", "cover", "collection", "washed"],
+      "rationale": "A saturated red accent in a grey field is colour contrast; looking at it first is the one-subject attention goal (the book genre is not a requested outcome)."
+    },
+    {
+      "id": "a10",
+      "category": "described",
+      "text": "website section for our hiking tours. want the trail to pull the viewer from the bottom corner up to the hut on the ridge",
+      "techniques": ["leading-lines"],
+      "goals": ["guide-the-eye"],
+      "subjects": ["trail", "hut", "ridge"],
+      "not_subjects": ["website", "section", "tours", "viewer", "bottom", "corner"],
+      "rationale": "A path that carries the eye to a distant subject is a leading line, and the requested viewing path is guiding the eye."
+    },
+    {
+      "id": "a11",
+      "category": "described",
+      "text": "poster for a jazz night: a saxophonist reduced to a solid black shape in front of an orange sunset, no face detail visible",
+      "techniques": ["silhouette"],
+      "goals": [],
+      "subjects": ["saxophonist", "sunset"],
+      "not_subjects": ["poster", "night", "solid", "shape", "face", "detail"],
+      "rationale": "A featureless dark figure against a bright sky is a silhouette; no outcome beyond the look is asked for."
+    },
+    {
+      "id": "a12",
+      "category": "described",
+      "text": "email newsletter banner for a sleep supplement. only soft blues and greys, nothing loud, a bedroom at dawn",
+      "techniques": ["color-harmony"],
+      "goals": ["create-calm"],
+      "subjects": ["bedroom", "dawn"],
+      "not_subjects": ["email", "newsletter", "banner", "supplement", "blues", "greys", "loud"],
+      "rationale": "Restricting the image to one cool colour family is a limited palette, and 'nothing loud' asks for a quiet result."
+    },
+    {
+      "id": "a13",
+      "category": "described",
+      "text": "about-page photo idea: the founder working at her bench, seen past the edges of an open workshop door so the door boxes her in, like you're peeking in",
+      "techniques": ["framing"],
+      "goals": [],
+      "subjects": ["founder", "bench", "workshop", "door"],
+      "not_subjects": ["about", "page", "photo", "idea", "edges", "peeking"],
+      "rationale": "The door edges enclosing the subject are a frame within a frame; the peeking feel is a mood of the frame, not a separate requested outcome."
+    },
+    {
+      "id": "a14",
+      "category": "described",
+      "text": "Need a background for a running app splash screen: a runner caught with both feet off the ground, streaks trailing behind them, should feel quick",
+      "techniques": ["implied-motion"],
+      "goals": ["suggest-motion"],
+      "subjects": ["runner"],
+      "not_subjects": ["background", "app", "splash", "screen", "streaks", "quick"],
+      "rationale": "An airborne mid-stride pose with directional streaks are motion cues, and feeling quick is the movement goal."
+    },
+    {
+      "id": "a15",
+      "category": "described",
+      "text": "image for a LinkedIn post about how small habits pile up: thousands of identical paper clips laid in neat lines edge to edge",
+      "techniques": ["rhythm-pattern"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["paper", "clips"],
+      "not_subjects": ["image", "linkedin", "post", "habits", "lines", "edge"],
+      "rationale": "Identical units at regular intervals across the picture are a pattern, used here to make accumulation of habits concrete; nothing breaks the pattern."
+    },
+    {
+      "id": "a16",
+      "category": "described",
+      "text": "hero for a luxury skincare page: a wet stone next to a glass bottle, really feel the difference between grainy rock and polished glass",
+      "techniques": ["texture-contrast"],
+      "goals": [],
+      "subjects": ["stone", "bottle", "glass", "rock"],
+      "not_subjects": ["hero", "luxury", "skincare", "page", "difference"],
+      "rationale": "Grainy against polished surfaces is texture contrast; no further communication outcome is requested."
+    },
+    {
+      "id": "a17",
+      "category": "described",
+      "text": "slide about information overload, user wants something that leaves viewers a bit on edge: a desk buried in papers, framed so the pile spills past every edge of the picture",
+      "techniques": ["tight-cropping"],
+      "goals": ["create-tension"],
+      "subjects": ["desk", "papers"],
+      "not_subjects": ["slide", "information", "overload", "user", "viewers", "framed", "picture"],
+      "rationale": "The subject cut by all frame edges is tight cropping, and leaving viewers on edge asks for unease."
+    },
+    {
+      "id": "a18",
+      "category": "described",
+      "text": "Background art for a fantasy novel landing page. a castle on a far hill, forest in front, a river in the middle, mountains way behind. want it to feel like you could walk into it",
+      "techniques": ["layered-depth"],
+      "goals": ["build-depth"],
+      "subjects": ["castle", "hill", "forest", "river", "mountains"],
+      "not_subjects": ["background", "art", "fantasy", "novel", "landing", "page", "walk"],
+      "rationale": "Explicit front, middle and back planes are layered depth, and walking into it asks for deep space."
+    },
+    {
+      "id": "a19",
+      "category": "described",
+      "text": "image for a museum exhibition ad: the gallery hall shot from dead centre, left wall and right wall matching like reflections, very formal and still",
+      "techniques": ["symmetry"],
+      "goals": ["create-calm"],
+      "subjects": ["gallery", "hall", "walls"],
+      "not_subjects": ["image", "exhibition", "ad", "centre", "reflections", "formal"],
+      "rationale": "Halves matching around a central axis is symmetry, and 'formal and still' asks for order and calm."
+    },
+    {
+      "id": "a20",
+      "category": "described",
+      "text": "cover of a quarterly report on supply chain risk. a lone worker caught in one shaft of light cutting through an otherwise pitch-black warehouse",
+      "techniques": ["value-contrast"],
+      "goals": [],
+      "subjects": ["worker", "warehouse"],
+      "not_subjects": ["cover", "quarterly", "report", "supply", "chain", "shaft"],
+      "rationale": "One bright lit area in surrounding darkness is light-dark contrast; the report topic does not state a requested outcome."
+    },
+    {
+      "id": "a21",
+      "category": "described",
+      "text": "a slide about disruption in insurance: a giraffe standing in a perfectly normal office cubicle. the oddness is the hook",
+      "techniques": ["contextual-incongruity"],
+      "goals": ["surprise"],
+      "subjects": ["giraffe", "office", "cubicle"],
+      "not_subjects": ["slide", "disruption", "insurance", "oddness", "hook"],
+      "rationale": "An animal in a setting where it does not belong is incongruity, and making the oddness the hook asks for surprise."
+    },
+    {
+      "id": "a22",
+      "category": "described",
+      "text": "Instagram carousel cover about mental health: a woman by a window, her eyes turned toward something beyond the edge of the photo, leaving the viewer curious",
+      "techniques": ["gaze-direction"],
+      "goals": ["tell-a-story"],
+      "subjects": ["woman", "window"],
+      "not_subjects": ["instagram", "carousel", "cover", "mental", "health", "eyes", "edge", "photo", "viewer"],
+      "rationale": "A look aimed out of frame is gaze direction; curiosity about the unseen implies something beyond what is shown."
+    },
+    {
+      "id": "a23",
+      "category": "described",
+      "text": "for the 404 page of a design studio site: a puzzling picture where you see a vase first and then two faces",
+      "techniques": ["figure-ground-ambiguity"],
+      "goals": ["surprise"],
+      "subjects": ["vase", "faces"],
+      "not_subjects": ["404", "page", "design", "studio", "site", "puzzling", "picture"],
+      "rationale": "A shape whose reading flips between vase and faces is figure-ground ambiguity, and the puzzle asks the viewer to look again."
+    },
+    {
+      "id": "a24",
+      "category": "described",
+      "text": "Banner for a cycling club: riders banking hard into a bend, with the road and horizon running corner to corner across the frame. make it feel like it's moving",
+      "techniques": ["diagonal-energy", "implied-motion"],
+      "goals": ["suggest-motion"],
+      "subjects": ["riders", "road"],
+      "not_subjects": ["banner", "club", "horizon", "corner", "frame"],
+      "rationale": "Corner-to-corner lines are diagonals and riders banked mid-turn are motion cues; feeling like it moves is the stated goal."
+    },
+    {
+      "id": "a25",
+      "category": "described",
+      "text": "data journalism piece on the wealth gap: a mansion and a tarp shelter on the same street, both equally prominent",
+      "techniques": ["juxtaposition"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["mansion", "shelter", "street"],
+      "not_subjects": ["data", "journalism", "piece", "wealth", "gap", "prominent"],
+      "rationale": "Two unlike subjects of equal weight set for comparison is juxtaposition, used to make inequality visible."
+    },
+    {
+      "id": "a26",
+      "category": "described",
+      "text": "the user asked for 'one of those photos where a hiker is a speck at the bottom of a massive glacier' for a climate keynote",
+      "techniques": ["scale-contrast"],
+      "goals": ["show-scale"],
+      "subjects": ["hiker", "glacier"],
+      "not_subjects": ["user", "asked", "photos", "speck", "climate", "keynote"],
+      "rationale": "A familiar small figure against a vast form is scale contrast, and making the glacier read as vast is the scale goal."
+    },
+    {
+      "id": "a27",
+      "category": "described",
+      "text": "header image for a winter newsletter: snowy field, nothing in it except one red barn far off to the right",
+      "techniques": ["negative-space", "asymmetric-balance"],
+      "goals": [],
+      "subjects": ["snow", "field", "barn"],
+      "not_subjects": ["header", "image", "newsletter", "right"],
+      "rationale": "A single subject in an otherwise empty field is negative space and its placement to one side is off-centre balance; red on white is not a hue contrast, and no outcome is stated."
+    },
+    {
+      "id": "a28",
+      "category": "described",
+      "text": "slide for a talk on privacy: a hand held over a face, the hand shaped like a padlock",
+      "techniques": ["visual-metaphor"],
+      "goals": ["make-an-idea-visible"],
+      "subjects": ["hand", "face", "padlock"],
+      "not_subjects": ["slide", "talk", "shaped"],
+      "rationale": "A hand fused with a padlock transfers the meaning of locking to the face, expressing privacy through a concrete form."
+    },
+    {
+      "id": "a29",
+      "category": "described",
+      "text": "app store screenshot background for a birdwatching app: starlings bunched tightly on the left of the wire, one starling sitting alone way over on the right",
+      "techniques": ["proximity-grouping"],
+      "goals": ["group-and-relate"],
+      "subjects": ["starlings", "wire"],
+      "not_subjects": ["app", "store", "screenshot", "background", "left", "right"],
+      "rationale": "Spacing alone separates one bird from the cluster, which is proximity grouping showing belonging and separation."
+    },
+    {
+      "id": "a30",
+      "category": "described",
+      "text": "keynote opener on seeing the whole system: a city intersection shot from a drone pointing straight at the ground, crosswalks and cars flattened into a graphic",
+      "techniques": ["vantage-point"],
+      "goals": [],
+      "subjects": ["city", "intersection", "crosswalks", "cars"],
+      "not_subjects": ["keynote", "opener", "system", "drone", "graphic"],
+      "rationale": "A straight-down camera position is an unusual vantage point; the theme title does not itself request a separate outcome."
+    },
+    {
+      "id": "a31",
+      "category": "negated",
+      "text": "Hero for a farm-to-table restaurant site: vegetables laid out in neat repeating lines in market crates. NOT a shallow-focus shot, the user wants everything sharp.",
+      "techniques": ["rhythm-pattern"],
+      "goals": [],
+      "subjects": ["vegetables", "crates"],
+      "not_subjects": ["hero", "restaurant", "site", "shallow", "focus", "shot", "sharp", "user"],
+      "rationale": "Selective focus is explicitly rejected; regular repeated lines of produce still establish pattern."
+    },
+    {
+      "id": "a32",
+      "category": "negated",
+      "text": "poster for a chamber orchestra. no silhouettes, the user wants faces visible. violinists on stage lit hard from one side with the rest of the stage black",
+      "techniques": ["value-contrast"],
+      "goals": [],
+      "subjects": ["violinists", "stage"],
+      "not_subjects": ["poster", "silhouettes", "user", "lit", "side", "black"],
+      "rationale": "Silhouette is negated; lit, modelled figures in surrounding darkness are light-dark contrast."
+    },
+    {
+      "id": "a33",
+      "category": "negated",
+      "text": "landing page for a co-working space; avoid anything mirror-balanced or centred. put a lone desk off to the left with daylight coming through the window",
+      "techniques": ["asymmetric-balance"],
+      "goals": [],
+      "subjects": ["desk", "window"],
+      "not_subjects": ["landing", "page", "mirror-balanced", "centred", "left", "daylight"],
+      "rationale": "Symmetry is explicitly excluded; the subject placed to one side is off-centre placement."
+    },
+    {
+      "id": "a34",
+      "category": "negated",
+      "text": "slide on product reliability: a lighthouse in a storm, but no canted or skewed framing, keep the horizon level and upright",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["lighthouse", "storm"],
+      "not_subjects": ["slide", "product", "reliability", "canted", "skewed", "framing", "horizon", "level", "upright"],
+      "rationale": "Diagonal energy is rejected and nothing else describes a mechanism; a storm alone does not establish one."
+    },
+    {
+      "id": "a35",
+      "category": "no-mechanism",
+      "text": "cover for a report on urban heat islands",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["urban", "heat"],
+      "not_subjects": ["cover", "report"],
+      "rationale": "Topic only; no composition or outcome is described."
+    },
+    {
+      "id": "a36",
+      "category": "no-mechanism",
+      "text": "blog post thumbnail: sourdough bread",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["sourdough", "bread"],
+      "not_subjects": ["blog", "post", "thumbnail"],
+      "rationale": "A format and a subject; nothing establishes a mechanism."
+    },
+    {
+      "id": "a37",
+      "category": "no-mechanism",
+      "text": "illustration for a chapter on the history of the printing press. user just said 'something old-timey and warm'",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["printing", "press"],
+      "not_subjects": ["illustration", "chapter", "history", "user", "old-timey", "warm"],
+      "rationale": "Period feel and warmth are mood words that do not name a palette, layout or other mechanism."
+    },
+    {
+      "id": "a38",
+      "category": "no-mechanism",
+      "text": "beekeeping, hives, summer",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["beekeeping", "hives", "summer"],
+      "not_subjects": [],
+      "rationale": "Bare keywords give subjects only."
+    },
+    {
+      "id": "a39",
+      "category": "no-mechanism",
+      "text": "user's words: 'make it feel hopeful'. it's the closing slide of a fundraising deck for a children's hospital",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["children", "hospital"],
+      "not_subjects": ["user", "words", "feel", "hopeful", "closing", "slide", "fundraising", "deck"],
+      "rationale": "Hopefulness is a mood with no matching codebook goal or mechanism, and no visual description is given."
+    },
+    {
+      "id": "a40",
+      "category": "no-mechanism",
+      "text": "og:image for a blog post about remote work in Lisbon",
+      "techniques": [],
+      "goals": [],
+      "subjects": ["lisbon"],
+      "not_subjects": ["og", "image", "blog", "post"],
+      "rationale": "Place and topic only; no mechanism or outcome."
+    }
+  ]
+}
