@@ -12,7 +12,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from atlas import __version__, catalog, coding, images, jobs, transfer
+from atlas import __version__, catalog, coding, desk, images, jobs, transfer
+from atlas import layers as desk_layers
 from atlas.home import REPO, home_dir, local_setting
 from atlas.store import LibraryBusy, Store
 
@@ -661,6 +662,52 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         # Maintenance mode refuses to start while a job is active and blocks every write (this app's worker,
         # other windows, the CLI) until the restore has finished or failed.
         return transfer.restore(home, name)
+
+    # ---- reference desk (read-only, no AI) --------------------------------------------------------------
+    def for_web(ref: dict) -> dict:
+        """No local file paths in the browser: library pictures by media URL, layer pictures by ref."""
+        out = {k: v for k, v in ref.items() if k != 'file'}
+        if ref['layer'] == 'library':
+            out['image'] = media_url(ref.get('display'))
+            out['thumb'] = media_url(ref.get('thumb'))
+        else:
+            out['image'] = out['thumb'] = f"/layer-media?ref={ref['ref']}"
+        return out
+
+    @app.get('/api/desk')
+    def desk_advice(brief: str = '', use: str = 'reference', layers: str = '', limit: int = 12, technique: str = ''):
+        wanted = [part for part in layers.split(',') if part] or None
+        if brief.strip():
+            result = desk.advise(brief, limit=max(1, min(limit, 40)), publishable_only=use == 'publish',
+                                 layers_wanted=wanted, home=home)
+        elif technique:
+            result = desk.search(techniques=[technique], limit=max(1, min(limit, 40)),
+                                 publishable_only=use == 'publish', layers_wanted=wanted, home=home)
+            result['guidance'] = desk.guidance([technique])
+        else:
+            raise ValueError('Describe what the picture should do.')
+        result['results'] = [for_web(r) for r in result['results']]
+        result['layers'] = {'generated': bool(desk_layers.generated()), 'design-system': [
+            {'name': s['name'], 'count': len(s['references'])} for s in desk_layers.systems(home)]}
+        return result
+
+    @app.get('/api/desk/ref')
+    def desk_reference(ref: str):
+        try:
+            return for_web(desk.get(ref, home))
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from None
+
+    @app.get('/layer-media', include_in_schema=False)
+    def layer_media(ref: str):
+        """Pictures from the generated and design-system layers, found by ref in their index, never by path."""
+        try:
+            found = desk_layers.find(ref, home) if desk.REF.match(ref) else None
+        except (OSError, ValueError):
+            found = None
+        if not found:
+            raise HTTPException(404)
+        return FileResponse(found['file'], headers={'Cache-Control': 'private, max-age=3600'})
 
     @app.get('/media/{path:path}', include_in_schema=False)
     def media(path: str):

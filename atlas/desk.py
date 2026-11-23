@@ -80,7 +80,7 @@ def _library(home: Path) -> list[dict]:
             'licence': {'label': rights.get('label', ''), 'code': code, 'url': rights.get('url', ''),
                         'restrictions': rights.get('restrictions', ''), 'checked_by': 'atlas/rights.py'},
             'credit': rights.get('attribution', ''), 'file': str(media / path) if path else None,
-            'thumb': row['thumb_path'], 'image_id': row['id']})
+            'thumb': row['thumb_path'], 'display': path, 'image_id': row['id']})
     return out
 
 
@@ -267,7 +267,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
 
 def _public(ref: dict) -> dict:
     keep = ('ref', 'layer', 'system', 'title', 'creator', 'date', 'medium', 'subjects', 'orientation', 'colour',
-            'palette', 'width', 'height', 'generated', 'licence', 'credit', 'source_url', 'file', 'prompt', 'studied')
+            'palette', 'width', 'height', 'generated', 'licence', 'credit', 'source_url', 'file', 'prompt', 'studied',
+            'image_id', 'thumb', 'display')
     out = {key: ref[key] for key in keep if key in ref and ref[key] not in (None, '', [])}
     out['techniques'] = [{'id': t['id'], 'state': t['state']} for t in ref.get('techniques', [])]
     return out
