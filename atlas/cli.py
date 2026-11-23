@@ -285,12 +285,36 @@ def _show(result: dict, text: bool):
 
 @app.command()
 def advise(brief: str = typer.Argument(..., help='The visual decision, in plain words.'),
+           technique: list[str] = typer.Option(None, help='Technique id(s) you read in the brief (atlas taxonomy).'),
+           goal: list[str] = typer.Option(None, help='Goal id(s) you read in the brief.'),
            limit: int = typer.Option(6, help='How many references (1-40).'),
            publish: bool = typer.Option(False, help='Only images you may publish (CC0, public domain, CC BY).'),
            layer: list[str] = typer.Option(None, help='library, generated or design-system (repeatable).'),
            text: bool = typer.Option(False, help='Readable text instead of JSON.')):
     """Advice for a visual decision: techniques that fit, how to apply them, and references with reasons."""
-    _show(desk.advise(brief, limit=limit, publishable_only=publish, layers_wanted=_layers(layer)), text)
+    _show(desk.advise(brief, techniques=technique, goals=goal, limit=limit, publishable_only=publish,
+                      layers_wanted=_layers(layer)), text)
+
+
+@app.command()
+def directions(brief: str = typer.Argument(..., help='The visual decision, in plain words.'),
+               technique: list[str] = typer.Option(None, help='Technique id(s) to steer it.'),
+               goal: list[str] = typer.Option(None, help='Goal id(s) to steer it.'),
+               count: int = typer.Option(3, help='How many directions (1-5).'),
+               publish: bool = typer.Option(False, help='Only images you may publish.'),
+               text: bool = typer.Option(False, help='Readable text instead of JSON.')):
+    """Distinct ways to answer a brief, one technique each, with the references that show it. No AI."""
+    result = desk.directions(brief, techniques=technique, goals=goal, count=count, publishable_only=publish)
+    if not text:
+        _print(result)
+        return
+    for number, item in enumerate(result['directions'], 1):
+        typer.echo(f"{number}. {item['technique']['name']} (serves {', '.join(item['serves'])})\n   {item['idea']}"
+                   f"\n   Make sure: {'; '.join(item['make_sure'][:3])}")
+        for ref in item['references']:
+            typer.echo(f"   {ref['ref']}  {ref.get('title', '')[:60]} · {ref['licence']['label']}")
+    if not result['directions']:
+        typer.echo(result['note'])
 
 
 @app.command()

@@ -126,6 +126,10 @@ def test_cli_advise_refs_and_ref(env):
     one = runner.invoke(app, ['ref', data['results'][0]['ref']])
     assert one.exit_code == 0 and json.loads(one.output)['licence']['label']
     assert runner.invoke(app, ['ref', 'library:999999']).exit_code == 1
+    steered = json.loads(runner.invoke(app, ['advise', 'zzqx', '--technique', 'silhouette']).output)
+    assert [t['id'] for t in steered['reading']['techniques']] == ['silhouette']
+    options = runner.invoke(app, ['directions', 'calm slide', '--goal', 'create-calm', '--count', '2', '--text'])
+    assert options.exit_code == 0 and options.output.startswith('1. ') and '\n2. ' in options.output
     empty = runner.invoke(app, ['advise', 'zzqx', '--text'])
     assert 'No reference matched' in empty.output
 
