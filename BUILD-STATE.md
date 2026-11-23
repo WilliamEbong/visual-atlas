@@ -16,6 +16,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
 - Content round: curated starter (102 refs, museum works for stock), leads by strength, mood goals plus per-picture
   moods, Find and Projects show results, long tail, two Codex reviews fixed. Fresh-scorer mean 7.05 -> 7.5. What
   still blocks a 9 is in OVERNIGHT-CHANGES.md "Content round".
+- Final Codex review of the whole branch: 3 findings, all fixed with tests (MCP file containment, MCP UTF-8 input,
+  credits in readable CLI output). 477 backend and 18 web tests pass.
 - Next concrete action: owner's blind test (docs/evaluation/v0.5/BLIND-TEST.md), then the merge.
 
 ## 008 Reference desk, design pass and round 3 (2026-11-23, same branch)

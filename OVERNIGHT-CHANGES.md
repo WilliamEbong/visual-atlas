@@ -52,7 +52,7 @@ chosen, and whether you may publish it.
 
   Layout changes alone stalled at about 7; better pictures and honest answers moved the score. What is left before 9
   is listed under "Content round".
-- **Checks.** 474 backend tests, 18 web tests, Ruff, TypeScript, the taxonomy and data checks, and three Codex
+- **Checks.** 477 backend tests, 18 web tests, Ruff, TypeScript, the taxonomy and data checks, and four Codex
   reviews. Every confirmed finding was fixed with a test.
 
 **Your decisions**
@@ -182,6 +182,10 @@ The scorers' reasons pointed at content, not layout, so this round worked on con
     collapsing its own list, and phone Compare overlapping.
   - Content round, 4 findings fixed: false mood claims, the Library mood filter, uniqueness applied after the limit,
     and a stale "Recently added".
+  - Final review of the whole branch against `visual-atlas-v0.4`, 3 findings, all confirmed and fixed with tests:
+    - the MCP image viewer could open a library file outside the media folder;
+    - MCP input on Windows mangled non-ASCII text;
+    - readable CLI output dropped the stored credit.
 
 | Build | Product designer | Editorial designer | Mean |
 |---|---|---|---|
@@ -442,7 +446,7 @@ app, start it with `uv run visual-atlas` and open **Ask**.
 
 ## How to merge
 `visual-atlas-v0.4` still points at `f9e400c`, where this branch was cut, so the merge has no conflicts (85 commits).
-A full merge rehearsal passed every check in round 4; the final checks on this branch passed again: 474 backend
+A full merge rehearsal passed every check in round 4; the final checks on this branch passed again: 477 backend
 tests, 18 web tests, Ruff, TypeScript, the taxonomy check and the data guard.
 
 From the main checkout (`C:\Users\Owner\OneDrive\Documents\VisualAtlas`), with a clean working tree:
