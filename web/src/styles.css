@@ -481,3 +481,13 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   .ref-strip li { flex: 0 0 44%; }
   .drawers.goals { grid-template-columns: 1fr; }
 }
+
+/* scored design cycle 4: strips use the Library's justified rows */
+.refs-row { --row: 170px; list-style: none; padding: 0; margin: 16px 0 0; gap: 28px 16px; }
+.refs-row .plate-title { font-size: 16px; }
+.refs-row .strip-reason { display: block; -webkit-line-clamp: unset; overflow: visible; margin-top: 4px; }
+.refs-row .strip-meta { display: block; margin-top: 4px; }
+.way .refs-row { margin-top: 0; }
+@media (max-width: 600px) { .refs-row { --row: 120px; } }
+.refs-row .strip-reason, .refs-row .strip-meta { min-width: 0; }
+.refs-row::after { display: none; }  /* short strips fill their width */

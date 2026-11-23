@@ -179,14 +179,15 @@ function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: 
 
 /** Thumbnails that open their reference; shared by Ways to do it and More like this. */
 function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; label: string; use: string }) {
+  // The Library's justified rows: every picture at its true shape, rows that fill the width, one caption style.
   return (
-    <ul className="ref-strip" aria-label={label}>
-      {refs.map((ref) => <li key={ref.ref}>
-        <a href={refLink(ref, from, use)} className="specimen" style={{ aspectRatio: aspect(ref) }}>
-          <RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></a>
-        <span className="strip-label">{cleanTitle(ref.title)}</span>
+    <ul className="justified refs-row" aria-label={label}>
+      {refs.map((ref) => <li key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
+        <a href={refLink(ref, from, use)} className="plate">
+          <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
+          <span className="plate-title">{cleanTitle(ref.title)}</span></a>
         {ref.reasons[0] && !ref.reasons[0].startsWith('Similar placement') && <span className="strip-reason"><Reason text={ref.reasons[0]} /></span>}
-        <span className="mono strip-meta">{layerLabel(ref)} · {plainLicence(ref)}</span>
+        <span className="mono strip-meta">{ref.layer !== 'library' ? `${layerLabel(ref)} · ` : ''}{plainLicence(ref)}</span>
       </li>)}
     </ul>
   )
