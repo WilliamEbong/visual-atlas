@@ -6,13 +6,18 @@
     {"id": "guide-the-eye", "name": "Guide the eye", "description": "Control the order and path in which the viewer looks around the image.", "request_cues": ["guide the eye", "lead the eye", "move the eye", "direct the eye", "eye travel", "eye wander", "reading order", "visual path", "visual flow", "flow through", "eye path", "scan the image", "where to look", "eye movement", "path for the eye", "visual hierarchy", "move through the image", "lead the viewer", "walk the viewer", "take the eye"]},
     {"id": "show-scale", "name": "Show size or scale", "description": "Make something read as vast, tiny, or out of proportion.", "request_cues": ["sense of scale", "dwarfed", "tiny", "huge", "enormous", "vast", "giant", "towering", "how big", "how huge", "sense of size", "massive", "colossal", "gigantic", "immense", "monumental", "sheer size", "feel small", "feel insignificant", "larger than life", "miniature", "magnitude", "how small"]},
     {"id": "create-tension", "name": "Create tension or unease", "description": "Make the image feel unstable, crowded, confrontational or unresolved.", "request_cues": ["dramatic", "unsettling", "tense", "tension", "eerie", "ominous", "menacing", "uneasy", "horror", "thriller", "dread", "on edge", "claustrophobic", "jittery", "anxiety", "edgy", "suspense", "suspenseful", "foreboding", "creepy", "disturbing", "unstable", "uncomfortable", "something wrong", "sinister", "threatening"]},
-    {"id": "create-calm", "name": "Create calm and order", "description": "Make the image feel quiet, balanced, stable or contemplative.", "request_cues": ["calm", "serene", "peaceful", "quiet", "tranquil", "soothing", "gentle", "restful", "zen", "meditative", "contemplative", "stillness", "relaxing", "relaxed", "orderly", "sense of order", "unhurried", "slow living", "spa like", "at peace", "hushed", "placid", "sense of peace"]},
+    {"id": "create-calm", "name": "Create calm and order", "description": "Make the image feel quiet, balanced, stable or contemplative.", "request_cues": ["calm", "serene", "peaceful", "quiet", "tranquil", "soothing", "gentle", "restful", "zen", "meditative", "contemplative", "stillness", "relaxing", "relaxed", "orderly", "sense of order", "unhurried", "slow living", "spa like", "at peace", "hushed", "placid", "sense of peace", "unwind", "slow down", "slowing down", "decompress", "breathe easy"]},
     {"id": "group-and-relate", "name": "Show what belongs together", "description": "Make parts read as a set, a pair, or as separate from one another.", "request_cues": ["belong together", "grouped", "huddled", "as a group", "set of", "go together", "belonging", "belong to", "family of", "related item", "together and apart", "part of the same", "matching set", "collection of", "in the group", "team of", "unity", "who belong"]},
     {"id": "surprise", "name": "Surprise or provoke a second look", "description": "Break an expectation so the viewer stops and looks again.", "request_cues": ["surprising", "surprise", "unexpected", "surreal", "second look", "double take", "strangeness", "stop scrolling", "scroll stopping", "thumb stopping", "make people stop", "head turning", "wait what", "mind bending", "shocking", "startling", "provocative", "catch off guard", "not what you expect", "wow factor", "twist"]},
     {"id": "tell-a-story", "name": "Suggest a story or relationship", "description": "Imply events, intentions or relationships beyond what is literally shown.", "request_cues": ["story", "narrative", "satirical", "cartoon", "characters", "something happening", "relationship between", "what happened", "moment before", "a moment between", "backstory", "storytelling", "scene from", "tale", "implied story", "plot", "interaction between", "cinematic moment", "a moment in time", "glimpse of a life", "slice of life"]},
     {"id": "build-depth", "name": "Build depth and space", "description": "Make a flat picture read as deep, layered space.", "request_cues": ["sense of depth", "depth", "receding", "far distance", "three dimensional", "3d feel", "feel deep", "pull you in", "draw you into", "immersive", "go on forever", "stretch away", "into the distance", "not flat", "flat looking", "sense of space", "spatial depth", "deep view", "far away"]},
-    {"id": "suggest-motion", "name": "Suggest movement or energy", "description": "Make a still image feel active, fast or about to change.", "request_cues": ["movement", "motion", "speed", "dynamic", "feels fast", "action", "energetic", "kinetic", "fast paced", "momentum", "whoosh", "velocity", "on the move", "racing", "explosive", "lively", "full of energy", "feel alive", "about to move"]},
-    {"id": "make-an-idea-visible", "name": "Make an idea visible", "description": "Express an abstract concept through concrete visual form.", "request_cues": ["concept", "metaphor", "symbol of", "stands for", "abstract idea", "the idea of", "intangible", "convey the idea", "express the idea", "visualise", "visualize", "show the concept", "illustrate the idea", "represent", "meaning of", "abstract notion", "big idea", "idea behind", "visual explanation"]}
+    {"id": "suggest-motion", "name": "Suggest movement or energy", "description": "Make a still image feel active, fast or about to change.", "request_cues": ["movement", "motion", "speed", "dynamic", "feels fast", "action", "energetic", "kinetic", "fast paced", "momentum", "whoosh", "velocity", "on the move", "racing", "explosive", "lively", "full of energy", "feel alive", "about to move", "high energy", "high octane", "adrenaline", "punchy", "buzzing", "exhilarating", "upbeat", "exciting"]},
+    {"id": "make-an-idea-visible", "name": "Make an idea visible", "description": "Express an abstract concept through concrete visual form.", "request_cues": ["concept", "metaphor", "symbol of", "stands for", "abstract idea", "the idea of", "intangible", "convey the idea", "express the idea", "visualise", "visualize", "show the concept", "illustrate the idea", "represent", "meaning of", "abstract notion", "big idea", "idea behind", "visual explanation"]},
+    {"id": "feel-warm", "name": "Feel warm and welcoming", "description": "Make the image feel friendly, close and inviting, as if the viewer is among people who are glad they came.", "request_cues": ["warm", "warmth", "welcoming", "welcome", "cosy", "cozy", "communal", "inviting", "friendly", "homely", "feel at home", "hospitable", "heartwarming", "neighbourly", "neighborly", "convivial", "community spirit", "coming together", "bring people together", "open arms", "sense of belonging", "affectionate", "tender", "kinship"]},
+    {"id": "feel-serious", "name": "Feel serious and credible", "description": "Make the image feel trustworthy, authoritative and composed, so the message is taken seriously.", "request_cues": ["serious", "credible", "credibility", "authoritative", "authority", "trustworthy", "trusted", "dependable", "reliable", "professional", "formal", "sober", "dignified", "gravitas", "solemn", "institutional", "no nonsense", "nothing frivolous", "weighty", "respectable", "businesslike", "corporate", "official", "stately"]},
+    {"id": "feel-playful", "name": "Feel playful", "description": "Make the image feel light-hearted, funny or mischievous, so people smile.", "request_cues": ["playful", "fun", "funny", "silly", "whimsical", "whimsy", "quirky", "cheeky", "light hearted", "lighthearted", "jolly", "zany", "goofy", "irreverent", "mischievous", "tongue in cheek", "make people smile", "grin", "giggle", "humorous", "humour", "humor", "witty", "cheerful", "childlike"]},
+    {"id": "feel-luxurious", "name": "Feel luxurious", "description": "Make the image feel rare, expensive and refined, worth more than its price.", "request_cues": ["luxurious", "luxury", "opulent", "opulence", "lavish", "sumptuous", "high end", "upmarket", "upscale", "premium", "exclusive", "refined", "elegant", "sophisticated", "glamorous", "glamour", "indulgent", "decadent", "five star", "couture", "feel expensive", "expensive looking", "classy", "deluxe", "prestige"]},
+    {"id": "feel-wistful", "name": "Feel lonely or wistful", "description": "Make the image feel solitary, nostalgic or sad, with a sense of longing or loss.", "request_cues": ["lonely", "loneliness", "wistful", "melancholy", "melancholic", "nostalgic", "nostalgia", "bittersweet", "sombre", "somber", "mournful", "grief", "grieving", "elegiac", "longing", "sad", "sadness", "poignant", "forlorn", "desolate", "feel alone", "sense of loss", "remembrance"]}
   ],
   "operations": [
     {"id": "contrast", "name": "Contrast", "description": "Set one value of a visual variable against a very different value."},
@@ -60,7 +65,7 @@
         {"technique": "silhouette", "relation": "often_combined"},
         {"technique": "tight-cropping", "relation": "opposite_strategy"}
       ],
-      "goals": ["draw-attention", "create-calm", "show-scale"],
+      "goals": ["draw-attention", "create-calm", "show-scale", "feel-serious", "feel-luxurious", "feel-wistful"],
       "operations": ["isolate", "reduce"],
       "domains": ["position", "space"],
       "search_hints": {
@@ -95,7 +100,7 @@
         {"technique": "layered-depth", "relation": "often_combined"},
         {"technique": "contextual-incongruity", "relation": "can_create"}
       ],
-      "goals": ["show-scale", "draw-attention", "tell-a-story"],
+      "goals": ["show-scale", "draw-attention", "tell-a-story", "feel-playful"],
       "operations": ["contrast"],
       "domains": ["scale"],
       "search_hints": {
@@ -130,7 +135,7 @@
         {"technique": "color-harmony", "relation": "opposite_strategy"},
         {"technique": "repetition-with-interruption", "relation": "can_create"}
       ],
-      "goals": ["draw-attention", "suggest-motion"],
+      "goals": ["draw-attention", "suggest-motion", "feel-playful"],
       "operations": ["contrast"],
       "domains": ["color"],
       "search_hints": {
@@ -165,7 +170,7 @@
         {"technique": "color-contrast", "relation": "often_combined"},
         {"technique": "selective-focus", "relation": "similar_purpose"}
       ],
-      "goals": ["draw-attention", "create-tension", "build-depth"],
+      "goals": ["draw-attention", "create-tension", "build-depth", "feel-serious", "feel-luxurious"],
       "operations": ["contrast", "isolate"],
       "domains": ["value"],
       "search_hints": {
@@ -200,7 +205,7 @@
         {"technique": "color-contrast", "relation": "often_combined"},
         {"technique": "contextual-incongruity", "relation": "similar_purpose"}
       ],
-      "goals": ["draw-attention", "surprise"],
+      "goals": ["draw-attention", "surprise", "feel-playful"],
       "operations": ["repeat", "break-expectation"],
       "domains": ["position", "color", "line-shape"],
       "search_hints": {
@@ -235,7 +240,7 @@
         {"technique": "value-contrast", "relation": "often_combined"},
         {"technique": "leading-lines", "relation": "similar_purpose"}
       ],
-      "goals": ["draw-attention", "build-depth", "tell-a-story"],
+      "goals": ["draw-attention", "build-depth", "tell-a-story", "feel-warm"],
       "operations": ["enclose", "layer"],
       "domains": ["position", "space"],
       "search_hints": {
@@ -305,7 +310,7 @@
         {"technique": "rhythm-pattern", "relation": "related"},
         {"technique": "negative-space", "relation": "related"}
       ],
-      "goals": ["group-and-relate", "tell-a-story"],
+      "goals": ["group-and-relate", "tell-a-story", "feel-warm"],
       "operations": ["group"],
       "domains": ["position"],
       "search_hints": {
@@ -340,7 +345,7 @@
         {"technique": "proximity-grouping", "relation": "often_combined"},
         {"technique": "juxtaposition", "relation": "often_combined"}
       ],
-      "goals": ["guide-the-eye", "tell-a-story"],
+      "goals": ["guide-the-eye", "tell-a-story", "feel-warm", "feel-wistful"],
       "operations": ["direct"],
       "domains": ["body-gaze"],
       "search_hints": {
@@ -410,7 +415,7 @@
         {"technique": "visual-metaphor", "relation": "related"},
         {"technique": "scale-contrast", "relation": "related"}
       ],
-      "goals": ["tell-a-story", "surprise", "make-an-idea-visible"],
+      "goals": ["tell-a-story", "surprise", "make-an-idea-visible", "feel-playful"],
       "operations": ["juxtapose"],
       "domains": ["meaning"],
       "search_hints": {
@@ -515,7 +520,7 @@
         {"technique": "visual-metaphor", "relation": "often_combined"},
         {"technique": "scale-contrast", "relation": "can_create"}
       ],
-      "goals": ["surprise", "tell-a-story"],
+      "goals": ["surprise", "tell-a-story", "feel-playful"],
       "operations": ["break-expectation", "juxtapose"],
       "domains": ["meaning"],
       "search_hints": {
@@ -550,7 +555,7 @@
         {"technique": "framing", "relation": "often_combined"},
         {"technique": "rhythm-pattern", "relation": "related"}
       ],
-      "goals": ["create-calm", "draw-attention"],
+      "goals": ["create-calm", "draw-attention", "feel-serious"],
       "operations": ["repeat"],
       "domains": ["position"],
       "search_hints": {
@@ -655,7 +660,7 @@
         {"technique": "color-harmony", "relation": "often_combined"},
         {"technique": "negative-space", "relation": "related"}
       ],
-      "goals": ["build-depth", "create-calm"],
+      "goals": ["build-depth", "create-calm", "feel-wistful"],
       "operations": ["layer", "reduce"],
       "domains": ["space", "color", "value"],
       "search_hints": {
@@ -690,7 +695,7 @@
         {"technique": "negative-space", "relation": "similar_purpose"},
         {"technique": "layered-depth", "relation": "often_combined"}
       ],
-      "goals": ["draw-attention", "build-depth"],
+      "goals": ["draw-attention", "build-depth", "feel-luxurious"],
       "operations": ["isolate", "contrast"],
       "domains": ["texture", "space"],
       "search_hints": {
@@ -795,7 +800,7 @@
         {"technique": "negative-space", "relation": "often_combined"},
         {"technique": "figure-ground-ambiguity", "relation": "can_create"}
       ],
-      "goals": ["draw-attention", "make-an-idea-visible", "create-calm"],
+      "goals": ["draw-attention", "make-an-idea-visible", "create-calm", "feel-wistful"],
       "operations": ["contrast", "reduce"],
       "domains": ["value", "line-shape"],
       "search_hints": {
@@ -830,7 +835,7 @@
         {"technique": "value-contrast", "relation": "often_combined"},
         {"technique": "juxtaposition", "relation": "related"}
       ],
-      "goals": ["draw-attention", "make-an-idea-visible"],
+      "goals": ["draw-attention", "make-an-idea-visible", "feel-luxurious"],
       "operations": ["contrast"],
       "domains": ["texture"],
       "search_hints": {
@@ -865,7 +870,7 @@
         {"technique": "scale-contrast", "relation": "related"},
         {"technique": "rhythm-pattern", "relation": "can_create"}
       ],
-      "goals": ["create-tension", "show-scale", "surprise"],
+      "goals": ["create-tension", "show-scale", "surprise", "feel-serious"],
       "operations": ["break-expectation"],
       "domains": ["space", "scale"],
       "search_hints": {
@@ -900,7 +905,7 @@
         {"technique": "atmospheric-perspective", "relation": "often_combined"},
         {"technique": "negative-space", "relation": "related"}
       ],
-      "goals": ["create-calm", "make-an-idea-visible"],
+      "goals": ["create-calm", "make-an-idea-visible", "feel-warm", "feel-luxurious"],
       "operations": ["reduce"],
       "domains": ["color"],
       "search_hints": {
