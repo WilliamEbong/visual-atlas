@@ -14,6 +14,7 @@ import os
 import re
 import sqlite3
 import tempfile
+import threading
 from contextlib import contextmanager, suppress
 from functools import lru_cache
 from pathlib import Path
@@ -201,7 +202,8 @@ def _text(text: str) -> str:
 
 def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orientation: str = '', colour: str = '',
            medium: str = '', era_from: int | None = None, era_to: int | None = None, layers_wanted=None,
-           system: str = '', publishable_only: bool = False, limit: int = 8, home: Path | None = None) -> dict:
+           system: str = '', publishable_only: bool = False, limit: int = 8, home: Path | None = None,
+           require_technique: str = '') -> dict:
     """Rank references across layers. Inputs are validated here because agents call this directly."""
     if not isinstance(brief, str) or len(brief) > MAX_TEXT:
         raise ValueError(f'the brief must be text of at most {MAX_TEXT} characters')
@@ -242,6 +244,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
         if orientation and ref.get('orientation') != orientation:
             continue
         if system and ref.get('system') != system:
+            continue
+        if require_technique and not any(t['id'] == require_technique for t in ref['techniques']):
             continue
         if colour and colour.lower() not in (ref.get('colour') or '').lower():
             continue
@@ -375,10 +379,9 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
     for tid in _candidates(found, taxonomy):
         if len(out) == count:
             break
-        # Only pictures that carry the technique, ranked by it and the subject; then the per-direction limit.
-        refs = search(techniques=[tid], subjects=subjects, limit=40, publishable_only=publishable_only,
-                      layers_wanted=layers_wanted, home=home)['results']
-        refs = [r for r in refs if any(t['id'] == tid for t in r['techniques'])][:per_direction]
+        # Only pictures that carry the technique compete; the subject words then rank them.
+        refs = search(techniques=[tid], subjects=subjects, limit=per_direction, publishable_only=publishable_only,
+                      layers_wanted=layers_wanted, home=home, require_technique=tid)['results']
         if not refs:
             continue  # a direction with nothing to show is advice the agent cannot check; skip it
         technique = by_id[tid]
@@ -470,7 +473,12 @@ def _cache_file(home: Path) -> Path:
     return SIGNATURES / f"signatures-{hashlib.sha256(str(home.resolve()).encode()).hexdigest()[:16]}.json"
 
 
+_cache_lock = threading.Lock()
+
+
 def _load_signatures(home: Path) -> dict:
+    with suppress(OSError):  # the first overnight build kept one shared file with paths in it: retire it
+        (SIGNATURES / 'signatures-v1.json').unlink(missing_ok=True)
     try:
         data = json.loads(_cache_file(home).read_text(encoding='utf-8'))
         return data if isinstance(data, dict) else {}
@@ -478,13 +486,15 @@ def _load_signatures(home: Path) -> dict:
         return {}
 
 
-def _save_signatures(home: Path, cache: dict):
-    with suppress(OSError):  # only a cache: losing it costs time, never results
+def _save_signatures(home: Path, cache: dict, prune: bool):
+    """A full pass replaces the file (pruning); a filtered pass only adds to what is there now."""
+    with _cache_lock, suppress(OSError):  # only a cache: losing it costs time, never results
         SIGNATURES.mkdir(parents=True, exist_ok=True)
         target = _cache_file(home)
-        part = target.with_suffix(f'.{os.getpid()}.tmp')
-        part.write_text(json.dumps(cache), encoding='utf-8')
-        os.replace(part, target)
+        merged = cache if prune else {**_load_signatures(home), **cache}
+        with tempfile.NamedTemporaryFile('w', encoding='utf-8', dir=SIGNATURES, suffix='.tmp', delete=False) as part:
+            json.dump(merged, part)
+        os.replace(part.name, target)
 
 
 def _signature(path: Path, cache: dict, seen: set) -> Image.Image | None:
@@ -545,9 +555,10 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
         # ponytail: brute force over every reference; fine to tens of thousands, index it if libraries grow past that
         distance = sum(ImageStat.Stat(ImageChops.difference(mine, theirs)).mean) / 3  # mean difference, 0-255
         scored.append((distance, candidate))
-    if set(wanted) == set(LAYERS) and not publishable_only:  # a full pass: drop pictures no longer there
+    full = set(wanted) == set(LAYERS) and not publishable_only
+    if full:  # a full pass: drop pictures no longer there
         cache = {key: value for key, value in cache.items() if key in seen}
-    _save_signatures(home, cache)
+    _save_signatures(home, cache, prune=full)
     scored.sort(key=lambda item: (item[0], item[1]['ref']))
     results = []
     for distance, candidate in scored[:limit]:

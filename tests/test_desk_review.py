@@ -311,3 +311,39 @@ def test_library_only_directions_do_not_route_to_private_systems(starter_home, t
     assert desk.search(brief='tea garden calm', home=starter_home)['route']['system']  # routed when allowed
     scoped = desk.directions('tea garden calm', goals=['create-calm'], layers_wanted=['library'], home=starter_home)
     assert scoped['route']['system'] is None and scoped['directions']
+
+
+
+# ---- Codex review, overnight round 3 ------------------------------------------------------------------------------
+
+
+def test_the_old_shared_signature_file_is_retired(tmp_path, monkeypatch):
+    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache')
+    (tmp_path / 'cache').mkdir()
+    old = tmp_path / 'cache' / 'signatures-v1.json'
+    old.write_text(json.dumps({'C:/private/picture.jpg|1|2': '00'}), encoding='utf-8')
+    desk._load_signatures(tmp_path / 'home')
+    assert not old.exists()
+
+
+def test_a_filtered_comparison_keeps_what_a_full_pass_saved(tmp_path, monkeypatch):
+    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache')
+    home = tmp_path / 'home'
+    desk._save_signatures(home, {'a': '01', 'b': '02'}, prune=True)
+    desk._save_signatures(home, {'c': '03'}, prune=False)
+    assert desk._load_signatures(home) == {'a': '01', 'b': '02', 'c': '03'}
+    desk._save_signatures(home, {'c': '03'}, prune=True)
+    assert desk._load_signatures(home) == {'c': '03'}
+
+
+def test_directions_find_technique_examples_behind_many_word_matches(tmp_path, monkeypatch):
+    def record(i, techniques, subjects):
+        return {'ref': f'generated:r-{i}', 'layer': 'generated', 'title': f'Picture {i}', 'subjects': subjects,
+                'techniques': [{'id': t, 'state': 'proposed'} for t in techniques], 'generated': True,
+                'licence': {'label': 'Generated', 'code': 'generated'}, 'width': 10, 'height': 10}
+    crowd = [record(i, [], ['tea', 'garden', 'cup']) for i in range(50)]
+    shown = [record(100 + i, ['silhouette'], ['night']) for i in range(3)]
+    monkeypatch.setattr(desk, 'references', lambda home=None, layer_names=desk.LAYERS: crowd + shown)
+    result = desk.directions('tea garden cup', techniques=['silhouette'], count=1, per_direction=3,
+                             home=tmp_path / 'home')
+    assert [r['ref'] for r in result['directions'][0]['references']] == [r['ref'] for r in shown]
