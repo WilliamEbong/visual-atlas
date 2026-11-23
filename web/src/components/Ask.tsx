@@ -46,8 +46,11 @@ export function layerLabel(ref: DeskRef): string {
   return ref.layer === 'generated' ? 'Generated example' : 'Library'
 }
 
-function refLink(ref: DeskRef, from: string): string {
-  return ref.layer === 'library' && ref.image_id ? href(`image/${ref.image_id}`, { from }) : href('ref', { id: ref.ref, from })
+/** Links keep the publication mode, so "More like this" on the next page stays within publishable pictures. */
+function refLink(ref: DeskRef, from: string, use = 'reference'): string {
+  const keep = use === 'publish' ? { use } : {}
+  return ref.layer === 'library' && ref.image_id ? href(`image/${ref.image_id}`, { from, ...keep })
+    : href('ref', { id: ref.ref, from, ...keep })
 }
 
 function aspect(ref: DeskRef): number {
@@ -134,21 +137,22 @@ function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: 
 }
 
 /** Thumbnails that open their reference; shared by Ways to do it and More like this. */
-function RefStrip({ refs, from, label }: { refs: DeskRef[]; from: string; label: string }) {
+function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; label: string; use: string }) {
   return (
     <ul className="ref-strip" aria-label={label}>
       {refs.map((ref) => <li key={ref.ref}>
-        <a href={refLink(ref, from)} className="specimen" style={{ aspectRatio: aspect(ref) }}>
+        <a href={refLink(ref, from, use)} className="specimen" style={{ aspectRatio: aspect(ref) }}>
           <RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></a>
         <span className="strip-label">{ref.title}</span>
+        <span className="mono strip-meta">{layerLabel(ref)} · {plainLicence(ref)}</span>
       </li>)}
     </ul>
   )
 }
 
 /** "More like this": pictures whose light, dark and colour sit in the same places, from every layer. */
-export function MoreLikeThis({ refId, from }: { refId: string; from: string }) {
-  const alike = useData<DeskSimilar>(readOnly ? null : `desk/similar?ref=${encodeURIComponent(refId)}&limit=8`)
+export function MoreLikeThis({ refId, from, use }: { refId: string; from: string; use: string }) {
+  const alike = useData<DeskSimilar>(readOnly ? null : `desk/similar?ref=${encodeURIComponent(refId)}&limit=8&use=${use === 'publish' ? 'publish' : 'reference'}`)
   if (!alike.data?.results.length) return null
   return (
     <section className="section" aria-labelledby="alike-title" style={{ marginTop: 56 }}>
@@ -156,16 +160,16 @@ export function MoreLikeThis({ refId, from }: { refId: string; from: string }) {
         <h2 id="alike-title">More like this</h2>
         <p className="mono">Similar placement of light, dark and colour, compared on this computer</p>
       </div>
-      <RefStrip refs={alike.data.results} from={from} label="Pictures with a similar composition" />
+      <RefStrip refs={alike.data.results} from={from} use={use} label="Pictures with a similar composition" />
     </section>
   )
 }
 
-function Plates({ refs, from, small }: { refs: DeskRef[]; from: string; small?: boolean }) {
+function Plates({ refs, from, small, use }: { refs: DeskRef[]; from: string; small?: boolean; use: string }) {
   return (
     <div className={`justified desk-results${small ? ' small' : ''}`}>
       {refs.map((ref) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
-        <a className="plate" href={refLink(ref, from)}>
+        <a className="plate" href={refLink(ref, from, use)}>
           <span className="plate-frame"><RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></span>
           <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>
           <span className="plate-title">{ref.title}</span>
@@ -218,7 +222,7 @@ function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, mor
               <ul>{way.make_sure.slice(0, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
               {way.not_to_confuse_with[0] && <p className="muted guide-note">{way.not_to_confuse_with[0]}</p>}
             </div>
-            <RefStrip refs={way.references} from={from} label={`Pictures that show ${way.technique.name}`} />
+            <RefStrip refs={way.references} from={from} use={use} label={`Pictures that show ${way.technique.name}`} />
           </li>)}
         </ol>
       </section>
@@ -244,10 +248,10 @@ function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, mor
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
           : <>
-            {strong.length > 0 && <Plates refs={strong} from={from} />}
+            {strong.length > 0 && <Plates refs={strong} from={from} use={use} />}
             {weak.length > 0 && <>
               <h3 className="weak-title mono">{strong.length ? 'Matched on words only' : 'Matched on words only: no technique evidence yet'}</h3>
-              <Plates refs={weak} from={from} small />
+              <Plates refs={weak} from={from} use={use} small />
             </>}
           </>}
         {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
@@ -307,7 +311,7 @@ export function RefPage({ id }: { id: string }) {
           {r.layer === 'design-system' && <p className="muted" style={{ marginTop: 14, fontSize: 14 }}>From a private design-system library on this computer. It is not part of Visual Atlas and is never shared or exported by it.</p>}
         </section>
       </div>
-      <MoreLikeThis refId={r.ref} from={window.location.hash} />
+      <MoreLikeThis refId={r.ref} from={window.location.hash} use={route.query.get('use') ?? 'reference'} />
     </>
   )
 }

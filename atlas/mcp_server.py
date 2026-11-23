@@ -82,11 +82,13 @@ TOOLS = [
      'description': 'When the local references do not fit: search Wikimedia Commons, the Met, the Art Institute of '
                     'Chicago, the Cleveland Museum of Art and the Rijksmuseum live for a subject. Every candidate is '
                     'licence-checked by the atlas from its record and only eligible ones come back, with credit. '
-                    'Contacts those public APIs once each; downloads and stores nothing.',
+                    'One search per collection (the Rijksmuseum also reads each record found); downloads and stores '
+                    'nothing.',
      'inputSchema': {'type': 'object', 'required': ['query'], 'additionalProperties': False, 'properties': {
          'query': {'type': 'string', 'minLength': 1, 'maxLength': 200,
                    'description': 'A subject in a few words (e.g. "lighthouse at night"), not a whole brief'},
-         'collections': {'type': 'array', 'items': {'enum': list(desk.OPEN_PROVIDERS)}, 'maxItems': 5},
+         'collections': {'type': 'array', 'items': {'enum': list(desk.OPEN_PROVIDERS)}, 'minItems': 1,
+                         'maxItems': 5},
          'per_collection': {'type': 'integer', 'minimum': 1, 'maximum': 10, 'default': 6}}}},
     {'name': 'list_techniques', 'title': 'List techniques and goals',
      'description': 'The taxonomy: communication goals and the techniques that serve them, with ids to use in '
@@ -133,6 +135,8 @@ def _check(arguments: dict, schema: dict):
             raise ValueError(f'{name} must be a whole number in range')
         if kind == 'array' and (not isinstance(value, list) or len(value) > rule.get('maxItems', 12)):
             raise ValueError(f'{name} must be a list of at most {rule.get("maxItems", 12)} items')
+        if kind == 'array' and len(value) < rule.get('minItems', 0):
+            raise ValueError(f'{name} needs at least {rule["minItems"]} item(s)')
 
 
 def _publish(arguments: dict) -> bool:

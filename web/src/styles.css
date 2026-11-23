@@ -403,3 +403,4 @@ h1 { text-wrap: balance; }
 .desk-results.small { --row: 150px; }
 .state.disputed { color: var(--accent); border-color: var(--accent); }
 .ask-form .segments .choice:has(input:checked) { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
+.strip-meta { font-size: 11px; color: var(--caption); }

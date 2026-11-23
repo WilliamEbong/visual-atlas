@@ -221,7 +221,7 @@ export default function ImagePage({ id }: { id: number }) {
         <p className="mono strip-caption">{related.slice(0, 6).map((r) => r.title).join(' · ')}</p>
       </section>}
 
-      <MoreLikeThis refId={`library:${image.id}`} from={window.location.hash} />
+      <MoreLikeThis refId={`library:${image.id}`} from={window.location.hash} use={query.get('use') ?? 'reference'} />
 
       <section className="section" aria-label="See also" style={{ marginTop: 40 }}>
         <div className="row"><a className="button small" href={href('connections', { focus: `image:${image.id}`, from })}>See connections</a></div>

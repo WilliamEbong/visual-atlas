@@ -231,12 +231,17 @@ def test_more_like_this_ranks_the_closest_composition_first(tmp_path, monkeypatc
         items.append({'id': name, 'file': f'{name}.jpg', 'title': name, 'tool': 'x', 'date': 'd', 'prompt': 'p'})
     (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
     monkeypatch.setattr(layers, 'GENERATED', folder)
-    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache' / 'signatures.json')
+    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache')
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     found = desk.similar('generated:red-left', layers_wanted=['generated'], home=tmp_path / 'home')
     assert [r['ref'] for r in found['results']] == ['generated:red-left-copy', 'generated:blue-right']
     assert found['results'][0]['score'] > 0.9 > found['results'][1]['score']
-    assert (tmp_path / 'cache' / 'signatures.json').is_file() and not (tmp_path / 'home').exists()
+    cache = list((tmp_path / 'cache').glob('signatures-*.json'))
+    assert len(cache) == 1 and not (tmp_path / 'home').exists()
+    assert 'red-left' not in cache[0].read_text(encoding='utf-8')  # opaque keys: no file names or paths
+    (folder / 'blue-right.jpg').unlink()  # a full pass forgets pictures that are gone
+    desk.similar('generated:red-left', home=tmp_path / 'home')
+    assert len(json.loads(cache[0].read_text(encoding='utf-8'))) == 2
 
 
 def test_open_search_returns_only_rights_checked_candidates(monkeypatch):
@@ -261,3 +266,48 @@ def test_open_search_returns_only_rights_checked_candidates(monkeypatch):
                 {'query': 'x', 'per_provider': 11}):
         with pytest.raises(ValueError):
             desk.open_search(**bad, fetcher=object())
+
+
+
+# ---- Codex review, overnight round 2 ------------------------------------------------------------------------------
+
+
+def test_open_search_never_widens_an_empty_selection(monkeypatch):
+    from atlas import providers
+    calls = []
+    monkeypatch.setattr(providers, 'search', lambda *a, **k: calls.append(a) or [])
+    for empty in ([], [''], ['  ']):
+        with pytest.raises(ValueError, match='at least one collection'):
+            desk.open_search('lighthouse', providers_wanted=empty, fetcher=object())
+    assert calls == []
+    assert mcp_server.call('search_open_collections', {'query': 'x', 'collections': []})['isError'] is True
+
+
+def test_open_searches_share_one_fetcher_so_cooldowns_carry_over(monkeypatch):
+    from atlas import providers
+    seen = []
+    monkeypatch.setattr(providers, 'search', lambda fetcher, *a, **k: seen.append(fetcher) or [])
+    desk.open_search('a', providers_wanted=['met'])
+    desk.open_search('b', providers_wanted=['met'])
+    assert len(seen) == 2 and seen[0] is seen[1]
+
+
+def test_long_colliding_system_names_still_give_refs_that_open(starter_home, tmp_path, monkeypatch):
+    long = 'x' * 70
+    first = _system(tmp_path / 'a', ['tea-1,window,tea,light,muted,painting,First,A,1800,CC0,A,https://x,,tea,300x200'])
+    second = _system(tmp_path / 'b', ['tea-1,window,tea,light,muted,painting,Second,A,1800,CC0,A,https://x,,tea,300x200'])
+    first, second = first.rename(first.with_name(long)), second.rename(second.with_name(long))
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', f'{first};{second}')
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    refs = [r['ref'] for r in desk.search(brief='tea', home=starter_home)['results'] if r['layer'] == 'design-system']
+    assert len(set(refs)) == 2
+    assert {desk.get(ref, home=starter_home)['title'] for ref in refs} == {'First', 'Second'}
+
+
+def test_library_only_directions_do_not_route_to_private_systems(starter_home, tmp_path, monkeypatch):
+    root = _system(tmp_path, ['tea-1,window,tea;garden,light,muted,painting,Tea,A,1800,CC0,A,https://x,,tea,300x200'])
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', str(root))
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    assert desk.search(brief='tea garden calm', home=starter_home)['route']['system']  # routed when allowed
+    scoped = desk.directions('tea garden calm', goals=['create-calm'], layers_wanted=['library'], home=starter_home)
+    assert scoped['route']['system'] is None and scoped['directions']

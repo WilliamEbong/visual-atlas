@@ -93,3 +93,10 @@ def test_directions_and_more_like_this_carry_no_local_paths(client):
     assert len(alike['results']) == 4 and all('file' not in r for r in alike['results'])
     assert first['ref'] not in {r['ref'] for r in alike['results']}
     assert client.get('/api/desk/similar', params={'ref': 'library:999999'}).status_code == 404
+
+
+
+def test_an_unknown_use_mode_is_refused_not_widened(client):
+    for path, params in (('/api/desk', {'brief': 'calm'}), ('/api/desk/directions', {'brief': 'calm'}),
+                         ('/api/desk/similar', {'ref': 'library:1'})):
+        assert client.get(path, params={**params, 'use': 'Publish'}).status_code == 400

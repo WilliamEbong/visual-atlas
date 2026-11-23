@@ -8,6 +8,7 @@ web app (/api/desk). It reads three layers and labels each result with the layer
 Every reason is built from stored data (an annotation, a subject word, a metric), so it can be checked.
 """
 
+import hashlib
 import json
 import os
 import re
@@ -363,7 +364,8 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
         raise ValueError('count is between 1 and 5')
     if not isinstance(per_direction, int) or not 1 <= per_direction <= 4:
         raise ValueError('per_direction is between 1 and 4')
-    found = search(brief=brief, techniques=techniques, goals=goals, limit=1, home=home)
+    found = search(brief=brief, techniques=techniques, goals=goals, limit=1, publishable_only=publishable_only,
+                   layers_wanted=layers_wanted, home=home)
     taxonomy = catalog.load()[0]
     by_id = {t['id']: t for t in taxonomy['techniques']}
     goal_names = {g['id']: g['name'] for g in taxonomy['goals']}
@@ -373,9 +375,10 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
     for tid in _candidates(found, taxonomy):
         if len(out) == count:
             break
-        refs = search(techniques=[tid], subjects=subjects, limit=per_direction, publishable_only=publishable_only,
+        # Only pictures that carry the technique, ranked by it and the subject; then the per-direction limit.
+        refs = search(techniques=[tid], subjects=subjects, limit=40, publishable_only=publishable_only,
                       layers_wanted=layers_wanted, home=home)['results']
-        refs = [r for r in refs if any(t['id'] == tid for t in r['techniques'])]
+        refs = [r for r in refs if any(t['id'] == tid for t in r['techniques'])][:per_direction]
         if not refs:
             continue  # a direction with nothing to show is advice the agent cannot check; skip it
         technique = by_id[tid]
@@ -457,61 +460,59 @@ def _picture(record: dict, home: Path) -> Path | None:
     return path if path.is_relative_to((home / 'media').resolve()) and path.is_file() else None
 
 
-# Signatures of pictures already seen, kept in the system temp folder (never in the library): large design-system
-# files take about 0.1 s each to decode, so a first comparison across hundreds of them would otherwise take a minute.
-SIGNATURES = Path(tempfile.gettempdir()) / 'visual-atlas' / 'signatures-v1.json'
-_signatures: dict[str, str] = {}
-_signatures_changed = False
+# Signatures of pictures already seen. Large design-system files take about 0.1 s each to decode, so a first
+# comparison across hundreds of them would take a minute. They are kept in the user's own temp folder (never in the
+# library), one file per library, under opaque keys, and pruned to what the last full comparison still used.
+SIGNATURES = Path(tempfile.gettempdir()) / 'visual-atlas'
 
 
-def _load_signatures():
-    global _signatures
-    if not _signatures:
-        try:
-            _signatures = json.loads(SIGNATURES.read_text(encoding='utf-8'))
-        except (OSError, ValueError):
-            _signatures = {}
+def _cache_file(home: Path) -> Path:
+    return SIGNATURES / f"signatures-{hashlib.sha256(str(home.resolve()).encode()).hexdigest()[:16]}.json"
 
 
-def _save_signatures():
-    global _signatures_changed
-    if not _signatures_changed:
-        return
+def _load_signatures(home: Path) -> dict:
+    try:
+        data = json.loads(_cache_file(home).read_text(encoding='utf-8'))
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_signatures(home: Path, cache: dict):
     with suppress(OSError):  # only a cache: losing it costs time, never results
-        SIGNATURES.parent.mkdir(parents=True, exist_ok=True)
-        part = SIGNATURES.with_suffix(f'.{os.getpid()}.tmp')
-        part.write_text(json.dumps(_signatures), encoding='utf-8')
-        os.replace(part, SIGNATURES)
-        _signatures_changed = False
+        SIGNATURES.mkdir(parents=True, exist_ok=True)
+        target = _cache_file(home)
+        part = target.with_suffix(f'.{os.getpid()}.tmp')
+        part.write_text(json.dumps(cache), encoding='utf-8')
+        os.replace(part, target)
 
 
-def _signature(path: Path) -> Image.Image | None:
+def _signature(path: Path, cache: dict, seen: set) -> Image.Image | None:
     """An 8 x 8 luma-chroma thumbnail: where the light, dark and colour sit. Local, no model."""
-    global _signatures_changed
     try:
         stat = path.stat()
     except OSError:
         return None
-    key = f'{path}|{stat.st_mtime_ns}|{stat.st_size}'
-    if key not in _signatures:
+    key = hashlib.sha256(f'{path}|{stat.st_mtime_ns}|{stat.st_size}'.encode()).hexdigest()[:32]
+    seen.add(key)
+    if key not in cache:
         try:
             with Image.open(path) as picture:
                 picture.draft('RGB', (64, 64))
                 small = picture.convert('RGB').resize((8, 8), Image.Resampling.BOX).convert('YCbCr')
         except (OSError, ValueError, Image.DecompressionBombError):
             return None
-        _signatures[key] = small.tobytes().hex()
-        _signatures_changed = True
+        cache[key] = small.tobytes().hex()
     try:
-        return Image.frombytes('YCbCr', (8, 8), bytes.fromhex(_signatures[key]))
-    except ValueError:  # a damaged cache entry: forget it
-        _signatures.pop(key, None)
+        return Image.frombytes('YCbCr', (8, 8), bytes.fromhex(cache[key]))
+    except (ValueError, TypeError):  # a damaged cache entry: forget it
+        cache.pop(key, None)
         return None
 
 
-def _signature_of(record: dict, home: Path) -> Image.Image | None:
+def _signature_of(record: dict, home: Path, cache: dict, seen: set) -> Image.Image | None:
     path = _picture(record, home)
-    return _signature(path) if path else None
+    return _signature(path, cache, seen) if path else None
 
 
 def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_wanted=None,
@@ -525,8 +526,8 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
         raise ValueError(f"layers are {', '.join(LAYERS)}")
     home = home_dir(home)
     target = _record(ref, home)
-    _load_signatures()
-    mine = _signature_of(target, home)
+    cache, seen = _load_signatures(home), set()
+    mine = _signature_of(target, home, cache, seen)
     if mine is None:
         raise LookupError(f'the picture for {ref} cannot be read')
     names = {t['id']: t['name'] for t in catalog.load()[0]['techniques']}
@@ -538,13 +539,15 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
             continue
         if publishable_only and (candidate['layer'] != 'library' or candidate['licence']['code'] not in PUBLISHABLE):
             continue
-        theirs = _signature_of(candidate, home)
+        theirs = _signature_of(candidate, home, cache, seen)
         if theirs is None:
             continue
         # ponytail: brute force over every reference; fine to tens of thousands, index it if libraries grow past that
         distance = sum(ImageStat.Stat(ImageChops.difference(mine, theirs)).mean) / 3  # mean difference, 0-255
         scored.append((distance, candidate))
-    _save_signatures()
+    if set(wanted) == set(LAYERS) and not publishable_only:  # a full pass: drop pictures no longer there
+        cache = {key: value for key, value in cache.items() if key in seen}
+    _save_signatures(home, cache)
     scored.sort(key=lambda item: (item[0], item[1]['ref']))
     results = []
     for distance, candidate in scored[:limit]:
@@ -562,21 +565,35 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
 OPEN_PROVIDERS = ('commons', 'met', 'aic', 'cma', 'rijksmuseum')  # live search APIs; NGA needs its large index
 
 
+@lru_cache(maxsize=1)
+def _fetcher_for(key: str):
+    from atlas.fetch import Fetcher
+    return Fetcher(json.loads(key))
+
+
+def _shared_fetcher(policies: dict):
+    """One fetcher per process, so a provider's Retry-After and pacing carry over between an agent's searches."""
+    return _fetcher_for(json.dumps(policies, sort_keys=True))
+
+
 def open_search(query: str, *, providers_wanted=None, per_provider: int = 6, fetcher=None) -> dict:
     """Search public collections live for a picture the library does not have. Each candidate goes through
     atlas/rights.py, as in Find; only eligible ones are returned, with licence and credit. Nothing is downloaded or
-    stored: to keep one, import it with Find in the app. Network use is bounded (one search per collection)."""
+    stored: to keep one, import it with Find in the app. Network use is bounded: one search per collection (the
+    Rijksmuseum also reads each result's linked records, about three requests per result)."""
     from atlas import providers, rights
-    from atlas.fetch import Fetcher, FetchError
+    from atlas.fetch import FetchError
     if not isinstance(query, str) or not query.strip() or len(query) > 200:
         raise ValueError('the query is 1 to 200 characters of plain words (a subject, not a whole brief)')
-    wanted = _clean_list(providers_wanted, len(OPEN_PROVIDERS)) or list(OPEN_PROVIDERS)
+    wanted = list(OPEN_PROVIDERS) if providers_wanted is None else _clean_list(providers_wanted, len(OPEN_PROVIDERS))
+    if not wanted:
+        raise ValueError('choose at least one collection, or leave the choice out to search them all')
     if any(p not in OPEN_PROVIDERS for p in wanted):
         raise ValueError(f"collections are {', '.join(OPEN_PROVIDERS)}")
     if not isinstance(per_provider, int) or not 1 <= per_provider <= 10:
         raise ValueError('per_provider is between 1 and 10')
     policies = catalog.load()[1]
-    fetcher = fetcher or Fetcher(policies)
+    fetcher = fetcher or _shared_fetcher(policies)
     results, rejected, errors = [], {}, {}
     for provider in wanted:
         policy = catalog.policy(policies, provider)

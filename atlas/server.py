@@ -673,6 +673,11 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         return transfer.restore(home, name)
 
     # ---- reference desk (read-only, no AI) --------------------------------------------------------------
+    def publish_mode(use: str) -> bool:
+        if use not in ('reference', 'publish'):
+            raise ValueError('use is "reference" or "publish"')
+        return use == 'publish'
+
     def for_web(ref: dict) -> dict:
         """No local file paths in the browser: library pictures by media URL, layer pictures by ref."""
         out = {k: v for k, v in ref.items() if k != 'file'}
@@ -689,11 +694,11 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         wanted = [part for part in layers.split(',') if part] or None
         if brief.strip():
             chosen = [part for part in goals.split(',') if part] or None  # the person's own reading of the brief
-            result = desk.advise(brief, goals=chosen, limit=max(1, min(limit, 40)), publishable_only=use == 'publish',
+            result = desk.advise(brief, goals=chosen, limit=max(1, min(limit, 40)), publishable_only=publish_mode(use),
                                  layers_wanted=wanted, home=home)
         elif technique:
             result = desk.search(techniques=[technique], limit=max(1, min(limit, 40)),
-                                 publishable_only=use == 'publish', layers_wanted=wanted, home=home)
+                                 publishable_only=publish_mode(use), layers_wanted=wanted, home=home)
             result['guidance'] = desk.guidance([technique])
         else:
             raise ValueError('Describe what the picture should do.')
@@ -705,7 +710,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     @app.get('/api/desk/directions')
     def desk_directions(brief: str, use: str = 'reference', layers: str = '', goals: str = ''):
         result = desk.directions(brief, goals=[part for part in goals.split(',') if part] or None, count=3,
-                                 per_direction=3, publishable_only=use == 'publish',
+                                 per_direction=3, publishable_only=publish_mode(use),
                                  layers_wanted=[part for part in layers.split(',') if part] or None, home=home)
         for item in result['directions']:
             item['references'] = [for_web(r) for r in item['references']]
@@ -714,7 +719,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     @app.get('/api/desk/similar')
     def desk_similar(ref: str, use: str = 'reference', limit: int = 6):
         try:
-            result = desk.similar(ref, limit=max(1, min(limit, 24)), publishable_only=use == 'publish', home=home)
+            result = desk.similar(ref, limit=max(1, min(limit, 24)), publishable_only=publish_mode(use), home=home)
         except LookupError as error:
             raise HTTPException(404, str(error)) from None
         result['results'] = [for_web(r) for r in result['results']]
