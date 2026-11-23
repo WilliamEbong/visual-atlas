@@ -9,11 +9,15 @@ Every reason is built from stored data (an annotation, a subject word, a metric)
 """
 
 import json
+import os
 import re
 import sqlite3
-from contextlib import contextmanager
+import tempfile
+from contextlib import contextmanager, suppress
 from functools import lru_cache
 from pathlib import Path
+
+from PIL import Image, ImageChops, ImageStat
 
 from atlas import catalog, coding, jobs, layers
 from atlas.home import home_dir
@@ -394,8 +398,7 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
 REF = re.compile(r'^(library:\d{1,9}|generated:[a-z0-9][a-z0-9-]{0,80}|system:[a-z0-9-]{1,60}:[a-z0-9][a-z0-9-]{0,80})$')
 
 
-def get(ref: str, home: Path | None = None) -> dict:
-    """One reference in full: evidence and effect per technique, licence, credit, and its local file."""
+def _record(ref: str, home: Path | None = None) -> dict:
     if not isinstance(ref, str) or not REF.match(ref):
         raise ValueError('ref looks like library:12, generated:some-id or system:archive-of-looking:some-id')
     if ref.startswith('library:'):
@@ -404,6 +407,12 @@ def get(ref: str, home: Path | None = None) -> dict:
         found = layers.find(ref, home)
     if found is None:
         raise LookupError(f'no reference {ref} (removed, not ready, or its layer is not enabled here)')
+    return found
+
+
+def get(ref: str, home: Path | None = None) -> dict:
+    """One reference in full: evidence and effect per technique, licence, credit, and its local file."""
+    found = _record(ref, home)
     taxonomy = catalog.load()[0]
     names = {t['id']: t['name'] for t in taxonomy['techniques']}
     out = {**_public(found), 'orientation': found.get('orientation') or _orientation(found.get('width'), found.get('height'))}
@@ -435,3 +444,116 @@ def technique(technique_id: str, *, limit: int = 4, publishable_only: bool = Fal
     found = search(techniques=[technique_id], limit=limit, publishable_only=publishable_only, home=home)
     return {**guidance([technique_id], taxonomy)[0], 'references': found['results'],
             'examples_available': found['total_matches']}
+
+
+def _picture(record: dict, home: Path) -> Path | None:
+    """The record's own image file, only if it is still inside its folder (library media or the layer folder)."""
+    if record['layer'] != 'library':
+        return layers.safe_file(record)
+    try:
+        path = Path(record['file']).resolve(strict=True)
+    except (OSError, TypeError, RuntimeError):
+        return None
+    return path if path.is_relative_to((home / 'media').resolve()) and path.is_file() else None
+
+
+# Signatures of pictures already seen, kept in the system temp folder (never in the library): large design-system
+# files take about 0.1 s each to decode, so a first comparison across hundreds of them would otherwise take a minute.
+SIGNATURES = Path(tempfile.gettempdir()) / 'visual-atlas' / 'signatures-v1.json'
+_signatures: dict[str, str] = {}
+_signatures_changed = False
+
+
+def _load_signatures():
+    global _signatures
+    if not _signatures:
+        try:
+            _signatures = json.loads(SIGNATURES.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            _signatures = {}
+
+
+def _save_signatures():
+    global _signatures_changed
+    if not _signatures_changed:
+        return
+    with suppress(OSError):  # only a cache: losing it costs time, never results
+        SIGNATURES.parent.mkdir(parents=True, exist_ok=True)
+        part = SIGNATURES.with_suffix(f'.{os.getpid()}.tmp')
+        part.write_text(json.dumps(_signatures), encoding='utf-8')
+        os.replace(part, SIGNATURES)
+        _signatures_changed = False
+
+
+def _signature(path: Path) -> Image.Image | None:
+    """An 8 x 8 luma-chroma thumbnail: where the light, dark and colour sit. Local, no model."""
+    global _signatures_changed
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    key = f'{path}|{stat.st_mtime_ns}|{stat.st_size}'
+    if key not in _signatures:
+        try:
+            with Image.open(path) as picture:
+                picture.draft('RGB', (64, 64))
+                small = picture.convert('RGB').resize((8, 8), Image.Resampling.BOX).convert('YCbCr')
+        except (OSError, ValueError, Image.DecompressionBombError):
+            return None
+        _signatures[key] = small.tobytes().hex()
+        _signatures_changed = True
+    try:
+        return Image.frombytes('YCbCr', (8, 8), bytes.fromhex(_signatures[key]))
+    except ValueError:  # a damaged cache entry: forget it
+        _signatures.pop(key, None)
+        return None
+
+
+def _signature_of(record: dict, home: Path) -> Image.Image | None:
+    path = _picture(record, home)
+    return _signature(path) if path else None
+
+
+def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_wanted=None,
+            home: Path | None = None) -> dict:
+    """References that look like this one: similar placement of light, dark and colour (a composition match, not
+    a subject match), with the techniques they share. Local pixel comparison; no AI, no service."""
+    if not isinstance(limit, int) or not 1 <= limit <= 40:
+        raise ValueError('limit is between 1 and 40')
+    wanted = _clean_list(layers_wanted, 3) or list(LAYERS)
+    if any(layer not in LAYERS for layer in wanted):
+        raise ValueError(f"layers are {', '.join(LAYERS)}")
+    home = home_dir(home)
+    target = _record(ref, home)
+    _load_signatures()
+    mine = _signature_of(target, home)
+    if mine is None:
+        raise LookupError(f'the picture for {ref} cannot be read')
+    names = {t['id']: t['name'] for t in catalog.load()[0]['techniques']}
+    own = {t['id'] for t in target.get('techniques', [])}
+    family = VARIANT.sub('', ref)
+    scored = []
+    for candidate in references(home, wanted):
+        if VARIANT.sub('', candidate['ref']) == family:
+            continue
+        if publishable_only and (candidate['layer'] != 'library' or candidate['licence']['code'] not in PUBLISHABLE):
+            continue
+        theirs = _signature_of(candidate, home)
+        if theirs is None:
+            continue
+        # ponytail: brute force over every reference; fine to tens of thousands, index it if libraries grow past that
+        distance = sum(ImageStat.Stat(ImageChops.difference(mine, theirs)).mean) / 3  # mean difference, 0-255
+        scored.append((distance, candidate))
+    _save_signatures()
+    scored.sort(key=lambda item: (item[0], item[1]['ref']))
+    results = []
+    for distance, candidate in scored[:limit]:
+        likeness = max(0.0, 1 - distance / 64)  # 1 = the same layout of tones and colours; unrelated pictures ~0.3
+        shared = [names[t['id']] for t in candidate.get('techniques', []) if t['id'] in own and t['id'] in names]
+        reasons = [f'Similar placement of light, dark and colour ({round(likeness * 100)}% alike)']
+        if shared:
+            reasons.append(f"Also shows {', '.join(shared[:3])}")
+        results.append({**_public(candidate), 'score': round(likeness, 3), 'reasons': reasons})
+    return {'like': ref, 'results': results, 'compared': len(scored),
+            'note': 'Compared by where light, dark and colour sit in each picture (an 8 x 8 thumbnail), on this '
+                    'computer. It finds compositions that look alike, not the same subject.'}

@@ -264,9 +264,12 @@ def _show(result: dict, text: bool):
         _print(result)
         return
     reading = result.get('reading', {})
-    typer.echo('Reads as: ' + (', '.join(t['name'] for t in reading.get('goals', []) + reading.get('techniques', []))
-                               or 'no known goal or technique') + (f"; subjects {', '.join(reading['subject_terms'])}"
-                                                                    if reading.get('subject_terms') else ''))
+    if 'like' in result:
+        typer.echo(f"Looks like {result['like']} ({result['note']})")
+    else:
+        typer.echo('Reads as: ' + (', '.join(t['name'] for t in reading.get('goals', []) + reading.get('techniques', []))
+                                   or 'no known goal or technique') + (f"; subjects {', '.join(reading['subject_terms'])}"
+                                                                        if reading.get('subject_terms') else ''))
     system = (result.get('route') or {}).get('system')
     if system:
         typer.echo(f"Design system: {system['name']} ({system['why']})")
@@ -340,6 +343,18 @@ def ref(ref_id: str = typer.Argument(..., help='e.g. library:12, generated:ID or
     """One reference in full: evidence, review state, licence, credit and file."""
     try:
         _print(desk.get(ref_id))
+    except LookupError as error:
+        typer.echo(str(error))
+        raise typer.Exit(1)
+
+
+@app.command()
+def similar(ref_id: str = typer.Argument(..., help='e.g. library:12, generated:ID or system:NAME:ID'),
+            limit: int = typer.Option(6), publish: bool = typer.Option(False, help='Only images you may publish.'),
+            text: bool = typer.Option(False, help='Readable text instead of JSON.')):
+    """References whose composition looks like this one (light, dark and colour), compared locally."""
+    try:
+        _show(desk.similar(ref_id, limit=limit, publishable_only=publish), text)
     except LookupError as error:
         typer.echo(str(error))
         raise typer.Exit(1)

@@ -216,3 +216,24 @@ def test_every_generated_file_carries_its_provenance_label():
         xmp = Image.open(REPO / 'generated' / item['file']).info.get('xmp', b'')
         assert b'digitalsourcetype/trainedAlgorithmicMedia' in xmp, item['file']
         assert item['id'].encode() in xmp
+
+
+def test_more_like_this_ranks_the_closest_composition_first(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    pictures = {'red-left': [(200, 30, 30), (240, 240, 240)], 'red-left-copy': [(190, 40, 35), (235, 235, 230)],
+                'blue-right': [(240, 240, 240), (30, 30, 200)]}
+    items = []
+    for name, (left, right) in pictures.items():
+        picture = Image.new('RGB', (200, 100), right)
+        picture.paste(Image.new('RGB', (100, 100), left), (0, 0))
+        picture.save(folder / f'{name}.jpg', 'JPEG')
+        items.append({'id': name, 'file': f'{name}.jpg', 'title': name, 'tool': 'x', 'date': 'd', 'prompt': 'p'})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.setattr(desk, 'SIGNATURES', tmp_path / 'cache' / 'signatures.json')
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.similar('generated:red-left', layers_wanted=['generated'], home=tmp_path / 'home')
+    assert [r['ref'] for r in found['results']] == ['generated:red-left-copy', 'generated:blue-right']
+    assert found['results'][0]['score'] > 0.9 > found['results'][1]['score']
+    assert (tmp_path / 'cache' / 'signatures.json').is_file() and not (tmp_path / 'home').exists()

@@ -57,7 +57,8 @@ def test_stdio_round_trip_in_a_subprocess(starter_home):
     assert replies[0]['result']['capabilities'] == {'tools': {'listChanged': False}}
     tools = replies[1]['result']['tools']
     assert {t['name'] for t in tools} == {'advise', 'search_references', 'get_reference', 'view_reference',
-                                         'list_techniques', 'get_technique', 'route_brief', 'suggest_directions'}
+                                         'list_techniques', 'get_technique', 'route_brief', 'suggest_directions',
+                                         'similar_references'}
     assert all(t['annotations']['readOnlyHint'] and not t['annotations']['destructiveHint'] for t in tools)
     advice = replies[2]['result']
     assert advice['isError'] is False and advice['structuredContent']['results']
@@ -105,7 +106,8 @@ def test_tools_never_write_or_start_jobs(env):
     for name, arguments in (('advise', {'brief': 'show scale'}), ('list_techniques', {}),
                             ('get_technique', {'id': 'framing'}), ('route_brief', {'brief': 'tea house'}),
                             ('search_references', {'goals': ['create-calm']}),
-                            ('suggest_directions', {'brief': 'calm cover', 'goals': ['create-calm']})):
+                            ('suggest_directions', {'brief': 'calm cover', 'goals': ['create-calm']}),
+                            ('similar_references', {'ref': 'library:1', 'limit': 2})):
         assert call(name, arguments)['isError'] is False
     with jobs.open_store(env) as store:
         after = {table: store.one(f'SELECT COUNT(*) AS n FROM {table}')['n'] for table in before}

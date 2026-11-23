@@ -72,6 +72,11 @@ TOOLS = [
      'description': 'The picture itself as a JPEG (at most 1024 px on the long side by default), with its credit.',
      'inputSchema': {'type': 'object', 'required': ['ref'], 'additionalProperties': False, 'properties': {
          'ref': _REF, 'max_size': {'type': 'integer', 'minimum': 128, 'maximum': 1024, 'default': 768}}}},
+    {'name': 'similar_references', 'title': 'More like this',
+     'description': 'References whose composition looks like a given one: where light, dark and colour sit, '
+                    'compared on this computer (not subject matching), with the techniques they share.',
+     'inputSchema': {'type': 'object', 'required': ['ref'], 'additionalProperties': False, 'properties': {
+         'ref': _REF, 'use': _USE, 'layers': _LAYERS, 'limit': {**_LIMIT, 'default': 6}}}},
     {'name': 'list_techniques', 'title': 'List techniques and goals',
      'description': 'The taxonomy: communication goals and the techniques that serve them, with ids to use in '
                     'search_references and get_technique.',
@@ -166,6 +171,9 @@ def call(name: str, arguments: dict) -> dict:
                 era_from=arguments.get('era_from'), era_to=arguments.get('era_to'),
                 layers_wanted=arguments.get('layers'), system=arguments.get('system', ''),
                 publishable_only=_publish(arguments), limit=arguments.get('limit', 8))
+        elif name == 'similar_references':
+            result = desk.similar(arguments['ref'], limit=arguments.get('limit', 6), publishable_only=_publish(arguments),
+                                  layers_wanted=arguments.get('layers'))
         elif name == 'get_reference':
             result = desk.get(arguments['ref'])
         elif name == 'list_techniques':

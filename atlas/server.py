@@ -92,6 +92,9 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         def warm():
             with suppress(Exception):  # only a speed-up: a failure here shows up properly on the first real Ask
                 desk.advise('warm up', home=home)
+                first = next(iter(desk.references(home)), None)
+                if first:  # also fills the picture-signature cache used by "More like this"
+                    desk.similar(first['ref'], home=home)
         threading.Thread(target=warm, daemon=True, name='atlas-warm').start()
 
     def db() -> Store:
@@ -681,10 +684,12 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         return out
 
     @app.get('/api/desk')
-    def desk_advice(brief: str = '', use: str = 'reference', layers: str = '', limit: int = 12, technique: str = ''):
+    def desk_advice(brief: str = '', use: str = 'reference', layers: str = '', limit: int = 12, technique: str = '',
+                    goals: str = ''):
         wanted = [part for part in layers.split(',') if part] or None
         if brief.strip():
-            result = desk.advise(brief, limit=max(1, min(limit, 40)), publishable_only=use == 'publish',
+            chosen = [part for part in goals.split(',') if part] or None  # the person's own reading of the brief
+            result = desk.advise(brief, goals=chosen, limit=max(1, min(limit, 40)), publishable_only=use == 'publish',
                                  layers_wanted=wanted, home=home)
         elif technique:
             result = desk.search(techniques=[technique], limit=max(1, min(limit, 40)),
@@ -695,6 +700,24 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         result['results'] = [for_web(r) for r in result['results']]
         result['layers'] = {'generated': bool(desk_layers.generated()), 'design-system': [
             {'name': s['name'], 'count': len(s['references'])} for s in desk_layers.systems(home)]}
+        return result
+
+    @app.get('/api/desk/directions')
+    def desk_directions(brief: str, use: str = 'reference', layers: str = '', goals: str = ''):
+        result = desk.directions(brief, goals=[part for part in goals.split(',') if part] or None, count=3,
+                                 per_direction=3, publishable_only=use == 'publish',
+                                 layers_wanted=[part for part in layers.split(',') if part] or None, home=home)
+        for item in result['directions']:
+            item['references'] = [for_web(r) for r in item['references']]
+        return result
+
+    @app.get('/api/desk/similar')
+    def desk_similar(ref: str, use: str = 'reference', limit: int = 6):
+        try:
+            result = desk.similar(ref, limit=max(1, min(limit, 24)), publishable_only=use == 'publish', home=home)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from None
+        result['results'] = [for_web(r) for r in result['results']]
         return result
 
     @app.get('/api/desk/ref')

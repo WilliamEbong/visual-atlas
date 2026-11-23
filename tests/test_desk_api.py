@@ -73,3 +73,23 @@ def test_empty_request_and_unknown_ref(client):
     assert client.get('/api/desk').status_code == 400
     assert client.get('/api/desk/ref', params={'ref': 'library:999999'}).status_code == 404
     assert client.get('/api/desk/ref', params={'ref': 'bad ref'}).status_code == 400
+
+
+def test_goals_chosen_by_the_person_steer_the_answer(client):
+    plain = client.get('/api/desk', params={'brief': 'cover for a report on urban heat islands'}).json()
+    assert plain['reading']['goals'] == [] and plain['codebook']['goals']
+    chosen = client.get('/api/desk', params={'brief': 'cover for a report on urban heat islands',
+                                             'goals': 'create-calm'}).json()
+    assert [g['id'] for g in chosen['reading']['goals']] == ['create-calm'] and chosen['guidance']
+    assert client.get('/api/desk', params={'brief': 'x', 'goals': 'not-a-goal'}).status_code == 400
+
+
+def test_directions_and_more_like_this_carry_no_local_paths(client):
+    directions = client.get('/api/desk/directions', params={'brief': 'calm slide', 'goals': 'create-calm'}).json()
+    assert len(directions['directions']) == 3
+    first = directions['directions'][0]['references'][0]
+    assert 'file' not in first and first['thumb']
+    alike = client.get('/api/desk/similar', params={'ref': first['ref'], 'limit': 4}).json()
+    assert len(alike['results']) == 4 and all('file' not in r for r in alike['results'])
+    assert first['ref'] not in {r['ref'] for r in alike['results']}
+    assert client.get('/api/desk/similar', params={'ref': 'library:999999'}).status_code == 404
