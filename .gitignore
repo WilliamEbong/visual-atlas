@@ -45,3 +45,8 @@ archive-of-looking/
 garden-of-lingering/
 citadel-of-watching/
 harbour-of-drifting/
+
+# graphify: local interpreter path and extraction cache stay out of the repo
+graphify-out/cache/
+graphify-out/.graphify_python
+graphify-out/.graphify_root
