@@ -47,7 +47,7 @@ function ExploreIndex({ from }: { from: string | null }) {
               {t.thumb ? <img src={media(t.thumb)} alt="" loading="lazy" /> : <span className="tech-blank" aria-hidden="true" />}
               <span style={{ fontFamily: 'var(--display)', fontSize: 21 }}>{t.name}</span></a></th><td>{t.definition}</td>
               <td className="mono">{t.operations.map((o) => taxonomy.operations.find((x) => x.id === o)?.name ?? o).join(', ')}</td>
-              <td className="mono">{t.examples}</td></tr>))}</tbody>
+              <td className="mono">{t.examples} example{t.examples === 1 ? '' : 's'}</td></tr>))}</tbody>
         </table></div>
       </section>
       <details className="section glossary"><summary>Operations and domains: the words used to classify techniques</summary>

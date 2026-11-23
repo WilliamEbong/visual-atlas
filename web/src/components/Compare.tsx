@@ -71,7 +71,7 @@ export default function Compare({ ids }: { ids: number[] }) {
               {data.images.map((d) => <td key={d.image.id}><span className="palette" role="img" aria-label={`Palette: ${d.metrics?.palette.map((p) => p.name).join(', ') ?? 'not measured'}`}>
                 {d.metrics?.palette.map((p) => <span key={p.hex} style={{ background: p.hex, flex: `${p.share} 1 0` }} />)}</span></td>)}</tr>
             <tr><th scope="row" className="mono">Shape · contrast · colourfulness</th>
-              {data.images.map((d) => <td key={d.image.id} className="mono" style={{ color: 'var(--ink)' }}>{d.metrics ? `${d.metrics.orientation} · ${Math.round(d.metrics.contrast)} · ${Math.round(d.metrics.colorfulness)}` : '—'}</td>)}</tr>
+              {data.images.map((d) => <td key={d.image.id} className="mono" style={{ color: 'var(--ink)' }}>{d.metrics ? `${d.metrics.orientation} · contrast ${Math.round(d.metrics.contrast)} · colour ${Math.round(d.metrics.colorfulness)}` : '—'}</td>)}</tr>
           </tbody>
         </table></div>
       </section>

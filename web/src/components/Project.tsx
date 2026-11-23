@@ -59,7 +59,7 @@ function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: 
       <label className="field">Project name<input required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Solitude talk: poster" /></label>
       <label className="field">The brief: audience, message, format, mood, constraints
         <textarea required rows={6} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)}
-          placeholder="A poster for a public talk about solitude and attention. Calm, a little melancholy, not lonely-sad. A2 portrait, title at the top, lots of room for text." /></label>
+          placeholder="For example: a poster for a public talk about solitude and attention. Calm, a little melancholy, not lonely-sad. A2 portrait, title at the top, lots of room for text." /></label>
       <div className="row"><button type="submit" className="primary">{brief ? 'Save brief' : 'Save brief, then get directions'}</button>
         {onCancel && <button type="button" onClick={onCancel}>Cancel</button>}</div>
     </form>

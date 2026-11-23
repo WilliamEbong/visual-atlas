@@ -528,11 +528,9 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .compare-table th[scope="col"]:first-child { width: 30% !important; }
 .lens { overflow: visible; }
 .lens .lens-caption { position: absolute; top: calc(100% + 8px); left: 0; right: 0; font-size: 12px; color: var(--caption); line-height: 1.4; }
-.drawers.goals > :last-child:nth-child(4n+3) { grid-column: span 2; }
 .technique-card .row { opacity: .0; transition: opacity .15s; }
 .technique-card:hover .row, .technique-card:focus-within .row { opacity: 1; }
 @media (hover: none) { .technique-card .row { opacity: 1; } }
-@media (max-width: 900px) { .drawers.goals > :last-child:nth-child(4n+3) { grid-column: auto; } }
 @media (max-width: 760px) {
   .compare-grid { grid-template-columns: 1fr; }
   .compare-key { display: none; }
@@ -544,3 +542,11 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   .asked-brief { font-size: 21px; }
 }
 @media (max-width: 600px) { .lens .lens-caption { position: static; display: block; margin-top: 8px; } }
+
+/* long tail */
+.section-title button.quiet, .asked button.quiet { padding-left: 0; }
+@media (max-width: 600px) {
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+  .tabs button { flex: none; }
+  .main-col .segments { flex-direction: column; align-items: stretch; }
+}

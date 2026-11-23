@@ -223,7 +223,8 @@ export function MoreLikeThis({ refId, from, use }: { refId: string; from: string
         <h2 id="alike-title">More like this</h2>
         <p className="mono">Similar placement of light, dark and colour, compared on this computer</p>
       </div>
-      <RefStrip refs={alike.data.results} from={from} use={use} label="Pictures with a similar composition" />
+      <RefStrip refs={[...alike.data.results].sort((a, b) => Number(a.layer !== 'library') - Number(b.layer !== 'library'))}
+        from={from} use={use} label="Pictures with a similar composition" />
     </section>
   )
 }
@@ -339,8 +340,8 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
       </section>
       <nav className="section next-steps" aria-label="Next steps" style={{ marginTop: 48 }}>
         {missed && strong.length === 0
-          ? <><a className="button primary" href={href('find', { goal: asked })}>Find images for this brief</a>
-            <a className="button" href={href('project', { text: asked })}>Start a project from this brief</a></>
+          ? <><a className="button" href={href('project', { text: asked })}>Start a project from this brief</a>
+            <a className="button primary" href={href('find', { goal: asked })}>Find images for this brief</a></>
           : <><a className="button primary" href={href('project', { text: asked })}>Start a project from this brief</a>
             <a className="button" href={href('find', { goal: asked })}>Find more images for this brief</a></>}
       </nav>
