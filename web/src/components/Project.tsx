@@ -37,7 +37,7 @@ export default function Project({ id }: { id?: number }) {
         </aside>
       </div>
       {list.data?.length === 0 && !readOnly && <SampleAnswer brief="A calm opening slide: one small figure in a lot of empty space" use="reference"
-        from={window.location.hash} open={() => go('ask', { q: 'A calm opening slide: one small figure in a lot of empty space' })} />}
+        from={href('ask', { q: 'A calm opening slide: one small figure in a lot of empty space' })} open={() => go('ask', { q: 'A calm opening slide: one small figure in a lot of empty space' })} />}
     </>
   )
 }

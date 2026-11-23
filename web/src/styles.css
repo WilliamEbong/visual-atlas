@@ -537,7 +537,9 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   .compare-grid { grid-template-columns: 1fr; }
   .compare-key { display: none; }
   .compare-col { grid-row: auto; grid-template-rows: auto auto; margin-bottom: 28px; }
-  .compare-table th[scope="col"]:first-child { width: 40% !important; }
+  .compare-table { table-layout: auto; }
+  .compare-table th[scope="col"]:first-child { width: auto !important; }
+  .compare-table td, .compare-table th[scope="col"] { min-width: 96px; }
   .compare-table th[scope="row"] { position: sticky; left: 0; background: var(--ground); }
   .asked-brief { font-size: 21px; }
 }

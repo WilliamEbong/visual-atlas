@@ -27,7 +27,7 @@ function readCompare(): Pick[] {
 export default function App() {
   const route = useRoute()
   // #/ is Ask; an old library link (#/?technique=…) still opens the Library
-  const section = route.path[0] ?? ([...route.query.keys()].length ? 'library' : '')
+  const section = route.path[0] ?? (readOnly || [...route.query.keys()].length ? 'library' : '')
   const taxonomy = useData<Taxonomy>('taxonomy')
   const [compare, setCompare] = useState<Pick[]>(readCompare)
   const [running, setRunning] = useState<Job | null>(null)
@@ -89,7 +89,7 @@ export default function App() {
             <button type="button" className="menu-button small" aria-expanded={menuOpen} aria-controls="main-nav" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? 'Close' : 'Menu'}</button>
             <nav id="main-nav" className={`nav${menuOpen ? ' open' : ''}`} aria-label="Main">
-              {NAV.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
+              {NAV.map(([key, label]) => <a key={key} href={key === '' && readOnly ? '#/ask' : `#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
               <span style={{ flex: '1 1 auto' }} aria-hidden="true" />
               {TOOLS.map(([key, label]) => <a key={key} href={`#/${key}`} aria-current={current(key) ? 'page' : undefined}>{label}</a>)}
             </nav>

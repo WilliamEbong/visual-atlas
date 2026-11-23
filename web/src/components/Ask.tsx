@@ -1,6 +1,6 @@
 // Ask the atlas: a brief in, techniques that fit and references with reasons out. Ordinary code, no AI, so it
 // answers at once. The same engine answers agents through the CLI and the MCP server (atlas/desk.py).
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { protectedImage, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
 import { cleanMaker, cleanTitle, shortDate } from '../lib/library'
@@ -78,7 +78,9 @@ export default function Ask() {
   const goals = (route.query.get('goals') ?? '').split(',').filter(Boolean)
   const [text, setText] = useState(asked)
   const [changing, setChanging] = useState(false)
-  useEffect(() => { setText(asked); setChanging(false) }, [asked])
+  const [moreOpen, setMoreOpen] = useState(false)
+  const focusFrom = useRef(0)  // after loading more, focus the first new picture
+  useEffect(() => { setText(asked); setChanging(false); setMoreOpen(false) }, [asked])
   const limit = Math.min(40, Math.max(12, Number(route.query.get('limit')) || 12))
   const query = new URLSearchParams({ brief: asked, use })
   const wanted = Object.keys(LAYER_NAMES).filter((layer) => !off.includes(layer))
@@ -87,8 +89,15 @@ export default function Ask() {
   const live = !readOnly && asked.trim()
   const answer = useData<DeskAnswer>(live ? `desk?${query}&limit=${limit}` : null)
   const ways = useData<DeskDirections>(live ? `desk/directions?${query}` : null)
+  useEffect(() => {
+    if (!focusFrom.current || !answer.data) return
+    const links = document.querySelectorAll<HTMLAnchorElement>('section[aria-labelledby="refs-title"] a.plate')
+    const target = links[focusFrom.current - 1] ?? links[links.length - 1]
+    focusFrom.current = 0
+    target?.focus()
+  }, [answer.data])
   const set = (changes: Record<string, string>) => go('ask', { q: asked, use, off: off.join(','), goals: goals.join(','), limit: '', ...changes })
-  const from = window.location.hash
+  const from = /^#\/?$/.test(window.location.hash) ? '#/ask' : window.location.hash  // the front page is Ask
 
   if (readOnly) return <><PageHead kicker="Ask the atlas" title="What should the picture do?" />
     <div className="slip under" style={{ marginTop: 32 }}><p>Asking works in the downloaded app, where it reads your whole
@@ -134,7 +143,8 @@ export default function Ask() {
       {asked && !answer.data && !answer.error && <Loading label="Reading your brief…" />}
       {answer.data && <Answer asked={asked} data={answer.data} ways={ways.error ? { reading: answer.data.reading, directions: [], note: '' } : ways.data} goals={goals} use={use} off={off} from={from}
         choose={(goal) => set({ goals: (goals.includes(goal) ? goals.filter((g) => g !== goal) : [...goals, goal]).join(',') })} more={limit < 40 && answer.data.total_matches > limit
-        ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
+        ? () => { focusFrom.current = document.querySelectorAll('section[aria-labelledby="refs-title"] a.plate').length + 1; set({ limit: String(limit + 12) }) } : undefined}
+        moreOpen={moreOpen} setMoreOpen={setMoreOpen} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
       {!asked && <SampleAnswer brief={EXAMPLES[0]} use={use} from={from} open={() => set({ q: EXAMPLES[0], goals: '' })} />}
 
@@ -235,7 +245,8 @@ function Plates({ refs, from, small, use }: { refs: DeskRef[]; from: string; sma
   )
 }
 
-function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choose, more }: { asked: string; data: DeskAnswer
+function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choose, more, moreOpen, setMoreOpen }: { asked: string; data: DeskAnswer
+  moreOpen: boolean; setMoreOpen: (open: boolean) => void
   ways: DeskDirections | null; goals: string[]; use: string; off: string[]; from: string
   toggle: (layer: string) => void; choose: (goal: string) => void; more?: () => void }) {
   const goals = data.reading.goals.map((g) => g.name)
@@ -310,7 +321,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
-          : shown.size > 0 ? <details className="more-refs"><summary>See {rest.length} more pictures that match</summary>
+          : shown.size > 0 ? <details className="more-refs" open={moreOpen} onToggle={(event) => setMoreOpen(event.currentTarget.open)}><summary>See {rest.length} more pictures that match</summary>
             {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model{strong.some((ref) => ref.generated) ? ' · ◇ intended in a generated example' : ''}</p>
               <Plates refs={strong} from={from} use={use} /></>}
             {weak.length > 0 && <><h3 className="weak-title mono">Matched only on words, not on a technique</h3><Plates refs={weak} from={from} use={use} small /></>}
