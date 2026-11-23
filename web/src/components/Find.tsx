@@ -13,6 +13,15 @@ const ASSISTANTS: [string, string][] = [['codex:claude', 'Codex analyses, Claude
 export interface Source { id: string; name: string; status: string; rule?: string; reason?: string; label?: string; attribution?: string
   evidence_urls: string[]; checked_on: string; notes?: string; default_on?: boolean; setup?: string }
 
+function AnalysisSettings({ count, setCount, assistant, setAssistant }: { count: number; setCount: (n: number) => void
+  assistant: string; setAssistant: (value: string) => void }) {
+  return <div className="filters">
+    <label className="field">How many new images<input type="number" min={1} max={40} value={count} onChange={(event) => setCount(Number(event.target.value))} /></label>
+    <label className="field grow">Who analyses<select value={assistant} onChange={(event) => setAssistant(event.target.value)}>
+      {ASSISTANTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+  </div>
+}
+
 export default function Find() {
   const route = useRoute()
   const { taxonomy } = useApp()
@@ -77,8 +86,7 @@ export default function Find() {
   return (
     <>
       <PageHead kicker="Find · searches open collections · keeps only pictures you may use" title={mode === 'find' ? 'Find images' : 'Grow my library'}
-        aside={<ol className="mono" aria-label="What happens" style={{ listStyle: 'none', padding: '0 0 24px', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <li>1  Search</li><li>2  Check permissions</li><li>3  Filter</li><li>4  Analyse</li><li>5  File by technique</li></ol>} />
+ />
       <div className="split" style={{ marginTop: 40 }}>
         <form className="main-col slip stack" style={{ gap: 22, padding: 28 }} onSubmit={submit}>
           <fieldset><legend className="sr-only">What to do</legend>
@@ -93,6 +101,7 @@ export default function Find() {
                 placeholder="a quiet image where one small figure stands alone in a big empty landscape" /></label>
             {readingFailed && <p role="status" className="mono">The automatic reading is unavailable. Choose goals, techniques and subject words below, or continue with your original request.</p>}
             {goal.trim() && <ReadingEditor reading={reading} value={correction} onChange={setCorrection} />}
+            <details className="refine"><summary>Refine: goal, technique, subject, shape, colour, how many</summary>
             <div className="filters">
               <label className="field">Goal<select value={goalId} onChange={(event) => setGoalId(event.target.value)}><option value="">Any</option>
                 {taxonomy?.goals.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
@@ -111,18 +120,17 @@ export default function Find() {
               <label className="field">Main colour<select value={color} onChange={(event) => setColor(event.target.value)}>
                 {COLORS.map((c) => <option key={c} value={c}>{c || 'Any'}</option>)}</select></label>
             </div>
-          </> : <fieldset><legend>Techniques to find more examples of (fewest examples first)</legend>
+            <AnalysisSettings count={count} setCount={setCount} assistant={assistant} setAssistant={setAssistant} />
+            </details>
+          </> : <><fieldset><legend>Techniques to find more examples of (fewest examples first)</legend>
             <div className="row">{coverage.data?.slice(0, 12).map((t) => (
               <label key={t.id} className="choice plain" style={{ minWidth: 240 }}><input type="checkbox" checked={growTechniques.includes(t.id)}
                 onChange={(event) => setGrowTechniques(event.target.checked ? [...growTechniques, t.id] : growTechniques.filter((x) => x !== t.id))} />
                 {t.name} <span className="mono">{t.examples}</span></label>))}</div>
             <p className="mono" style={{ marginTop: 8 }}>Searches use each technique's curated search hints; no AI is used for planning.</p>
-          </fieldset>}
-          <div className="filters">
-            <label className="field">How many new images<input type="number" min={1} max={40} value={count} onChange={(event) => setCount(Number(event.target.value))} /></label>
-            <label className="field grow">Who analyses<select value={assistant} onChange={(event) => setAssistant(event.target.value)}>
-              {ASSISTANTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          </div>
+          </fieldset>
+          <details className="refine"><summary>Refine: how many, who reads the pictures</summary>
+            <AnalysisSettings count={count} setCount={setCount} assistant={assistant} setAssistant={setAssistant} /></details></>}
           <fieldset style={{ borderTop: '1px solid var(--keyline)', paddingTop: 16 }}><legend className="label" style={{ color: 'var(--ink)', fontSize: 15 }}>Sources (each item's licence is checked)</legend>
             <div className="sources">
               {enabled.map((s) => (

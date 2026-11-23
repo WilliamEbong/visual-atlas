@@ -77,7 +77,8 @@ export default function Ask() {
   const off = (route.query.get('off') ?? '').split(',').filter(Boolean)
   const goals = (route.query.get('goals') ?? '').split(',').filter(Boolean)
   const [text, setText] = useState(asked)
-  useEffect(() => setText(asked), [asked])
+  const [changing, setChanging] = useState(false)
+  useEffect(() => { setText(asked); setChanging(false) }, [asked])
   const limit = Math.min(40, Math.max(12, Number(route.query.get('limit')) || 12))
   const query = new URLSearchParams({ brief: asked, use })
   const wanted = Object.keys(LAYER_NAMES).filter((layer) => !off.includes(layer))
@@ -96,8 +97,16 @@ export default function Ask() {
   return (
     <>
       <PageHead kicker="Ask the atlas" title="What should the picture do?" />
-      {!asked && <p className="lede under">Describe the picture you need. You get ways to do it and pictures that show them, each with its reason and licence. No AI is used.</p>}
-      <form className="ask-form under" onSubmit={(event) => { event.preventDefault()
+      {!asked && <p className="lede under">You get ways to do it and pictures that show them, each with its reason and licence, chosen from your library without AI.</p>}
+      {asked && !changing ? <div className="asked under">
+        <p className="asked-brief">“{asked}”</p>
+        <button type="button" className="quiet small" onClick={() => setChanging(true)}>Change the brief</button>
+        <div className="segments small-segments" role="radiogroup" aria-label="How you will use it">
+          {([['reference', 'As a reference'], ['publish', 'In published work']] as const).map(([value, label]) => (
+            <label key={value} className="choice"><input type="radio" name="use-line" checked={use === value} onChange={() => set({ use: value })} />{label}</label>))}
+        </div>
+      </div>
+      : <form className="ask-form under" onSubmit={(event) => { event.preventDefault()
         if (!text.trim()) { (event.currentTarget.querySelector('textarea') as HTMLTextAreaElement | null)?.focus(); return }
         set({ q: text.trim(), goals: '' }) }}>
         <label className="field ask-brief">Describe the picture you need and what it is for
@@ -118,9 +127,9 @@ export default function Ask() {
         </div>
         {!asked && <div className="examples" role="group" aria-label="Examples">
           <span className="mono">Try</span>
-          {EXAMPLES.map((example) => <button key={example} type="button" className="quiet" onClick={() => set({ q: example, goals: '' })}>{example}</button>)}
+          <div className="example-links">{EXAMPLES.map((example) => <button key={example} type="button" className="quiet" onClick={() => set({ q: example, goals: '' })}>{example}</button>)}</div>
         </div>}
-      </form>
+      </form>}
       {asked && answer.error && <Failure message={answer.error} busy={answer.busy} retry={answer.reload} />}
       {asked && !answer.data && !answer.error && <Loading label="Reading your brief…" />}
       {answer.data && <Answer asked={asked} data={answer.data} ways={ways.error ? { reading: answer.data.reading, directions: [], note: '' } : ways.data} goals={goals} use={use} off={off} from={from}
@@ -134,7 +143,7 @@ export default function Ask() {
 }
 
 /** The empty page shows what an answer looks like, with pictures, before anyone types. */
-function SampleAnswer({ brief, use, from, open }: { brief: string; use: string; from: string; open: () => void }) {
+export function SampleAnswer({ brief, use, from, open }: { brief: string; use: string; from: string; open: () => void }) {
   const sample = useData<DeskDirections>(`desk/directions?${new URLSearchParams({ brief, use })}`)
   // The pictures chosen for the example's ways to do it: the first screen must show judgment, not every match.
   const checked = (sample.data?.directions ?? []).flatMap((way) => way.references).slice(0, 5)
@@ -145,7 +154,7 @@ function SampleAnswer({ brief, use, from, open }: { brief: string; use: string; 
         <h2 id="sample-title">For example: “{brief}”</h2>
         <button type="button" className="quiet" onClick={open}>See the whole answer</button>
       </div>
-      <RefStrip refs={checked} from={from} use={use} label="Pictures from a sample answer" />
+      <RefStrip refs={checked} from={from} use={use} label="Pictures from a sample answer" compact />
     </section>
   )
 }
@@ -178,7 +187,7 @@ function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: 
 }
 
 /** Thumbnails that open their reference; shared by Ways to do it and More like this. */
-function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; label: string; use: string }) {
+function RefStrip({ refs, from, label, use, compact }: { refs: DeskRef[]; from: string; label: string; use: string; compact?: boolean }) {
   // The Library's justified rows: every picture at its true shape, rows that fill the width, one caption style.
   return (
     <ul className="justified refs-row" aria-label={label}>
@@ -186,8 +195,9 @@ function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; l
         <a href={refLink(ref, from, use)} className="plate">
           <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
           <span className="plate-title">{cleanTitle(ref.title)}</span>{ref.creator && <span className="sr-only">, {ref.creator}</span>}</a>
+        {compact ? <span className="mono strip-meta">{/^Shows (.+?) \(/.exec(ref.reasons[0] ?? '')?.[1] ?? layerLabel(ref)}</span> : <>
         {ref.reasons[0] && !ref.reasons[0].startsWith('Similar placement') && <span className="strip-reason"><Reason text={ref.reasons[0]} /></span>}
-        <span className="mono strip-meta">{ref.layer !== 'library' ? `${layerLabel(ref)} · ` : ''}{plainLicence(ref)}</span>
+        <span className="mono strip-meta">{ref.layer !== 'library' ? `${layerLabel(ref)} · ` : ''}{plainLicence(ref)}</span></>}
       </li>)}
     </ul>
   )
@@ -268,8 +278,9 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
                 {way.serves.length > 0 && <p className="mono">Serves: {way.serves.join(' · ')}</p>}</div>
             </div>
             <RefStrip refs={way.references} from={from} use={use} label={`Pictures that show ${way.technique.name}`} />
+            {way.make_sure[0] && <p className="way-first"><span className="mono">Make sure </span>{way.make_sure[0]}</p>}
             <details className="way-how"><summary className="mono">How to carry it out</summary>
-              <ul>{way.make_sure.slice(0, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
+              <ul>{way.make_sure.slice(1, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
               {way.not_to_confuse_with[0] && <p className="muted guide-note">{way.not_to_confuse_with[0]}</p>}
             </details>
           </li>)}

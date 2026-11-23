@@ -41,13 +41,11 @@ export default function Compare({ ids }: { ids: number[] }) {
     <>
       <PageHead kicker={`Compare · ${data.images.length} of up to 4 images`} title="Compare" asideClass="actions"
         aside={<><a className="button" href={from ?? '#/library'}>Add an image</a><button type="button" onClick={() => { clearCompare(); window.location.hash = from ?? '#/library' }}>Clear</button></>} />
-      <section className="baseline" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
-        {data.images.map((d) => <figure key={d.image.id}><img src={media(d.image.display)} alt={d.image.title} />
-          <figcaption className="phone-only mono">Fig. {d.image.id}</figcaption></figure>)}
-      </section>
-      <div className="baseline-captions" style={columns}>
-        {data.images.map((d) => (
-          <div key={d.image.id} className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
+      <section className="compare-grid" aria-label="Images side by side" style={{ ...columns, marginTop: 32 }}>
+        <div className="compare-col compare-key"><span /><p className="mono">Side by side, on one baseline. The table below lines up with each picture.</p></div>
+        {data.images.map((d) => <div key={d.image.id} className="compare-col">
+          <figure><img src={media(d.image.display)} alt={d.image.title} /></figure>
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'nowrap' }}>
             <div>
               <p className="mono">Fig. {d.image.id}</p>
               <h2 style={{ fontSize: 24, lineHeight: 1.1, marginTop: 2 }}><a href={href(`image/${d.image.id}`, { from })}>{d.image.title}</a></h2>
@@ -55,13 +53,13 @@ export default function Compare({ ids }: { ids: number[] }) {
               {data.comparison?.per_image.find((n) => n.image_id === d.image.id) && <p style={{ fontSize: 14, marginTop: 8 }}>{data.comparison.per_image.find((n) => n.image_id === d.image.id)!.note}</p>}
             </div>
             <button type="button" className="small" aria-label={`Remove ${d.image.title} from the comparison`} onClick={() => drop(d.image.id, d.image.title)}>×</button>
-          </div>))}
-      </div>
+          </div></div>)}
+      </section>
 
       <section className="section" aria-labelledby="matrix" style={{ marginTop: 48 }}>
         <h2 id="matrix">Techniques</h2>
         <p className="mono" style={{ margin: '8px 0 12px' }}>◐ agreed by a second model · ● confirmed by you · ○ proposed by a model · — not seen{shared.length ? ` · shared by all: ${shared.map((t) => t.name.replace(/ \(.*\)$/, '')).join(', ')}` : ''}</p>
-        <div className="scroll-x"><table className="plain">
+        <div className="scroll-x"><table className="plain compare-table">
           <thead><tr><th scope="col" style={{ width: '34%' }}>Technique</th>{data.images.map((d) => <th key={d.image.id} scope="col">Fig. {d.image.id}</th>)}</tr></thead>
           <tbody>
             {used.map((t) => <tr key={t.id}><th scope="row"><a href={href(`technique/${t.id}`, { from })}>{t.name}</a></th>

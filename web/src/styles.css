@@ -155,7 +155,6 @@ legend { font: 12px/1.4 var(--mono); color: var(--caption); padding: 0; margin-b
 
 /* ── the library: a justified grid; widths follow each picture's proportions ── */
 .justified { --row: 240px; display: flex; flex-wrap: wrap; gap: 40px 20px; margin-top: 28px; }
-.justified::after { content: ''; flex: 1000000 1 0; }
 .plate-item { flex: calc(var(--a) * 100) 1 calc(var(--a) * var(--row)); min-width: 0; position: relative; }
 .plate { display: block; text-decoration: none; }
 .plate-frame { display: block; aspect-ratio: var(--a); background: var(--card); outline: 1px solid var(--keyline); outline-offset: -1px; overflow: hidden; }
@@ -265,10 +264,6 @@ dialog h2 { font-size: 30px; }
 dialog .row { justify-content: flex-end; margin-top: 20px; }
 
 /* ── compare, collections, tables, graph ──────────────────────────────── */
-.baseline { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 32px; align-items: end; border-bottom: 1px solid var(--axis); }
-.baseline figure { margin: 0; display: flex; justify-content: center; align-items: flex-end; }
-.baseline figure img { max-height: 380px; max-width: 100%; width: auto; outline: 1px solid var(--keyline); outline-offset: -1px; object-fit: contain; }
-.baseline-captions { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 32px; padding-top: 16px; }
 table.plain { border-collapse: collapse; width: 100%; font-size: 15px; }
 table.plain th, table.plain td { text-align: left; padding: 12px 10px 12px 0; border-bottom: 1px solid var(--hair); vertical-align: top; font-weight: 400; }
 table.plain thead th { font: 12px var(--mono); color: var(--caption); }
@@ -338,8 +333,6 @@ table.plain thead th { font: 12px var(--mono); color: var(--caption); }
   .justified { --row: 2000px; gap: 28px; }
   .lens { position: relative; transform: none; width: 150px; height: 150px; right: auto; align-self: flex-end; margin-bottom: -75px; flex: none; }
   .beside-lens { padding-right: 0; min-height: 0; padding-top: 90px; }
-  .baseline, .baseline-captions { --n: 1 !important; }
-  .baseline figure { height: auto; }
   .toasts { left: 16px; right: 16px; }
 }
 @media (prefers-reduced-motion: no-preference) { a, button { transition: color .15s, background-color .15s, border-color .15s; } }
@@ -449,10 +442,7 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 16px; }
 .sources .choice.plain { align-items: flex-start; }
 .source-note { display: block; font-size: 11px; color: var(--caption); }
-.phone-only { display: none; }
 @media (max-width: 600px) {
-  .phone-only { display: block; margin-top: 6px; font-size: 14px; }
-  .baseline figure { flex-direction: column; align-items: flex-start; }
   .head-aside:has(.specimens) { display: none; }
   .beside-lens + p.mono, .lens-caption { text-align: left !important; }
 }
@@ -511,5 +501,44 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   .way .refs-row { --row: 220px; }
   .justified:not(.refs-row) { --row: 180px; }
 }
-.way .refs-row::after { display: none; }  /* a way's pictures fill its band, up to a height cap */
 .way .refs-row .plate-item { max-width: calc(var(--a) * 400px); }
+
+/* structural pass B: one picture system. Every row fills the width; no picture grows past 1.6 times its row height */
+.plate-item { max-width: calc(var(--a) * var(--row) * 1.6); }
+.way .refs-row .plate-item { max-width: calc(var(--a) * 400px); }
+.asked { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; padding: 18px 0; border-bottom: 1px solid var(--hair); }
+.asked-brief { font: 26px/1.25 var(--display); margin: 0; flex: 1 1 420px; }
+.small-segments .choice { min-height: 36px; font-size: 14px; }
+.examples { display: grid; grid-template-columns: auto 1fr; gap: 0 18px; align-items: baseline; }
+.example-links { display: flex; flex-wrap: wrap; gap: 2px 18px; }
+.way-first { margin: 14px 0 0; max-width: 760px; }
+.refine { border-top: 1px solid var(--keyline); padding-top: 12px; }
+.refine > summary { cursor: pointer; font-size: 15px; }
+.refine[open] > summary { margin-bottom: 16px; }
+.glossary > summary { cursor: pointer; font: 22px/1.2 var(--display); }
+.compare-grid { display: grid; grid-template-columns: 30% repeat(var(--n), minmax(0, 1fr)); grid-template-rows: auto auto; column-gap: 32px; }
+.compare-col { display: grid; grid-row: span 2; grid-template-rows: subgrid; }
+.compare-col figure { margin: 0; display: flex; justify-content: center; align-items: flex-end; border-bottom: 1px solid var(--axis); }
+.compare-col figure img { max-height: 380px; max-width: 100%; outline: 1px solid var(--keyline); outline-offset: -1px; object-fit: contain; }
+.compare-col > .row { padding-top: 16px; }
+.compare-key { border-bottom: 0; }
+.compare-key p { align-self: start; padding-top: 16px; }
+.compare-key > span { border-bottom: 1px solid var(--axis); }
+.compare-table { table-layout: fixed; }
+.compare-table th[scope="col"]:first-child { width: 30% !important; }
+.lens { overflow: visible; }
+.lens .lens-caption { position: absolute; top: calc(100% + 8px); left: 0; right: 0; font-size: 12px; color: var(--caption); line-height: 1.4; }
+.drawers.goals > :last-child:nth-child(4n+3) { grid-column: span 2; }
+.technique-card .row { opacity: .0; transition: opacity .15s; }
+.technique-card:hover .row, .technique-card:focus-within .row { opacity: 1; }
+@media (hover: none) { .technique-card .row { opacity: 1; } }
+@media (max-width: 900px) { .drawers.goals > :last-child:nth-child(4n+3) { grid-column: auto; } }
+@media (max-width: 760px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .compare-key { display: none; }
+  .compare-col { grid-row: auto; grid-template-rows: auto auto; margin-bottom: 28px; }
+  .compare-table th[scope="col"]:first-child { width: 40% !important; }
+  .compare-table th[scope="row"] { position: sticky; left: 0; background: var(--ground); }
+  .asked-brief { font-size: 21px; }
+}
+@media (max-width: 600px) { .lens .lens-caption { position: static; display: block; margin-top: 8px; } }

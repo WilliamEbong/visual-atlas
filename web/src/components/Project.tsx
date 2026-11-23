@@ -7,6 +7,7 @@ import type { Brief, Job, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
 import ReadingEditor from './ReadingEditor'
 import { Empty, Failure, Loading, PageHead, useNotice } from './ui'
+import { SampleAnswer } from './Ask'
 
 const RULES = ['rule-rust', 'rule-blue', 'rule-green', 'rule-ochre', 'rule-ink']
 const THUMB_HEIGHTS = [70, 58, 86, 64, 100]
@@ -16,7 +17,7 @@ export default function Project({ id }: { id?: number }) {
   if (id) return <BriefPage id={id} onChange={list.reload} />
   return (
     <>
-      <PageHead kicker="My project · directions grounded in your library" title="My project" />
+      <PageHead kicker="Projects · directions grounded in your library" title="Projects" />
       <div className="split" style={{ marginTop: 40 }}>
         <section className="main-col stack" aria-labelledby="new-brief">
           <h2 id="new-brief">A new brief</h2>
@@ -26,7 +27,7 @@ export default function Project({ id }: { id?: number }) {
         <aside className="side-col" aria-labelledby="briefs">
           <h2 id="briefs">Your briefs</h2>
           {list.error ? <Failure message={list.error} busy={list.busy} retry={list.reload} /> : !list.data ? <Loading plates={false} />
-            : list.data.length === 0 ? <p className="muted" style={{ marginTop: 12 }}>None yet. Save a brief and ask for directions: you get two to five ways to approach it, each naming its techniques, the pictures from your library that show them, how to carry it out, and what it costs you. Briefs and directions are kept, so reopening one costs nothing.</p>
+            : list.data.length === 0 ? <p className="muted" style={{ marginTop: 12 }}>None yet. Save a brief and ask for directions: two to five ways to approach it, each with its techniques, pictures from your library, how to carry it out, and what it costs you.</p>
             : <nav className="drawers" aria-label="Your briefs" style={{ gridTemplateColumns: '1fr', marginTop: 16 }}>
               {list.data.map((b, index) => <a key={b.id} className="drawer" href={href(`project/${b.id}`)}>
                 <span className="letter" aria-hidden="true">{index + 1}</span>
@@ -35,6 +36,8 @@ export default function Project({ id }: { id?: number }) {
             </nav>}
         </aside>
       </div>
+      {list.data?.length === 0 && !readOnly && <SampleAnswer brief="A calm opening slide: one small figure in a lot of empty space" use="reference"
+        from={window.location.hash} open={() => go('ask', { q: 'A calm opening slide: one small figure in a lot of empty space' })} />}
     </>
   )
 }
@@ -53,7 +56,7 @@ function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: 
   }
   return (
     <form className="stack slip" onSubmit={save}>
-      <label className="field">Project name<input required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Solitude talk — poster" /></label>
+      <label className="field">Project name<input required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Solitude talk: poster" /></label>
       <label className="field">The brief: audience, message, format, mood, constraints
         <textarea required rows={6} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)}
           placeholder="A poster for a public talk about solitude and attention. Calm, a little melancholy, not lonely-sad. A2 portrait, title at the top, lots of room for text." /></label>
