@@ -3,7 +3,18 @@
 Durable checkpoint for the autonomous build. Newest status first. Plan of record:
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
-## Next concrete action
+## 008 Reference desk (overnight 2026-11-22/23, branch claude/product-direction-d8e569)
+- Owner handoff: build continuously toward a genuinely useful product. Thesis, research and decisions:
+  docs/research/05-thesis.md. Spec Kit feature: specs/008-reference-desk (spec, plan, tasks, session-log).
+- Summary for the owner and merge steps: OVERNIGHT-CHANGES.md. Evidence and the Later list are kept there.
+- Built: atlas/desk.py (deterministic reference desk), atlas/layers.py (generated and design-system layers),
+  atlas/mcp_server.py (read-only stdio MCP, stdlib), CLI advise/refs/ref/mcp, /api/desk and /layer-media, Ask page,
+  generated/ layer, commit guard for design-system files, constitution 1.1.0.
+- Invariants kept: rights.py is still the only gate into the library; no new dependency; no migration; the
+  owner's real library was untouched (all runs used %TEMP%\va-home); design systems were read in place.
+- Next concrete action: the owner runs docs/evaluation/v0.5/BLIND-TEST.md, then decides whether to merge.
+
+## Next concrete action (v0.4, superseded by 008 above)
 v0.4.0 local release implemented and verified. Launch with `uv run visual-atlas`, or extract
 `release/VisualAtlas-v0.4.0.zip` and run `Install Visual Atlas.cmd`. No pending core implementation task.
 Owner's latest instruction authorizes committing and pushing the implementation and documentation.

@@ -131,7 +131,7 @@ legend { font: 12px/1.4 var(--mono); color: var(--caption); padding: 0; margin-b
 .panel { border: 1px solid var(--keyline); background: var(--paper); padding: 20px; margin-top: 14px; display: flex; flex-direction: column; gap: 18px; }
 
 /* ── catalogue drawers, slips, trays ──────────────────────────────────── */
-.drawers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 32px; }
+.drawers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 32px; }
 .drawer { display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; border: 1px solid var(--keyline); text-decoration: none; min-height: 104px; }
 .drawer:hover { border-color: var(--ink); color: var(--ink); background: var(--paper); }
 .drawer .letter { font-family: var(--display); font-size: 44px; line-height: .9; min-width: 30px; }
