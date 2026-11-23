@@ -96,6 +96,8 @@ export default function Library({ query }: { query: URLSearchParams }) {
           .replace(/^Print made by:\s*/i, '').split(/[,;(]| Published| from /)[0].trim().slice(0, 32)).join(' · ')}</p>}
       </div>
       <nav className="drawers" aria-label="Ways in">
+        {!readOnly && <a className="drawer" href="#/ask"><span className="letter" aria-hidden="true">A</span><span><strong>Ask the atlas</strong>
+          <span className="text">Say what a picture should do; get techniques and references, each with its reason and licence.</span></span></a>}
         <a className="drawer" href="#/find"><span className="letter" aria-hidden="true">F</span><span><strong>Find images</strong>
           <span className="text">Describe what you need; the atlas searches open collections and checks permissions.</span></span></a>
         <a className="drawer" href="#/explore"><span className="letter" aria-hidden="true">E</span><span><strong>Explore techniques</strong>

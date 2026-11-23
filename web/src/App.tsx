@@ -3,6 +3,7 @@ import { media, readOnly, request } from './lib/client'
 import { AppContext, useData, usePoll, type Pick } from './lib/hooks'
 import { href, useRoute } from './lib/router'
 import type { Job, Taxonomy } from './lib/types'
+import Ask, { RefPage } from './components/Ask'
 import Collections from './components/Collections'
 import Compare from './components/Compare'
 import Connections from './components/Connections'
@@ -16,7 +17,7 @@ import SettingsPage from './components/Settings'
 import { NoticeProvider } from './components/ui'
 import Welcome from './components/Welcome'
 
-const NAV = [['', 'Library'], ['find', 'Find images'], ['explore', 'Explore'], ['project', 'My project'], ['collections', 'Collections']] as const
+const NAV = [['ask', 'Ask'], ['', 'Library'], ['find', 'Find images'], ['explore', 'Explore'], ['project', 'My project'], ['collections', 'Collections']] as const
 const TOOLS = [['jobs', 'Jobs'], ['settings', 'Settings']] as const
 
 function readCompare(): Pick[] {
@@ -42,13 +43,15 @@ export default function App() {
   useEffect(checkJobs, [checkJobs, section])
   usePoll(checkJobs, true, running ? 3000 : 30000)  // the 30 s ping also tells the launcher the window is open
   useEffect(() => {
-    const extra: Record<string, string> = { compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
+    const extra: Record<string, string> = { ref: 'Reference', compare: 'Compare', connections: 'See connections', technique: 'Technique', jobs: 'Jobs', settings: 'Settings' }
     if (section !== 'image') document.title = `${NAV.find(([key]) => key === section)?.[1] ?? extra[section] ?? 'Library'} · Visual Atlas`
   }, [section])
 
   let page
   switch (section) {
     case 'image': page = <ImagePage id={Number(route.path[1])} />; break
+    case 'ask': page = <Ask />; break
+    case 'ref': page = <RefPage id={route.query.get('id') ?? ''} />; break
     case 'find': page = <Find />; break
     case 'jobs': page = <Jobs id={route.path[1]} />; break
     case 'explore': page = <Explore route={route} />; break
@@ -61,7 +64,7 @@ export default function App() {
     default: page = <Library query={route.query} />
   }
   const current = (key: string) => section === key || (key === 'explore' && ['technique', 'connections'].includes(section))
-    || (key === '' && ['image', 'compare'].includes(section))
+    || (key === '' && ['image', 'compare'].includes(section)) || (key === 'ask' && section === 'ref')
 
   return (
     <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]), refreshTaxonomy: taxonomy.reload }}>
