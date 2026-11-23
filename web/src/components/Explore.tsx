@@ -103,7 +103,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         <p className="muted" style={{ marginTop: 12, maxWidth: 760 }}>{data.explanation}</p>
         {data.aliases.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Also called {data.aliases.join(', ')}</p>}
       </div>
-      {lens && <p className="mono" style={{ textAlign: 'right', marginTop: 8 }}>Through the lens: {cleanTitle(lens.title)}{lens.creator ? `, ${lens.creator}` : ''}</p>}
+      {lens && <p className="mono lens-caption" style={{ textAlign: 'right', marginTop: 8 }}>Through the lens: {cleanTitle(lens.title)}{lens.creator ? `, ${lens.creator}` : ''}</p>}
 
       <div className="trays section" style={{ marginTop: 48 }}>
         <section className="tray-col rule-blue" aria-labelledby="spot"><h2 id="spot">How to spot it</h2>

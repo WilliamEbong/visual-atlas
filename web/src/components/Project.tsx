@@ -26,7 +26,7 @@ export default function Project({ id }: { id?: number }) {
         <aside className="side-col" aria-labelledby="briefs">
           <h2 id="briefs">Your briefs</h2>
           {list.error ? <Failure message={list.error} busy={list.busy} retry={list.reload} /> : !list.data ? <Loading plates={false} />
-            : list.data.length === 0 ? <p className="muted" style={{ marginTop: 12 }}>None yet. Briefs and their suggestions are saved, so reopening one costs nothing.</p>
+            : list.data.length === 0 ? <p className="muted" style={{ marginTop: 12 }}>None yet. Save a brief and ask for directions: you get two to five ways to approach it, each naming its techniques, the pictures from your library that show them, how to carry it out, and what it costs you. Briefs and directions are kept, so reopening one costs nothing.</p>
             : <nav className="drawers" aria-label="Your briefs" style={{ gridTemplateColumns: '1fr', marginTop: 16 }}>
               {list.data.map((b, index) => <a key={b.id} className="drawer" href={href(`project/${b.id}`)}>
                 <span className="letter" aria-hidden="true">{index + 1}</span>

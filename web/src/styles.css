@@ -442,3 +442,17 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .lens img { object-fit: contain; }
 @media (max-width: 900px) { .lens { width: 240px; max-height: 240px; } }
 @media (max-width: 600px) { .lens { width: 160px; max-height: 160px; margin-bottom: -40px; } }
+
+/* scored design cycle 1 */
+.ref-strip { flex-wrap: wrap; overflow: visible; row-gap: 24px; }
+.strip.captioned { flex-wrap: wrap; overflow: visible; row-gap: 20px; border-bottom: 0; }
+.strip-reason { font-size: 12px; line-height: 1.35; color: var(--graphite); min-width: 140px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 16px; }
+.sources .choice.plain { align-items: flex-start; }
+.source-note { display: block; font-size: 11px; color: var(--caption); }
+.phone-only { display: none; }
+@media (max-width: 600px) {
+  .phone-only { display: block; margin-top: 6px; font-size: 14px; }
+  .head-aside:has(.specimens) { display: none; }
+  .beside-lens + p.mono, .lens-caption { text-align: left !important; }
+}

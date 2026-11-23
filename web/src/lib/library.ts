@@ -108,8 +108,13 @@ export function activeFilters(filters: Filters, names: Record<string, string>): 
 
 /** A catalogue title without the noise of file names: "Slovenian Sunset (7027587519)" → "Slovenian Sunset",
  *  "Alice 05a-1116x1492" → "Alice 05a", "…Sunset 5746" stays (it is part of the title). Display only. */
-export function cleanTitle(title: string): string {
-  return title.replace(/\s*\(\d{6,}\)$/, '').replace(/[-_ ]\d{2,5}x\d{2,5}(-\d+)?$/, '').replace(/\.(jpe?g|png|tiff?)\b.*$/i, '').trim() || title
+export function cleanTitle(title: string, maker = '', date = ''): string {
+  let clean = title.replace(/\s*\(\d{6,}\)$/, '').replace(/[-_ ]\d{2,5}x\d{2,5}(-\d+)?$/, '').replace(/\.(jpe?g|png|tiff?)\b.*$/i, '').trim()
+  const name = maker.trim()
+  if (name && clean.toLowerCase().startsWith(`${name.toLowerCase()} - `)) clean = clean.slice(name.length + 3)  // "Maker - Title"
+  const year = /\d{4}/.exec(date)?.[0]
+  if (year) clean = clean.replace(new RegExp(`,\\s*${year}$`), '')  // "Title, 1926" when 1926 is the date
+  return clean.trim() || title
 }
 
 /** Dates as people write them: camera timestamps lose their time of day. */

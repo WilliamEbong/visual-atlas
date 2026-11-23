@@ -88,3 +88,10 @@ describe('shortDate', () => {
     expect(cleanTitle('Ronchamp17f.jpg - Flickr - scarletgreen')).toBe('Ronchamp17f')
   })
 })
+
+describe('cleanTitle with its maker and date', () => {
+  it('does not repeat what the next line says', () => {
+    expect(cleanTitle('Ludwig Hohlwein - Igeha Schokolade, 1926', 'Ludwig Hohlwein', '1926')).toBe('Igeha Schokolade')
+    expect(cleanTitle('Igeha Schokolade, 1926', 'Someone', '1930')).toBe('Igeha Schokolade, 1926')
+  })
+})

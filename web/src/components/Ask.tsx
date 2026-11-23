@@ -97,7 +97,9 @@ export default function Ask() {
     <>
       <PageHead kicker="Ask the atlas" title="What should the picture do?" />
       {!asked && <p className="lede under">Describe the picture you need. You get ways to do it and pictures that show them, each with its reason and licence. No AI is used.</p>}
-      <form className="ask-form under" onSubmit={(event) => { event.preventDefault(); set({ q: text.trim(), goals: '' }) }}>
+      <form className="ask-form under" onSubmit={(event) => { event.preventDefault()
+        if (!text.trim()) { (event.currentTarget.querySelector('textarea') as HTMLTextAreaElement | null)?.focus(); return }
+        set({ q: text.trim(), goals: '' }) }}>
         <label className="field ask-brief">Describe the picture you need and what it is for
           <textarea rows={3} value={text} maxLength={4000} onChange={(event) => setText(event.target.value)}
             placeholder="For example: a calm opening slide with one small figure in a lot of empty space"
@@ -112,7 +114,7 @@ export default function Ask() {
                   onChange={() => set({ use: value })} />{label}</label>))}
             </div>
           </fieldset>
-          <button type="submit" className="primary" disabled={!text.trim()}>Ask</button>
+          <button type="submit" className="primary">Ask</button>
         </div>
         {!asked && <div className="examples" role="group" aria-label="Examples">
           <span className="mono">Try</span>
@@ -183,6 +185,7 @@ function RefStrip({ refs, from, label, use }: { refs: DeskRef[]; from: string; l
         <a href={refLink(ref, from, use)} className="specimen" style={{ aspectRatio: aspect(ref) }}>
           <RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></a>
         <span className="strip-label">{cleanTitle(ref.title)}</span>
+        {ref.reasons[0] && !ref.reasons[0].startsWith('Similar placement') && <span className="strip-reason"><Reason text={ref.reasons[0]} /></span>}
         <span className="mono strip-meta">{layerLabel(ref)} · {plainLicence(ref)}</span>
       </li>)}
     </ul>
@@ -240,7 +243,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
           {techniques.length > 0 && !(ways?.directions.length || data.guidance.length) && <><span className="mono">{goals.length ? ' Techniques ' : 'Techniques '}</span>{techniques.join(' · ')}</>}
           {goals.length === 0 && techniques.length > 0 && (ways?.directions.length || data.guidance.length) ? <><span className="mono">Read as </span>{techniques.join(' · ')}</> : ''}</>
           : 'We could not tell what the picture should do.'}</p>
-        {data.reading.subject_terms.length > 0 && <p className="mono">Subject words: {data.reading.subject_terms.join(', ')}</p>}
+        {missed && data.reading.subject_terms.length > 0 && <p className="mono">Words it looked for: {data.reading.subject_terms.join(', ')}</p>}
         <GoalChoice chosen={chosen} read={data.reading.goals.map((g) => g.id).filter((g) => !chosen.includes(g))} choose={choose} missed={missed} />
         {data.route.system && data.layers['design-system'].length > 0 && <p className="mono">Design system: {data.route.system.name}. {data.route.system.why}.</p>}
         {available.length > 1 && <div className="row layer-toggles" role="group" aria-label="Where to look">
@@ -282,13 +285,13 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
       </section>}
       <section className="section" aria-labelledby="refs-title" style={{ marginTop: 56 }}>
         <div className="section-title">
-          <h2 id="refs-title">{shown.size ? 'More references' : missed && strong.length === 0 ? 'Nothing matches a technique yet' : 'References'}</h2>
+          <h2 id="refs-title">{shown.size ? 'More references' : missed && strong.length === 0 ? 'Meanwhile' : 'References'}</h2>
           <p className="mono">{rest.length && !(missed && strong.length === 0) ? `${rest.length}${shown.size ? ' more' : ''} of ${data.total_matches} matches` : ''}
             {use === 'publish' ? ' · free to publish with credit' : ''}</p>
         </div>
-        {missed && strong.length === 0 && shown.size === 0 ? <><p className="lede">Pick what the picture should do, above, or find new images for this brief.</p>
-          {weak.length > 0 && <details className="weak"><summary className="mono">{weak.length} picture{weak.length === 1 ? '' : 's'} matched only on words</summary>
-            <Plates refs={weak} from={from} use={use} small /></details>}</>
+        {missed && strong.length === 0 && shown.size === 0 ? <>
+          {weak.length > 0 && <><p className="mono">Only these share your words, not a technique:</p>
+            <RefStrip refs={weak.slice(0, 6)} from={from} use={use} label="Pictures that share your words" /></>}</>
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
@@ -303,8 +306,11 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
       </section>
       <nav className="section next-steps" aria-label="Next steps" style={{ marginTop: 48 }}>
-        <a className="button primary" href={href('project', { text: asked })}>Start a project from this brief</a>
-        <a className="button" href={href('find', { goal: asked })}>Find more images for this brief</a>
+        {missed && strong.length === 0
+          ? <><a className="button primary" href={href('find', { goal: asked })}>Find images for this brief</a>
+            <a className="button" href={href('project', { text: asked })}>Start a project from this brief</a></>
+          : <><a className="button primary" href={href('project', { text: asked })}>Start a project from this brief</a>
+            <a className="button" href={href('find', { goal: asked })}>Find more images for this brief</a></>}
       </nav>
       <p className="muted" style={{ marginTop: 40, maxWidth: 760, fontSize: 14, lineHeight: 1.5 }}>{data.note}</p>
     </>

@@ -78,7 +78,7 @@ export default function Find() {
     <>
       <PageHead kicker="Find · searches open collections · keeps only pictures you may use" title={mode === 'find' ? 'Find images' : 'Grow my library'}
         aside={<ol className="mono" aria-label="What happens" style={{ listStyle: 'none', padding: '0 0 24px', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <li>1  Search</li><li>2  Check permissions</li><li>3  Analyse</li><li>4  File by technique</li></ol>} />
+          <li>1  Search</li><li>2  Check permissions</li><li>3  Filter</li><li>4  Analyse</li><li>5  File by technique</li></ol>} />
       <div className="split" style={{ marginTop: 40 }}>
         <form className="main-col slip stack" style={{ gap: 22, padding: 28 }} onSubmit={submit}>
           <fieldset><legend className="sr-only">What to do</legend>
@@ -124,11 +124,11 @@ export default function Find() {
               {ASSISTANTS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           </div>
           <fieldset style={{ borderTop: '1px solid var(--keyline)', paddingTop: 16 }}><legend className="label" style={{ color: 'var(--ink)', fontSize: 15 }}>Sources (each item's licence is checked)</legend>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '6px 16px' }}>
+            <div className="sources">
               {enabled.map((s) => (
                 <label key={s.id} className="choice plain"><input type="checkbox" checked={chosen.includes(s.id)}
                   onChange={(event) => setProviders(event.target.checked ? [...chosen, s.id] : chosen.filter((p) => p !== s.id))} />
-                  <span>{s.name} {s.label && <span className="mono" style={{ fontSize: 11 }}>{s.label}</span>}
+                  <span title={s.label}>{s.name}{s.label && <span className="mono source-note">{s.label.length > 48 ? 'Licence read from each file' : s.label}</span>}
                     {s.setup && <span className="mono" style={{ display: 'block', fontSize: 11 }}>{s.setup}</span>}</span></label>))}
             </div>
           </fieldset>

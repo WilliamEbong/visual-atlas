@@ -200,7 +200,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
                     <a className="plate" href={href(`image/${item.id}`, { from })}>
                       <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" decoding="async" /></span>
                       <span className="fig">Fig. {item.id}{plateState(item) ? `  ${plateState(item)}` : ''}</span>
-                      <span className="plate-title">{cleanTitle(item.title)}</span>
+                      <span className="plate-title">{cleanTitle(item.title, cleanMaker(item.creator), item.date_text)}</span>
                       <span className="maker">{[cleanMaker(item.creator), shortDate(item.date_text)].filter(Boolean).join(', ') || 'Unknown maker'}</span>
                       <span className="techs">{item.techniques.slice(0, 3).map((t) => t.name.replace(/ \(.*\)$/, '')).join(' · ') || (item.status === 'pending' ? 'Waiting for analysis' : 'No technique yet')}</span>
                     </a>

@@ -150,7 +150,7 @@ export default function ImagePage({ id }: { id: number }) {
         <section className="why" aria-labelledby="why">
           <div className="ruled-title rule-rust section-title"><h2 id="why">Why it may work</h2>
             {!readOnly && <button type="button" className="quiet small" aria-expanded={adding} onClick={() => setAdding(!adding)}>{adding ? 'Close' : 'Add a technique'}</button>}</div>
-          {data.goals.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Serves: {data.goals.map((g, i) => <span key={g.id}>{i ? ', ' : ''}<a href={href(`explore/goal/${g.id}`, { from })}>{g.name}</a></span>)}</p>}
+          {data.goals.length > 0 && <p className="mono" style={{ marginTop: 10 }}>Serves: {data.goals.slice(0, 3).map((g, i) => <span key={g.id}>{i ? ', ' : ''}<a href={href(`explore/goal/${g.id}`, { from })}>{g.name}</a></span>)}{data.goals.length > 3 ? ` +${data.goals.length - 3}` : ''}</p>}
           {adding && <TechniqueForm title="Add a technique you can see" techniques={taxonomy?.techniques.filter((t) => !data.annotations.some((a) => a.technique_id === t.id)) ?? []}
             onSave={(techniqueId, evidence, effect) => decide({ technique_id: techniqueId }, 'human_reviewed', { evidence, effect })} />}
           {data.annotations.length === 0 && <p className="muted" style={{ marginTop: 14 }}>No technique recorded yet.</p>}
