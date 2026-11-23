@@ -1117,3 +1117,135 @@ Thomas Cole, The Titan's Goblet, 1833. The Metropolitan Museum of Art. CC0 (Gift
 
 Source URL: https://www.metmuseum.org/art/collection/search/10499
 Restrictions: Only objects The Met marks public domain; other objects are skipped.
+
+## Carte figurative des pertes successives en hommes de l'armée française dans la Campagne de Russie 1812-13 (#94)
+
+Creator: Charles Minard
+Date: 1869
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Carte figurative des pertes successives en hommes de l'armée française dans la Campagne de Russie 1812-13" by Charles Minard, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Carte_figurative_des_pertes_successives_en_hommes_de_l%27arm%C3%A9e_fran%C3%A7aise_dans_la_Campagne_de_Russie_1812-13.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Carte_figurative_des_pertes_successives_en_hommes_de_l%27arm%C3%A9e_fran%C3%A7aise_dans_la_Campagne_de_Russie_1812-13.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Playfair piecharts (#95)
+
+Creator: William Playfair
+Date: 1801-01-01
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Playfair piecharts" by William Playfair, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Playfair_piecharts.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Playfair_piecharts.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## A series of statistical charts illustrating the condition of the descendants of former African slaves now in residence in the United States of America LCCN2013650373 (#96)
+
+Creator: African American Photographs Assembled for 1900 Paris Exposition
+Date: 1900
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"A series of statistical charts illustrating the condition of the descendants of former African slaves now in residence in the United States of America LCCN2013650373" by African American Photographs Assembled for 1900 Paris Exposition, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:A_series_of_statistical_charts_illustrating_the_condition_of_the_descendants_of_former_African_slaves_now_in_residence_in_the_United_States_of_America_LCCN2013650373.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:A_series_of_statistical_charts_illustrating_the_condition_of_the_descendants_of_former_African_slaves_now_in_residence_in_the_United_States_of_America_LCCN2013650373.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Tube map 1908-2 (#97)
+
+Creator: Unknown author Unknown author
+Date: 1908
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Tube map 1908-2" by Unknown author Unknown author, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Tube_map_1908-2.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Tube_map_1908-2.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## 1882 Cincinnati Type Foundry specimen book detail p148 (#98)
+
+Creator: Cincinnati Type Foundry
+Date: 1882
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"1882 Cincinnati Type Foundry specimen book detail p148" by Cincinnati Type Foundry, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:1882_Cincinnati_Type_Foundry_specimen_book_detail_p148.png).
+
+Source URL: https://commons.wikimedia.org/wiki/File:1882_Cincinnati_Type_Foundry_specimen_book_detail_p148.png
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Bodoni Book type specimen (16335113031) (#99)
+
+Creator: James Puckett from Boulder, USA
+Date: 2013-09-17 16:28
+Source: commons
+Licence: Free with attribution — credit included — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0)
+
+"Bodoni Book type specimen (16335113031)" by James Puckett from Boulder, USA, CC BY 2.0 (https://creativecommons.org/licenses/by/2.0), via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Bodoni_Book_type_specimen_(16335113031).jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Bodoni_Book_type_specimen_(16335113031).jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Beat the Whites with the Red Wedge (#100)
+
+Creator: El Lissitzky
+Date: 1919
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Beat the Whites with the Red Wedge" by El Lissitzky, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Beat_the_Whites_with_the_Red_Wedge.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Beat_the_Whites_with_the_Red_Wedge.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Divan Japonais (#101)
+
+Creator: Henri de Toulouse-Lautrec
+Date: 1892–93
+Source: met
+Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+Henri de Toulouse-Lautrec, Divan Japonais, 1892–93. The Metropolitan Museum of Art. CC0 (Bequest of Clifford A. Furst, 1958).
+
+Source URL: https://www.metmuseum.org/art/collection/search/334197
+Restrictions: Only objects The Met marks public domain; other objects are skipped.
+
+## Poster for the Lembrée Gallery (#102)
+
+Creator: Theo van Rysselberghe (Belgian, 1862–1926)
+Date: 1897
+Source: cma
+Licence: CC0 — source checked — [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+Theo van Rysselberghe (Belgian, 1862–1926), Poster for the Lembrée Gallery, 1897. Cleveland Museum of Art. CC0.
+
+Source URL: https://clevelandart.org/art/1968.257
+Restrictions: Copyrighted and 'Other' records are skipped.
+
+## Filippo Tommaso Marinetti - Parole in Liberta 1932 A (#103)
+
+Creator: Filippo Tommaso Marinetti
+Date: 1932
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Filippo Tommaso Marinetti - Parole in Liberta 1932 A" by Filippo Tommaso Marinetti, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Filippo_Tommaso_Marinetti_-_Parole_in_Liberta_1932_A.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Filippo_Tommaso_Marinetti_-_Parole_in_Liberta_1932_A.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
+
+## Ludwig Hohlwein - Igeha Schokolade, 1926 (#104)
+
+Creator: Ludwig Hohlwein
+Date: 1926
+Source: commons
+Licence: Public domain — source checked — [PD](https://creativecommons.org/publicdomain/mark/1.0/)
+
+"Ludwig Hohlwein - Igeha Schokolade, 1926" by Ludwig Hohlwein, Public domain, via Wikimedia Commons (https://commons.wikimedia.org/wiki/File:Ludwig_Hohlwein_-_Igeha_Schokolade,_1926.jpg).
+
+Source URL: https://commons.wikimedia.org/wiki/File:Ludwig_Hohlwein_-_Igeha_Schokolade,_1926.jpg
+Restrictions: CC BY-SA, NC and ND files are excluded from automatic collection (share-alike and non-commercial obligations are not handled yet). Personality-rights or trademark restrictions are shown on the image.
