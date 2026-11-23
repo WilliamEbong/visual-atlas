@@ -8,7 +8,7 @@ import { go, href, useRoute } from '../lib/router'
 import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
 
-const EXAMPLES = ['A calm opening slide: one small figure in a lot of empty space',
+const EXAMPLES = ['A quiet cover with one clear silhouette', 'A calm opening slide: one small figure in a lot of empty space',
   'Make one product stand out on a dark poster', 'Show how big the mountains are for a travel talk',
   'A surprising image for an essay about cities']
 /** A reference picture; layer pictures sit behind the launch token, so they are fetched rather than linked. */

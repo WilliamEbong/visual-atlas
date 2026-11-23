@@ -25,6 +25,12 @@ SCHEMA = max(int(f.name.split('_')[0]) for f in (Path(__file__).parent / 'migrat
 LAYERS = ('library', 'generated', 'design-system')
 STATE_WEIGHT = {'human_reviewed': 3.0, 'model_reviewed': 2.0, 'proposed': 1.0, 'intended': 1.0}
 MOODS = Path(__file__).parent / 'data' / 'moods.json'
+LEADS = Path(__file__).parent / 'data' / 'leads.json'
+
+
+def leads() -> dict:
+    """Each technique's reviewer-chosen strongest starter examples (provider:item), strongest first."""
+    return json.loads(LEADS.read_text(encoding='utf-8'))['leads'] if LEADS.exists() else {}
 
 
 def moods() -> tuple[set, dict]:
@@ -125,6 +131,7 @@ def _library(home: Path) -> list[dict]:
             'orientation': row['orientation'] or _orientation(row['width'], row['height']),
             'width': row['width'], 'height': row['height'], 'generated': False, 'provider': row['provider'],
             'source_url': row['source_url'], 'moods': tagged.get(f"{row['provider']}:{row['provider_item_id']}", []),
+            'key': f"{row['provider']}:{row['provider_item_id']}",
             'licence': {'label': rights.get('label', ''), 'code': code, 'url': rights.get('url', ''),
                         'restrictions': rights.get('restrictions', ''), 'checked_by': 'atlas/rights.py'},
             'credit': rights.get('attribution', ''), 'file': str(media / path) if path else None,
@@ -245,6 +252,7 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     goal_links = {g['id']: {t['id'] for t in taxonomy['techniques'] if g['id'] in t['goals']} for g in taxonomy['goals']}
     names = {t['id']: t['name'] for t in taxonomy['techniques']} | {g['id']: g['name'] for g in taxonomy['goals']}
     mood_goals = moods()[0]
+    chosen = leads()
     routed = route(brief, home) if brief and 'design-system' in wanted_layers else {'system': None}
     routed_system = system or (routed['system'] or {}).get('name', '')
 
@@ -275,9 +283,13 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
                 # A more confident reading of the same state and role ranks higher (otherwise ties fell to ref order).
                 score += (STATE_WEIGHT.get(note['state'], 1) + (1 if note.get('role') == 'primary' else 0)
                           + 0.5 * note.get('confidence', 0.8))
+                if ref.get('key') in chosen.get(tid, []):  # a curator's lead example teaches the technique best
+                    score += 100.0 - 10 * chosen[tid].index(ref['key'])  # the curator's order decides among leads
                 evidence = f": {note['evidence'][0]}" if note.get('evidence') else ''
                 reasons.append(f"Shows {names[tid]} ({STATE_WORDS.get(note['state'], note['state'])}){evidence}")
         for gid in want_g:
+            if gid in ref.get('moods', []) and gid not in mood_goals:
+                score += 50.0  # a reviewer judged that this picture itself conveys the goal (calm, movement)
             if gid in mood_goals:  # a mood is served only by a picture that itself carries it, never by a technique's claim
                 if gid in ref.get('moods', []):
                     score += 3.0
@@ -409,6 +421,8 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
     mood_goals = moods()[0]
     subjects = found['reading']['subject_terms'][:8]
     moods_wanted = [g for g in wanted_goals if g in mood_goals]
+    tagged_goals = {g for goals in moods()[1].values() for g in goals}
+    soft = [g for g in wanted_goals if g in tagged_goals and g not in mood_goals]  # preferred, not required
     out = []
     used = set()
     # A mood brief first keeps only pictures that carry the mood; with none anywhere, technique evidence alone.
@@ -417,7 +431,7 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
             if len(out) == count:
                 break
             # Only pictures that carry the technique compete; the subject words then rank them.
-            refs = search(techniques=[tid], goals=moods_wanted, subjects=subjects, limit=40,
+            refs = search(techniques=[tid], goals=moods_wanted + soft, subjects=subjects, limit=40,
                           publishable_only=publishable_only, layers_wanted=layers_wanted, home=home,
                           require_technique=tid)['results']
             refs = [r for r in refs if r['ref'] not in used]  # each picture teaches one way only

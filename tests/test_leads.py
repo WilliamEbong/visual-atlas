@@ -47,3 +47,19 @@ def test_example_brief_resolves_its_pictures_in_this_library(tmp_path, monkeypat
     monkeypatch.setattr(server, 'EXAMPLE', example)
     direction = client.get('/api/briefs/example').json()['directions'][0]
     assert len(direction['images']) == 1 and direction['techniques'][0]['name']
+
+
+def test_answers_lead_with_the_curated_example(tmp_path, monkeypatch):
+    from atlas import desk, layers
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+        rows = store.rows("SELECT i.provider, i.provider_item_id, i.title FROM annotations a JOIN images i ON i.id=a.image_id "
+                          "WHERE a.technique_id='scale-contrast' AND a.state!='rejected' ORDER BY a.confidence")
+    last = rows[0]
+    data = tmp_path / 'leads.json'
+    data.write_text(json.dumps({'leads': {'scale-contrast': [f"{last['provider']}:{last['provider_item_id']}"]}}), encoding='utf-8')
+    monkeypatch.setattr(desk, 'LEADS', data)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    assert desk.search(techniques=['scale-contrast'], home=home)['results'][0]['title'] == last['title']
