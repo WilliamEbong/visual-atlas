@@ -86,7 +86,7 @@ After updating a source checkout, run `uv sync`, the two npm commands, and `uv r
 
 Try this with the starter library. It takes you from an intention to a pair of examples without making an AI call.
 
-1. Open **Explore**, then **See connections**.
+1. Open **Techniques**, then **See connections**.
 2. In **Start or focus on**, choose **Make one thing stand out**.
 3. In the context panel, follow **Isolate**, then **Space and depth**.
 4. Follow **Negative space isolation** in the map or List. Its explanation describes a subject surrounded by a large, quiet area.
@@ -164,7 +164,7 @@ For the solitude example, look for **Create calm and order**, **Negative space i
 3. Edit **Subject words**, separated by commas. Use concrete search words such as `person, coast, boat`, rather than layout instructions such as `leave room for title`.
 4. Check the summary above the editor, then start the search or ask for project directions.
 
-Corrections apply to the next submitted request. They do not rewrite your original text or the readings attached to library images. Changing the request fields recalculates the automatic reading and clears the correction; in My project, editing the saved brief clears it too. Use **Use automatic reading** to discard your corrections deliberately.
+Corrections apply to the next submitted request. They do not rewrite your original text or the readings attached to library images. Changing the request fields recalculates the automatic reading and clears the correction; in Projects, editing the saved brief clears it too. Use **Use automatic reading** to discard your corrections deliberately.
 
 If the automatic reading is unavailable in Find, the page says so and leaves the correction controls available. You can also continue with your original request. Unfamiliar descriptions, conflicting instructions and phrases such as "avoid X and use Y" still need care. A mistaken suggestion affects reference ranking, but does not remove all other candidates from consideration.
 
@@ -221,7 +221,7 @@ History records changes. If a later analysis drops an earlier model proposal, th
 
 ## Explore visual techniques
 
-Use **Explore** when you know what you want an image to do but do not yet have a reference in mind.
+Use **Techniques** when you know what you want an image to do but do not yet have a reference in mind.
 
 | Term | Example | Meaning |
 |---|---|---|
@@ -262,11 +262,13 @@ When you started from Connections, use **Return to your exploration** to resume 
 
 ## Ask the atlas
 
-Open **Ask** and describe the picture you need and what it is for, for example "a calm opening slide: one small figure in a lot of empty space". The atlas shows:
+**Ask** is the first page. Describe the picture you need and what it is for, for example "a calm opening slide: one small figure in a lot of empty space". The atlas shows:
 
 - how it read the brief: the goals, techniques and subject words it recognised;
 - **Ways to do it**: up to three techniques that could do the job, one each, with what to make sure of, what not to confuse it with, and pictures that show it;
-- **All references**: every match, with the reasons it was chosen and its licence. Pictures chosen only because a word matched (no technique evidence yet) are kept apart under **Matched on words only**.
+- **More references**: the other matches, folded under **See N more pictures that match**, each with the reasons it was chosen and its licence. Pictures chosen only because a word matched (no technique evidence yet) are kept apart.
+
+Once you have asked, the brief shows on one line; choose **Change the brief** to edit it.
 
 The atlas reads briefs by matching words, so it misses some ways of saying things. Under the reading, choose what the picture should do (**Make one thing stand out**, **Create calm and order**, **Show size or scale** and so on): the answer changes at once. Choose **In published work** to see only CC0, public-domain and CC BY pictures. Their credits are included. Asking uses no AI and sends nothing anywhere: it reads the readings, words and licences already in your library.
 
@@ -336,7 +338,7 @@ Tips for agents:
 
 ## Get directions for a project
 
-1. Open **My project** and enter a project name.
+1. Open **Projects** (top right) and enter a project name.
 2. Write the brief with its audience, message, format, mood and constraints. For example: "An A2 poster for a public talk about solitude. Calm, with a small person in a wide landscape. Keep the top third quiet enough for a title."
 3. Choose **Save and continue**. Saving the brief does not request AI advice.
 4. Read and, if necessary, correct its goals, techniques and subject words.

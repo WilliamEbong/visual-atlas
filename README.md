@@ -48,7 +48,7 @@ The starter pack contains **104 references across 26 techniques**, including pai
 
 ## Develop a direction for your project
 
-In **My project**, write the audience, message, format and constraints. An assistant can suggest up to five visual directions, each tied to images already in your library, with execution notes and tradeoffs. Open the references, compare them and keep the useful directions with your brief. Save the reference images in a collection.
+In **Projects**, write the audience, message, format and constraints. An assistant can suggest up to five visual directions, each tied to images already in your library, with execution notes and tradeoffs. Open the references, compare them and keep the useful directions with your brief. Save the reference images in a collection.
 
 Collection exports include images, credits and annotation data. Starter images are reduced copies, up to 1024 pixels on the long side; check the source if you need a larger file for production.
 
