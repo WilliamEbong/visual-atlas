@@ -410,6 +410,7 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
     subjects = found['reading']['subject_terms'][:8]
     moods_wanted = [g for g in wanted_goals if g in mood_goals]
     out = []
+    used = set()
     # A mood brief first keeps only pictures that carry the mood; with none anywhere, technique evidence alone.
     for strict in ([True, False] if moods_wanted else [False]):
         for tid in _candidates(found, taxonomy):
@@ -419,6 +420,7 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
             refs = search(techniques=[tid], goals=moods_wanted, subjects=subjects, limit=min(40, per_direction * 3),
                           publishable_only=publishable_only, layers_wanted=layers_wanted, home=home,
                           require_technique=tid)['results']
+            refs = [r for r in refs if r['ref'] not in used]  # each picture teaches one way only
             if strict:  # with only mood goals passed, a Serves reason means the picture itself carries the mood
                 refs = [r for r in refs if any(reason.startswith('Serves') for reason in r['reasons'])]
             refs = refs[:per_direction]
@@ -432,6 +434,7 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
                         'make_sure': technique['observable_cues'], 'watch_out': technique['limitations'],
                         'not_to_confuse_with': [c['how_to_tell'] for c in technique['confusions']][:2],
                         'references': refs})
+            used.update(r['ref'] for r in refs)
         if out:
             break
     result = {'reading': found['reading'], 'route': found['route'], 'directions': out,

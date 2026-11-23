@@ -444,3 +444,13 @@ def test_goal_evidence_outranks_a_title_word(tmp_path, monkeypatch):
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     found = desk.search(brief='harbour', goals=['create-calm'], layers_wanted=['generated'], home=tmp_path / 'h')['results']
     assert [r['ref'] for r in found] == ['generated:goal', 'generated:word']
+
+
+def test_a_picture_teaches_one_way_only(starter_home, monkeypatch, tmp_path):
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    for brief in ('Poster for a community choir concert in a church, warm and communal',
+                  'Make one product stand out on a dark poster with a sense of scale and drama'):
+        refs = [r['ref'] for way in desk.directions(brief, count=4, per_direction=3, home=starter_home)['directions']
+                for r in way['references']]
+        assert len(refs) == len(set(refs)), brief
