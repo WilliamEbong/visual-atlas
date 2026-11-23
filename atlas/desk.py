@@ -24,6 +24,13 @@ SCHEMA = max(int(f.name.split('_')[0]) for f in (Path(__file__).parent / 'migrat
 
 LAYERS = ('library', 'generated', 'design-system')
 STATE_WEIGHT = {'human_reviewed': 3.0, 'model_reviewed': 2.0, 'proposed': 1.0, 'intended': 1.0}
+MOODS = Path(__file__).parent / 'data' / 'moods.json'
+
+
+def moods() -> tuple[set, dict]:
+    """Mood goals, and the moods each starter picture itself conveys (provider:item -> goal ids), from data."""
+    data = json.loads(MOODS.read_text(encoding='utf-8')) if MOODS.exists() else {}
+    return set(data.get('goals', [])), data.get('moods', {})
 STATE_WORDS = {'human_reviewed': 'confirmed by you', 'model_reviewed': 'agreed by a second model',
                'proposed': 'proposed by a model', 'intended': 'intended by the prompt, checked by eye'}
 PUBLISHABLE = {'cc0', 'pd', 'cc-by'}  # licence codes with a documented free licence (generated and unclear are not)
@@ -85,7 +92,7 @@ def _library(home: Path) -> list[dict]:
         if connection is None:
             return []
         images = _rows(connection, 
-            "SELECT i.id, i.title, i.creator, i.date_text, i.medium, i.description, i.provider, i.source_url, i.width, "
+            "SELECT i.id, i.title, i.creator, i.date_text, i.medium, i.description, i.provider, i.provider_item_id, i.source_url, i.width, "
             "i.height, i.original_path, i.analysis_path, i.thumb_path, a.result_json, m.color_family, m.palette_json, "
             "m.orientation, (SELECT json_object('code', r.license_code, 'version', r.license_version, 'label', r.label, "
             "'url', r.license_url, 'attribution', r.required_attribution, 'restrictions', r.restrictions) FROM "
@@ -100,6 +107,7 @@ def _library(home: Path) -> list[dict]:
                  'evidence': json.loads(row['evidence_json'])[:2], 'effect': row['effect'],
                  'confidence': row['confidence'] or 0.0})
     media = home / 'media'
+    tagged = moods()[1]
     out = []
     for row in images:
         result = json.loads(row['result_json']) if row['result_json'] else {}
@@ -116,7 +124,7 @@ def _library(home: Path) -> list[dict]:
             'palette': [p['hex'] for p in json.loads(row['palette_json'] or '[]')][:4],
             'orientation': row['orientation'] or _orientation(row['width'], row['height']),
             'width': row['width'], 'height': row['height'], 'generated': False, 'provider': row['provider'],
-            'source_url': row['source_url'],
+            'source_url': row['source_url'], 'moods': tagged.get(f"{row['provider']}:{row['provider_item_id']}", []),
             'licence': {'label': rights.get('label', ''), 'code': code, 'url': rights.get('url', ''),
                         'restrictions': rights.get('restrictions', ''), 'checked_by': 'atlas/rights.py'},
             'credit': rights.get('attribution', ''), 'file': str(media / path) if path else None,
@@ -236,6 +244,7 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     terms = list(dict.fromkeys(subjects + [t for t in reading['subject_terms'] if t not in coding.GENERIC | FORMAT_WORDS]))[:12]
     goal_links = {g['id']: {t['id'] for t in taxonomy['techniques'] if g['id'] in t['goals']} for g in taxonomy['goals']}
     names = {t['id']: t['name'] for t in taxonomy['techniques']} | {g['id']: g['name'] for g in taxonomy['goals']}
+    mood_goals = moods()[0]
     routed = route(brief, home) if brief and 'design-system' in wanted_layers else {'system': None}
     routed_system = system or (routed['system'] or {}).get('name', '')
 
@@ -269,6 +278,11 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
                 evidence = f": {note['evidence'][0]}" if note.get('evidence') else ''
                 reasons.append(f"Shows {names[tid]} ({STATE_WORDS.get(note['state'], note['state'])}){evidence}")
         for gid in want_g:
+            if gid in mood_goals:  # a mood is served only by a picture that itself carries it, never by a technique's claim
+                if gid in ref.get('moods', []):
+                    score += 3.0
+                    reasons.append(f"Serves “{names[gid]}”: the picture itself reads that way (a reviewer's reading)")
+                continue
             via = sorted(goal_links.get(gid, set()) & set(shown) - set(want_t),
                          key=lambda v: (-STATE_WEIGHT.get(shown[v]['state'], 1) - (shown[v].get('role') == 'primary'), v))
             if via:
@@ -392,24 +406,34 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
     by_id = {t['id']: t for t in taxonomy['techniques']}
     goal_names = {g['id']: g['name'] for g in taxonomy['goals']}
     wanted_goals = [g['id'] for g in found['reading']['goals']]
+    mood_goals = moods()[0]
     subjects = found['reading']['subject_terms'][:8]
+    moods_wanted = [g for g in wanted_goals if g in mood_goals]
     out = []
-    for tid in _candidates(found, taxonomy):
-        if len(out) == count:
+    # A mood brief first keeps only pictures that carry the mood; with none anywhere, technique evidence alone.
+    for strict in ([True, False] if moods_wanted else [False]):
+        for tid in _candidates(found, taxonomy):
+            if len(out) == count:
+                break
+            # Only pictures that carry the technique compete; the subject words then rank them.
+            refs = search(techniques=[tid], goals=moods_wanted, subjects=subjects, limit=min(40, per_direction * 3),
+                          publishable_only=publishable_only, layers_wanted=layers_wanted, home=home,
+                          require_technique=tid)['results']
+            if strict:  # with only mood goals passed, a Serves reason means the picture itself carries the mood
+                refs = [r for r in refs if any(reason.startswith('Serves') for reason in r['reasons'])]
+            refs = refs[:per_direction]
+            if not refs:
+                continue  # a direction with nothing to show is advice the agent cannot check; skip it
+            technique = by_id[tid]
+            serves = [goal_names[g] for g in wanted_goals if g in technique['goals']] or \
+                [goal_names[g] for g in technique['goals'] if g in goal_names][:2]
+            out.append({'technique': {'id': tid, 'name': technique['name']}, 'serves': serves,
+                        'idea': technique['definition'], 'why_it_works': technique['explanation'],
+                        'make_sure': technique['observable_cues'], 'watch_out': technique['limitations'],
+                        'not_to_confuse_with': [c['how_to_tell'] for c in technique['confusions']][:2],
+                        'references': refs})
+        if out:
             break
-        # Only pictures that carry the technique compete; the subject words then rank them.
-        refs = search(techniques=[tid], subjects=subjects, limit=per_direction, publishable_only=publishable_only,
-                      layers_wanted=layers_wanted, home=home, require_technique=tid)['results']
-        if not refs:
-            continue  # a direction with nothing to show is advice the agent cannot check; skip it
-        technique = by_id[tid]
-        serves = [goal_names[g] for g in wanted_goals if g in technique['goals']] or \
-            [goal_names[g] for g in technique['goals'] if g in goal_names][:2]
-        out.append({'technique': {'id': tid, 'name': technique['name']}, 'serves': serves,
-                    'idea': technique['definition'], 'why_it_works': technique['explanation'],
-                    'make_sure': technique['observable_cues'], 'watch_out': technique['limitations'],
-                    'not_to_confuse_with': [c['how_to_tell'] for c in technique['confusions']][:2],
-                    'references': refs})
     result = {'reading': found['reading'], 'route': found['route'], 'directions': out,
               'note': 'Directions come from the codebook and stored readings, with no AI. Each one names a single '
                       'technique: pick one, then borrow the technique, never the picture.'}
