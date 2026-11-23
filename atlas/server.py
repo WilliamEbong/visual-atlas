@@ -24,7 +24,7 @@ EXAMPLE = REPO / 'atlas' / 'data' / 'example_brief.json'
 
 def lead_rank(technique_id: str):
     """Sort key: a technique's chosen lead examples first, strongest first; the rest keep their order."""
-    order = json.loads(LEADS.read_text(encoding='utf-8'))['leads'].get(technique_id, [])
+    order = (json.loads(LEADS.read_text(encoding='utf-8'))['leads'] if LEADS.exists() else {}).get(technique_id, [])
     return lambda row: order.index(f"{row['provider']}:{row['provider_item_id']}") \
         if f"{row['provider']}:{row['provider_item_id']}" in order else len(order)
 
@@ -349,7 +349,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             examples = sorted(examples, key=lambda e: (e['state'] != 'human_reviewed', rank(e)))[:24]
             for e in examples:
                 e['chosen'] = e['state'] == 'human_reviewed' or rank(e) < len(
-                    json.loads(LEADS.read_text(encoding='utf-8'))['leads'].get(technique_id, []))
+                    (json.loads(LEADS.read_text(encoding='utf-8'))['leads'] if LEADS.exists() else {}).get(technique_id, []))
                 del e['provider'], e['provider_item_id']
             goals = store.rows("SELECT g.* FROM technique_links l JOIN goals g ON g.id=l.target_id WHERE "
                                "l.technique_id=? AND l.kind='goal'", (technique_id,))

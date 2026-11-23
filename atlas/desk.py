@@ -283,6 +283,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
                 # A more confident reading of the same state and role ranks higher (otherwise ties fell to ref order).
                 score += (STATE_WEIGHT.get(note['state'], 1) + (1 if note.get('role') == 'primary' else 0)
                           + 0.5 * note.get('confidence', 0.8))
+                if note['state'] == 'human_reviewed':
+                    score += 200.0  # the person's own confirmation comes before any curator's pick
                 if ref.get('key') in chosen.get(tid, []):  # a curator's lead example teaches the technique best
                     score += 100.0 - 10 * chosen[tid].index(ref['key'])  # the curator's order decides among leads
                 evidence = f": {note['evidence'][0]}" if note.get('evidence') else ''
@@ -435,8 +437,9 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
                           publishable_only=publishable_only, layers_wanted=layers_wanted, home=home,
                           require_technique=tid)['results']
             refs = [r for r in refs if r['ref'] not in used]  # each picture teaches one way only
-            if strict:  # with only mood goals passed, a Serves reason means the picture itself carries the mood
-                refs = [r for r in refs if any(reason.startswith('Serves') for reason in r['reasons'])]
+            if strict:  # keep pictures that themselves carry a requested mood; other goal reasons do not count
+                carries = tuple(f"Serves “{goal_names[g]}”: the picture itself" for g in moods_wanted)
+                refs = [r for r in refs if any(reason.startswith(carries) for reason in r['reasons'])]
             refs = refs[:per_direction]
             if not refs:
                 continue  # a direction with nothing to show is advice the agent cannot check; skip it

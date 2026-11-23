@@ -89,3 +89,28 @@ def test_the_front_page_sample_brief_is_answered_with_pictures(tmp_path, monkeyp
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     ways = desk.directions(sample, home=home)['directions']
     assert ways and all(way['references'] for way in ways)
+
+
+
+def test_technique_routes_work_without_a_leads_file(tmp_path, monkeypatch):
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+    monkeypatch.setattr(server, 'LEADS', tmp_path / 'absent.json')
+    client = TestClient(create_app(home, token=TOKEN, dist=tmp_path / 'dist'), base_url='http://127.0.0.1:8775',
+                        headers={'x-atlas-token': TOKEN})
+    assert client.get('/api/techniques/silhouette').status_code == 200
+    assert client.get('/api/taxonomy').status_code == 200
+
+
+def test_a_confirmed_reading_outranks_a_curators_lead(tmp_path, monkeypatch):
+    from atlas import desk, layers
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+        rows = store.rows("SELECT a.image_id, i.title FROM annotations a JOIN images i ON i.id=a.image_id "
+                          "WHERE a.technique_id='silhouette' AND i.title LIKE 'Divan%'")
+        store.human_annotation(rows[0]['image_id'], 'silhouette', state='human_reviewed')
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    assert desk.search(techniques=['silhouette'], home=home)['results'][0]['title'] == rows[0]['title']
