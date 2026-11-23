@@ -46,3 +46,34 @@ def test_a_mood_is_served_only_by_pictures_that_carry_it(tmp_path, monkeypatch):
     found = desk.search(goals=['feel-warm'], layers_wanted=['library'], home=home)['results']
     serving = [r for r in found if any(x.startswith('Serves') for x in r['reasons'])]
     assert [r['title'] for r in serving] == [found[0]['title']] and len(serving) == 1
+
+
+
+def test_directions_name_a_mood_only_when_a_picture_carries_it(tmp_path, monkeypatch):
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+    data = tmp_path / 'moods.json'
+    data.write_text(json.dumps({'goals': ['feel-warm', 'feel-serious'], 'moods': {}}), encoding='utf-8')
+    monkeypatch.setattr(desk, 'MOODS', data)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    found = desk.directions('A warm and welcoming poster', count=3, home=home)['directions']
+    assert found and all('Feel warm and welcoming' not in way['serves'] for way in found)
+
+
+def test_library_mood_filter_matches_the_pictures_own_moods(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from atlas import server
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+        row = store.one('SELECT provider, provider_item_id, title FROM images ORDER BY id LIMIT 1')
+    data = tmp_path / 'moods.json'
+    data.write_text(json.dumps({'goals': ['feel-warm'], 'moods': {f"{row['provider']}:{row['provider_item_id']}": ['feel-warm']}}),
+                    encoding='utf-8')
+    monkeypatch.setattr(desk, 'MOODS', data)
+    client = TestClient(server.create_app(home, token='t', dist=tmp_path / 'dist'), base_url='http://127.0.0.1:8775',
+                        headers={'x-atlas-token': 't'})
+    assert [i['title'] for i in client.get('/api/library', params={'goal': 'feel-warm'}).json()['items']] == [row['title']]

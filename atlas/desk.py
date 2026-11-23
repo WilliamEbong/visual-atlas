@@ -417,7 +417,7 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
             if len(out) == count:
                 break
             # Only pictures that carry the technique compete; the subject words then rank them.
-            refs = search(techniques=[tid], goals=moods_wanted, subjects=subjects, limit=min(40, per_direction * 3),
+            refs = search(techniques=[tid], goals=moods_wanted, subjects=subjects, limit=40,
                           publishable_only=publishable_only, layers_wanted=layers_wanted, home=home,
                           require_technique=tid)['results']
             refs = [r for r in refs if r['ref'] not in used]  # each picture teaches one way only
@@ -427,8 +427,9 @@ def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_d
             if not refs:
                 continue  # a direction with nothing to show is advice the agent cannot check; skip it
             technique = by_id[tid]
-            serves = [goal_names[g] for g in wanted_goals if g in technique['goals']] or \
-                [goal_names[g] for g in technique['goals'] if g in goal_names][:2]
+            carried = {g for g in moods_wanted for r in refs if any(x.startswith(f"Serves “{goal_names[g]}”") for x in r['reasons'])}
+            serves = [goal_names[g] for g in wanted_goals if g in technique['goals'] and (g not in mood_goals or g in carried)] or \
+                [goal_names[g] for g in technique['goals'] if g in goal_names and g not in mood_goals][:2]
             out.append({'technique': {'id': tid, 'name': technique['name']}, 'serves': serves,
                         'idea': technique['definition'], 'why_it_works': technique['explanation'],
                         'make_sure': technique['observable_cues'], 'watch_out': technique['limitations'],

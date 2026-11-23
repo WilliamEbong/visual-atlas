@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { media, post, readOnly, request } from '../lib/client'
-import { useApp, useData } from '../lib/hooks'
+import { useApp, useData, usePoll } from '../lib/hooks'
 import { aspect, cleanMaker, cleanTitle } from '../lib/library'
 import { href, useRoute } from '../lib/router'
 import type { Job, LibraryItem, Reading, ReadingCorrection, Settings } from '../lib/types'
@@ -159,14 +159,15 @@ export default function Find() {
           </div>}
         </aside>
       </div>
-      <RecentlyAdded />
+      <RecentlyAdded watching={!!jobId} />
     </>
   )
 }
 
 /** What finding gives you: the pictures most recently added to the library, each filed with its licence. */
-function RecentlyAdded() {
+function RecentlyAdded({ watching }: { watching: boolean }) {
   const recent = useData<{ items: LibraryItem[]; total: number }>(readOnly ? null : 'library?sort=newest&limit=8&offset=0')
+  usePoll(recent.reload, watching, 5000)
   if (!recent.data?.items.length) return null
   return (
     <section className="section" aria-labelledby="recent-title">

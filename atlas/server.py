@@ -172,7 +172,12 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         if technique:
             where.append("i.id IN (SELECT image_id FROM annotations WHERE technique_id=? AND state!='rejected')")
             params.append(technique)
-        if goal:
+        gated, tagged = desk.moods()
+        if goal in gated:  # a mood belongs to the picture itself, as on Ask
+            keys = [k for k, v in tagged.items() if goal in v]
+            where.append("(i.provider || ':' || i.provider_item_id) IN (SELECT value FROM json_each(?))")
+            params.append(json.dumps(keys))
+        elif goal:
             where.append("i.id IN (SELECT a.image_id FROM annotations a JOIN technique_links l ON l.technique_id="
                          "a.technique_id AND l.kind='goal' WHERE l.target_id=? AND a.state!='rejected')")
             params.append(goal)
