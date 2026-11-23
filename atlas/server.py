@@ -18,6 +18,15 @@ from atlas import layers as desk_layers
 from atlas.home import REPO, home_dir, local_setting
 from atlas.store import LibraryBusy, Store
 
+LEADS = REPO / 'atlas' / 'data' / 'leads.json'
+
+
+def lead_rank(technique_id: str):
+    """Sort key: a technique's chosen lead examples first, strongest first; the rest keep their order."""
+    order = json.loads(LEADS.read_text(encoding='utf-8'))['leads'].get(technique_id, [])
+    return lambda row: order.index(f"{row['provider']}:{row['provider_item_id']}") \
+        if f"{row['provider']}:{row['provider_item_id']}" in order else len(order)
+
 # Every order ends with the image id, so offset pages never repeat or skip an image with an equal sort value.
 SORTS = {'newest': 'i.created_at DESC, i.id DESC', 'oldest': 'i.created_at, i.id', 'title': 'i.title COLLATE NOCASE, i.id',
          'maker': 'i.creator COLLATE NOCASE, i.id', 'colorful': 'm.colorfulness DESC, i.id DESC',
@@ -291,10 +300,15 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         with db() as store, store.reading():
             counts = {r['id']: r['examples'] for r in catalog.coverage(store)}
             best = {}  # one picture per technique for the index: the best-checked, most confident reading
-            for row in store.rows("SELECT a.technique_id, i.thumb_path FROM annotations a JOIN images i ON i.id=a.image_id "
+            candidates = {}
+            for row in store.rows("SELECT a.technique_id, a.state, i.thumb_path, i.provider, i.provider_item_id "
+                                  "FROM annotations a JOIN images i ON i.id=a.image_id "
                                   "WHERE a.state!='rejected' AND i.removed_at IS NULL AND i.thumb_path IS NOT NULL "
                                   "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC"):
-                best.setdefault(row['technique_id'], row['thumb_path'])
+                candidates.setdefault(row['technique_id'], []).append(row)
+            for technique_id, rows in candidates.items():
+                rank = lead_rank(technique_id)
+                best[technique_id] = min(rows, key=lambda r: (r['state'] != 'human_reviewed', rank(r)))['thumb_path']
             techniques = []
             for row in store.rows('SELECT id, data_json FROM techniques ORDER BY name'):
                 data = json.loads(row['data_json'])
@@ -317,10 +331,14 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             names = {r['id']: r['name'] for r in store.rows('SELECT id, name FROM techniques')}
             examples = store.rows(
                 "SELECT i.id, i.title, i.creator, i.date_text, i.thumb_path, i.analysis_path, i.width, i.height, a.state, "
-                "a.effect, a.role FROM annotations a "
+                "a.effect, a.role, i.provider, i.provider_item_id FROM annotations a "
                 "JOIN images i ON i.id=a.image_id WHERE a.technique_id=? AND a.state!='rejected' AND i.removed_at IS NULL "
-                "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC LIMIT 24",
+                "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC",
                 (technique_id,))
+            rank = lead_rank(technique_id)  # pictures you confirmed, then the chosen leads, then the rest
+            examples = sorted(examples, key=lambda e: (e['state'] != 'human_reviewed', rank(e)))[:24]
+            for e in examples:
+                del e['provider'], e['provider_item_id']
             goals = store.rows("SELECT g.* FROM technique_links l JOIN goals g ON g.id=l.target_id WHERE "
                                "l.technique_id=? AND l.kind='goal'", (technique_id,))
             operations = store.rows("SELECT o.* FROM technique_links l JOIN operations o ON o.id=l.target_id WHERE "
