@@ -12,8 +12,9 @@ import json
 import sys
 import traceback
 
-from atlas import __version__, catalog, desk
+from atlas import __version__, catalog, desk, layers
 
+MAX_FRAME = 1_000_000  # characters per message; the largest real request (a 4000-character brief) is far smaller
 VERSIONS = ('2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05')
 INSTRUCTIONS = (
     'Visual Atlas is a local reference desk for visual decisions. Start with `advise` for a design brief, then '
@@ -111,9 +112,11 @@ def _publish(arguments: dict) -> bool:
 def _view(ref: str, max_size: int) -> list[dict]:
     from PIL import Image
     record = desk.get(ref)
-    if not record.get('file'):
+    # Layer files are checked again on disk now (the index is cached); library files come from the database.
+    path = layers.safe_file(layers.find(ref) or {}) if record['layer'] != 'library' else record.get('file')
+    if not path:
         raise LookupError('that reference has no local image file')
-    with Image.open(record['file']) as image:
+    with Image.open(path) as image:
         image = image.convert('RGB')
         image.thumbnail((max_size, max_size))
         buffer = io.BytesIO()
@@ -203,8 +206,10 @@ def serve(stdin=None, stdout=None) -> None:
         if not line.strip():
             continue
         try:
+            if len(line) > MAX_FRAME:
+                raise ValueError('frame too large')
             message = json.loads(line)
-        except json.JSONDecodeError:
+        except (ValueError, RecursionError):  # bad JSON, absurd nesting or numbers: answer, keep the session
             response = {'jsonrpc': '2.0', 'id': None, 'error': {'code': -32700, 'message': 'Parse error'}}
         else:
             try:

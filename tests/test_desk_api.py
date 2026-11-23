@@ -47,7 +47,7 @@ def test_desk_answers_with_pictures_reasons_and_no_local_paths(client):
     assert data['results'] and data['guidance'] and data['layers'] == {'generated': True, 'design-system': []}
     for ref in data['results']:
         assert 'file' not in ref and ref['reasons']
-        assert ref['image'].startswith('/media/' if ref['layer'] == 'library' else '/layer-media?ref=')
+        assert ref['image'].startswith('/media/' if ref['layer'] == 'library' else '/api/desk/media?ref=')
         assert client.get(ref['thumb']).status_code == 200
     assert str(REPO) not in json.dumps(data, ensure_ascii=False).replace('\\\\', '\\')
 
@@ -55,9 +55,10 @@ def test_desk_answers_with_pictures_reasons_and_no_local_paths(client):
 def test_technique_mode_and_generated_pictures(client):
     data = client.get('/api/desk', params={'technique': 'symmetry', 'limit': 6}).json()
     generated = next(r for r in data['results'] if r['layer'] == 'generated')
-    assert generated['image'] == '/layer-media?ref=generated:sym-01'
+    assert generated['image'] == '/api/desk/media?ref=generated:sym-01'
     picture = client.get(generated['image'])
     assert picture.status_code == 200 and picture.headers['content-type'] == 'image/jpeg'
+    assert client.get(generated['image'], headers={'x-atlas-token': ''}).status_code == 401  # private layers need it
     assert data['guidance'][0]['id'] == 'symmetry'
     assert all(r['layer'] == 'library' for r in client.get('/api/desk', params={
         'technique': 'symmetry', 'use': 'publish'}).json()['results'])
@@ -65,7 +66,7 @@ def test_technique_mode_and_generated_pictures(client):
 
 @pytest.mark.parametrize('ref', ['../../atlas.db', 'generated:../manifest', 'system:x:..', 'library:1', 'generated:nope'])
 def test_layer_media_serves_only_indexed_layer_refs(client, ref):
-    assert client.get('/layer-media', params={'ref': ref}).status_code == 404
+    assert client.get('/api/desk/media', params={'ref': ref}).status_code == 404
 
 
 def test_empty_request_and_unknown_ref(client):

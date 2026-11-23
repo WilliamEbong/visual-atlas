@@ -10,10 +10,14 @@ Every reason is built from stored data (an annotation, a subject word, a metric)
 
 import json
 import re
+import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 
 from atlas import catalog, coding, jobs, layers
 from atlas.home import home_dir
+
+SCHEMA = max(int(f.name.split('_')[0]) for f in (Path(__file__).parent / 'migrations').glob('*.sql'))
 
 LAYERS = ('library', 'generated', 'design-system')
 STATE_WEIGHT = {'human_reviewed': 3.0, 'model_reviewed': 2.0, 'proposed': 1.0, 'intended': 1.0}
@@ -42,10 +46,36 @@ def _orientation(width, height) -> str:
     return 'square' if 0.9 <= ratio <= 1.1 else 'landscape' if ratio > 1 else 'portrait'
 
 
+@contextmanager
+def _readonly(home: Path):
+    """A read-only connection, or None when there is no library yet. Never creates, migrates or syncs anything:
+    the desk, the CLI and the MCP server only read. An older library must be opened by the app first."""
+    path = jobs.db_path(home)
+    if not path.is_file():
+        yield None
+        return
+    connection = sqlite3.connect(f'{path.resolve().as_uri()}?mode=ro', uri=True, timeout=5)
+    connection.row_factory = sqlite3.Row
+    try:
+        version = connection.execute('PRAGMA user_version').fetchone()[0]
+        if version != SCHEMA:
+            raise ValueError('This library was made by another version of Visual Atlas. Open the app (or run '
+                             '`uv run atlas doctor`) once to bring it up to date, then ask again.')
+        yield connection
+    finally:
+        connection.close()
+
+
+def _rows(connection, query: str, parameters=()) -> list[dict]:
+    return [dict(row) for row in connection.execute(query, parameters)]
+
+
 def _library(home: Path) -> list[dict]:
     """Every ready library image as a reference record (one pass; fine for thousands of images)."""
-    with jobs.open_store(home) as store, store.reading():
-        images = store.rows(
+    with _readonly(home) as connection:
+        if connection is None:
+            return []
+        images = _rows(connection, 
             "SELECT i.id, i.title, i.creator, i.date_text, i.medium, i.description, i.provider, i.source_url, i.width, "
             "i.height, i.original_path, i.analysis_path, i.thumb_path, a.result_json, m.color_family, m.palette_json, "
             "m.orientation, (SELECT json_object('code', r.license_code, 'version', r.license_version, 'label', r.label, "
@@ -54,7 +84,7 @@ def _library(home: Path) -> list[dict]:
             "LEFT JOIN analyses a ON a.id=i.analysis_id LEFT JOIN image_metrics m ON m.image_id=i.id "
             "WHERE i.removed_at IS NULL AND i.status='ready'")
         notes = {}
-        for row in store.rows("SELECT image_id, technique_id, state, role, evidence_json, effect FROM annotations "
+        for row in _rows(connection, "SELECT image_id, technique_id, state, role, evidence_json, effect FROM annotations "
                               "WHERE state!='rejected' ORDER BY role='primary' DESC, confidence DESC"):
             notes.setdefault(row['image_id'], []).append(
                 {'id': row['technique_id'], 'state': row['state'], 'role': row['role'],
@@ -133,8 +163,8 @@ def route(brief: str, home: Path | None = None) -> dict:
         if not best['score'] and best['system'] != 'archive-of-looking':
             system = None
     collections = []
-    with jobs.open_store(home_dir(home)) as store:
-        for row in store.rows('SELECT id, name, description FROM collections'):
+    with _readonly(home_dir(home)) as connection:
+        for row in _rows(connection, 'SELECT id, name, description FROM collections') if connection else []:
             matched = sorted(tokens & (set(coding.words(f"{row['name']} {row['description']}")) - coding.GENERIC))
             if matched:
                 collections.append({'id': row['id'], 'name': row['name'], 'matched': matched})
@@ -194,7 +224,8 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
 
     ranked = []
     for ref in references(home, wanted_layers):
-        if publishable_only and ref['licence']['code'] not in PUBLISHABLE:
+        # Only atlas/rights.py decides publication: other layers are references only, whatever their own notes say.
+        if publishable_only and (ref['layer'] != 'library' or ref['licence']['code'] not in PUBLISHABLE):
             continue
         if orientation and ref.get('orientation') != orientation:
             continue
@@ -218,11 +249,12 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
                 reasons.append(f"Shows {names[tid]} ({STATE_WORDS.get(note['state'], note['state'])}){evidence}")
         for gid in want_g:
             via = sorted(goal_links.get(gid, set()) & set(shown) - set(want_t),
-                         key=lambda v: -STATE_WEIGHT.get(shown[v]['state'], 1) - (shown[v].get('role') == 'primary'))
+                         key=lambda v: (-STATE_WEIGHT.get(shown[v]['state'], 1) - (shown[v].get('role') == 'primary'), v))
             if via:
                 best = shown[via[0]]
                 score += 0.75 * (STATE_WEIGHT.get(best['state'], 1) + (1 if best.get('role') == 'primary' else 0))
-                reasons.append(f"Serves “{names[gid]}” through {', '.join(names[v] for v in via[:3])} "
+                # The state and evidence quoted belong to the named technique only.
+                reasons.append(f"Serves “{names[gid]}” through {names[via[0]]} "
                                f"({STATE_WORDS.get(best['state'], best['state'])})"
                                + (f": {best['evidence'][0]}" if best.get('evidence') else ''))
         strong = ' '.join(coding.words(' '.join([ref['title'], *ref.get('subjects', [])])))

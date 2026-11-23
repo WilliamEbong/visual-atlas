@@ -29,8 +29,13 @@ def _split(value: str) -> list[str]:
 
 def _licence(text: str) -> dict:
     """Plain words for a design-system row's own licence note. The row's note is kept verbatim as evidence."""
-    lowered = text.lower()
-    if lowered.startswith('original image generated'):
+    lowered = text.split(';')[0].lower()  # the claim itself; quoted source evidence follows the ';'
+    # "no US copyright" (NASA) is a public-domain statement, not a restriction.
+    restricted = re.search(r'\b(nc|nd|sa|non-?commercial|no ?deriv\w*|share ?alike|not in the public domain|'
+                           r'all rights reserved)\b|(?<!no us )\bcopyright(ed)?\b', lowered)
+    if restricted and not lowered.startswith('original image generated'):
+        label, code = 'Restricted or unclear licence: check the source', 'unclear'
+    elif lowered.startswith('original image generated'):
         label, code = 'Generated image (owner\'s design system)', 'generated'
     elif lowered.startswith('cc0'):
         label, code = 'CC0 (per the design system catalogue)', 'cc0'
@@ -90,7 +95,8 @@ def _read_system(folder: Path, mtime: float) -> dict:
                 'colour': row.get('colour', ''), 'ground': row.get('ground', ''), 'notes': row.get('notes', ''),
                 'width': int(width) if width.isdigit() else None, 'height': int(height) if height.isdigit() else None,
                 'licence': licence, 'credit': row.get('credit', ''), 'source_url': row.get('page', ''),
-                'generated': licence['code'] == 'generated', 'techniques': [], 'file': str(path)})
+                'generated': licence['code'] == 'generated', 'techniques': [], 'file': str(path),
+                'root': str(library)})
     return {'name': name, 'description': _description(folder), 'references': refs}
 
 
@@ -125,7 +131,7 @@ def _read_generated(path: Path, mtime: float) -> list[dict]:
             'licence': {'label': 'Generated image: no licence asserted', 'code': 'generated',
                         'note': data.get('licence_note', ''), 'checked_by': 'not a rights decision'},
             'credit': f"Generated for Visual Atlas with {item['tool']} on {item['date']}", 'source_url': '',
-            'file': str(file)})
+            'file': str(file), 'root': str(root)})
     return refs
 
 
@@ -137,13 +143,24 @@ def generated(path: Path | None = None) -> list[dict]:
         return []
 
 
+def safe_file(record: dict) -> Path | None:
+    """The record's file, checked again at access time: still a regular file inside its layer folder. The index is
+    cached, so a file swapped for a link after indexing must not lead outside the folder."""
+    try:
+        path = Path(record['file'])
+        resolved = path.resolve(strict=True)
+        if path.is_symlink() or not resolved.is_relative_to(Path(record['root'])) or not resolved.is_file():
+            return None
+        return resolved
+    except (OSError, KeyError, RuntimeError):
+        return None
+
+
 def find(ref: str, home: Path | None = None) -> dict | None:
-    """One layer reference by its ref string, or None. Only indexed files are ever returned."""
+    """One layer reference by its ref string, or None. Only indexed files that are still in place are returned."""
+    found = None
     if ref.startswith('generated:'):
-        return next((r for r in generated() if r['ref'] == ref), None)
-    if ref.startswith('system:'):
-        for system in systems(home):
-            for r in system['references']:
-                if r['ref'] == ref:
-                    return r
-    return None
+        found = next((r for r in generated() if r['ref'] == ref), None)
+    elif ref.startswith('system:'):
+        found = next((r for system in systems(home) for r in system['references'] if r['ref'] == ref), None)
+    return found if found and safe_file(found) else None

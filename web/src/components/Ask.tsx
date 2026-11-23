@@ -1,7 +1,7 @@
 // Ask the atlas: a brief in, techniques that fit and references with reasons out. Ordinary code, no AI, so it
 // answers at once. The same engine answers agents through the CLI and the MCP server (atlas/desk.py).
 import { useEffect, useState } from 'react'
-import { readOnly } from '../lib/client'
+import { protectedImage, readOnly } from '../lib/client'
 import { useData } from '../lib/hooks'
 import { go, href, useRoute } from '../lib/router'
 import type { DeskAnswer, DeskRef } from '../lib/types'
@@ -10,6 +10,20 @@ import { Empty, Failure, Loading, PageHead } from './ui'
 const EXAMPLES = ['A calm opening slide: one small figure in a lot of empty space',
   'Make one product stand out on a dark poster', 'Show how big the mountains are for a travel talk',
   'A surprising image for an essay about cities']
+/** A reference picture; layer pictures sit behind the launch token, so they are fetched rather than linked. */
+function RefImage({ src, alt }: { src: string | null; alt: string }) {
+  const [shown, setShown] = useState<string | undefined>(src && !src.startsWith('/api/') ? src : undefined)
+  useEffect(() => {
+    if (!src || !src.startsWith('/api/')) { setShown(src ?? undefined); return }
+    let live = true
+    let url: string | undefined
+    protectedImage(src).then((value) => { url = value; if (live) setShown(value); else URL.revokeObjectURL(value) })
+      .catch(() => { if (live) setShown(undefined) })
+    return () => { live = false; if (url) URL.revokeObjectURL(url) }
+  }, [src])
+  return shown ? <img src={shown} alt={alt} loading="lazy" decoding="async" /> : <span className="sr-only">{alt}</span>
+}
+
 const LAYER_NAMES: Record<string, string> = { library: 'Your library', generated: 'Generated examples', 'design-system': 'Design systems' }
 
 /** Licence in plain words for the grid; the exact licence stays on the reference page. */
@@ -132,7 +146,7 @@ function Answer({ data, use, off, from, toggle, more }: { data: DeskAnswer; use:
           : <div className="justified desk-results">
             {data.results.map((ref) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
               <a className="plate" href={refLink(ref, from)}>
-                <span className="plate-frame"><img src={ref.thumb ?? undefined} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} loading="lazy" decoding="async" /></span>
+                <span className="plate-frame"><RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></span>
                 <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>
                 <span className="plate-title">{ref.title}</span>
                 {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${ref.date}` : ''}</span>}
@@ -160,7 +174,7 @@ export function RefPage({ id }: { id: string }) {
       <div className="crumbs">{back ? <a href={back}>← Back to your answer</a> : <a href="#/ask">← Ask the atlas</a>}
         <span className="mono">{layerLabel(r)}</span></div>
       <div className="image-head">
-        <figure className="figure" style={{ aspectRatio: aspect(r) }}><img src={r.image ?? undefined} alt={r.title} /></figure>
+        <figure className="figure" style={{ aspectRatio: aspect(r) }}><RefImage src={r.image} alt={r.title} /></figure>
         <div className="image-title">
           <p className="kicker">{layerLabel(r)}</p>
           <h1>{r.title}</h1>

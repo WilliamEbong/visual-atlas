@@ -671,7 +671,7 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
             out['image'] = media_url(ref.get('display'))
             out['thumb'] = media_url(ref.get('thumb'))
         else:
-            out['image'] = out['thumb'] = f"/layer-media?ref={ref['ref']}"
+            out['image'] = out['thumb'] = f"/api/desk/media?ref={ref['ref']}"
         return out
 
     @app.get('/api/desk')
@@ -698,16 +698,18 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
         except LookupError as error:
             raise HTTPException(404, str(error)) from None
 
-    @app.get('/layer-media', include_in_schema=False)
+    @app.get('/api/desk/media')
     def layer_media(ref: str):
-        """Pictures from the generated and design-system layers, found by ref in their index, never by path."""
+        """Pictures from the generated and design-system layers: behind the launch token (private files), found by
+        ref in their index, never by path, and checked again on disk at the moment they are served."""
         try:
             found = desk_layers.find(ref, home) if desk.REF.match(ref) else None
         except (OSError, ValueError):
             found = None
-        if not found:
+        path = found and desk_layers.safe_file(found)
+        if not path:
             raise HTTPException(404)
-        return FileResponse(found['file'], headers={'Cache-Control': 'private, max-age=3600'})
+        return FileResponse(path, headers={'Cache-Control': 'private, max-age=3600'})
 
     @app.get('/media/{path:path}', include_in_schema=False)
     def media(path: str):

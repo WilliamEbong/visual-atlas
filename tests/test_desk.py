@@ -170,17 +170,11 @@ def test_router_falls_back_to_the_owners_default(starter_home, fake_system, no_e
     assert desk.route('cyberpunk game night', starter_home)['system']['name'] == 'harbour-of-drifting'
 
 
-def test_design_system_paths_and_copies_cannot_be_committed(tmp_path, fake_system):
+def test_design_system_paths_cannot_be_committed():
     for path in ('archive-of-looking/assets/library/a.jpg', 'x/assets/library/b.jpg', 'x/references/images.csv',
                  'harbour-of-drifting.skill', 'docs/garden-of-lingering/notes.md'):
         assert check_no_data.forbidden(path), path
-    assert not check_no_data.forbidden('generated/fg-01.jpg')
-    repo = tmp_path / 'repo'
-    (repo / 'docs').mkdir(parents=True)
-    shutil.copy(fake_system / 'assets' / 'library' / 'nasa-earth.jpg', repo / 'docs' / 'renamed.jpg')
-    _jpeg(repo / 'docs' / 'mine.jpg', (360, 640), (200, 0, 0))
-    assert check_no_data.design_system_copies(['docs/renamed.jpg', 'docs/mine.jpg'], repo,
-                                              [fake_system / 'assets' / 'library']) == ['docs/renamed.jpg']
+    assert not check_no_data.forbidden('generated/fg-01.jpg')  # copies by content: test_desk_review.py
 
 
 def test_gitignore_keeps_design_system_folders_out():
