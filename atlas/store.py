@@ -14,7 +14,6 @@ else:
     import fcntl
 
 APPEND_ONLY = ('rights_records', 'analyses', 'annotation_history', 'attempts', 'tombstones', 'comparisons')
-ANNOTATION_STATES = ('proposed', 'model_reviewed', 'human_reviewed', 'rejected')
 MAINTENANCE_KEY = 'maintenance'
 
 
@@ -305,15 +304,6 @@ class Store:
         with self.transaction():
             if not self._update('images', 'id', image_id, {'favorite': int(favorite)}):
                 raise ValueError('image not found')
-
-    def fix_metadata(self, image_id: int, **changes):
-        """Correct catalogue text (title, maker, date, medium) copied from a source; licence records are untouched."""
-        if not changes or set(changes) - {'title', 'creator', 'date_text', 'medium'}:
-            raise ValueError('only title, creator, date_text and medium can be corrected')
-        with self.transaction():
-            if not self._update('images', 'id', image_id, {k: str(v)[:300] for k, v in changes.items()}):
-                raise ValueError('image not found')
-            self.refresh_search(image_id)
 
     def refresh_search(self, image_id: int):
         """Rewrite one image's search row from its metadata, observations and technique names."""
@@ -745,4 +735,3 @@ class Store:
 _FINAL = ('added', 'ineligible', 'duplicate', 'low_quality', 'no_technique', 'failed', 'skipped',
           'searched', 'filtered')
 _FINAL_SQL = '(' + ','.join(f"'{state}'" for state in _FINAL) + ')'
-FINAL_ITEM_STATES = _FINAL

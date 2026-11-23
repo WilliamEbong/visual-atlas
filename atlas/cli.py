@@ -255,10 +255,6 @@ def taxonomy_sync():
 
 
 # ---- reference desk (read-only; no AI, no downloads) -----------------------------------------------------------
-def _layers(include: list[str] | None) -> list[str] | None:
-    return include or None
-
-
 def _show(result: dict, text: bool):
     if not text:
         _print(result)
@@ -296,7 +292,7 @@ def advise(brief: str = typer.Argument(..., help='The visual decision, in plain 
            text: bool = typer.Option(False, help='Readable text instead of JSON.')):
     """Advice for a visual decision: techniques that fit, how to apply them, and references with reasons."""
     _show(desk.advise(brief, techniques=technique, goals=goal, limit=limit, publishable_only=publish,
-                      layers_wanted=_layers(layer)), text)
+                      layers_wanted=layer or None), text)
 
 
 @app.command()
@@ -335,7 +331,7 @@ def refs(brief: str = typer.Argument('', help='Optional brief.'),
     """Ranked references by brief, technique, goal, subject and filters."""
     _show(desk.search(brief=brief, techniques=technique, goals=goal, subjects=subject, orientation=orientation,
                       colour=colour, medium=medium, era_from=era_from, era_to=era_to, system=system,
-                      layers_wanted=_layers(layer), publishable_only=publish, limit=limit), text)
+                      layers_wanted=layer or None, publishable_only=publish, limit=limit), text)
 
 
 @app.command()
