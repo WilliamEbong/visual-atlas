@@ -290,11 +290,17 @@ def create_app(home: Path | None = None, token: str | None = None, dist: Path | 
     def taxonomy():
         with db() as store, store.reading():
             counts = {r['id']: r['examples'] for r in catalog.coverage(store)}
+            best = {}  # one picture per technique for the index: the best-checked, most confident reading
+            for row in store.rows("SELECT a.technique_id, i.thumb_path FROM annotations a JOIN images i ON i.id=a.image_id "
+                                  "WHERE a.state!='rejected' AND i.removed_at IS NULL AND i.thumb_path IS NOT NULL "
+                                  "ORDER BY a.state='human_reviewed' DESC, a.state='model_reviewed' DESC, a.confidence DESC"):
+                best.setdefault(row['technique_id'], row['thumb_path'])
             techniques = []
             for row in store.rows('SELECT id, data_json FROM techniques ORDER BY name'):
                 data = json.loads(row['data_json'])
                 techniques.append({k: data[k] for k in ('id', 'name', 'aliases', 'definition', 'goals', 'operations',
-                                                        'domains')} | {'examples': counts.get(row['id'], 0)})
+                                                        'domains')} | {'examples': counts.get(row['id'], 0),
+                                                                       'thumb': media_url(best.get(row['id']))})
             return {'goals': store.rows('SELECT * FROM goals ORDER BY name'),
                     'operations': store.rows('SELECT * FROM operations ORDER BY name'),
                     'domains': [{**d, 'variables': json.loads(d.pop('variables_json'))}

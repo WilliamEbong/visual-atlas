@@ -36,7 +36,7 @@ export interface ImageDetail {
 
 export interface Goal { id: string; name: string; description: string }
 export interface TaxonomyTechnique { id: string; name: string; aliases: string[]; definition: string; goals: string[]
-  operations: string[]; domains: string[]; examples: number }
+  operations: string[]; domains: string[]; examples: number; thumb?: string | null }
 export interface Taxonomy { goals: Goal[]; operations: Goal[]; domains: (Goal & { variables: string[] })[]; techniques: TaxonomyTechnique[] }
 
 export interface TechniqueDetail {

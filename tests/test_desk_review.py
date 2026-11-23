@@ -341,7 +341,7 @@ def test_layout_words_are_not_subjects(starter_home, monkeypatch, tmp_path):
     monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
     terms = desk.search(brief='Slide 1 of a talk on burnout: quiet, room on the left for the title; landing page '
                               'hero with headline space on the right side', home=starter_home)['reading']['subject_terms']
-    assert not {'left', 'right', 'room', 'side', 'landing', 'headline', 'space'} & set(terms)
+    assert not {'left', 'right', 'room', 'side', 'landing', 'headline', 'space', 'quiet'} & set(terms)
     assert 'burnout' in terms
 
 

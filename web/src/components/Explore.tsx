@@ -40,10 +40,12 @@ function ExploreIndex({ from }: { from: string | null }) {
       </section>
       <section className="section" aria-labelledby="all">
         <h2 id="all">All techniques</h2>
-        <div className="scroll-x" style={{ marginTop: 12 }}><table className="plain">
+        <div className="scroll-x" style={{ marginTop: 12 }}><table className="plain techniques">
           <thead><tr><th scope="col">Technique</th><th scope="col">What it is</th><th scope="col">Operations</th><th scope="col">Examples</th></tr></thead>
           <tbody>{taxonomy.techniques.map((t) => (
-            <tr key={t.id}><th scope="row"><a href={href(`technique/${t.id}`, { from })} style={{ fontFamily: 'var(--display)', fontSize: 21 }}>{t.name}</a></th><td>{t.definition}</td>
+            <tr key={t.id}><th scope="row"><a className="tech-link" href={href(`technique/${t.id}`, { from })}>
+              {t.thumb ? <img src={media(t.thumb)} alt="" loading="lazy" /> : <span className="tech-blank" aria-hidden="true" />}
+              <span style={{ fontFamily: 'var(--display)', fontSize: 21 }}>{t.name}</span></a></th><td>{t.definition}</td>
               <td className="mono">{t.operations.map((o) => taxonomy.operations.find((x) => x.id === o)?.name ?? o).join(', ')}</td>
               <td className="mono">{t.examples}</td></tr>))}</tbody>
         </table></div>

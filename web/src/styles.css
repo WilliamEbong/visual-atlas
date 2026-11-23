@@ -388,7 +388,6 @@ h1 { text-wrap: balance; }
 @media (max-width: 760px) {
   .way { grid-template-columns: 1fr; gap: 16px; }
   .ref-strip .specimen { height: 132px; }
-  .ref-strip li { max-width: 180px; }
 }
 
 /* design review, round 2 */
@@ -453,6 +452,17 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
 .phone-only { display: none; }
 @media (max-width: 600px) {
   .phone-only { display: block; margin-top: 6px; font-size: 14px; }
+  .baseline figure { flex-direction: column; align-items: flex-start; }
+  .baseline-captions { display: none; }
   .head-aside:has(.specimens) { display: none; }
   .beside-lens + p.mono, .lens-caption { text-align: left !important; }
 }
+.tech-link { display: flex; align-items: center; gap: 14px; }
+.tech-link img, .tech-blank { width: 64px; height: 48px; object-fit: contain; background: var(--card); flex: none; }
+@media (max-width: 600px) {
+  table.plain.techniques, table.plain.techniques tbody, table.plain.techniques tr, table.plain.techniques th, table.plain.techniques td { display: block; }
+  table.plain.techniques thead { display: none; }
+  table.plain.techniques tr { padding: 14px 0; border-bottom: 1px solid var(--hair); }
+  table.plain.techniques td, table.plain.techniques th { border: 0; padding: 4px 0; }
+}
+@media (max-width: 600px) { .lens { position: static; transform: none; width: 100%; max-height: none; margin: 16px 0 0; } }

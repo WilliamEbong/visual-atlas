@@ -32,7 +32,10 @@ MAX_TEXT = 4000
 # Format and occasion words say what is being made, not what the picture shows (they still route design systems).
 FORMAT_WORDS = {'deck', 'pitch', 'keynote', 'studio', 'launch', 'brand', 'client', 'opener', 'reel', 'thumbnail',
                 # layout words say where text goes, not what the picture shows ('room on the left for the title')
-                'left', 'right', 'room', 'side', 'half', 'corner', 'headline', 'landing', 'space', 'copy', 'text'}
+                'left', 'right', 'room', 'side', 'half', 'corner', 'headline', 'landing', 'space', 'copy', 'text',
+                # mood words describe the feeling wanted, not what is in the picture ('warm' matched a gold medal)
+                'warm', 'communal', 'calm', 'quiet', 'lonely', 'steady', 'trustworthy', 'cosy', 'cozy', 'festive',
+                'hopeful', 'tense', 'credible', 'serious', 'playful', 'friendly', 'elegant', 'moody', 'bold', 'soft'}
 VARIANT = re.compile(r'-\d+x\d+$')  # the same picture cropped for another format (gen-x-4x5)
 SHOT_NUMBER = re.compile(r'[\s_(-]+\d{2,}\)?$')  # "Sunset 5746", "(7027587519)": a camera's shot number
 

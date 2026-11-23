@@ -16,7 +16,7 @@ export default function Project({ id }: { id?: number }) {
   if (id) return <BriefPage id={id} onChange={list.reload} />
   return (
     <>
-      <PageHead kicker="My project · directions grounded in your library" title="Help with my project" />
+      <PageHead kicker="My project · directions grounded in your library" title="My project" />
       <div className="split" style={{ marginTop: 40 }}>
         <section className="main-col stack" aria-labelledby="new-brief">
           <h2 id="new-brief">A new brief</h2>
