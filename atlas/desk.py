@@ -22,6 +22,9 @@ STATE_WORDS = {'human_reviewed': 'confirmed by a person', 'model_reviewed': 'agr
 PUBLISHABLE = {'cc0', 'pd', 'cc-by'}  # licence codes with a documented free licence (generated and unclear are not)
 ORIENTATIONS = ('portrait', 'landscape', 'square')
 MAX_TEXT = 4000
+# Format and occasion words say what is being made, not what the picture shows (they still route design systems).
+FORMAT_WORDS = {'deck', 'pitch', 'keynote', 'studio', 'launch', 'brand', 'client', 'opener', 'reel', 'thumbnail'}
+VARIANT = re.compile(r'-\d+x\d+$')  # the same picture cropped for another format (gen-x-4x5)
 
 
 def _year(text: str) -> int | None:
@@ -183,7 +186,7 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
          'subject_terms': []}
     want_t = [t['id'] for t in reading['techniques']]
     want_g = [g['id'] for g in reading['goals']]
-    terms = list(dict.fromkeys(subjects + [t for t in reading['subject_terms'] if t not in coding.GENERIC]))[:12]
+    terms = list(dict.fromkeys(subjects + [t for t in reading['subject_terms'] if t not in coding.GENERIC | FORMAT_WORDS]))[:12]
     goal_links = {g['id']: {t['id'] for t in taxonomy['techniques'] if g['id'] in t['goals']} for g in taxonomy['goals']}
     names = {t['id']: t['name'] for t in taxonomy['techniques']} | {g['id']: g['name'] for g in taxonomy['goals']}
     routed = route(brief, home) if brief and 'design-system' in wanted_layers else {'system': None}
@@ -239,6 +242,13 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
         ranked.append((score, ref, reasons))
     ranked.sort(key=lambda item: (-item[0], item[1]['layer'] != 'library', item[1]['ref']))
     # Each other layer with a match keeps its best two places, so library volume never hides them.
+    seen, unique = set(), []
+    for item in ranked:
+        family = VARIANT.sub('', item[1]['ref'])
+        if family not in seen:
+            seen.add(family)
+            unique.append(item)
+    ranked = unique
     chosen = []
     for layer in wanted_layers:
         if layer != 'library':
