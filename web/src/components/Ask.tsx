@@ -1,6 +1,7 @@
 // Ask the atlas: a brief in, techniques that fit and references with reasons out. Ordinary code, no AI, so it
 // answers at once. The same engine answers agents through the CLI and the MCP server (atlas/desk.py).
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useJustified } from '../lib/justify'
 import { protectedImage, readOnly } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
 import { cleanMaker, cleanTitle, shortDate } from '../lib/library'
@@ -187,11 +188,13 @@ function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: 
 }
 
 /** Thumbnails that open their reference; shared by Ways to do it and More like this. */
-function RefStrip({ refs, from, label, use, compact }: { refs: DeskRef[]; from: string; label: string; use: string; compact?: boolean }) {
+function RefStrip({ refs, from, label, use, compact, row = 190 }: { refs: DeskRef[]; from: string; label: string; use: string; compact?: boolean; row?: number }) {
   // The Library's justified rows: every picture at its true shape, rows that fill the width, one caption style.
+  const box = useRef<HTMLUListElement>(null)
+  const widths = useJustified(box, refs.map(aspect), row, 200)
   return (
-    <ul className="justified refs-row" aria-label={label}>
-      {refs.map((ref) => <li key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
+    <ul ref={box} className={`justified refs-row${widths ? ' measured' : ''}`} aria-label={label}>
+      {refs.map((ref, i) => <li key={ref.ref} className="plate-item" style={{ '--a': aspect(ref), width: widths?.[i] } as React.CSSProperties}>
         <a href={refLink(ref, from, use)} className="plate">
           <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
           <span className="plate-title">{cleanTitle(ref.title)}</span>{ref.creator && <span className="sr-only">, {ref.creator}</span>}</a>
@@ -219,9 +222,11 @@ export function MoreLikeThis({ refId, from, use }: { refId: string; from: string
 }
 
 function Plates({ refs, from, small, use }: { refs: DeskRef[]; from: string; small?: boolean; use: string }) {
+  const box = useRef<HTMLDivElement>(null)
+  const widths = useJustified(box, refs.map(aspect), small ? 160 : 260, small ? 140 : 200)
   return (
-    <div className={`justified desk-results${small ? ' small' : ''}`}>
-      {refs.map((ref) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
+    <div ref={box} className={`justified desk-results${small ? ' small' : ''}${widths ? ' measured' : ''}`}>
+      {refs.map((ref, i) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref), width: widths?.[i] } as React.CSSProperties}>
         <a className="plate" href={refLink(ref, from, use)}>
           <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
           {ref.layer !== 'library' && <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>}
@@ -277,7 +282,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
               <div><p className="guide-def">{way.idea}</p>
                 {way.serves.length > 0 && <p className="mono">Serves: {way.serves.join(' · ')}</p>}</div>
             </div>
-            <RefStrip refs={way.references} from={from} use={use} label={`Pictures that show ${way.technique.name}`} />
+            <RefStrip refs={way.references} from={from} use={use} label={`Pictures that show ${way.technique.name}`} row={340} />
             {way.make_sure[0] && <p className="way-first"><span className="mono">Make sure </span>{way.make_sure[0]}</p>}
             <details className="way-how"><summary className="mono">How to carry it out</summary>
               <ul>{way.make_sure.slice(1, 3).map((cue) => <li key={cue}>{cue}</li>)}</ul>
@@ -306,7 +311,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
         </div>
         {missed && strong.length === 0 && shown.size === 0 ? <>
           {weak.length > 0 && <><p className="mono">Only these share your words, not a technique:</p>
-            <Plates refs={weak} from={from} use={use} small /></>}</>
+            <RefStrip refs={weak} from={from} use={use} label="Pictures that share your words" compact row={150} /></>}</>
         : data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
