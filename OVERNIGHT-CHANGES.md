@@ -1,7 +1,49 @@
 # Overnight changes, 22–23 November 2026
 
-Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. Round 1: 13 commits on top of `f9e400c`; round 2 added more (see `git log d6117cf..HEAD`). Nothing has been pushed, merged, tagged or
-released, and the version number is unchanged (0.4.0).
+Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4` at `f9e400c`. Nothing has been pushed, merged,
+tagged or released, and the version number is unchanged (0.4.0). Your real library at `C:\Users\Owner\VisualAtlas`
+was never touched.
+
+## What changed for you, in plain words
+
+**Visual Atlas is now a reference desk.** You (or an AI agent working for you) say what a picture should do, and it
+answers with ways to do it, each one a technique with pictures that show it, the reason each picture was chosen, and
+whether you may publish it.
+
+**In the app**
+- **Ask** is the first page. It opens on a sample answer with pictures. You type a brief and get "Ways to do it",
+  more references, and a next step (start a project from the brief, or find more images). If it can't tell what the
+  picture should do, you pick it with one click and the answer changes.
+- Open any picture and **More like this** shows pictures with a similar composition. The back link returns you to
+  your answer.
+- The whole app had a design pass: seven specialist reviewers, six rounds of fixes, four rounds of fresh review.
+  Pictures are no longer cropped, words are plain, keyboard and contrast meet WCAG AA, and phones work.
+  Screenshots are in `design-review/r3` and `design-review/r4`.
+- The starter library grew from 93 to 104 pictures, adding posters, type specimens and Minard/Playfair/Du Bois
+  charts. There are 18 generated teaching examples, each labelled as generated (with an IPTC tag inside the file),
+  and none is ever offered for publication.
+
+**For AI agents (Claude Code, Codex)**
+- There is a read-only MCP server and CLI. Agents can ask for advice, get distinct directions, look at the pictures,
+  find look-alikes, and search the public museum collections live. Every result is licence-checked by the atlas and
+  comes with its credit. The guide's section "Use Visual Atlas from an AI agent" has the one-line setup.
+
+**What the tests say, honestly**
+- **Reading briefs.** Recall doubled on 45 new briefs it was never tuned on (from 0.18 to 0.37), and precision rose
+  too. Word matching still misses about half of what people mean, so agents and people can now say it directly.
+- **Proxy blind test.** Opus judges preferred an Opus agent *without* the desk in both rounds. Licences were
+  equally right; the desk lost on fit because its own collection is small. Live open-collection search halved the
+  gap. **Your own blind test is still the deciding one** (`docs/evaluation/v0.5/BLIND-TEST.md`).
+- **Acceptance testers.** An independent "designer" installed the release from the zip and worked a choir-poster
+  brief end to end. An "agent" did three jobs over MCP. Everything worked. What they hit has been fixed
+  (listed under "Round 4"). The main gap left is content: the starter has no choir or gathering pictures, and the
+  museum copies are about 850 px wide, so they are references, not print files.
+
+**Your decisions**
+1. Run the blind test.
+2. Merge if you like it (steps at the end; the rehearsal merge passed every check).
+3. Optionally: add mood goals such as "warm and welcoming" to the taxonomy (both testers asked for them); decide
+   whether merging to `main` should publish the demo.
 
 ## Round 3: tidy, simplify, graphify (23 November)
 
@@ -266,9 +308,25 @@ Then ask Claude Code: "Use visual-atlas to find two references for a calm openin
 app, start it with `uv run visual-atlas` and open **Ask**.
 
 ## How to merge
-Review the branch, then from the main checkout:
+Rehearsed on 23 November in a throwaway worktree: the branch merges onto `visual-atlas-v0.4` with no conflicts
+(`visual-atlas-v0.4` had no new commits since this branch was cut), and on the merged result 456 backend tests,
+Ruff, the taxonomy and data checks, TypeScript, 17 frontend tests and the web build all passed.
+
+From the main checkout (`C:\Users\Owner\OneDrive\Documents\VisualAtlas`), with a clean working tree:
+```powershell
+git switch visual-atlas-v0.4
+```
 ```powershell
 git merge --no-ff claude/product-direction-d8e569
 ```
-It merges into `visual-atlas-v0.4` (its base) without conflicts at the time of writing. Rebuild the web app
-(`npm --prefix web run build`) after merging. No database migration is involved.
+```powershell
+uv sync; npm --prefix web ci; npm --prefix web run build; uv run pytest
+```
+No database migration is involved; an existing library keeps working.
+
+**Rollback** (before pushing): `git reset --hard ORIG_HEAD` on `visual-atlas-v0.4` undoes the merge. After pushing,
+use `git revert -m 1 <merge commit>` instead.
+
+**Warning about `main`:** a push to `main` triggers the GitHub Pages workflow and republishes the public demo.
+Merge into `visual-atlas-v0.4` first, and only bring it to `main` when you want the demo updated. Nothing here
+has been pushed.
