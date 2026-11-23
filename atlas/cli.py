@@ -280,6 +280,8 @@ def _show(result: dict, text: bool):
     for ref in result.get('results', []):
         typer.echo(f"{ref['ref']}  {ref.get('title', '')[:70]} — {ref.get('creator', '')[:50]}")
         typer.echo(f"  {ref['layer']} · {ref['licence']['label']}")
+        if ref.get('credit'):
+            typer.echo(f"  Credit: {ref['credit']}")
         for reason in ref['reasons']:
             typer.echo(f'  · {reason[:160]}')
     if not result.get('results'):
@@ -317,6 +319,8 @@ def directions(brief: str = typer.Argument(..., help='The visual decision, in pl
                    f"\n   Make sure: {'; '.join(item['make_sure'][:3])}")
         for ref in item['references']:
             typer.echo(f"   {ref['ref']}  {ref.get('title', '')[:60]} · {ref['licence']['label']}")
+            if ref.get('credit'):
+                typer.echo(f"   Credit: {ref['credit']}")
     if not result['directions']:
         typer.echo(result['note'])
 
@@ -373,6 +377,8 @@ def search_open(query: str = typer.Argument(..., help='A subject in a few words.
     for item in result['results']:
         typer.echo(f"{item['title'][:70]} — {item['creator'][:40]} ({item['provider']})\n  {item['licence']['label']}"
                    f" · {item['source_url']}")
+        if item.get('credit'):
+            typer.echo(f"  Credit: {item['credit']}")
     for provider, error in result['errors'].items():
         typer.echo(f'{provider}: not searched ({error})')
 

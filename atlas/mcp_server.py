@@ -13,6 +13,7 @@ import sys
 import traceback
 
 from atlas import __version__, catalog, desk, layers
+from atlas.home import home_dir
 
 MAX_FRAME = 1_000_000  # characters per message; the largest real request (a 4000-character brief) is far smaller
 VERSIONS = ('2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05')
@@ -147,7 +148,7 @@ def _view(ref: str, max_size: int) -> list[dict]:
     from PIL import Image
     record = desk.get(ref)
     # Layer files are checked again on disk now (the index is cached); library files come from the database.
-    path = layers.safe_file(layers.find(ref) or {}) if record['layer'] != 'library' else record.get('file')
+    path = layers.safe_file(layers.find(ref) or {}) if record['layer'] != 'library' else desk._picture(record, home_dir())
     if not path:
         raise LookupError('that reference has no local image file')
     with Image.open(path) as image:
@@ -245,8 +246,9 @@ def handle(message: dict) -> dict | None:
 
 
 def serve(stdin=None, stdout=None) -> None:
-    stdin = stdin or sys.stdin
-    stdout = stdout or sys.stdout
+    # MCP frames are UTF-8 whatever the console's code page (Windows pipes default to it otherwise)
+    stdin = stdin or io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+    stdout = stdout or io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
     catalog.load()  # fail fast, before the client waits on a broken knowledge file
     while True:
         line = stdin.readline(MAX_FRAME + 1)  # bounded: an endless line never fills memory
