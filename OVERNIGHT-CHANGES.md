@@ -1,6 +1,6 @@
 # Overnight changes, 22–23 November 2026
 
-Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. 13 commits on top of `f9e400c`. Nothing has been pushed, merged, tagged or
+Branch `claude/product-direction-d8e569`, cut from `visual-atlas-v0.4`. 13 commits on top of `f9e400c` (including this record). Nothing has been pushed, merged, tagged or
 released, and the version number is unchanged (0.4.0).
 
 ## Product thesis, in five lines
