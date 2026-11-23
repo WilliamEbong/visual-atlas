@@ -2,6 +2,8 @@
 
 ## Landed 2026-11-23
 
+2026-11-23: the design root-cause pass landed in `visual-atlas-v0.4` as merge `847547c` (branch tip `edb6c37`) and was pushed. Checks on the merge: 482 backend passed (1 skipped), 18 web passed, typecheck, Ruff, build, taxonomy, data guard and pip-audit clean.
+
 The branch was merged into `visual-atlas-v0.4` as `a30add4` (originally `9f2c85b`) and pushed, followed by the dependency security patch `e3c8d23` (originally `42ead4b`; pillow 13.0.0, certifi and opentelemetry-api; the audit is clean), and CI is green. The MCP server `visual-atlas` is registered for Claude Code. `main` and the public demo were deliberately left alone until your blind test.
 
 On 2026-11-23, with your approval, the design-review screenshots the merge had added (354 files, about 400 MB, in `design-review/r2`, `r3`, `r4`, `r5` and `v0.5`) were removed from this branch's history and are now gitignored. The captures are kept locally, not in the repository: in `design-review/` of this working copy and in `C:\Users\Owner\VisualAtlas-design-review-backup\` (with earlier overwritten versions and a commit map). Every screenshot path named below refers to those local copies. Commit hashes after `f9e400c` quoted below are the pre-rewrite ones; `commit-map.txt` in that backup folder gives the new hash for each, and the local branch `backup/v0.4-before-strip` keeps the old history.

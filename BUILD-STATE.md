@@ -12,6 +12,8 @@ Durable checkpoint for the autonomous build. Newest status first. Plan of record
   layout in code, then content (calm and warm works), then mood answers that lead with the thin note.
 
 ## Landed 2026-11-23
+- 2026-11-23: design root-cause pass merged into `visual-atlas-v0.4` as `847547c` (branch tip `edb6c37`) and pushed;
+  482 backend + 18 web tests pass, typecheck, Ruff, build, data guard and pip-audit clean.
 - 008 Reference desk merged into `visual-atlas-v0.4` as `a30add4` (was `9f2c85b`) and pushed, then dependency security
   patch `e3c8d23` (was `42ead4b`; pillow 13.0.0, certifi, opentelemetry-api; audit clean). CI green. MCP server
   `visual-atlas` registered for Claude Code.
