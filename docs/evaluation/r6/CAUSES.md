@@ -39,3 +39,27 @@ Source: the six fresh scorer reports of the last three builds:
 | **B. Picture-row system** | 5 screens | Rows fill on desktop, generated sorted last | Orphan or ragged last rows; phone strips that switch pattern; a single way laid out like a full row |
 | **C. Screen leftovers** | 5 screens | Compare captions and labels; Find and Projects show results | Compare's empty key column; image title alignment; Explore goal cards; Projects thumbnails; Library techniques hidden on hover; the technique count |
 | **D. Copy of reasons** | 2 reports | — | Reasons read as pixel inventory, not as why the picture fits |
+
+## What was fixed, and the check that each cause is gone
+
+Tactics are in `TACTICS.md`. Each fix was verified by one fresh reviewer, who answered one question per screen from
+the before (`f-*`) and after (`g-*`) screenshots. These screenshots are kept on disk only, outside git.
+
+| Cause | Fix (commit) | Verdict |
+|---|---|---|
+| A. Answers ignored the curator's leads, so negative space opened on paper-margin prints | The desk ranks each technique's curated leads first, in the curator's order; it prefers pictures tagged calm or energetic when the brief asks for them (`e3140aa`) | Partly. Scale contrast now opens on the Hiroshige eagle. Negative space opens on a Redon: the reviewer judged it strongest for the technique, but it is eerie for a calm brief. No calm picture in the starter shows negative space (content gap) |
+| A. The front-page sample's pictures did not show its brief | The sample is a brief the library answers well, about figures read by their outline (`e3140aa`, `ae70a5f`) | Partly, then reworded so the brief matches what its pictures show |
+| A. Weak readings taught techniques (Divan Japonais as silhouette) | Technique pages show the chosen examples; other readings fold away, marked unchecked (`fa7a2a1`) | Fixed |
+| A. Two techniques led by the same picture | Each technique gets its own index picture (`fa7a2a1`) | Fixed |
+| C. Library techniques hidden until hover | Every tile shows its techniques (`189fc01`) | Fixed |
+| C. Explore goals as boxed cards | A ruled index (`189fc01`) | Fixed |
+| C. Projects direction pictures tiny and uneven | One lead picture per direction at one height (`189fc01`, `ae70a5f`) | Fixed |
+| C. Image title bottom-aligned | Top-aligned (`189fc01`) | Partly: the empty space moved below the buttons |
+| C. Compare's empty key column | A 160 px column holding the legend, on desktop only (`189fc01`, `6bbe7a1`, `ae70a5f`) | Partly: the column is narrower and holds the key |
+
+Not addressed in this round:
+- **B. Picture-row system.** Orphan and ragged rows, and phone patterns that change within a strip. Code-measured rows
+  were tried in pass C and reverted.
+- **D. Reason copy.** Reasons still describe the pixels rather than why the picture fits.
+- **Content gaps.** Warm has two pictures. No calm picture shows negative space. Duplicate orchids and Mammals Hall
+  photographs remain in the starter.
