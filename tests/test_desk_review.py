@@ -208,3 +208,11 @@ def test_two_folders_with_the_same_slug_keep_separate_refs(starter_home, tmp_pat
     refs = [r['ref'] for r in desk.search(brief='tea garden', home=starter_home)['results'] if r['layer'] == 'design-system']
     assert len(refs) == len(set(refs)) == 2
     assert {desk.get(ref, home=starter_home)['title'] for ref in refs} == {'First tea', 'Second tea'}
+
+
+def test_every_generated_file_carries_its_provenance_label():
+    manifest = json.loads((REPO / 'generated' / 'manifest.json').read_text(encoding='utf-8'))
+    for item in manifest['images']:
+        xmp = Image.open(REPO / 'generated' / item['file']).info.get('xmp', b'')
+        assert b'digitalsourcetype/trainedAlgorithmicMedia' in xmp, item['file']
+        assert item['id'].encode() in xmp

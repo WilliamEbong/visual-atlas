@@ -5,6 +5,7 @@ Run from the repository root:
     uv run python scripts/generate_images.py prompts            # list image ids
     uv run python scripts/generate_images.py gen ID [ID ...]    # one image per id, 3 at a time
     uv run python scripts/generate_images.py build REVIEW.json  # kept images -> generated/*.jpg + manifest.json
+    uv run python scripts/generate_images.py label              # (re)write the provenance label in every kept file
 
 `gen` sends each prompt to the Codex plugin companion (`node codex-companion.mjs task --fresh`,
 prompt on stdin) and copies the PNG it reports to the scratch folder (VA_GEN_SCRATCH, default
@@ -246,6 +247,47 @@ def build(review_path: str):
     (OUT / 'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 
 
+SOURCE_TYPE = 'http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia'
+
+
+def xmp_label(item: dict) -> bytes:
+    """IPTC/XMP provenance: 'made by a trained algorithm', the tool, the date and where the prompt is kept. This is
+    the IPTC digital source type that C2PA and photo tools read; it is a plain label, not a signed C2PA manifest."""
+    from xml.sax.saxutils import escape
+    text = escape(f"Generated image for Visual Atlas ({item['tool']}, {item['date']}). Not a photograph or an "
+                  f"artwork from a collection. Prompt and review: generated/manifest.json, id {item['id']}.")
+    return ('<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?><x:xmpmeta xmlns:x="adobe:ns:meta/">'
+            '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description rdf:about="" '
+            'xmlns:Iptc4xmpExt="http://iptc.org/std/Iptc4xmpExt/2008-02-29/" xmlns:dc="http://purl.org/dc/elements/1.1/" '
+            f'xmlns:xmp="http://ns.adobe.com/xap/1.0/" Iptc4xmpExt:DigitalSourceType="{SOURCE_TYPE}" '
+            f'xmp:CreatorTool="{escape(item["tool"])}" xmp:CreateDate="{item["date"]}">'
+            f'<dc:description><rdf:Alt><rdf:li xml:lang="x-default">{text}</rdf:li></rdf:Alt></dc:description>'
+            '</rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end="r"?>').encode('utf-8')
+
+
+def embed_label(path: Path, item: dict):
+    """Insert (or replace) the XMP segment without re-encoding the picture."""
+    data = path.read_bytes()
+    assert data[:2] == b'\xff\xd8', f'{path} is not a JPEG'
+    header = b'http://ns.adobe.com/xap/1.0/\x00'
+    segments, i = [], 2
+    while data[i] == 0xFF and data[i + 1] in range(0xE0, 0xF0) or data[i + 1] == 0xFE:  # APPn and comments
+        length = int.from_bytes(data[i + 2:i + 4], 'big')
+        segment = data[i:i + 2 + length]
+        if not (data[i + 1] == 0xE1 and segment[4:4 + len(header)] == header):  # drop an old XMP label
+            segments.append(segment)
+        i += 2 + length
+    payload = header + xmp_label(item)
+    xmp = b'\xff\xe1' + (len(payload) + 2).to_bytes(2, 'big') + payload
+    path.write_bytes(b'\xff\xd8' + b''.join(segments[:1]) + xmp + b''.join(segments[1:]) + data[i:])
+
+
+def label():
+    for item in json.loads((OUT / 'manifest.json').read_text(encoding='utf-8'))['images']:
+        embed_label(OUT / item['file'], item)
+        print('labelled', item['file'])
+
+
 def _selfcheck():
     assert all(re.fullmatch(r'[a-z0-9-]+', k) for k in IMAGES)
     assert all(v['technique'] in STUDIED for v in IMAGES.values())
@@ -266,5 +308,8 @@ if __name__ == '__main__':
                 print(*res, flush=True)
     elif cmd == 'build' and len(args) == 1:
         build(args[0])
+        label()
+    elif cmd == 'label':
+        label()
     else:
         sys.exit(__doc__)
