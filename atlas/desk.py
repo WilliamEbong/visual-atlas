@@ -24,8 +24,8 @@ SCHEMA = max(int(f.name.split('_')[0]) for f in (Path(__file__).parent / 'migrat
 
 LAYERS = ('library', 'generated', 'design-system')
 STATE_WEIGHT = {'human_reviewed': 3.0, 'model_reviewed': 2.0, 'proposed': 1.0, 'intended': 1.0}
-STATE_WORDS = {'human_reviewed': 'confirmed by a person', 'model_reviewed': 'agreed by a second model',
-               'proposed': 'proposed by a model, not yet checked', 'intended': 'intended by the prompt, checked by eye'}
+STATE_WORDS = {'human_reviewed': 'confirmed by you', 'model_reviewed': 'agreed by a second model',
+               'proposed': 'proposed by a model', 'intended': 'intended by the prompt, checked by eye'}
 PUBLISHABLE = {'cc0', 'pd', 'cc-by'}  # licence codes with a documented free licence (generated and unclear are not)
 ORIENTATIONS = ('portrait', 'landscape', 'square')
 MAX_TEXT = 4000

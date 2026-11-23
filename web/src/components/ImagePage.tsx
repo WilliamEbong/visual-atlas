@@ -32,7 +32,7 @@ function readTrail(): { query: string; ids: number[] } {
 
 export default function ImagePage({ id }: { id: number }) {
   const { query } = useRoute()
-  const from = query.get('from')?.startsWith('#/connections?') ? query.get('from') : null
+  const from = /^#\/(connections|ask)\?/.test(query.get('from') ?? '') ? query.get('from') : null
   const { data, error, busy, reload, setData } = useData<ImageDetail>(`images/${id}`)
   const { taxonomy, compare, toggleCompare } = useApp()
   const { notify, fail, confirm } = useNotice()
@@ -164,7 +164,7 @@ export default function ImagePage({ id }: { id: number }) {
               </div>
               <p style={{ fontSize: 15 }}>{a.effect || 'No effect recorded.'}</p>
               <p style={{ fontSize: 14 }} className="muted">{a.evidence.join(' ') || '—'}</p>
-              <p className="mono">{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
+              <p className="provenance">{a.role === 'primary' ? 'Main technique · ' : ''}{a.proposed_backend
                 ? `proposed by ${backendName(a.proposed_backend)}` : 'added by you'}
                 {a.changed_by !== 'human' && a.proposed_backend && !a.changed_by.includes(`:${a.proposed_backend}/`) ? ` · checked by ${who(a.changed_by)}` : ''}
                 {a.changed_by === 'human' && a.proposed_backend ? ' · decided by you, kept on re-analysis' : ''}{a.note ? ` · ${a.note}` : ''}</p>
@@ -239,8 +239,9 @@ export default function ImagePage({ id }: { id: number }) {
 function Crumbs({ trail, position, previous, next, from }: { trail: { query: string; ids: number[] }; position: number; previous: number | null; next: number | null; from: string | null }) {
   return (
     <nav className="crumbs" aria-label="Results">
-      <a href={href('', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>
-      {position >= 0 && <div className="row">
+      {from?.startsWith('#/ask?') ? <a href={from} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Back to your answer</a>
+        : <a href={href('', { ...Object.fromEntries(new URLSearchParams(trail.query)), from })} className="mono" style={{ color: 'var(--graphite)', textDecoration: 'none' }}>← Library</a>}
+      {position >= 0 && !from?.startsWith('#/ask?') && <div className="row">
         <span className="mono">{position + 1} of {trail.ids.length} · ← → to move</span>
         <a className="button small" aria-disabled={!previous} href={previous ? href(`image/${previous}`, { from }) : undefined}>← Previous</a>
         <a className="button small" aria-disabled={!next} href={next ? href(`image/${next}`, { from }) : undefined}>Next →</a>

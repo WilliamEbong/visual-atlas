@@ -2,9 +2,9 @@
 // answers at once. The same engine answers agents through the CLI and the MCP server (atlas/desk.py).
 import { useEffect, useState } from 'react'
 import { protectedImage, readOnly } from '../lib/client'
-import { useData } from '../lib/hooks'
+import { useApp, useData } from '../lib/hooks'
 import { go, href, useRoute } from '../lib/router'
-import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar, Taxonomy } from '../lib/types'
+import type { DeskAnswer, DeskDirections, DeskRef, DeskSimilar } from '../lib/types'
 import { Empty, Failure, Loading, PageHead } from './ui'
 
 const EXAMPLES = ['A calm opening slide: one small figure in a lot of empty space',
@@ -51,6 +51,22 @@ function refLink(ref: DeskRef, from: string, use = 'reference'): string {
   const keep = use === 'publish' ? { use } : {}
   return ref.layer === 'library' && ref.image_id ? href(`image/${ref.image_id}`, { from, ...keep })
     : href('ref', { id: ref.ref, from, ...keep })
+}
+
+const STATE_MARK: Record<string, string> = { 'confirmed by you': '●', 'agreed by a second model': '◐', 'proposed by a model': '○' }
+
+/** "Shows Silhouette (agreed by a second model): A small bird…" as the technique, its evidence and a state mark. */
+export function Reason({ text }: { text: string }) {
+  const match = /^(?:Shows (.+?)|Serves “(.+?)” through (.+?)) \(([^)]+)\)(?:: (.*))?$/s.exec(text)
+  if (!match) return <>{text}</>
+  const [, shows, goal, via, state, evidence] = match
+  return <><strong>{shows ?? `${via}, for “${goal}”`}</strong>{' '}
+    <span className="state-mark" title={state} aria-label={state}>{STATE_MARK[state] ?? '○'}</span>{evidence ? ` ${evidence}` : ''}</>
+}
+
+/** Dates as people write them: camera timestamps lose their time of day. */
+export function shortDate(date?: string): string {
+  return (date ?? '').replace(/^(\d{4}-\d{2}-\d{2})[ T]\d{2}:\d{2}(:\d{2})?.*$/, '$1').replace(/, \d{1,2}:\d{2}(:\d{2})? \(according to Exif data\)$/, '')
 }
 
 function aspect(ref: DeskRef): number {
@@ -107,32 +123,39 @@ export default function Ask() {
       </form>
       {asked && answer.error && <Failure message={answer.error} busy={answer.busy} retry={answer.reload} />}
       {asked && !answer.data && !answer.error && <Loading label="Reading your brief…" />}
-      {answer.data && <Answer data={answer.data} ways={ways.data} goals={goals} use={use} off={off} from={from}
+      {answer.data && <Answer asked={asked} data={answer.data} ways={ways.error ? { reading: answer.data.reading, directions: [], note: '' } : ways.data} goals={goals} use={use} off={off} from={from}
         choose={(goal) => set({ goals: (goals.includes(goal) ? goals.filter((g) => g !== goal) : [...goals, goal]).join(',') })} more={limit < 40 && answer.data.total_matches > limit
         ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
-      {!asked && <p className="lede" style={{ marginTop: 40 }}>The atlas reads your brief, names the techniques that could serve it,
-        and shows pictures that use them, each with the reason it was chosen and its licence. It works from readings already saved in your library and sends nothing to an AI service.</p>}
+      {!asked && <p className="lede" style={{ marginTop: 40 }}>Describe what the picture should do. You get ways to do it and pictures that show them, each with its reason and licence. Nothing is sent to an AI service.</p>}
     </>
   )
 }
 
 /** What the picture should do, chosen by the person: the word reader misses paraphrase, a click does not. */
 function GoalChoice({ chosen, read, choose, missed }: { chosen: string[]; read: string[]; choose: (goal: string) => void; missed: boolean }) {
-  const taxonomy = useData<Taxonomy>('taxonomy')
-  if (!taxonomy.data) return null
-  return (
+  const { taxonomy } = useApp()
+  if (!taxonomy) return null
+  const chips = <div className="chips">
+    {taxonomy.goals.map((goal) => {
+      const fromBrief = read.includes(goal.id)
+      return <button key={goal.id} type="button" className={`chip${fromBrief ? ' from-brief' : ''}`}
+        aria-pressed={chosen.includes(goal.id) || fromBrief} title={fromBrief ? 'Read from your brief: edit the brief to remove it' : goal.description}
+        aria-describedby={fromBrief ? 'goal-choice-note' : undefined} disabled={fromBrief} onClick={() => choose(goal.id)}>{goal.name}</button>
+    })}
+  </div>
+  if (missed) return (
     <div className="goal-choice" role="group" aria-labelledby="goal-choice-label">
-      <p id="goal-choice-label" className={missed ? 'goal-ask' : 'mono'}>{missed
-        ? 'The words did not say what the picture should do. Choose one or two:' : 'Adjust what it should do'}</p>
-      <div className="chips">
-        {taxonomy.data.goals.map((goal) => {
-          const on = chosen.includes(goal.id) || read.includes(goal.id)
-          return <button key={goal.id} type="button" className="chip" aria-pressed={on} title={goal.description}
-            disabled={on && !chosen.includes(goal.id)} onClick={() => choose(goal.id)}>{goal.name}</button>
-        })}
-      </div>
+      <p id="goal-choice-label" className="goal-ask">Pick one or two things the picture should do. The answer updates at once.</p>
+      {chips}
     </div>
+  )
+  return (
+    <details className="goal-choice" open={chosen.length > 0}>
+      <summary className="mono">Change what the picture should do</summary>
+      <div role="group" aria-label="What the picture should do">{chips}</div>
+      {read.length > 0 && <p id="goal-choice-note" className="mono">Outlined goals were read from your brief.</p>}
+    </details>
   )
 }
 
@@ -170,35 +193,37 @@ function Plates({ refs, from, small, use }: { refs: DeskRef[]; from: string; sma
     <div className={`justified desk-results${small ? ' small' : ''}`}>
       {refs.map((ref) => <article key={ref.ref} className="plate-item" style={{ '--a': aspect(ref) } as React.CSSProperties}>
         <a className="plate" href={refLink(ref, from, use)}>
-          <span className="plate-frame"><RefImage src={ref.thumb} alt={`${ref.title}${ref.creator ? `, ${ref.creator}` : ''}`} /></span>
-          <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>
+          <span className="plate-frame"><RefImage src={ref.thumb} alt="" /></span>
+          {ref.layer !== 'library' && <span className={`fig layer-tag ${ref.layer}`}>{layerLabel(ref)}</span>}
           <span className="plate-title">{ref.title}</span>
-          {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${ref.date}` : ''}</span>}
+          {ref.creator && <span className="maker">{ref.creator}{ref.date ? `, ${shortDate(ref.date)}` : ''}</span>}
         </a>
-        <p className="reason" title={ref.reasons.join('\n')}>{ref.reasons[0]}</p>
+        <p className="reason" title={ref.reasons.join('\n')}><Reason text={ref.reasons[0]} /></p>
         <p className="licence-line">{plainLicence(ref)}</p>
       </article>)}
     </div>
   )
 }
 
-function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, more }: { data: DeskAnswer
+function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choose, more }: { asked: string; data: DeskAnswer
   ways: DeskDirections | null; goals: string[]; use: string; off: string[]; from: string
   toggle: (layer: string) => void; choose: (goal: string) => void; more?: () => void }) {
   const goals = data.reading.goals.map((g) => g.name)
   const techniques = data.reading.techniques.map((t) => t.name)
   const missed = !goals.length && !techniques.length
   const wordsOnly = (ref: DeskRef) => ref.reasons.every((reason) => reason.startsWith('Subject matches') || reason.startsWith('Matches the filters'))
-  const strong = data.results.filter((ref) => !wordsOnly(ref))
-  const weak = data.results.filter(wordsOnly)
+  const shown = new Set((ways?.directions ?? []).flatMap((way) => way.references.map((ref) => ref.ref)))
+  const rest = data.results.filter((ref) => !shown.has(ref.ref))
+  const strong = rest.filter((ref) => !wordsOnly(ref))
+  const weak = rest.filter(wordsOnly)
   const available = ['library', ...(data.layers.generated ? ['generated'] : []), ...(data.layers['design-system'].length ? ['design-system'] : [])]
   return (
     <>
       <section className="reading-line" aria-label="How the atlas read your brief">
         <p>{!missed ? <>{goals.length > 0 && <><span className="mono">Goal </span>{goals.join(' · ')} </>}
           {techniques.length > 0 && !(ways?.directions.length || data.guidance.length) && <><span className="mono">{goals.length ? ' Techniques ' : 'Techniques '}</span>{techniques.join(' · ')}</>}
-          {goals.length === 0 && techniques.length > 0 && (ways?.directions.length || data.guidance.length) ? 'Read as a technique; ways to do it below.' : ''}</>
-          : 'No goal or technique recognised yet.'}</p>
+          {goals.length === 0 && techniques.length > 0 && (ways?.directions.length || data.guidance.length) ? <><span className="mono">Read as </span>{techniques.join(' · ')}</> : ''}</>
+          : 'We could not tell what the picture should do.'}</p>
         {data.reading.subject_terms.length > 0 && <p className="mono">Subject words: {data.reading.subject_terms.join(', ')}</p>}
         <GoalChoice chosen={chosen} read={data.reading.goals.map((g) => g.id).filter((g) => !chosen.includes(g))} choose={choose} missed={missed} />
         {data.route.system && data.layers['design-system'].length > 0 && <p className="mono">Design system: {data.route.system.name}. {data.route.system.why}.</p>}
@@ -207,7 +232,8 @@ function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, mor
             onChange={() => toggle(layer)} />{LAYER_NAMES[layer]}</label>)}
         </div>}
       </section>
-      {ways && ways.directions.length > 0 ? <section className="section ways" aria-labelledby="ways-title" style={{ marginTop: 40 }}>
+      {!ways ? <div className="section" style={{ marginTop: 40 }}><Loading plates={false} label="Finding ways to do it…" /></div>
+      : ways.directions.length > 0 ? <section className="section ways" aria-labelledby="ways-title" style={{ marginTop: 40 }}>
         <div className="section-title">
           <h2 id="ways-title">Ways to do it</h2>
           <p className="mono">One technique each, with pictures that show it</p>
@@ -240,8 +266,8 @@ function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, mor
       </section>}
       <section className="section" aria-labelledby="refs-title" style={{ marginTop: 56 }}>
         <div className="section-title">
-          <h2 id="refs-title">{ways?.directions.length ? 'All references' : 'References'}</h2>
-          <p className="mono">{data.results.length ? `${data.results.length} of ${data.total_matches} matches` : ''}
+          <h2 id="refs-title">{shown.size ? 'More references' : 'References'}</h2>
+          <p className="mono">{rest.length ? `${rest.length}${shown.size ? ' more' : ''} of ${data.total_matches} matches` : ''}
             {use === 'publish' ? ' · free to publish with credit' : ''}</p>
         </div>
         {data.results.length === 0 ? <Empty title="Nothing in the atlas fits yet" actions={<a className="button primary"
@@ -249,13 +275,17 @@ function Answer({ data, ways, goals: chosen, use, off, from, toggle, choose, mor
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
           : <>
             {strong.length > 0 && <Plates refs={strong} from={from} use={use} />}
-            {weak.length > 0 && <>
-              <h3 className="weak-title mono">{strong.length ? 'Matched on words only' : 'Matched on words only: no technique evidence yet'}</h3>
-              <Plates refs={weak} from={from} use={use} small />
-            </>}
+            {weak.length > 0 && (strong.length + shown.size >= 3
+              ? <details className="weak"><summary className="mono">{weak.length} more matched only on words, not on a technique</summary>
+                <Plates refs={weak} from={from} use={use} small /></details>
+              : <><h3 className="weak-title mono">Matched only on words, not on a technique</h3><Plates refs={weak} from={from} use={use} small /></>)}
           </>}
         {more && <div className="row" style={{ marginTop: 32 }}><button type="button" onClick={more}>Show more references</button></div>}
       </section>
+      <nav className="section next-steps" aria-label="Next steps" style={{ marginTop: 48 }}>
+        <a className="button primary" href={href('project', { text: asked })}>Start a project from this brief</a>
+        <a className="button" href={href('find', { goal: asked })}>Find more images for this brief</a>
+      </nav>
       <p className="muted" style={{ marginTop: 40, maxWidth: 760, fontSize: 14, lineHeight: 1.5 }}>{data.note}</p>
     </>
   )

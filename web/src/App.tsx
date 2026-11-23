@@ -33,6 +33,11 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => { try { sessionStorage.setItem('compare', JSON.stringify(compare)) } catch { /* private mode */ } }, [compare])
   useEffect(() => setMenuOpen(false), [route])
+  const pageKey = route.path.join('/')
+  useEffect(() => {  // a new page: start at its top, with keyboard and screen-reader focus on the content
+    window.scrollTo(0, 0)
+    document.getElementById('content')?.focus({ preventScroll: true })
+  }, [pageKey])
   const toggleCompare = useCallback((pick: Pick) => setCompare((picks) => picks.some((p) => p.id === pick.id)
     ? picks.filter((p) => p.id !== pick.id) : picks.length >= 4 ? picks : [...picks, pick]), [])
   const checkJobs = useCallback(() => {
@@ -64,7 +69,8 @@ export default function App() {
     default: page = <Library query={route.query} />
   }
   const current = (key: string) => section === key || (key === 'explore' && ['technique', 'connections'].includes(section))
-    || (key === '' && ['image', 'compare'].includes(section)) || (key === 'ask' && section === 'ref')
+    || (key === '' && ['image', 'compare'].includes(section) && !route.query.get('from')?.startsWith('#/ask'))
+    || (key === 'ask' && (section === 'ref' || (section === 'image' && !!route.query.get('from')?.startsWith('#/ask'))))
 
   return (
     <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]), refreshTaxonomy: taxonomy.reload }}>

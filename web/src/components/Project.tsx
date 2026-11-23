@@ -40,7 +40,7 @@ export default function Project({ id }: { id?: number }) {
 
 function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: number) => void; onCancel?: () => void }) {
   const [title, setTitle] = useState(brief?.title ?? '')
-  const [text, setText] = useState(brief?.text ?? '')
+  const [text, setText] = useState(brief?.text ?? new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('text') ?? '')
   const { fail } = useNotice()
   async function save(event: React.FormEvent) {
     event.preventDefault()
@@ -53,7 +53,7 @@ function BriefForm({ brief, onSaved, onCancel }: { brief?: Brief; onSaved: (id: 
     <form className="stack slip" onSubmit={save}>
       <label className="field">Project name<input required maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Solitude talk — poster" /></label>
       <label className="field">The brief: audience, message, format, mood, constraints
-        <textarea required rows={6} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)} style={{ fontFamily: 'var(--mono)' }}
+        <textarea required rows={6} maxLength={4000} value={text} onChange={(e) => setText(e.target.value)}
           placeholder="A poster for a public talk about solitude and attention. Calm, a little melancholy, not lonely-sad. A2 portrait, title at the top, lots of room for text." /></label>
       <div className="row"><button type="submit" className="primary">{brief ? 'Save brief' : 'Save and continue'}</button>
         {onCancel && <button type="button" onClick={onCancel}>Cancel</button>}</div>

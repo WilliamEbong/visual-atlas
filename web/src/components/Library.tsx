@@ -95,7 +95,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
         {hero.length > 0 && <p className="mono">Fig. 1–{hero.length}  From your library: {hero.slice(0, 3).map((item) => (item.creator || item.title)
           .replace(/^Print made by:\s*/i, '').split(/[,;(]| Published| from /)[0].trim().slice(0, 32)).join(' · ')}</p>}
       </div>
-      <nav className="drawers" aria-label="Ways in">
+      {(data?.total ?? 0) < 12 && <nav className="drawers" aria-label="Ways in">
         {!readOnly && <a className="drawer" href="#/ask"><span className="letter" aria-hidden="true">A</span><span><strong>Ask the atlas</strong>
           <span className="text">Say what a picture should do; get techniques and references, each with its reason and licence.</span></span></a>}
         <a className="drawer" href="#/find"><span className="letter" aria-hidden="true">F</span><span><strong>Find images</strong>
@@ -106,7 +106,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
           <span className="text">Paste a brief and get directions grounded in your library.</span></span></a>
         <a className="drawer" href="#/collections"><span className="letter" aria-hidden="true">C</span><span><strong>Collections</strong>
           <span className="text">Boards for projects, with credits ready to export.</span></span></a>
-      </nav>
+      </nav>}
 
       {error ? <Failure message={error} busy={busy} retry={reload} />
         : !data ? <Loading label="Loading the library…" />
@@ -200,7 +200,7 @@ export default function Library({ query }: { query: URLSearchParams }) {
                 return (
                   <article key={item.id} className="plate-item" style={{ '--a': aspect(item) } as React.CSSProperties}>
                     <a className="plate" href={href(`image/${item.id}`, { from })}>
-                      <span className="plate-frame"><img src={media(item.thumb)} alt={`${item.title}${item.creator ? `, ${item.creator}` : ''}`} loading="lazy" decoding="async" /></span>
+                      <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" decoding="async" /></span>
                       <span className="fig">Fig. {item.id}{plateState(item) ? `  ${plateState(item)}` : ''}</span>
                       <span className="plate-title">{item.title}</span>
                       <span className="maker">{[item.creator, item.date_text].filter(Boolean).join(', ') || 'Unknown maker'}</span>
