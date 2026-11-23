@@ -63,11 +63,6 @@ export function nextPages<T extends { id: number }>(previous: Pages<T>, key: str
 }
 
 /** Arrow-key movement in a grid of `count` items laid out in `columns` columns. */
-export function nextIndex(index: number, key: string, columns: number, count: number): number {
-  const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns, Home: -index, End: count - 1 - index }[key]
-  if (step === undefined || count === 0) return index
-  return Math.min(count - 1, Math.max(0, index + step))
-}
 
 export interface Box { left: number; top: number; width: number }
 

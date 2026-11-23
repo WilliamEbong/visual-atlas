@@ -79,7 +79,7 @@ export default function App() {
     || (key === 'ask' && (section === 'ref' || (section === 'image' && !!route.query.get('from')?.startsWith('#/ask'))))
 
   return (
-    <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]), refreshTaxonomy: taxonomy.reload }}>
+    <AppContext.Provider value={{ taxonomy: taxonomy.data, compare, toggleCompare, clearCompare: () => setCompare([]) }}>
       <NoticeProvider>
         <a className="skip" href="#content" onClick={(event) => { event.preventDefault(); document.getElementById('content')?.focus() }}>Skip to content</a>
         <header className="topbar">

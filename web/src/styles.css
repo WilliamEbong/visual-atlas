@@ -306,9 +306,6 @@ table.plain thead th { font: 12px var(--mono); color: var(--caption); }
   .connection-controls, .connection-workbench { grid-template-columns: 1fr; gap: 16px; }
   .connections .horizon-head { min-height: 120px; }
 }
-.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; }
-.legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: middle; }
-.legend .g::before { background: #A2573B; } .legend .t::before { background: #236292; border-radius: 50%; } .legend .i::before { background: #8B867B; }
 .side-nav { position: sticky; top: 16px; align-self: flex-start; display: flex; flex-direction: column; flex: 0 1 220px; }
 .side-nav button { justify-content: flex-start; border: 0; border-left: 1px solid var(--hair); padding: 10px 0 10px 14px; font: 15px var(--text); color: var(--graphite); min-height: 40px; }
 .side-nav button[aria-current="true"] { border-left: 3px solid var(--ink); padding-left: 12px; color: var(--ink); }
@@ -360,9 +357,6 @@ table.plain thead th { font: 12px var(--mono); color: var(--caption); }
 .layer-toggles { gap: 4px 22px; }
 .guide-def { font-size: 15px; line-height: 1.45; }
 .guide-note { font-size: 14px; margin-top: 12px; }
-.tray-col ul.reasons, .reasons { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4; color: var(--graphite); }
-.reasons li { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.reasons li::before { content: '— '; color: var(--caption); }
 .licence-line { font: 12px/1.4 var(--mono); color: var(--graphite); margin-top: 6px; }
 .layer-tag.generated { color: var(--accent); }
 .layer-tag.design-system { color: var(--green-strong); }

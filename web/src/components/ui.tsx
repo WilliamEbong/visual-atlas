@@ -3,14 +3,14 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { BusyError } from '../lib/client'
 
-export function PageHead({ kicker, title, aside, asideClass = '', id = 'page-title' }: {
-  kicker?: ReactNode; title: ReactNode; aside?: ReactNode; asideClass?: string; id?: string
+export function PageHead({ kicker, title, aside, asideClass = '' }: {
+  kicker?: ReactNode; title: ReactNode; aside?: ReactNode; asideClass?: string
 }) {
   return (
-    <section className="horizon-head" aria-labelledby={id}>
+    <section className="horizon-head" aria-labelledby="page-title">
       <div className="head-text">
         {kicker && <p className="kicker">{kicker}</p>}
-        <h1 id={id}>{title}</h1>
+        <h1 id="page-title">{title}</h1>
       </div>
       {aside && <div className={`head-aside ${asideClass}`}>{aside}</div>}
     </section>

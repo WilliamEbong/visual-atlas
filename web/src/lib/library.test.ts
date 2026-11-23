@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextIndex, nextPages, toQuery } from './library'
+import { activeCount, activeFilters, apiPath, appendPage, EMPTY, fromQuery, nextByPosition, nextPages, toQuery } from './library'
 import { briefName, cleanMaker, cleanTitle, shortDate } from './library'
 
 describe('justified grid keyboard movement', () => {
@@ -43,17 +43,6 @@ describe('library filters', () => {
   })
 })
 
-describe('grid keyboard movement', () => {
-  it('moves by row and column and stays inside the grid', () => {
-    expect(nextIndex(0, 'ArrowRight', 4, 10)).toBe(1)
-    expect(nextIndex(5, 'ArrowUp', 4, 10)).toBe(1)
-    expect(nextIndex(8, 'ArrowDown', 4, 10)).toBe(9)
-    expect(nextIndex(0, 'ArrowLeft', 4, 10)).toBe(0)
-    expect(nextIndex(3, 'End', 4, 10)).toBe(9)
-    expect(nextIndex(7, 'Home', 4, 10)).toBe(0)
-    expect(nextIndex(2, 'Enter', 4, 10)).toBe(2)
-  })
-})
 
 describe('appendPage', () => {
   it('adds the next page without repeating images whose offsets shifted', () => {
