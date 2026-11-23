@@ -3,13 +3,20 @@
 Durable checkpoint for the autonomous build. Newest status first. Plan of record:
 `C:\Users\Owner\.claude\plans\first-make-a-folder-iridescent-fountain.md` (approved 2026-10-15).
 
+## 008 Reference desk, round 4 (2026-11-23, same branch)
+- Acceptance: an Opus "designer" installed the release zip in temp and an Opus "agent" used MCP and the CLI. Everything
+  worked; what they hit is fixed with tests (layout and mood words, evidence first, credits, serve port, zip contents).
+- Merge rehearsal onto visual-atlas-v0.4: clean, every check green. Steps and rollback: OVERNIGHT-CHANGES.md "How to merge".
+- Scored design cycle: 6.7/6.6, 6.9/6.3, 7.45/6.9, 7.5/7.15, then 7.1/6.85, so it stopped. Screenshots
+  design-review/r4. Remaining design items are listed in OVERNIGHT-CHANGES.md "Round 4".
+- Next concrete action: owner's blind test (docs/evaluation/v0.5/BLIND-TEST.md), then the merge.
+
 ## 008 Reference desk, design pass and round 3 (2026-11-23, same branch)
 - Design pass: seven lens reviewers, six fix batches, four review rounds; screenshots design-review/r3
   (before-*, after-*, final-*). Record: OVERNIGHT-CHANGES.md "Design pass".
 - Round 3: dead code and two round-2 extras removed (~−340 lines, −1.3 MB per release zip); MCP server starts
   ~1.2 s faster; graphify graph in graphify-out/ (query: `graphify query "<question>"`). Record: "Round 3".
-- Next concrete action: round 4 (independent acceptance as designer and agent, merge rehearsal onto
-  visual-atlas-v0.4, scored design cycle, one-page summary), then the owner's blind test.
+- (Round 4 followed; see above.)
 
 ## 008 Reference desk, overnight round 2 (2026-11-23, same branch)
 - Owner approved continuing: close open items, run a proxy of the blind test, extend along the Later list, a

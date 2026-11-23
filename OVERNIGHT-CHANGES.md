@@ -83,6 +83,8 @@ merged result (steps and rollback at the end of this file).
 | 4 | 7.5 | 7.15 | every strip uses the Library's justified rows |
 | 5 | 7.1 | 6.85 | scores fell, so the cycle stopped; a last fix put the technique examples on the same rows and capped phone pictures at 320 px (`final-*`) |
 
+Left from the last scoring (both scorers, about 6 to 7 out of 10 on these screens): Compare on a phone and its matrix lining up with the pictures; My project showing one worked example direction; Find explaining its steps twice; raw uploader titles in the Library ("Odd one out"); a missed brief showing a single picture under "Meanwhile".
+
 **Codex review of round 4:** four findings, then two more on the fix, all confirmed and fixed with tests (word-only
 results outranking evidence, mood words crowding out a subject, phone Compare losing its controls, unreachable word
 matches, a routed word match counted as evidence, phone strips wrapping).
