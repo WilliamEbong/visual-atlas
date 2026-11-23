@@ -168,9 +168,9 @@ function ExampleBrief() {
           <article key={d.title} className={`tray-col ${RULES[index % RULES.length]}`} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <p className="mono">Direction {index + 1}</p>
             <h3 className="direction-title">{d.title}</h3>
-            {d.images.length > 0 && <div className="contact" style={{ height: 120, gap: 8 }}>
-              {d.images.slice(0, 3).map((img, i) => <a key={img.id} href={href(`image/${img.id}`)} aria-label={img.title}>
-                <img src={media(img.thumb)} alt="" style={{ height: THUMB_HEIGHTS[i] }} /></a>)}</div>}
+            {d.images.length > 0 && <div className="contact" style={{ height: 170, gap: 10 }}>
+              {d.images.slice(0, 2).map((img) => <a key={img.id} href={href(`image/${img.id}`)} aria-label={img.title}>
+                <img src={media(img.thumb)} alt="" style={{ height: 170, maxWidth: '100%', objectFit: 'contain' }} /></a>)}</div>}
             <p style={{ fontSize: 15 }}>{d.idea}</p>
             <p className="mono">{d.techniques.map((t, i) => <span key={t.id}>{i ? ' · ' : ''}<a href={href(`technique/${t.id}`)}>{t.name.replace(/ \(.*\)$/, '')}</a></span>)}</p>
             <details><summary>How to do it, and tradeoffs</summary>
