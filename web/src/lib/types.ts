@@ -46,7 +46,7 @@ export interface TechniqueDetail {
   confusions: { technique: string; name: string; how_to_tell: string }[]
   related: { id: string; name: string; relation: string }[]
   goals: Goal[]; operations: Goal[]; domains: Goal[]
-  examples: { id: number; title: string; creator: string; date_text: string; thumb?: string; display?: string; width: number; height: number
+  examples: { id: number; title: string; creator: string; date_text: string; thumb?: string; display?: string; width: number; height: number; chosen?: boolean
     state: State; effect: string; role: string }[]
 }
 

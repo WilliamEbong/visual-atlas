@@ -63,3 +63,15 @@ def test_answers_lead_with_the_curated_example(tmp_path, monkeypatch):
     monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     assert desk.search(techniques=['scale-contrast'], home=home)['results'][0]['title'] == last['title']
+
+
+def test_each_technique_has_its_own_index_picture(tmp_path):
+    home = tmp_path / 'home'
+    with jobs.open_store(home) as store:
+        transfer.import_starter(store, home, REPO / 'starter')
+    client = TestClient(create_app(home, token=TOKEN, dist=tmp_path / 'dist'), base_url='http://127.0.0.1:8775',
+                        headers={'x-atlas-token': TOKEN})
+    thumbs = [t['thumb'] for t in client.get('/api/taxonomy').json()['techniques'] if t['thumb']]
+    assert len(thumbs) == len(set(thumbs))
+    examples = client.get('/api/techniques/silhouette').json()['examples']
+    assert examples[0]['chosen'] and any(not e['chosen'] for e in examples)
