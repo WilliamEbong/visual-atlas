@@ -557,3 +557,51 @@ def similar(ref: str, *, limit: int = 6, publishable_only: bool = False, layers_
     return {'like': ref, 'results': results, 'compared': len(scored),
             'note': 'Compared by where light, dark and colour sit in each picture (an 8 x 8 thumbnail), on this '
                     'computer. It finds compositions that look alike, not the same subject.'}
+
+
+OPEN_PROVIDERS = ('commons', 'met', 'aic', 'cma', 'rijksmuseum')  # live search APIs; NGA needs its large index
+
+
+def open_search(query: str, *, providers_wanted=None, per_provider: int = 6, fetcher=None) -> dict:
+    """Search public collections live for a picture the library does not have. Each candidate goes through
+    atlas/rights.py, as in Find; only eligible ones are returned, with licence and credit. Nothing is downloaded or
+    stored: to keep one, import it with Find in the app. Network use is bounded (one search per collection)."""
+    from atlas import providers, rights
+    from atlas.fetch import Fetcher, FetchError
+    if not isinstance(query, str) or not query.strip() or len(query) > 200:
+        raise ValueError('the query is 1 to 200 characters of plain words (a subject, not a whole brief)')
+    wanted = _clean_list(providers_wanted, len(OPEN_PROVIDERS)) or list(OPEN_PROVIDERS)
+    if any(p not in OPEN_PROVIDERS for p in wanted):
+        raise ValueError(f"collections are {', '.join(OPEN_PROVIDERS)}")
+    if not isinstance(per_provider, int) or not 1 <= per_provider <= 10:
+        raise ValueError('per_provider is between 1 and 10')
+    policies = catalog.load()[1]
+    fetcher = fetcher or Fetcher(policies)
+    results, rejected, errors = [], {}, {}
+    for provider in wanted:
+        policy = catalog.policy(policies, provider)
+        if policy.get('status') != 'enabled':
+            errors[provider] = 'not enabled in source_policies.json'
+            continue
+        try:
+            found = providers.search(fetcher, provider, query.strip(), 0, per_provider)
+        except (FetchError, ValueError, KeyError, TypeError, AttributeError) as error:
+            errors[provider] = getattr(error, 'code', None) or type(error).__name__
+            continue
+        for candidate in found:
+            decision = rights.check(candidate, policy)
+            if not decision['eligible']:
+                rejected[decision['reason']] = rejected.get(decision['reason'], 0) + 1
+                continue
+            code = {'CC0': 'cc0', 'PD': 'pd', 'PDM': 'pd', 'CC BY': 'cc-by'}.get(decision['license_code'], 'unclear')
+            results.append({
+                'provider': provider, 'title': candidate.get('title', ''), 'creator': candidate.get('creator', ''),
+                'date': candidate.get('date_text', ''), 'medium': candidate.get('medium', ''),
+                'source_url': candidate['source_url'], 'image_url': candidate['image_url'],
+                'licence': {'label': decision['label'], 'code': code, 'url': decision['license_url'],
+                            'restrictions': decision['restrictions'], 'checked_by': 'atlas/rights.py'},
+                'credit': decision['required_attribution'], 'publishable': code in PUBLISHABLE})
+    return {'query': query.strip(), 'results': results, 'rejected': rejected, 'errors': errors,
+            'note': 'Live results from public collections, licence-checked by atlas/rights.py from each record. No '
+                    'technique reading yet: judge the picture yourself, and import it with Find to keep it. Labels '
+                    'say what was checked; they are not legal advice.'}

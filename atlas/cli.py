@@ -360,6 +360,22 @@ def similar(ref_id: str = typer.Argument(..., help='e.g. library:12, generated:I
         raise typer.Exit(1)
 
 
+@app.command('search-open')
+def search_open(query: str = typer.Argument(..., help='A subject in a few words.'),
+                collection: list[str] = typer.Option(None, help='commons, met, aic, cma or rijksmuseum (repeatable).'),
+                per_collection: int = typer.Option(6), text: bool = typer.Option(False)):
+    """Search public collections live; only licence-checked results come back. Downloads nothing."""
+    result = desk.open_search(query, providers_wanted=collection, per_provider=per_collection)
+    if not text:
+        _print(result)
+        return
+    for item in result['results']:
+        typer.echo(f"{item['title'][:70]} — {item['creator'][:40]} ({item['provider']})\n  {item['licence']['label']}"
+                   f" · {item['source_url']}")
+    for provider, error in result['errors'].items():
+        typer.echo(f'{provider}: not searched ({error})')
+
+
 @app.command()
 def mcp():
     """Run the read-only MCP server on stdio (for Claude Code, Codex and other agents)."""

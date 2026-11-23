@@ -237,3 +237,27 @@ def test_more_like_this_ranks_the_closest_composition_first(tmp_path, monkeypatc
     assert [r['ref'] for r in found['results']] == ['generated:red-left-copy', 'generated:blue-right']
     assert found['results'][0]['score'] > 0.9 > found['results'][1]['score']
     assert (tmp_path / 'cache' / 'signatures.json').is_file() and not (tmp_path / 'home').exists()
+
+
+def test_open_search_returns_only_rights_checked_candidates(monkeypatch):
+    from atlas import providers
+    found = [{'provider': 'aic', 'title': 'Lighthouse', 'creator': 'A', 'date_text': '1900', 'medium': 'oil',
+              'source_url': 'https://www.artic.edu/artworks/1', 'image_url': 'https://www.artic.edu/iiif/2/x/full/843,/0/default.jpg',
+              'image_headers': {}, 'credit_line': '', 'raw': {'is_public_domain': True, 'image_id': 'x'}},
+             {'provider': 'aic', 'title': 'Modern', 'creator': 'B', 'date_text': '1990', 'medium': 'oil',
+              'source_url': 'https://www.artic.edu/artworks/2', 'image_url': '', 'image_headers': {}, 'credit_line': '',
+              'raw': {'is_public_domain': False, 'image_id': None}}]
+    calls = []
+
+    def fake(fetcher, provider, query, page, per_page, home=None):
+        calls.append((provider, query, per_page))
+        return found
+    monkeypatch.setattr(providers, 'search', fake)
+    result = desk.open_search('lighthouse at night', providers_wanted=['aic'], per_provider=3, fetcher=object())
+    assert calls == [('aic', 'lighthouse at night', 3)]
+    assert [r['title'] for r in result['results']] == ['Lighthouse'] and result['results'][0]['publishable']
+    assert result['results'][0]['licence']['checked_by'] == 'atlas/rights.py' and sum(result['rejected'].values()) == 1
+    for bad in ({'query': ''}, {'query': 'x' * 201}, {'query': 'x', 'providers_wanted': ['nga']},
+                {'query': 'x', 'per_provider': 11}):
+        with pytest.raises(ValueError):
+            desk.open_search(**bad, fetcher=object())

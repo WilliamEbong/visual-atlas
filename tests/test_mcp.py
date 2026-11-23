@@ -58,8 +58,9 @@ def test_stdio_round_trip_in_a_subprocess(starter_home):
     tools = replies[1]['result']['tools']
     assert {t['name'] for t in tools} == {'advise', 'search_references', 'get_reference', 'view_reference',
                                          'list_techniques', 'get_technique', 'route_brief', 'suggest_directions',
-                                         'similar_references'}
+                                         'similar_references', 'search_open_collections'}
     assert all(t['annotations']['readOnlyHint'] and not t['annotations']['destructiveHint'] for t in tools)
+    assert [t['name'] for t in tools if t['annotations']['openWorldHint']] == ['search_open_collections']
     advice = replies[2]['result']
     assert advice['isError'] is False and advice['structuredContent']['results']
     assert json.loads(advice['content'][0]['text']) == advice['structuredContent']
