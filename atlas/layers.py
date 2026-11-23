@@ -75,7 +75,7 @@ def _description(folder: Path) -> str:
 @lru_cache(maxsize=8)
 def _read_system(folder: Path, mtime: float) -> dict:
     del mtime  # part of the cache key: an edited catalogue is read again
-    name = folder.name
+    name = re.sub(r'[^a-z0-9]+', '-', folder.name.lower()).strip('-')[:60] or 'system'  # always a valid ref part
     library = (folder / 'assets' / 'library').resolve()
     refs = []
     with open(folder / 'references' / 'images.csv', encoding='utf-8', newline='') as handle:

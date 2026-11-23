@@ -64,7 +64,12 @@ def libraries() -> list[Path]:
     configured = os.environ.get('VISUAL_ATLAS_DESIGN_SYSTEMS', '')
     if configured.lower() not in ('', 'auto', 'off', '0', 'no', 'false'):
         roots += [Path(part.strip()) for part in configured.split(';') if part.strip()]
-    return [root / 'assets' / 'library' for root in roots]
+    try:  # the same lookup the desk uses, including the data home's .env file
+        from atlas.layers import enabled_systems
+        roots += enabled_systems()
+    except (ImportError, ValueError, OSError):
+        pass
+    return [root / 'assets' / 'library' for root in dict.fromkeys(roots)]
 
 
 if __name__ == '__main__':

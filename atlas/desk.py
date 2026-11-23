@@ -95,8 +95,8 @@ def _library(home: Path) -> list[dict]:
         result = json.loads(row['result_json']) if row['result_json'] else {}
         rights = json.loads(row['rights']) if row['rights'] else {}
         code = (rights.get('code') or '').lower()
-        code = 'cc0' if code == 'cc0' else 'pd' if code in ('pd', 'pdm', 'public-domain') else \
-            'cc-by' if code.startswith('cc-by') or code == 'cc by' else code
+        # Exact codes only: anything else (CC BY-NC, unknown) keeps its own code and is never publishable.
+        code = {'cc0': 'cc0', 'pd': 'pd', 'pdm': 'pd', 'cc by': 'cc-by', 'cc-by': 'cc-by'}.get(code, code or 'unclear')
         path = row['analysis_path'] or row['original_path']
         out.append({
             'ref': f"library:{row['id']}", 'layer': 'library', 'title': row['title'], 'creator': row['creator'],

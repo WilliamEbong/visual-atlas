@@ -202,11 +202,17 @@ def serve(stdin=None, stdout=None) -> None:
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
     catalog.load()  # fail fast, before the client waits on a broken knowledge file
-    for line in stdin:
-        if not line.strip():
+    while True:
+        line = stdin.readline(MAX_FRAME + 1)  # bounded: an endless line never fills memory
+        if not line:
+            break
+        oversized = len(line) > MAX_FRAME and not line.endswith('\n')
+        while oversized and line and not line.endswith('\n'):
+            line = stdin.readline(MAX_FRAME + 1)  # discard the rest of the frame, up to its newline
+        if not oversized and not line.strip():
             continue
         try:
-            if len(line) > MAX_FRAME:
+            if oversized:
                 raise ValueError('frame too large')
             message = json.loads(line)
         except (ValueError, RecursionError):  # bad JSON, absurd nesting or numbers: answer, keep the session

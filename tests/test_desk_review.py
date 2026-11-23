@@ -130,3 +130,66 @@ def test_goal_reasons_quote_one_technique_with_its_own_state(starter_home, monke
     assert reasons
     for reason in reasons:
         assert re.match(r'Serves “[^”]+” through [^,(]+ \(', reason), reason
+
+
+# ---- round 2 -------------------------------------------------------------------------------------------------
+
+
+def test_restricted_library_codes_are_never_publishable(starter_home, tmp_path, monkeypatch):
+    home = tmp_path / 'copy'
+    shutil.copytree(starter_home, home)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    target = desk.search(techniques=['silhouette'], publishable_only=True, home=home)['results'][0]['image_id']
+    connection = sqlite3.connect(home / 'atlas.db')
+    columns = [row[1] for row in connection.execute('PRAGMA table_info(rights_records)') if row[1] != 'id']
+    copied = ', '.join("'CC-BY-NC'" if c == 'license_code' else "'Noncommercial only'" if c == 'label' else c
+                       for c in columns)
+    connection.execute(f"INSERT INTO rights_records({', '.join(columns)}) SELECT {copied} FROM rights_records "
+                       "WHERE image_id=? ORDER BY id DESC LIMIT 1", (target,))
+    connection.commit()
+    connection.close()
+    published = desk.search(techniques=['silhouette'], publishable_only=True, limit=40, home=home)['results']
+    assert target not in {r.get('image_id') for r in published}
+
+
+def test_custom_folder_names_give_refs_that_open(starter_home, tmp_path, monkeypatch):
+    root = _system(tmp_path, ['tea-1,window,tea;garden,light,muted,painting,Tea garden,A,1800,CC0,A,https://x,,tea,'
+                              '300x200'])
+    custom = root.with_name('Studio References')
+    root.rename(custom)
+    monkeypatch.setenv('VISUAL_ATLAS_DESIGN_SYSTEMS', str(custom))
+    monkeypatch.setattr(layers, 'GENERATED', tmp_path / 'none')
+    found = desk.search(brief='tea garden', home=starter_home)['results']
+    ref = next(r['ref'] for r in found if r['layer'] == 'design-system')
+    assert ref == 'system:studio-references:tea-1'
+    assert desk.get(ref, home=starter_home)['title'] == 'Tea garden'
+
+
+def test_guard_covers_folders_configured_in_the_home_env_file(tmp_path, monkeypatch):
+    home = tmp_path / 'home'
+    home.mkdir()
+    root = _system(tmp_path, ['a-1,window,tea,light,muted,painting,T,A,1800,CC0,A,https://x,,n,300x200'])
+    (home / '.env').write_text(f'VISUAL_ATLAS_DESIGN_SYSTEMS={root}\n', encoding='utf-8')
+    monkeypatch.setenv('VISUAL_ATLAS_HOME', str(home))
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    assert root / 'assets' / 'library' in check_no_data.libraries()
+
+
+def test_mcp_discards_an_oversized_frame_and_answers_the_next(monkeypatch):
+    monkeypatch.setattr(mcp_server, 'MAX_FRAME', 100)
+
+    class Bounded(io.StringIO):  # every read must be bounded; reading a whole line at once is the defect
+        def readline(self, size=-1):
+            assert 0 < size <= 101
+            return super().readline(size)
+
+        def __iter__(self):
+            raise AssertionError('unbounded line iteration')
+
+    out = io.StringIO()
+    ping = json.dumps({'jsonrpc': '2.0', 'id': 8, 'method': 'ping'})
+    mcp_server.serve(Bounded('x' * 1000 + '\n' + ping + '\n'), out)
+    replies = [json.loads(line) for line in out.getvalue().splitlines()]
+    assert replies == [{'jsonrpc': '2.0', 'id': None, 'error': {'code': -32700, 'message': 'Parse error'}},
+                       {'jsonrpc': '2.0', 'id': 8, 'result': {}}]
