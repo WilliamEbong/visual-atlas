@@ -47,6 +47,7 @@ export default function ImagePage({ id }: { id: number }) {
     function onKey(event: KeyboardEvent) {
       const target = event.target as HTMLElement
       if (event.altKey || event.ctrlKey || event.metaKey || target.closest('input, textarea, select, [contenteditable], dialog[open], .tabs')) return
+      if (from?.startsWith('#/ask?')) return  // from an answer: there is no library trail to step through
       if (event.key === 'ArrowLeft' && previous) go(`image/${previous}`, { from })
       if (event.key === 'ArrowRight' && next) go(`image/${next}`, { from })
     }
@@ -220,7 +221,8 @@ export default function ImagePage({ id }: { id: number }) {
         </div>
         <ul className="ref-strip" style={{ marginTop: 20 }} aria-label="Related images">
           {related.map((r) => <li key={r.id}>
-            <a href={href(`image/${r.id}`, { from })} className="specimen" style={{ aspectRatio: aspect(r) }}><img src={media(r.thumb)} alt="" /></a>
+            <a href={href(`image/${r.id}`, { from, ...(query.get('use') === 'publish' ? { use: 'publish' } : {}) })} className="specimen"
+              style={{ aspectRatio: aspect(r) }} aria-label={cleanTitle(r.title)}><img src={media(r.thumb)} alt="" /></a>
             <span className="strip-label">{cleanTitle(r.title)}</span></li>)}
         </ul>
       </section>}

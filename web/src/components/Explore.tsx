@@ -130,7 +130,7 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
           <div className="strip captioned" style={{ marginTop: 22 }}>
             {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e) => (
               <figure key={e.id}>
-                <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: 200, aspectRatio: aspect(e) }}>
+                <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: 200, aspectRatio: aspect(e) }} aria-label={cleanTitle(e.title)}>
                   <img src={media(e.thumb)} alt="" loading="lazy" /></a>
                 <figcaption>{cleanTitle(e.title)}{e.state !== 'model_reviewed' && <> <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span></>}</figcaption>
               </figure>))}

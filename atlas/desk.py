@@ -32,6 +32,7 @@ MAX_TEXT = 4000
 # Format and occasion words say what is being made, not what the picture shows (they still route design systems).
 FORMAT_WORDS = {'deck', 'pitch', 'keynote', 'studio', 'launch', 'brand', 'client', 'opener', 'reel', 'thumbnail'}
 VARIANT = re.compile(r'-\d+x\d+$')  # the same picture cropped for another format (gen-x-4x5)
+SHOT_NUMBER = re.compile(r'[\s_(-]+\d{2,}\)?$')  # "Sunset 5746", "(7027587519)": a camera's shot number
 
 
 def _year(text: str) -> int | None:
@@ -289,10 +290,13 @@ def search(*, brief: str = '', techniques=None, goals=None, subjects=None, orien
     seen, unique = set(), []
     for item in ranked:
         family = VARIANT.sub('', item[1]['ref'])
-        # Numbered shots of one subject by one maker ("Frigate Bird ... Sunset 5746" and "... 5738") are one series.
-        series = (re.sub(r'[\s_(-]*\d+\)?$', '', (item[1].get('title') or '').lower()), (item[1].get('creator') or '').lower())
-        if family not in seen and (not all(series) or series not in seen):  # unknown maker: never a series
-            seen.update({family, series})
+        # Numbered shots of one subject by one known maker ("Frigate Bird ... Sunset 5746" and "... 5738") are one
+        # series; same-titled works without a shot number, or by an unknown maker, stay separate.
+        title, maker = (item[1].get('title') or '').lower(), (item[1].get('creator') or '').lower().strip()
+        stem = SHOT_NUMBER.sub('', title)
+        series = (stem, maker) if stem != title and maker and not maker.startswith('unknown') else None
+        if family not in seen and (series is None or series not in seen):
+            seen.update({family, series} - {None})
             unique.append(item)
     ranked = unique
     chosen = []

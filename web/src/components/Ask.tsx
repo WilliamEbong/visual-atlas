@@ -55,7 +55,7 @@ function refLink(ref: DeskRef, from: string, use = 'reference'): string {
 }
 
 const STATE_MARK: Record<string, string> = { 'confirmed by you': '●', 'agreed by a second model': '◐', 'proposed by a model': '○',
-  'intended by the prompt, checked by eye': '◐' }
+  'intended by the prompt, checked by eye': '◇' }
 
 /** "Shows Silhouette (agreed by a second model): A small bird…" as the technique, its evidence and a state mark. */
 export function Reason({ text }: { text: string }) {
@@ -125,15 +125,15 @@ export default function Ask() {
         choose={(goal) => set({ goals: (goals.includes(goal) ? goals.filter((g) => g !== goal) : [...goals, goal]).join(',') })} more={limit < 40 && answer.data.total_matches > limit
         ? () => set({ limit: String(limit + 12) }) : undefined} toggle={(layer) =>
         set({ off: (off.includes(layer) ? off.filter((l) => l !== layer) : [...off, layer]).join(',') })} />}
-      {!asked && <SampleAnswer brief={EXAMPLES[0]} open={() => set({ q: EXAMPLES[0], goals: '' })} />}
+      {!asked && <SampleAnswer brief={EXAMPLES[0]} use={use} from={from} open={() => set({ q: EXAMPLES[0], goals: '' })} />}
 
     </>
   )
 }
 
 /** The empty page shows what an answer looks like, with pictures, before anyone types. */
-function SampleAnswer({ brief, open }: { brief: string; open: () => void }) {
-  const sample = useData<DeskDirections>(`desk/directions?${new URLSearchParams({ brief })}`)
+function SampleAnswer({ brief, use, from, open }: { brief: string; use: string; from: string; open: () => void }) {
+  const sample = useData<DeskDirections>(`desk/directions?${new URLSearchParams({ brief, use })}`)
   // The pictures chosen for the example's ways to do it: the first screen must show judgment, not every match.
   const checked = (sample.data?.directions ?? []).flatMap((way) => way.references).slice(0, 5)
   if (!checked.length) return null
@@ -143,7 +143,7 @@ function SampleAnswer({ brief, open }: { brief: string; open: () => void }) {
         <h2 id="sample-title">For example: “{brief}”</h2>
         <button type="button" className="quiet" onClick={open}>See the whole answer</button>
       </div>
-      <RefStrip refs={checked} from="#/ask" use="reference" label="Pictures from a sample answer" />
+      <RefStrip refs={checked} from={from} use={use} label="Pictures from a sample answer" />
     </section>
   )
 }
@@ -293,7 +293,7 @@ function Answer({ asked, data, ways, goals: chosen, use, off, from, toggle, choo
           href={href('find', { goal: data.reading.subject_terms.join(' ') })}>Find new images</a>}>
           Try other words, say what the picture should do (stand out, feel calm, show scale), or find new images from open collections.</Empty>
           : <>
-            {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model</p>
+            {strong.length > 0 && <><p className="mono marks-key">● confirmed by you · ◐ agreed by a second model · ○ proposed by a model{strong.some((ref) => ref.generated) ? ' · ◇ intended in a generated example' : ''}</p>
               <Plates refs={strong} from={from} use={use} /></>}
             {weak.length > 0 && (strong.length + shown.size >= 3
               ? <details className="weak"><summary className="mono">{weak.length} more matched only on words, not on a technique</summary>

@@ -314,3 +314,20 @@ def test_numbered_shots_of_one_series_count_once(tmp_path, monkeypatch):
     monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
     refs = [r['ref'] for r in desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']]
     assert refs == ['generated:a', 'generated:c']  # one per maker's series, best ranked first
+
+
+
+def test_series_rule_needs_a_shot_number_and_a_known_maker(tmp_path, monkeypatch):
+    folder = tmp_path / 'generated'
+    folder.mkdir()
+    items = []
+    for rid, title, tool in (('u1', 'Untitled', 'Ann'), ('u2', 'Untitled', 'Ann'),
+                             ('k1', 'Harbour 0412', 'Unknown author'), ('k2', 'Harbour 0413', 'Unknown author')):
+        Image.new('RGB', (40, 30)).save(folder / f'{rid}.jpg', 'JPEG')
+        items.append({'id': rid, 'file': f'{rid}.jpg', 'title': title, 'tool': tool, 'date': 'd', 'prompt': 'p',
+                      'techniques': ['silhouette']})
+    (folder / 'manifest.json').write_text(json.dumps({'images': items}), encoding='utf-8')
+    monkeypatch.setattr(layers, 'GENERATED', folder)
+    monkeypatch.delenv('VISUAL_ATLAS_DESIGN_SYSTEMS', raising=False)
+    found = desk.search(techniques=['silhouette'], layers_wanted=['generated'], home=tmp_path / 'h')['results']
+    assert len(found) == 4  # same-titled works without a shot number, and unknown makers, stay separate
