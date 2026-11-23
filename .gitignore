@@ -32,6 +32,12 @@ web/test-results/
 .playwright-mcp/
 release/
 design-review/**/*.yml
+# review-round captures are kept locally, not in the repository
+design-review/r2/
+design-review/r3/
+design-review/r4/
+design-review/r5/
+design-review/v0.5/
 web/public-demo/
 scratch/
 docs/media/tour-frames/
