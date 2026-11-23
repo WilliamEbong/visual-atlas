@@ -57,7 +57,7 @@ def test_stdio_round_trip_in_a_subprocess(starter_home):
     assert replies[0]['result']['capabilities'] == {'tools': {'listChanged': False}}
     tools = replies[1]['result']['tools']
     assert {t['name'] for t in tools} == {'advise', 'search_references', 'get_reference', 'view_reference',
-                                         'list_techniques', 'get_technique', 'route_brief'}
+                                         'list_techniques', 'get_technique', 'route_brief', 'suggest_directions'}
     assert all(t['annotations']['readOnlyHint'] and not t['annotations']['destructiveHint'] for t in tools)
     advice = replies[2]['result']
     assert advice['isError'] is False and advice['structuredContent']['results']
@@ -104,7 +104,8 @@ def test_tools_never_write_or_start_jobs(env):
                   for table in ('jobs', 'images', 'annotations', 'annotation_history', 'analyses', 'collections')}
     for name, arguments in (('advise', {'brief': 'show scale'}), ('list_techniques', {}),
                             ('get_technique', {'id': 'framing'}), ('route_brief', {'brief': 'tea house'}),
-                            ('search_references', {'goals': ['create-calm']})):
+                            ('search_references', {'goals': ['create-calm']}),
+                            ('suggest_directions', {'brief': 'calm cover', 'goals': ['create-calm']})):
         assert call(name, arguments)['isError'] is False
     with jobs.open_store(env) as store:
         after = {table: store.one(f'SELECT COUNT(*) AS n FROM {table}')['n'] for table in before}
@@ -127,3 +128,24 @@ def test_cli_advise_refs_and_ref(env):
     assert runner.invoke(app, ['ref', 'library:999999']).exit_code == 1
     empty = runner.invoke(app, ['advise', 'zzqx', '--text'])
     assert 'No reference matched' in empty.output
+
+
+def test_an_agent_can_pass_the_ids_the_words_missed(env):
+    missed = call('advise', {'brief': 'cover for a report on urban heat islands'})['structuredContent']
+    assert not missed['reading']['techniques'] and len(missed['codebook']['techniques']) == 26
+    steered = call('advise', {'brief': 'cover for a report on urban heat islands', 'techniques': ['silhouette']})
+    result = steered['structuredContent']
+    assert [t['id'] for t in result['reading']['techniques']] == ['silhouette'] and 'codebook' not in result
+    assert result['guidance'][0]['id'] == 'silhouette'
+    assert call('advise', {'brief': 'x', 'techniques': ['not-a-technique']})['isError'] is True
+
+
+def test_directions_are_distinct_techniques_each_shown_by_its_references(env):
+    result = call('suggest_directions', {'brief': 'opening slide that feels calm', 'goals': ['create-calm'],
+                                         'count': 3})['structuredContent']
+    ids = [d['technique']['id'] for d in result['directions']]
+    assert len(ids) == len(set(ids)) == 3
+    for direction in result['directions']:
+        assert direction['references'] and direction['make_sure'] and direction['serves'] == ['Create calm and order']
+        assert all(any(t['id'] == direction['technique']['id'] for t in r['techniques']) for r in direction['references'])
+    assert call('suggest_directions', {'brief': 'x', 'count': 9})['isError'] is True

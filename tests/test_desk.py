@@ -100,7 +100,7 @@ def test_explicit_technique_returns_only_references_that_show_it(starter_home, n
 def test_unknown_words_return_nothing_rather_than_padding(starter_home, no_extra_layers):
     result = desk.advise('zzqx wvvq', home=starter_home)
     assert result['results'] == [] and result['guidance'] == []
-    assert 'named no goal or technique' in result['next_steps'][0]
+    assert 'matched no goal or technique' in result['next_steps'][0] and result['codebook']['goals']
 
 
 @pytest.mark.parametrize('kwargs, message', [

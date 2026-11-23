@@ -22,7 +22,8 @@ than don't do does""".split())
 GENERIC = STOPWORDS | {'contrast', 'balance', 'view', 'space', 'frame', 'pattern', 'colour', 'light', 'line', 'thing',
                        'stand', 'order', 'size', 'idea', 'visible', 'together', 'belong', 'point', 'direction', 'ground',
                        'figure', 'middle', 'background', 'foreground', 'central', 'energy', 'focus', 'perspective',
-                       'depth', 'visual', 'dark', 'within', 'tight', 'limited', 'unusual', 'part', 'parts', 'viewer'}
+                       'depth', 'visual', 'dark', 'within', 'tight', 'limited', 'unusual', 'part', 'parts', 'viewer',
+                       'centre'}  # 'centre' alone says nothing: dead centre is symmetry, off-centre the opposite
 
 
 def _singular(token: str) -> str:

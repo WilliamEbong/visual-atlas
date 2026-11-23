@@ -313,25 +313,82 @@ def _public(ref: dict) -> dict:
     return out
 
 
-def advise(brief: str, *, limit: int = 6, publishable_only: bool = False, layers_wanted=None,
-           home: Path | None = None) -> dict:
-    """For a visual decision: how the brief reads, which techniques could serve it and how, and references."""
+def _codebook(taxonomy: dict) -> dict:
+    """The ids an agent can pass back when the word reader missed: one call, then a second with ids."""
+    return {'goals': [{'id': g['id'], 'name': g['name'], 'description': g['description']} for g in taxonomy['goals']],
+            'techniques': [{'id': t['id'], 'name': t['name'], 'definition': t['definition']}
+                           for t in taxonomy['techniques']]}
+
+
+def _candidates(found: dict, taxonomy: dict) -> list[str]:
+    technique_ids = [t['id'] for t in found['reading']['techniques']]
+    if not technique_ids:  # a goal with no named technique: offer that goal's techniques, in codebook order
+        goal_ids = {g['id'] for g in found['reading']['goals']}
+        technique_ids = [t['id'] for t in taxonomy['techniques'] if goal_ids & set(t['goals'])]
+    return technique_ids
+
+
+def advise(brief: str, *, techniques=None, goals=None, limit: int = 6, publishable_only: bool = False,
+           layers_wanted=None, home: Path | None = None) -> dict:
+    """For a visual decision: how the brief reads, which techniques could serve it and how, and references.
+    Technique and goal ids, when given, are added to what the words say (agents can read a brief better)."""
     if not isinstance(brief, str) or not brief.strip():
         raise ValueError('describe the visual decision in a sentence or two')
-    found = search(brief=brief, limit=limit, publishable_only=publishable_only, layers_wanted=layers_wanted, home=home)
+    found = search(brief=brief, techniques=techniques, goals=goals, limit=limit, publishable_only=publishable_only,
+                   layers_wanted=layers_wanted, home=home)
     taxonomy = catalog.load()[0]
-    technique_ids = [t['id'] for t in found['reading']['techniques']]
-    if not technique_ids:  # a goal with no named technique: offer that goal's techniques, best covered first
-        goal_ids = {g['id'] for g in found['reading']['goals']}
-        technique_ids = [t['id'] for t in taxonomy['techniques'] if goal_ids & set(t['goals'])][:4]
+    technique_ids = _candidates(found, taxonomy)[:4]
     steps = ['Pick one technique below and say in a sentence what it should do for this audience.',
              'Open two or three references and check the "look for" cues in each before borrowing anything.',
              'Borrow the technique, never the picture: change subject, palette and framing so the result is yours.',
              'Check each reference\'s licence and restrictions before it appears in published work.']
+    extra = {}
     if not technique_ids:
-        steps.insert(0, 'The brief named no goal or technique the atlas knows. Say what the image should do '
-                        '(stand out, feel calm, show scale, surprise) or name a technique.')
-    return {**found, 'guidance': guidance(technique_ids[:4], taxonomy), 'next_steps': steps}
+        steps.insert(0, 'The words of the brief matched no goal or technique. Choose the ids that fit from '
+                        '`codebook` and ask again with them (techniques=[...], goals=[...]), or say what the image '
+                        'should do: stand out, feel calm, show scale, surprise.')
+        extra['codebook'] = _codebook(taxonomy)
+    return {**found, 'guidance': guidance(technique_ids, taxonomy), 'next_steps': steps, **extra}
+
+
+def directions(brief: str, *, techniques=None, goals=None, count: int = 3, per_direction: int = 2,
+               publishable_only: bool = False, layers_wanted=None, home: Path | None = None) -> dict:
+    """Distinct ways to answer a brief, one technique each, with how to carry it out, what to avoid and the
+    references that show it best. Built from the codebook and stored readings only: no AI, nothing written."""
+    if not isinstance(count, int) or not 1 <= count <= 5:
+        raise ValueError('count is between 1 and 5')
+    if not isinstance(per_direction, int) or not 1 <= per_direction <= 4:
+        raise ValueError('per_direction is between 1 and 4')
+    found = search(brief=brief, techniques=techniques, goals=goals, limit=1, home=home)
+    taxonomy = catalog.load()[0]
+    by_id = {t['id']: t for t in taxonomy['techniques']}
+    goal_names = {g['id']: g['name'] for g in taxonomy['goals']}
+    wanted_goals = [g['id'] for g in found['reading']['goals']]
+    subjects = found['reading']['subject_terms'][:8]
+    out = []
+    for tid in _candidates(found, taxonomy):
+        if len(out) == count:
+            break
+        refs = search(techniques=[tid], subjects=subjects, limit=per_direction, publishable_only=publishable_only,
+                      layers_wanted=layers_wanted, home=home)['results']
+        refs = [r for r in refs if any(t['id'] == tid for t in r['techniques'])]
+        if not refs:
+            continue  # a direction with nothing to show is advice the agent cannot check; skip it
+        technique = by_id[tid]
+        serves = [goal_names[g] for g in wanted_goals if g in technique['goals']] or \
+            [goal_names[g] for g in technique['goals'] if g in goal_names][:2]
+        out.append({'technique': {'id': tid, 'name': technique['name']}, 'serves': serves,
+                    'idea': technique['definition'], 'why_it_works': technique['explanation'],
+                    'make_sure': technique['observable_cues'], 'watch_out': technique['limitations'],
+                    'not_to_confuse_with': [c['how_to_tell'] for c in technique['confusions']][:2],
+                    'references': refs})
+    result = {'reading': found['reading'], 'route': found['route'], 'directions': out,
+              'note': 'Directions come from the codebook and stored readings, with no AI. Each one names a single '
+                      'technique: pick one, then borrow the technique, never the picture.'}
+    if not out:
+        result['codebook'] = _codebook(taxonomy)
+        result['note'] += ' Nothing matched: choose technique or goal ids from codebook and ask again.'
+    return result
 
 
 REF = re.compile(r'^(library:\d{1,9}|generated:[a-z0-9][a-z0-9-]{0,80}|system:[a-z0-9-]{1,60}:[a-z0-9][a-z0-9-]{0,80})$')
