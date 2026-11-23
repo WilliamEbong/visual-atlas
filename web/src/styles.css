@@ -550,3 +550,8 @@ details.goal-choice > summary { font: 500 15px var(--label); color: var(--ink); 
   .tabs button { flex: none; }
   .main-col .segments { flex-direction: column; align-items: stretch; }
 }
+
+/* content pass: a short last row keeps its natural height in grids; single-row bands still fill */
+.justified::after { content: ''; flex: 999 1 0; }
+.way .refs-row::after, .sample .refs-row::after { display: none; }
+.asked { border-bottom: 0; }
