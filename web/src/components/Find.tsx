@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { post, readOnly, request } from '../lib/client'
+import { media, post, readOnly, request } from '../lib/client'
 import { useApp, useData } from '../lib/hooks'
-import { useRoute } from '../lib/router'
-import type { Job, Reading, ReadingCorrection, Settings } from '../lib/types'
+import { aspect, cleanMaker, cleanTitle } from '../lib/library'
+import { href, useRoute } from '../lib/router'
+import type { Job, LibraryItem, Reading, ReadingCorrection, Settings } from '../lib/types'
 import JobProgress from './JobProgress'
 import ReadingEditor from './ReadingEditor'
 import { PageHead, useNotice } from './ui'
@@ -158,6 +159,27 @@ export default function Find() {
           </div>}
         </aside>
       </div>
+      <RecentlyAdded />
     </>
+  )
+}
+
+/** What finding gives you: the pictures most recently added to the library, each filed with its licence. */
+function RecentlyAdded() {
+  const recent = useData<{ items: LibraryItem[]; total: number }>(readOnly ? null : 'library?sort=newest&limit=8&offset=0')
+  if (!recent.data?.items.length) return null
+  return (
+    <section className="section" aria-labelledby="recent-title">
+      <div className="section-title"><h2 id="recent-title">Recently added to your library</h2>
+        <a href={href('library', { sort: 'newest' })}>See all {recent.data.total}</a></div>
+      <ul className="justified refs-row" aria-label="Recently added pictures">
+        {recent.data.items.map((item) => <li key={item.id} className="plate-item" style={{ '--a': aspect(item) } as React.CSSProperties}>
+          <a className="plate" href={href(`image/${item.id}`)}>
+            <span className="plate-frame"><img src={media(item.thumb)} alt="" loading="lazy" /></span>
+            <span className="plate-title">{cleanTitle(item.title, cleanMaker(item.creator), item.date_text)}</span></a>
+          <span className="mono strip-meta">{item.techniques.slice(0, 2).map((t) => t.name.replace(/ \(.*\)$/, '')).join(' · ') || 'Waiting for analysis'}</span>
+        </li>)}
+      </ul>
+    </section>
   )
 }
