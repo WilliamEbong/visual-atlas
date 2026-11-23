@@ -45,6 +45,48 @@ whether you may publish it.
 3. Optionally: add mood goals such as "warm and welcoming" to the taxonomy (both testers asked for them); decide
    whether merging to `main` should publish the demo.
 
+## Round 4: acceptance, merge rehearsal, scored design (23 November)
+
+**Independent acceptance.** Two fresh Opus testers, each given only the README and the user guide.
+- *Designer on a deadline* installed the release zip into a temp folder (install 13 s, exit 0, your library untouched)
+  and worked a printed choir poster and a calm slide end to end: Ask, references, Explore, Compare, a project,
+  a collection, an export.
+- *AI agent* did three jobs over MCP and the CLI: a slide, a publishable poster, a landing-page hero.
+
+Everything worked. What they hit, and what changed:
+| Found | Fix | Who notices |
+|---|---|---|
+| "Room on the left", "headline space" became subjects; "warm" matched a gold medal | Layout and mood words are not subjects, and are dropped before the 8-word cap (tested) | every agent and designer |
+| Technique ids an agent passed were outranked by word matches | Pictures with technique or goal evidence always come first; confidence breaks ties (tested) | every agent |
+| The same two pictures led every negative-space answer | Ties broken by the reading's confidence, not ref order (tested) | everyone who asks |
+| `atlas serve` announced an address on a port another app held | It says the port is taken and suggests the next (tested) | anyone running two local apps |
+| Credits said "Source: aic"; practice mode showed "fake"; "n.d.." in credits | Collection names, plain names, one full stop (tested) | anyone printing credits |
+| The release zip carried `.claude`, `.agents`, `.specify`, `specs` and these notes | Left out of the zip with export-ignore | anyone opening the download |
+| The Commons note promised personality-rights flags that are not shown | Note now says they are not checked | anyone using recent photos of people |
+| Error named a "techniques tool" | Names `list_techniques`; the guide maps CLI and MCP names | agents |
+
+Not fixed (content or decisions): the starter has no choir or gathering pictures; museum copies are about 850 px
+wide, so they are references, not print files; there are no mood goals such as "warm and welcoming"; search on AIC
+matches artist names ("church" finds Frederic Church).
+
+**Merge rehearsal.** Clean merge onto `visual-atlas-v0.4`; 456 backend tests and every other check passed on the
+merged result (steps and rollback at the end of this file).
+
+**Scored design cycle.** Fresh scorers (a senior product designer with `impeccable`, an editorial designer with
+`taste-skill`) scored ten screens out of 10 after each fix batch; screenshots `design-review/r4/score1-*` to
+`score5-*`.
+| Round | Product designer | Editorial designer | Main fix that followed |
+|---|---|---|---|
+| 1 | 6.7 | 6.6 | strips stop cutting off; reasons under pictures; Compare and Find on phones |
+| 2 | 6.9 | 6.3 | (scored the old ranking by mistake) Explore thumbnails; mood words |
+| 3 | 7.45 | 6.9 | one-band strips; generated examples after licensed ones |
+| 4 | 7.5 | 7.15 | every strip uses the Library's justified rows |
+| 5 | 7.1 | 6.85 | scores fell, so the cycle stopped; a last fix put the technique examples on the same rows and capped phone pictures at 320 px (`final-*`) |
+
+**Codex review of round 4:** four findings, then two more on the fix, all confirmed and fixed with tests (word-only
+results outranking evidence, mood words crowding out a subject, phone Compare losing its controls, unreachable word
+matches, a routed word match counted as evidence, phone strips wrapping).
+
 ## Round 3: tidy, simplify, graphify (23 November)
 
 **Bar used:** only changes someone notices (a designer, an agent, a maintainer) or that remove code. Two read-only Opus

@@ -129,14 +129,15 @@ function TechniquePage({ id, from }: { id: string; from: string | null }) {
         </div>
         {data.examples.length === 0 ? <Empty title="No examples yet" actions={!readOnly && <a className="button primary" href={href('find', { technique: data.id, from })}>Find examples</a>}>
           Find a few, and they will appear here with the evidence for each reading.</Empty> : <>
-          <div className="strip captioned" style={{ marginTop: 22 }}>
+          <ul className="justified refs-row" aria-label="Examples in your library">
             {data.examples.filter((e) => e.id !== lens?.id).slice(0, 12).map((e) => (
-              <figure key={e.id}>
-                <a href={href(`image/${e.id}`, { from })} className="specimen" style={{ height: 200, aspectRatio: aspect(e) }} aria-label={cleanTitle(e.title)}>
-                  <img src={media(e.thumb)} alt="" loading="lazy" /></a>
-                <figcaption>{cleanTitle(e.title)}{e.state !== 'model_reviewed' && <> <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span></>}</figcaption>
-              </figure>))}
-          </div>
+              <li key={e.id} className="plate-item" style={{ '--a': aspect(e) } as React.CSSProperties}>
+                <a href={href(`image/${e.id}`, { from })} className="plate">
+                  <span className="plate-frame"><img src={media(e.thumb)} alt="" loading="lazy" /></span>
+                  <span className="plate-title">{cleanTitle(e.title)}</span></a>
+                {e.state !== 'model_reviewed' && <span className={`state ${e.state}`}>{STATE_LABEL[e.state]}</span>}
+              </li>))}
+          </ul>
           <p className="mono" style={{ marginTop: 10 }}>Unmarked examples were agreed by a second model.</p>
         </>}
       </section>
