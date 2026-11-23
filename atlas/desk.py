@@ -17,7 +17,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageStat
 
-from atlas import catalog, coding, jobs, layers
+from atlas import catalog, coding, layers
 from atlas.home import home_dir
 
 SCHEMA = max(int(f.name.split('_')[0]) for f in (Path(__file__).parent / 'migrations').glob('*.sql'))
@@ -53,7 +53,7 @@ def _orientation(width, height) -> str:
 def _readonly(home: Path):
     """A read-only connection, or None when there is no library yet. Never creates, migrates or syncs anything:
     the desk, the CLI and the MCP server only read. An older library must be opened by the app first."""
-    path = jobs.db_path(home)
+    path = home / 'atlas.db'  # jobs.db_path, without importing the job runner (httpx, providers)
     if not path.is_file():
         yield None
         return
